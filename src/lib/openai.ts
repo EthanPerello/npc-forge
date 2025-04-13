@@ -1,9 +1,11 @@
 import OpenAI from 'openai';
 import { Character } from './types';
 
-// Initialize the OpenAI client
+// Initialize the OpenAI client with timeout settings
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+  timeout: 30000, // 30 seconds timeout for the client
+  maxRetries: 2, // Retry twice on failures
 });
 
 // Define OpenAI error type for better error handling
@@ -58,6 +60,7 @@ export async function generateCharacter(description: string, genre?: string): Pr
         { role: "user", content: userPrompt }
       ],
       temperature: 0.8,
+      // The client-level timeout setting will apply here
     });
 
     // Parse the response
@@ -72,16 +75,28 @@ export async function generateCharacter(description: string, genre?: string): Pr
       throw new Error("No valid JSON found in the response");
     }
 
-    // Parse the JSON
-    const character: Character = JSON.parse(jsonMatch[0]);
-    return character;
+    try {
+      // Parse the JSON
+      const character: Character = JSON.parse(jsonMatch[0]);
+      return character;
+    } catch (parseError) {
+      console.error("JSON parsing error:", parseError);
+      // Try to clean the JSON string if parsing fails
+      const cleaned = jsonMatch[0].replace(/[\u0000-\u001F]+/g, " ").trim();
+      return JSON.parse(cleaned); 
+    }
   } catch (error) {
     console.error("Error generating character:", error);
-    // Type guard for better error handling
+    // Add more detailed error logging
     if (error instanceof Error) {
-      throw error;
+      console.error(`Error name: ${error.name}, message: ${error.message}`);
+      if (error.stack) console.error(`Stack: ${error.stack}`);
+    }
+    
+    // Rethrow with more helpful error message
+    if (error instanceof Error) {
+      throw new Error(`OpenAI API error: ${error.message}`);
     } else {
-      // Fallback for unknown error types
       throw new Error("An unknown error occurred while generating character");
     }
   }
@@ -102,6 +117,7 @@ export async function generatePortrait(character: Character): Promise<string> {
       n: 1,
       size: "1024x1024",
       quality: "standard", // Use "hd" for better quality if needed
+      // No timeout parameter here, we use the client-level timeout
     });
 
     return response.data[0].url || '';
@@ -114,6 +130,8 @@ export async function generatePortrait(character: Character): Promise<string> {
     // Provide a helpful error message for common issues
     if (apiError.status === 429) {
       console.error("Rate limit exceeded for image generation. Consider waiting a minute before trying again.");
+    } else if (apiError.status === 400) {
+      console.error("Bad request error. The image prompt may violate content policies.");
     }
     
     if (error instanceof Error) {
