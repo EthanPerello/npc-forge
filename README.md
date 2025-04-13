@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NPC Forge
 
-## Getting Started
+AI-powered character generator for games using OpenAI's models.
 
-First, run the development server:
+![NPC Forge Preview](https://via.placeholder.com/800x400?text=NPC+Forge+Preview)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🎮 [Try the Live Demo](https://npc-forge.vercel.app)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎯 Project Overview
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+NPC Forge is an AI-powered character generator for games. It allows creators to quickly generate detailed non-playable characters (NPCs) from simple descriptions or genre templates. The tool uses OpenAI's models to create complete character profiles including name, appearance, personality, inventory, abilities, quests, dialogue, and an AI-generated portrait.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Perfect For:
+- Game developers needing quick character concepts
+- Tabletop RPG players and game masters
+- Creative writers looking for character inspiration
+- Anyone building interactive worlds or stories
 
-## Learn More
+## 🚀 Features
 
-To learn more about Next.js, take a look at the following resources:
+- **Intuitive Interface**: Simple form for character generation
+- **Genre Templates**: Quick-start options for Fantasy, Sci-Fi, Cyberpunk, Western, Modern, and Horror settings
+- **AI-Generated Portraits**: Visual representation of characters using DALL-E 3
+- **Comprehensive Profiles**: Detailed character information including:
+  - Physical appearance
+  - Personality traits
+  - Special abilities
+  - Inventory items
+  - Character dialogue
+  - Associated quests
+- **Tabbed Interface**: Easy navigation between character profile and quest details
+- **Export Options**: Download character data as JSON for use in your projects
+- **Responsive Design**: Works on desktop and mobile devices
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🔧 Technologies Used
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Frontend**: Next.js, React, TypeScript, Tailwind CSS
+- **AI Integration**: OpenAI API (GPT-4o-mini for text, DALL-E 3 for images)
+- **Architecture**: Clean component separation, context-based state management
+- **Deployment**: Vercel
 
-## Deploy on Vercel
+## 🛠️ Development
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Prerequisites
+- Node.js 18+
+- OpenAI API key
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Setup
+1. Clone the repository
+   ```bash
+   git clone https://github.com/EthanPerello/npc-forge.git
+   cd npc-forge
+   ```
+
+2. Install dependencies
+   ```bash
+   npm install
+   ```
+
+3. Create a `.env.local` file with your OpenAI API key
+   ```
+   OPENAI_API_KEY=your-api-key-here
+   ```
+
+4. Start the development server
+   ```bash
+   npm run dev
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+## 📋 Roadmap
+
+- **Core Enhancements**
+  - Improved UI components
+  - Better state management
+  - Enhanced error handling
+
+- **Upcoming Features**
+  - Dark/Light Mode Toggle
+  - "Talk to NPC" chat interface
+  - Character library for saving generated characters
+  - Additional export formats (PDF, CSV)
+  - Customization options for generated characters
+
+---
+
+Created by [Ethan Perello](https://github.com/EthanPerello)
