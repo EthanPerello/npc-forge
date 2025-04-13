@@ -1,6 +1,6 @@
 {
     "functions": {
-      "api/generate/route.ts": {
+      "src/app/api/generate/route.ts": {
         "memory": 1024,
         "maxDuration": 60
       }
