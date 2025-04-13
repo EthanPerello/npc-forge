@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Character } from '@/lib/types';
 
 interface CharacterCardProps {
@@ -21,11 +22,16 @@ export default function CharacterCard({ character, onDownload }: CharacterCardPr
         {/* Portrait Section */}
         <div className="md:w-1/3 p-4">
           {character.image_url ? (
-            <img 
-              src={character.image_url} 
-              alt={`Portrait of ${character.name}`} 
-              className="w-full h-auto rounded-lg shadow-md"
-            />
+            <div className="relative w-full h-64">
+              <Image 
+                src={character.image_url} 
+                alt={`Portrait of ${character.name}`} 
+                className="rounded-lg shadow-md"
+                fill
+                style={{ objectFit: 'contain' }}
+                unoptimized // For external URLs
+              />
+            </div>
           ) : (
             <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center dark:bg-gray-700">
               <span className="text-gray-500 dark:text-gray-400">No portrait available</span>
@@ -97,7 +103,7 @@ export default function CharacterCard({ character, onDownload }: CharacterCardPr
                 <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Dialogue</h3>
                 <div className="space-y-2">
                   {character.dialogue_lines.map((line, index) => (
-                    <div key={index} className="italic text-gray-600 dark:text-gray-400">"{line}"</div>
+                    <div key={index} className="italic text-gray-600 dark:text-gray-400">{line}</div>
                   ))}
                 </div>
               </div>
