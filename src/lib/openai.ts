@@ -17,47 +17,16 @@ interface OpenAIError {
   type?: string;
 }
 
-// System prompt for character generation
-const SYSTEM_PROMPT = `
-You are an expert RPG character generator. When a user provides a description of a character or concept, you generate a complete NPC profile.
-
-Return ONLY valid JSON with the following structure, and no other text or explanation:
-{
-  "name": "Character Name",
-  "appearance": "Detailed physical description",
-  "personality": ["Trait 1", "Trait 2", "Trait 3"],
-  "items": ["Item 1", "Item 2", "Item 3"],
-  "dialogue_lines": ["Line 1", "Line 2", "Line 3"],
-  "quest": {
-    "title": "Quest Title",
-    "description": "Quest Description",
-    "reward": "Quest Reward"
-  },
-  "special_ability": "Unique ability or power"
-}
-
-Be creative, detailed, and ensure the character feels cohesive and interesting.
-`;
-
-export async function generateCharacter(description: string, genre?: string): Promise<Character> {
+export async function generateCharacter(systemPrompt: string, description: string): Promise<Character> {
   try {
-    // Build the user prompt
-    let userPrompt = `Generate a detailed NPC character`;
-    
-    if (genre) {
-      userPrompt += ` in the ${genre} genre`;
-    }
-    
-    userPrompt += ` based on this description: ${description}`;
-
     console.log(`Generating character with model: gpt-4o-mini`);
 
     // Call the OpenAI API with GPT-4o-mini (good balance of quality and quota)
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini", // Higher quota than gpt-4o
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: userPrompt }
+        { role: "system", content: systemPrompt },
+        { role: "user", content: description }
       ],
       temperature: 0.8,
       // The client-level timeout setting will apply here
@@ -104,10 +73,26 @@ export async function generateCharacter(description: string, genre?: string): Pr
 
 export async function generatePortrait(character: Character): Promise<string> {
   try {
+    // Gather appearance details from the character
+    const appearanceText = character.appearance || "";
+    
+    // Get name and key traits
+    const name = character.name || "character";
+    
+    // Gather key traits from selected_traits
+    const traits: string[] = [];
+    
+    if (character.selected_traits) {
+      if (character.selected_traits.gender) traits.push(character.selected_traits.gender);
+      if (character.selected_traits.age_group) traits.push(character.selected_traits.age_group);
+      if (character.selected_traits.species) traits.push(character.selected_traits.species);
+      if (character.selected_traits.occupation) traits.push(character.selected_traits.occupation);
+    }
+    
     // Create a prompt for the image generation
-    const imagePrompt = `Portrait of ${character.name}: ${character.appearance}. 
-    Personality: ${character.personality.join(', ')}. 
-    High quality, detailed fantasy character portrait, professional digital art style.`;
+    const imagePrompt = `Portrait of ${name}: ${appearanceText.substring(0, 300)}
+    ${traits.length > 0 ? `Key traits: ${traits.join(', ')}.` : ''}
+    High quality, detailed character portrait, professional digital art style.`;
 
     console.log("Generating character portrait with DALL-E-3");
     

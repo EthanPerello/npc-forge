@@ -23,10 +23,16 @@ export default function CharacterForm({ onSubmit, isLoading }: CharacterFormProp
       return;
     }
 
-    onSubmit({
+    // Create form data with required fields
+    const formData: CharacterFormData = {
       description: description.trim(),
-      genre
-    });
+      genre,
+      include_quests: true,
+      include_dialogue: true,
+      include_items: true
+    };
+
+    onSubmit(formData);
   };
 
   const handleGenreChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -44,7 +50,7 @@ export default function CharacterForm({ onSubmit, isLoading }: CharacterFormProp
 
   const handleRandomize = () => {
     const randomIndex = Math.floor(Math.random() * GENRE_TEMPLATES.length);
-    const randomGenre = GENRE_TEMPLATES[randomIndex].id;
+    const randomGenre = GENRE_TEMPLATES[randomIndex].id as Genre;
     setGenre(randomGenre);
     setDescription(getTemplateExample(randomGenre));
   };

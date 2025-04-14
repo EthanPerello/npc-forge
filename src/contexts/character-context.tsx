@@ -1,0 +1,247 @@
+'use client';
+
+import { 
+  createContext, 
+  useContext, 
+  useState, 
+  useCallback, 
+  ReactNode, 
+  useMemo 
+} from 'react';
+
+// Updated character and form data types based on project design document
+export interface Character {
+  name: string;
+  selected_traits: {
+    genre?: string;
+    gender?: 'male' | 'female' | 'nonbinary' | 'unknown';
+    age_group?: 'child' | 'teen' | 'adult' | 'elder';
+    moral_alignment?: 'good' | 'neutral' | 'evil';
+    relationship_to_player?: 'ally' | 'enemy' | 'neutral' | 'mentor' | 'rival' | 'betrayer';
+    species?: string;
+    occupation?: string;
+    social_class?: string;
+    personality_trait?: string;
+  };
+  added_traits: {
+    [key: string]: string; // Additional traits AI added that weren't selected
+  };
+  appearance: string; // Now a freeform paragraph
+  personality: string; // Now a freeform paragraph
+  backstory_hook: string; // 1-2 sentence hook
+  special_ability?: string;
+  items?: string[];
+  dialogue_lines?: string[];
+  quests?: Quest[];
+  image_url?: string;
+}
+
+export interface Quest {
+  title: string;
+  description: string;
+  reward: string;
+  type?: string;
+}
+
+export interface CharacterFormData {
+  description: string;
+  include_quests: boolean;
+  include_dialogue: boolean;
+  include_items: boolean;
+  genre?: string;
+  gender?: 'male' | 'female' | 'nonbinary' | 'unknown';
+  age_group?: 'child' | 'teen' | 'adult' | 'elder';
+  moral_alignment?: 'good' | 'neutral' | 'evil';
+  relationship_to_player?: 'ally' | 'enemy' | 'neutral' | 'mentor' | 'rival' | 'betrayer';
+  advanced_options?: {
+    species?: string;
+    occupation?: string;
+    personality_trait?: string;
+    social_class?: string;
+  };
+  quest_options?: {
+    reward_type?: string;
+    number_of_quests?: number;
+    quest_type?: string;
+  };
+  dialogue_options?: {
+    number_of_lines?: number;
+    tone?: string;
+    context?: string;
+  };
+  item_options?: {
+    number_of_items?: number;
+    rarity_distribution?: string;
+    item_categories?: string[];
+  };
+}
+
+interface CharacterContextType {
+  character: Character | null;
+  formData: CharacterFormData;
+  isLoading: boolean;
+  error: string | null;
+  updateFormData: (data: Partial<CharacterFormData>) => void;
+  resetFormData: () => void;
+  generateCharacter: () => Promise<void>;
+  downloadCharacterJSON: () => void;
+}
+
+// Default form values
+const defaultFormData: CharacterFormData = {
+  description: '',
+  include_quests: true,
+  include_dialogue: true,
+  include_items: true,
+  genre: undefined,
+  gender: undefined,
+  age_group: undefined,
+  moral_alignment: undefined,
+  relationship_to_player: undefined,
+  advanced_options: {
+    species: undefined,
+    occupation: undefined,
+    personality_trait: undefined,
+    social_class: undefined,
+  },
+  quest_options: {
+    reward_type: undefined,
+    number_of_quests: 1,
+    quest_type: undefined,
+  },
+  dialogue_options: {
+    number_of_lines: 3,
+    tone: undefined,
+    context: undefined,
+  },
+  item_options: {
+    number_of_items: 3,
+    rarity_distribution: 'balanced',
+    item_categories: [],
+  },
+};
+
+// Create the context
+const CharacterContext = createContext<CharacterContextType | undefined>(undefined);
+
+// Context provider component
+export function CharacterProvider({ children }: { children: ReactNode }) {
+  const [character, setCharacter] = useState<Character | null>(null);
+  const [formData, setFormData] = useState<CharacterFormData>(defaultFormData);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Update form data
+  const updateFormData = useCallback((data: Partial<CharacterFormData>) => {
+    setFormData(prev => ({
+      ...prev,
+      ...data,
+      // Handle nested objects properly
+      advanced_options: {
+        ...prev.advanced_options,
+        ...(data.advanced_options || {})
+      },
+      quest_options: {
+        ...prev.quest_options,
+        ...(data.quest_options || {})
+      },
+      dialogue_options: {
+        ...prev.dialogue_options,
+        ...(data.dialogue_options || {})
+      },
+      item_options: {
+        ...prev.item_options,
+        ...(data.item_options || {})
+      }
+    }));
+  }, []);
+
+  // Reset form to defaults
+  const resetFormData = useCallback(() => {
+    setFormData(defaultFormData);
+  }, []);
+
+  // Generate character
+  const generateCharacter = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Call the API endpoint
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate character');
+      }
+
+      const data = await response.json();
+      setCharacter(data.character);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      console.error('Error generating character:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [formData]);
+
+  // Download character as JSON
+  const downloadCharacterJSON = useCallback(() => {
+    if (!character) return;
+
+    const jsonString = JSON.stringify(character, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const href = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = href;
+    link.download = `${character.name.replace(/\s+/g, '_').toLowerCase()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    
+    document.body.removeChild(link);
+    URL.revokeObjectURL(href);
+  }, [character]);
+
+  // Create the context value
+  const contextValue = useMemo(() => ({
+    character,
+    formData,
+    isLoading,
+    error,
+    updateFormData,
+    resetFormData,
+    generateCharacter,
+    downloadCharacterJSON,
+  }), [
+    character, 
+    formData, 
+    isLoading, 
+    error, 
+    updateFormData, 
+    resetFormData, 
+    generateCharacter,
+    downloadCharacterJSON
+  ]);
+
+  return (
+    <CharacterContext.Provider value={contextValue}>
+      {children}
+    </CharacterContext.Provider>
+  );
+}
+
+// Custom hook to use the character context
+export function useCharacter() {
+  const context = useContext(CharacterContext);
+  if (context === undefined) {
+    throw new Error('useCharacter must be used within a CharacterProvider');
+  }
+  return context;
+}

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Character } from '@/lib/types';
+import { getCharacterTraitsArray } from '@/lib/utils';
 
 interface CharacterCardProps {
   character: Character;
@@ -15,6 +16,9 @@ export default function CharacterCard({ character, onDownload }: CharacterCardPr
   if (!character) {
     return null;
   }
+
+  // Extract traits for display
+  const traits = getCharacterTraitsArray(character);
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden dark:bg-gray-800">
@@ -74,7 +78,7 @@ export default function CharacterCard({ character, onDownload }: CharacterCardPr
               <div>
                 <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Personality</h3>
                 <div className="flex flex-wrap gap-2">
-                  {character.personality.map((trait, index) => (
+                  {traits.map((trait, index) => (
                     <span 
                       key={index} 
                       className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-sm dark:bg-gray-700 dark:text-gray-300"
@@ -90,37 +94,41 @@ export default function CharacterCard({ character, onDownload }: CharacterCardPr
                 <p className="text-gray-600 dark:text-gray-400">{character.special_ability}</p>
               </div>
               
-              <div>
-                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Inventory</h3>
-                <ul className="list-disc list-inside text-gray-600 dark:text-gray-400">
-                  {character.items.map((item, index) => (
-                    <li key={index}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Dialogue</h3>
-                <div className="space-y-2">
-                  {character.dialogue_lines.map((line, index) => (
-                    <div key={index} className="italic text-gray-600 dark:text-gray-400">{line}</div>
-                  ))}
+              {character.items && character.items.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Inventory</h3>
+                  <ul className="list-disc list-inside text-gray-600 dark:text-gray-400">
+                    {character.items.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
                 </div>
-              </div>
+              )}
+              
+              {character.dialogue_lines && character.dialogue_lines.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Dialogue</h3>
+                  <div className="space-y-2">
+                    {character.dialogue_lines.map((line, index) => (
+                      <div key={index} className="italic text-gray-600 dark:text-gray-400">{line}</div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
           {/* Quest Content */}
-          {activeTab === 'quest' && (
+          {activeTab === 'quest' && character.quests && character.quests.length > 0 && (
             <div className="space-y-4">
               <div>
-                <h3 className="text-xl font-bold text-gray-700 dark:text-gray-300">{character.quest.title}</h3>
-                <p className="text-gray-600 mt-2 dark:text-gray-400">{character.quest.description}</p>
+                <h3 className="text-xl font-bold text-gray-700 dark:text-gray-300">{character.quests[0].title}</h3>
+                <p className="text-gray-600 mt-2 dark:text-gray-400">{character.quests[0].description}</p>
               </div>
               
               <div className="mt-4">
                 <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Reward</h3>
-                <p className="text-gray-600 dark:text-gray-400">{character.quest.reward}</p>
+                <p className="text-gray-600 dark:text-gray-400">{character.quests[0].reward}</p>
               </div>
             </div>
           )}

@@ -1,93 +1,49 @@
 'use client';
 
-import { useState } from 'react';
-import CharacterForm from '@/components/character-form';
-import CharacterCard from '@/components/character-card';
-import { Character, CharacterFormData } from '@/lib/types';
+import { CharacterProvider } from '@/contexts/character-context';
+import MainFormTabs from '@/components/main-form-tabs';
+import CharacterDisplay from '@/components/character-display';
 
 export default function Home() {
-  const [character, setCharacter] = useState<Character | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSubmit = async (data: CharacterFormData) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to generate character');
-      }
-
-      setCharacter(result.character);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
-      console.error('Error generating character:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDownload = () => {
-    if (!character) return;
-
-    // Create a blob from the character JSON
-    const blob = new Blob([JSON.stringify(character, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    
-    // Create a download link and trigger it
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${character.name.replace(/\s+/g, '_').toLowerCase()}.json`;
-    document.body.appendChild(a);
-    a.click();
-    
-    // Clean up
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
   return (
-    <main className="min-h-screen bg-gray-50 py-8 px-4 dark:bg-gray-900">
-      <div className="max-w-6xl mx-auto">
-        <header className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white">NPC Forge</h1>
-          <p className="text-xl text-gray-600 mt-2 dark:text-gray-400">
-            AI-Powered Character Generator for Games
-          </p>
-        </header>
-
-        <div className="space-y-8">
-          <CharacterForm onSubmit={handleSubmit} isLoading={isLoading} />
-
-          {error && (
-            <div className="w-full max-w-2xl mx-auto p-4 bg-red-50 text-red-600 rounded-lg">
-              <p>{error}</p>
-            </div>
-          )}
-
-          {isLoading && (
-            <div className="w-full max-w-2xl mx-auto p-4 text-center">
-              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-indigo-600 border-r-transparent"></div>
-              <p className="mt-2 text-gray-600 dark:text-gray-400">Generating your character...</p>
-            </div>
-          )}
-
-          {character && !isLoading && (
-            <CharacterCard character={character} onDownload={handleDownload} />
-          )}
+    <CharacterProvider>
+      <main className="min-h-screen py-8 px-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800">
+        <div className="container mx-auto">
+          <header className="mb-8 text-center">
+            <h1 className="text-4xl font-bold text-indigo-900 dark:text-indigo-300">
+              NPC Forge
+            </h1>
+            <p className="text-gray-600 mt-2 dark:text-gray-400">
+              AI-powered character generator for games
+            </p>
+          </header>
+          
+          {/* Character Creation Form */}
+          <section className="mb-12">
+            <MainFormTabs />
+          </section>
+          
+          {/* Character Display */}
+          <section>
+            <CharacterDisplay />
+          </section>
+          
+          {/* Footer */}
+          <footer className="mt-16 text-center text-gray-500 text-sm dark:text-gray-400">
+            <p>Created by Ethan Perello</p>
+            <p className="mt-1">
+              <a 
+                href="https://github.com/EthanPerello/npc-forge" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+              >
+                GitHub Repository
+              </a>
+            </p>
+          </footer>
         </div>
-      </div>
-    </main>
+      </main>
+    </CharacterProvider>
   );
 }
