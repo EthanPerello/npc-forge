@@ -2,7 +2,7 @@
 
 AI-powered character generator for games using OpenAI's models.
 
-![NPC Forge Preview](https://via.placeholder.com/800x400?text=NPC+Forge+Preview)
+![NPC Forge Preview](images/npc-forge.png)
 
 ## 🎮 [Try the Live Demo](https://npc-forge.vercel.app)
 
@@ -18,26 +18,50 @@ NPC Forge is an AI-powered character generator for games. It allows creators to 
 
 ## 🚀 Features
 
-- **Intuitive Interface**: Simple form for character generation
+### Intuitive Character Creation
+Create detailed NPCs with just a text description or by selecting from genre templates:
+
+- **Simple Text Prompts**: Describe your character concept in plain language
 - **Genre Templates**: Quick-start options for Fantasy, Sci-Fi, Cyberpunk, Western, Modern, and Horror settings
-- **AI-Generated Portraits**: Visual representation of characters using DALL-E 3
-- **Comprehensive Profiles**: Detailed character information including:
-  - Physical appearance
-  - Personality traits
-  - Special abilities
-  - Inventory items
-  - Character dialogue
-  - Associated quests
-- **Tabbed Interface**: Easy navigation between character profile and quest details
-- **Export Options**: Download character data as JSON for use in your projects
+- **Character Traits**: Customize gender, age, alignment, and relationship to player
+- **Advanced Options**: Fine-tune species, occupation, personality traits, and social class
+
+### Comprehensive Character Profiles
+Each generated character includes:
+
+- **Personal Details**: Name, appearance, personality, backstory hook, and special abilities
+- **Dialogue**: Custom dialogue lines with configurable tone and context
+- **Quests**: Associated quests with titles, descriptions, and rewards
+- **Inventory**: Character items with customizable rarity and categories
+- **AI-Generated Portrait**: Visual representation using DALL-E 3
+
+### Easy to Use Interface
+- **Tabbed Navigation**: Separate tabs for character details, quests, dialogue, and items
+- **Interactive Form**: Toggle which elements to include in your character
+- **JSON Export**: Download character data for use in your projects
 - **Responsive Design**: Works on desktop and mobile devices
+
+## 📸 Screenshots
+
+![NPC Forge Interface](images/npc-forge.png)
+*NPC Forge interface with character generation controls and results display*
 
 ## 🔧 Technologies Used
 
-- **Frontend**: Next.js, React, TypeScript, Tailwind CSS
-- **AI Integration**: OpenAI API (GPT-4o-mini for text, DALL-E 3 for images)
-- **Architecture**: Clean component separation, context-based state management
-- **Deployment**: Vercel
+- **Frontend**: 
+  - Next.js 14 with App Router
+  - React & TypeScript
+  - Tailwind CSS for styling
+  - Context API for state management
+
+- **AI Integration**:
+  - OpenAI API (GPT-4o-mini for text generation)
+  - DALL-E 3 for portrait generation
+
+- **Development**:
+  - Modular component architecture
+  - Responsive design principles
+  - Optimized API usage
 
 ## 🛠️ Development
 
@@ -69,19 +93,53 @@ NPC Forge is an AI-powered character generator for games. It allows creators to 
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-## 📋 Roadmap
+### Project Structure
+```
+npc-forge/
+├── src/
+│   ├── app/             # Next.js app router
+│   ├── components/      # UI components
+│   │   ├── tabs/        # Tab components for forms and display
+│   │   └── ui/          # Reusable UI components
+│   ├── contexts/        # React contexts
+│   └── lib/             # Utilities and configuration
+├── public/              # Static assets
+└── ...                  # Config files
+```
 
-- **Core Enhancements**
-  - Improved UI components
-  - Better state management
-  - Enhanced error handling
+## 📋 Planned Features
 
-- **Upcoming Features**
-  - Dark/Light Mode Toggle
-  - "Talk to NPC" chat interface
-  - Character library for saving generated characters
-  - Additional export formats (PDF, CSV)
-  - Customization options for generated characters
+Future updates will include:
+
+- **Advanced Options Panel** for more detailed character customization
+- **Dark/Light Mode Toggle** for better viewing experience
+- **"Talk to NPC" Chat Interface** for interactive character conversations
+- **Character Library** for saving and managing generated characters
+- **Additional Export Formats** (PDF, CSV, Unity-friendly)
+- **Performance Optimizations** for faster generation and improved API usage
+- **Enhanced Portrait Generation** with more detailed prompts
+- **Character Collections and Tags** for better organization
+
+## 🤝 Contributing
+
+Contributions are welcome! Here's how you can help:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgements
+
+- [OpenAI](https://openai.com) for providing the API that powers the character generation
+- [Next.js](https://nextjs.org) for the React framework
+- [Tailwind CSS](https://tailwindcss.com) for the styling framework
+- [Vercel](https://vercel.com) for hosting the live demo
 
 ---
 
