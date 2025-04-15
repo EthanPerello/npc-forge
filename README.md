@@ -10,6 +10,19 @@ AI-powered character generator for games using OpenAI's models.
 
 NPC Forge is an AI-powered character generator for games. It allows creators to quickly generate detailed non-playable characters (NPCs) from simple descriptions or genre templates. The tool uses OpenAI's models to create complete character profiles including name, appearance, personality, inventory, abilities, quests, dialogue, and an AI-generated portrait.
 
+## 📋 Version Information
+
+**Current Version**: v0.1.0 (Initial Release)
+
+### Version History
+- **v0.1.0** - Initial release with core character generation functionality, including:
+  - Basic character generation with OpenAI integration
+  - Genre template selection
+  - Custom character traits
+  - AI-generated portraits
+  - Quest, dialogue, and item generation
+  - JSON export functionality
+
 ### Perfect For:
 - Game developers needing quick character concepts
 - Tabletop RPG players and game masters
