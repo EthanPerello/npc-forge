@@ -1,6 +1,6 @@
 'use client';
 
-import { InputHTMLAttributes, forwardRef, useEffect, useRef } from 'react';
+import { InputHTMLAttributes, forwardRef, useEffect, useRef, useId } from 'react';
 
 interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label?: string;
@@ -21,7 +21,8 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     ...props 
   }, ref) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
-    const checkboxId = id || `checkbox-${Math.random().toString(36).substr(2, 9)}`;
+    const uniqueId = useId(); // Add useId hook
+    const checkboxId = id || `checkbox-${uniqueId}`; // Use stable ID
     
     // Handle forwarded ref
     useEffect(() => {

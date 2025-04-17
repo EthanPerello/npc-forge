@@ -22,6 +22,12 @@ export interface Character {
     dialogue_lines?: string[];
     quests?: Quest[];
     image_url?: string;
+    portrait_options?: {
+      art_style?: string;
+      mood?: string;
+      framing?: string;
+      background?: string;
+    };
   }
   
   export interface Quest {
@@ -64,6 +70,12 @@ export interface Character {
       rarity_distribution?: string;
       item_categories?: string[];
     };
+    portrait_options?: {
+      art_style?: string;
+      mood?: string;
+      framing?: string;
+      background?: string;
+    };
   }
   
   export interface GenerationResponse {
@@ -78,24 +90,24 @@ export interface Character {
     example: string;
   }
   
-  // Option interfaces for selects
+  // Modified option interfaces for selects to allow empty string values
   export interface GenderOption {
-    value: 'male' | 'female' | 'nonbinary' | 'unknown';
+    value: 'male' | 'female' | 'nonbinary' | 'unknown' | '';
     label: string;
   }
   
   export interface AgeGroupOption {
-    value: 'child' | 'teen' | 'adult' | 'elder';
+    value: 'child' | 'teen' | 'adult' | 'elder' | '';
     label: string;
   }
   
   export interface AlignmentOption {
-    value: 'good' | 'neutral' | 'evil';
+    value: 'good' | 'neutral' | 'evil' | '';
     label: string;
   }
   
   export interface RelationshipOption {
-    value: 'ally' | 'enemy' | 'neutral' | 'mentor' | 'rival' | 'betrayer';
+    value: 'ally' | 'enemy' | 'neutral' | 'mentor' | 'rival' | 'betrayer' | '';
     label: string;
   }
   

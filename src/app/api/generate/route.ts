@@ -32,6 +32,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generatio
     // Generate portrait if successful
     if (character) {
       try {
+        // Transfer portrait options from form data to character object
+        if (data.portrait_options) {
+          character.portrait_options = data.portrait_options;
+        }
+        
         const imageUrl = await generatePortrait(character);
         character.image_url = imageUrl;
       } catch (portraitError) {
