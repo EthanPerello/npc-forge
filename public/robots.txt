@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://npc-forge-ethan-perellos-projects.vercel.app/sitemap.xml

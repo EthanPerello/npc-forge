@@ -79,22 +79,44 @@ export async function generatePortrait(character: Character): Promise<string> {
     // Get name and key traits
     const name = character.name || "character";
     
-    // Gather key traits from selected_traits
+    // Gather key traits from selected_traits - only include defined values
     const traits: string[] = [];
     
     if (character.selected_traits) {
-      if (character.selected_traits.gender) traits.push(character.selected_traits.gender);
-      if (character.selected_traits.age_group) traits.push(character.selected_traits.age_group);
-      if (character.selected_traits.species) traits.push(character.selected_traits.species);
-      if (character.selected_traits.occupation) traits.push(character.selected_traits.occupation);
+      // Only add the trait if it has a value
+      if (character.selected_traits.gender) 
+        traits.push(character.selected_traits.gender);
+      
+      if (character.selected_traits.age_group) 
+        traits.push(character.selected_traits.age_group);
+      
+      if (character.selected_traits.species) 
+        traits.push(character.selected_traits.species);
+      
+      if (character.selected_traits.occupation) 
+        traits.push(character.selected_traits.occupation);
     }
+    
+    // Get portrait customization options - only include non-empty values
+    const portraitOptions = character.portrait_options || {};
+    
+    // Debug: Log the portrait options to verify they're being passed correctly
+    console.log("Portrait options received:", JSON.stringify(portraitOptions, null, 2));
+    
+    // Only add options that have been explicitly selected (not empty strings)
+    const artStyle = portraitOptions.art_style ? `${portraitOptions.art_style} style,` : '';
+    const mood = portraitOptions.mood ? `with a ${portraitOptions.mood} expression,` : '';
+    const framing = portraitOptions.framing ? `${portraitOptions.framing} shot,` : '';
+    const background = portraitOptions.background ? `with a ${portraitOptions.background} background,` : '';
     
     // Create a prompt for the image generation
     const imagePrompt = `Portrait of ${name}: ${appearanceText.substring(0, 300)}
     ${traits.length > 0 ? `Key traits: ${traits.join(', ')}.` : ''}
-    High quality, detailed character portrait, professional digital art style.`;
+    ${artStyle} ${mood} ${framing} ${background}
+    High quality, detailed character portrait, professional digital art.`;
 
     console.log("Generating character portrait with DALL-E-3");
+    console.log("Portrait prompt:", imagePrompt); // Debug the actual prompt being sent
     
     const response = await openai.images.generate({
       model: "dall-e-3", // Using the best model for quality

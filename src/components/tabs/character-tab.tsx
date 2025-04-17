@@ -6,6 +6,7 @@ import TemplateSelector from '@/components/template-selector';
 import Select from '@/components/ui/select';
 import { GENRE_TEMPLATES, getTemplateExample } from '@/lib/templates';
 import Button from '@/components/ui/button';
+import PortraitOptions from '@/components/tabs/portrait-options';
 import { 
   GenderOption,
   AgeGroupOption,
@@ -14,8 +15,9 @@ import {
   TemplateOption
 } from '@/lib/types';
 
-// Options for dropdown selects
+// Options for dropdown selects - all with "None" as first option
 const genderOptions: GenderOption[] = [
+  { value: '' as any, label: 'None' },
   { value: 'male', label: 'Male' },
   { value: 'female', label: 'Female' },
   { value: 'nonbinary', label: 'Nonbinary' },
@@ -23,6 +25,7 @@ const genderOptions: GenderOption[] = [
 ];
 
 const ageGroupOptions: AgeGroupOption[] = [
+  { value: '' as any, label: 'None' },
   { value: 'child', label: 'Child' },
   { value: 'teen', label: 'Teen' },
   { value: 'adult', label: 'Adult' },
@@ -30,12 +33,14 @@ const ageGroupOptions: AgeGroupOption[] = [
 ];
 
 const alignmentOptions: AlignmentOption[] = [
+  { value: '' as any, label: 'None' },
   { value: 'good', label: 'Good' },
   { value: 'neutral', label: 'Neutral' },
   { value: 'evil', label: 'Evil' }
 ];
 
 const relationshipOptions: RelationshipOption[] = [
+  { value: '' as any, label: 'None' },
   { value: 'ally', label: 'Ally' },
   { value: 'enemy', label: 'Enemy' },
   { value: 'neutral', label: 'Neutral' },
@@ -59,8 +64,11 @@ export default function CharacterTab() {
     }
   };
   
-  // Handle randomize function
+  // Handle randomize function - does NOT modify portrait options
   const handleRandomize = () => {
+    // Save portrait options to restore them later
+    const portraitOptions = formData.portrait_options;
+    
     const randomIndex = Math.floor(Math.random() * GENRE_TEMPLATES.length);
     const randomGenre = GENRE_TEMPLATES[randomIndex].id;
     const randomTemplate = GENRE_TEMPLATES.find(t => t.id === randomGenre);
@@ -69,17 +77,25 @@ export default function CharacterTab() {
       handleGenreChange(randomTemplate);
     }
     
-    // Randomly select other options
-    const randomGender = genderOptions[Math.floor(Math.random() * genderOptions.length)].value;
-    const randomAge = ageGroupOptions[Math.floor(Math.random() * ageGroupOptions.length)].value;
-    const randomAlignment = alignmentOptions[Math.floor(Math.random() * alignmentOptions.length)].value;
-    const randomRelationship = relationshipOptions[Math.floor(Math.random() * relationshipOptions.length)].value;
+    // Randomly select other options, selecting from index 1 and above (to skip "None")
+    const getRandomOption = (options: any[]) => {
+      // +1 to skip the "None" option at index 0
+      const randomIndex = Math.floor(Math.random() * (options.length - 1)) + 1;
+      return options[randomIndex].value;
+    };
+    
+    const randomGender = getRandomOption(genderOptions);
+    const randomAge = getRandomOption(ageGroupOptions);
+    const randomAlignment = getRandomOption(alignmentOptions);
+    const randomRelationship = getRandomOption(relationshipOptions);
     
     updateFormData({
       gender: randomGender,
       age_group: randomAge,
       moral_alignment: randomAlignment,
-      relationship_to_player: randomRelationship
+      relationship_to_player: randomRelationship,
+      // Restore portrait options to prevent them from being randomized
+      portrait_options: portraitOptions
     });
   };
   
@@ -155,7 +171,7 @@ export default function CharacterTab() {
         />
       </div>
       
-      {/* Advanced Options Toggle */}
+      {/* Advanced Options Toggle - Moved above Portrait Options */}
       <div>
         <button
           type="button"
@@ -187,7 +203,7 @@ export default function CharacterTab() {
         </div>
       )}
       
-      {/* Randomize Button */}
+      {/* Randomize Button - Moved above Portrait Options */}
       <div>
         <Button
           type="button"
@@ -197,6 +213,9 @@ export default function CharacterTab() {
           Randomize Character Options
         </Button>
       </div>
+      
+      {/* Portrait Options - Now below Advanced Options and Randomize Button */}
+      <PortraitOptions />
     </div>
   );
 }

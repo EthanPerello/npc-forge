@@ -12,16 +12,16 @@ NPC Forge is an AI-powered character generator for games. It allows creators to 
 
 ## 📋 Version Information
 
-**Current Version**: v0.1.0 (Initial Release)
+**Current Version**: v0.1.1 (April 2025)
 
 ### Version History
-- **v0.1.0** - Initial release with core character generation functionality, including:
-  - Basic character generation with OpenAI integration
-  - Genre template selection
-  - Custom character traits
-  - AI-generated portraits
-  - Quest, dialogue, and item generation
-  - JSON export functionality
+- **v0.1.1** - Portrait Customization Update (April 2025)
+  - Added portrait customization options (art style, mood, framing, background)
+  - Implemented expandable UI sections for advanced options
+  - Added searchable dropdown components for improved selection interfaces
+  - Enhanced metadata and PWA support
+
+- **v0.1.0** - Initial release with core character generation functionality
 
 ### Perfect For:
 - Game developers needing quick character concepts
@@ -39,6 +39,14 @@ Create detailed NPCs with just a text description or by selecting from genre tem
 - **Character Traits**: Customize gender, age, alignment, and relationship to player
 - **Advanced Options**: Fine-tune species, occupation, personality traits, and social class
 
+### Portrait Customization
+Control how your character portraits are generated:
+
+- **Art Style Selection**: Choose from multiple styles including realistic, fantasy art, anime, comic book, and more
+- **Expression/Mood**: Set the character's facial expression to match their personality
+- **Framing Options**: Specify portrait (head/shoulders), bust, full-body, or action poses
+- **Background Styles**: Select from plain, gradient, themed, environmental, or abstract backgrounds
+
 ### Comprehensive Character Profiles
 Each generated character includes:
 
@@ -53,11 +61,6 @@ Each generated character includes:
 - **Interactive Form**: Toggle which elements to include in your character
 - **JSON Export**: Download character data for use in your projects
 - **Responsive Design**: Works on desktop and mobile devices
-
-## 📸 Screenshots
-
-![NPC Forge Interface](images/npc-forge.png)
-*NPC Forge interface with character generation controls and results display*
 
 ## 🔧 Technologies Used
 
@@ -124,13 +127,10 @@ npc-forge/
 
 Future updates will include:
 
-- **Advanced Options Panel** for more detailed character customization
-- **Dark/Light Mode Toggle** for better viewing experience
 - **"Talk to NPC" Chat Interface** for interactive character conversations
 - **Character Library** for saving and managing generated characters
 - **Additional Export Formats** (PDF, CSV, Unity-friendly)
-- **Performance Optimizations** for faster generation and improved API usage
-- **Enhanced Portrait Generation** with more detailed prompts
+- **Performance Optimizations** for faster generation
 - **Character Collections and Tags** for better organization
 
 ## 🤝 Contributing

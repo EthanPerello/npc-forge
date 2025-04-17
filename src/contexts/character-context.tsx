@@ -34,6 +34,12 @@ export interface Character {
   dialogue_lines?: string[];
   quests?: Quest[];
   image_url?: string;
+  portrait_options?: {
+    art_style?: string;
+    mood?: string;
+    framing?: string;
+    background?: string;
+  };
 }
 
 export interface Quest {
@@ -74,6 +80,12 @@ export interface CharacterFormData {
     rarity_distribution?: string;
     item_categories?: string[];
   };
+  portrait_options?: {
+    art_style?: string;
+    mood?: string;
+    framing?: string;
+    background?: string;
+  };
 }
 
 interface CharacterContextType {
@@ -87,17 +99,17 @@ interface CharacterContextType {
   downloadCharacterJSON: () => void;
 }
 
-// Default form values
+// Default form values using undefined instead of empty strings for enum types
 const defaultFormData: CharacterFormData = {
   description: '',
   include_quests: true,
   include_dialogue: true,
   include_items: true,
   genre: undefined,
-  gender: undefined,
-  age_group: undefined,
-  moral_alignment: undefined,
-  relationship_to_player: undefined,
+  gender: undefined, // Changed from empty string
+  age_group: undefined, // Changed from empty string
+  moral_alignment: undefined, // Changed from empty string
+  relationship_to_player: undefined, // Changed from empty string
   advanced_options: {
     species: undefined,
     occupation: undefined,
@@ -118,6 +130,12 @@ const defaultFormData: CharacterFormData = {
     number_of_items: 3,
     rarity_distribution: 'balanced',
     item_categories: [],
+  },
+  portrait_options: {
+    art_style: '', // String fields can be empty
+    mood: '',
+    framing: '',
+    background: '',
   },
 };
 
@@ -152,6 +170,10 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
       item_options: {
         ...prev.item_options,
         ...(data.item_options || {})
+      },
+      portrait_options: {
+        ...prev.portrait_options,
+        ...(data.portrait_options || {})
       }
     }));
   }, []);
