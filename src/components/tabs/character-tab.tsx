@@ -7,12 +7,14 @@ import Select from '@/components/ui/select';
 import { GENRE_TEMPLATES, getTemplateExample } from '@/lib/templates';
 import Button from '@/components/ui/button';
 import PortraitOptions from '@/components/tabs/portrait-options';
+import SearchableSelect from '@/components/ui/searchable-select';
 import { 
   GenderOption,
   AgeGroupOption,
   AlignmentOption,
   RelationshipOption,
-  TemplateOption
+  TemplateOption,
+  SubGenreOption
 } from '@/lib/types';
 
 // Options for dropdown selects - all with "None" as first option
@@ -49,33 +51,213 @@ const relationshipOptions: RelationshipOption[] = [
   { value: 'betrayer', label: 'Betrayer' }
 ];
 
+// Physical trait options
+const heightOptions = [
+  { value: '', label: 'Not specified' },
+  { value: 'very_short', label: 'Very Short' },
+  { value: 'short', label: 'Short' },
+  { value: 'average', label: 'Average Height' },
+  { value: 'tall', label: 'Tall' },
+  { value: 'very_tall', label: 'Very Tall' }
+];
+
+const buildOptions = [
+  { value: '', label: 'Not specified' },
+  { value: 'thin', label: 'Thin/Slender' },
+  { value: 'athletic', label: 'Athletic/Toned' },
+  { value: 'average', label: 'Average Build' },
+  { value: 'sturdy', label: 'Sturdy/Solid' },
+  { value: 'muscular', label: 'Muscular' },
+  { value: 'heavy', label: 'Heavy/Large' }
+];
+
+// Social class options
+const socialClassOptions = [
+  { value: '', label: 'Not specified' },
+  { value: 'lower', label: 'Lower Class' },
+  { value: 'working', label: 'Working Class' },
+  { value: 'middle', label: 'Middle Class' },
+  { value: 'upper_middle', label: 'Upper-middle Class' },
+  { value: 'upper', label: 'Upper Class/Nobility' },
+  { value: 'outcast', label: 'Outcast/Outsider' }
+];
+
+// Occupation options (for searchable dropdown)
+const occupationOptions = [
+  // Fantasy occupations
+  { value: 'wizard', label: 'Wizard', group: 'Fantasy' },
+  { value: 'knight', label: 'Knight', group: 'Fantasy' },
+  { value: 'ranger', label: 'Ranger', group: 'Fantasy' },
+  { value: 'blacksmith', label: 'Blacksmith', group: 'Fantasy' },
+  { value: 'alchemist', label: 'Alchemist', group: 'Fantasy' },
+  { value: 'bard', label: 'Bard', group: 'Fantasy' },
+  { value: 'cleric', label: 'Cleric', group: 'Fantasy' },
+  { value: 'druid', label: 'Druid', group: 'Fantasy' },
+  
+  // Sci-Fi occupations
+  { value: 'engineer', label: 'Engineer', group: 'Sci-Fi' },
+  { value: 'pilot', label: 'Pilot', group: 'Sci-Fi' },
+  { value: 'scientist', label: 'Scientist', group: 'Sci-Fi' },
+  { value: 'bounty_hunter', label: 'Bounty Hunter', group: 'Sci-Fi' },
+  { value: 'android_technician', label: 'Android Technician', group: 'Sci-Fi' },
+  { value: 'space_trader', label: 'Space Trader', group: 'Sci-Fi' },
+  { value: 'colony_administrator', label: 'Colony Administrator', group: 'Sci-Fi' },
+  { value: 'xenobiologist', label: 'Xenobiologist', group: 'Sci-Fi' },
+  
+  // Historical occupations
+  { value: 'scholar', label: 'Scholar', group: 'Historical' },
+  { value: 'noble', label: 'Noble', group: 'Historical' },
+  { value: 'merchant', label: 'Merchant', group: 'Historical' },
+  { value: 'craftsperson', label: 'Craftsperson', group: 'Historical' },
+  { value: 'farmer', label: 'Farmer', group: 'Historical' },
+  { value: 'soldier', label: 'Soldier', group: 'Historical' },
+  { value: 'sailor', label: 'Sailor', group: 'Historical' },
+  { value: 'priest', label: 'Priest/Clergy', group: 'Historical' },
+  
+  // Contemporary occupations
+  { value: 'doctor', label: 'Doctor', group: 'Contemporary' },
+  { value: 'lawyer', label: 'Lawyer', group: 'Contemporary' },
+  { value: 'teacher', label: 'Teacher', group: 'Contemporary' },
+  { value: 'police', label: 'Police Officer', group: 'Contemporary' },
+  { value: 'chef', label: 'Chef', group: 'Contemporary' },
+  { value: 'artist', label: 'Artist', group: 'Contemporary' },
+  { value: 'programmer', label: 'Programmer', group: 'Contemporary' },
+  { value: 'journalist', label: 'Journalist', group: 'Contemporary' }
+];
+
+// Personality trait options
+const personalityTraitOptions = [
+  { value: 'brave', label: 'Brave' },
+  { value: 'cautious', label: 'Cautious' },
+  { value: 'curious', label: 'Curious' },
+  { value: 'determined', label: 'Determined' },
+  { value: 'friendly', label: 'Friendly' },
+  { value: 'honest', label: 'Honest' },
+  { value: 'humorous', label: 'Humorous' },
+  { value: 'loyal', label: 'Loyal' },
+  { value: 'mysterious', label: 'Mysterious' },
+  { value: 'proud', label: 'Proud' },
+  { value: 'reckless', label: 'Reckless' },
+  { value: 'sarcastic', label: 'Sarcastic' },
+  { value: 'shy', label: 'Shy' },
+  { value: 'suspicious', label: 'Suspicious' },
+  { value: 'wise', label: 'Wise' },
+  { value: 'greedy', label: 'Greedy' },
+  { value: 'ambitious', label: 'Ambitious' },
+  { value: 'paranoid', label: 'Paranoid' },
+  { value: 'optimistic', label: 'Optimistic' },
+  { value: 'pessimistic', label: 'Pessimistic' }
+];
+
 export default function CharacterTab() {
   const { formData, updateFormData } = useCharacter();
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  const [selectedSubGenre, setSelectedSubGenre] = useState<SubGenreOption | undefined>(undefined);
   
-  // Handle template selection
-  const handleGenreChange = (template: TemplateOption | undefined) => {
+  // Handle template and sub-genre selection
+  const handleGenreChange = (template: TemplateOption | undefined, subGenre?: SubGenreOption) => {
     const genre = template?.id;
-    updateFormData({ genre });
+    setSelectedSubGenre(subGenre);
+    
+    // Update form data with main genre and sub-genre if applicable
+    updateFormData({ 
+      genre,
+      sub_genre: subGenre?.id
+    });
     
     // If a genre is selected and description is empty, suggest an example
     if (genre && !formData.description.trim()) {
-      updateFormData({ description: getTemplateExample(genre) });
+      // Use sub-genre example if available, otherwise use main genre example
+      if (subGenre?.example) {
+        updateFormData({ description: subGenre.example });
+      } else if (genre) {
+        updateFormData({ description: getTemplateExample(genre) });
+      }
     }
+  };
+  
+  // Helper function to toggle personality traits (limit to 3)
+  const togglePersonalityTrait = (trait: string) => {
+    // Initialize the array if it doesn't exist
+    const currentTraits = formData.advanced_options?.personality_traits || [];
+    
+    // Toggle the trait
+    let updatedTraits;
+    if (currentTraits.includes(trait)) {
+      // Remove the trait if already selected
+      updatedTraits = currentTraits.filter(t => t !== trait);
+    } else {
+      // Add the trait if not at limit
+      if (currentTraits.length < 3) {
+        updatedTraits = [...currentTraits, trait];
+      } else {
+        // At limit, don't add more
+        updatedTraits = currentTraits;
+        // Optional: Show a toast or notification about the limit
+        return;
+      }
+    }
+    
+    updateFormData({
+      advanced_options: {
+        ...formData.advanced_options,
+        personality_traits: updatedTraits
+      }
+    });
+  };
+  
+  // Handle clear options function - preserves description and portrait options
+  const handleClearOptions = () => {
+    // Save portrait options and description to preserve them
+    const portraitOptions = formData.portrait_options;
+    const description = formData.description;
+    
+    // Reset character options
+    updateFormData({
+      genre: undefined,
+      sub_genre: undefined,
+      gender: undefined,
+      age_group: undefined,
+      moral_alignment: undefined,
+      relationship_to_player: undefined,
+      advanced_options: {
+        species: undefined,
+        occupation: undefined,
+        personality_traits: [],
+        social_class: undefined,
+        height: undefined,
+        build: undefined,
+        distinctive_features: undefined,
+        homeland: undefined
+      },
+      // Restore preserved values
+      description: description,
+      portrait_options: portraitOptions
+    });
+    
+    // Reset sub-genre state
+    setSelectedSubGenre(undefined);
   };
   
   // Handle randomize function - does NOT modify portrait options
   const handleRandomize = () => {
-    // Save portrait options to restore them later
+    // Save portrait options and description to restore them later
     const portraitOptions = formData.portrait_options;
+    const description = formData.description;
     
+    // Randomly select a main genre
     const randomIndex = Math.floor(Math.random() * GENRE_TEMPLATES.length);
-    const randomGenre = GENRE_TEMPLATES[randomIndex].id;
-    const randomTemplate = GENRE_TEMPLATES.find(t => t.id === randomGenre);
+    const randomGenre = GENRE_TEMPLATES[randomIndex];
     
-    if (randomTemplate) {
-      handleGenreChange(randomTemplate);
+    // Randomly select a sub-genre if available
+    let randomSubGenre: SubGenreOption | undefined = undefined;
+    if (randomGenre.subGenres && randomGenre.subGenres.length > 0) {
+      const randomSubIndex = Math.floor(Math.random() * randomGenre.subGenres.length);
+      randomSubGenre = randomGenre.subGenres[randomSubIndex];
     }
+    
+    // Apply the genre selection
+    handleGenreChange(randomGenre, randomSubGenre);
     
     // Randomly select other options, selecting from index 1 and above (to skip "None")
     const getRandomOption = (options: any[]) => {
@@ -94,7 +276,8 @@ export default function CharacterTab() {
       age_group: randomAge,
       moral_alignment: randomAlignment,
       relationship_to_player: randomRelationship,
-      // Restore portrait options to prevent them from being randomized
+      // Restore description and portrait options
+      description: description,
       portrait_options: portraitOptions
     });
   };
@@ -171,7 +354,7 @@ export default function CharacterTab() {
         />
       </div>
       
-      {/* Advanced Options Toggle - Moved above Portrait Options */}
+      {/* Advanced Options Toggle */}
       <div>
         <button
           type="button"
@@ -196,25 +379,144 @@ export default function CharacterTab() {
       
       {/* Advanced Options Panel */}
       {showAdvancedOptions && (
-        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-          <p className="text-sm text-gray-500 mb-4 dark:text-gray-400">
-            Advanced options are coming soon. These will include species, occupation, personality traits, and social class selectors.
-          </p>
+        <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Advanced Character Options
+          </h3>
+          
+          {/* Physical Traits Section */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-medium text-gray-600 dark:text-gray-400">Physical Traits</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Select
+                label="Height"
+                options={heightOptions}
+                value={formData.advanced_options?.height || ''}
+                onChange={(e) => updateFormData({ 
+                  advanced_options: { 
+                    ...formData.advanced_options,
+                    height: e.target.value || undefined 
+                  } 
+                })}
+              />
+              <Select
+                label="Build"
+                options={buildOptions}
+                value={formData.advanced_options?.build || ''}
+                onChange={(e) => updateFormData({ 
+                  advanced_options: { 
+                    ...formData.advanced_options,
+                    build: e.target.value || undefined 
+                  } 
+                })}
+              />
+            </div>
+            <textarea
+              placeholder="Distinctive features (scars, tattoos, unusual characteristics)..."
+              className="w-full p-2 border border-gray-300 rounded-md text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              value={formData.advanced_options?.distinctive_features || ''}
+              onChange={(e) => updateFormData({ 
+                advanced_options: { 
+                  ...formData.advanced_options,
+                  distinctive_features: e.target.value || undefined 
+                } 
+              })}
+              rows={2}
+            />
+          </div>
+          
+          {/* Background Elements */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-medium text-gray-600 dark:text-gray-400">Background & Origin</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Select
+                label="Social Class"
+                options={socialClassOptions}
+                value={formData.advanced_options?.social_class || ''}
+                onChange={(e) => updateFormData({ 
+                  advanced_options: { 
+                    ...formData.advanced_options,
+                    social_class: e.target.value || undefined 
+                  } 
+                })}
+              />
+              <input
+                type="text"
+                placeholder="Homeland/Origin"
+                className="w-full p-2 border border-gray-300 rounded-md text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                value={formData.advanced_options?.homeland || ''}
+                onChange={(e) => updateFormData({ 
+                  advanced_options: { 
+                    ...formData.advanced_options,
+                    homeland: e.target.value || undefined 
+                  } 
+                })}
+              />
+            </div>
+          </div>
+          
+          {/* Searchable Occupation Dropdown */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Occupation
+            </label>
+            <SearchableSelect
+              options={occupationOptions}
+              value={formData.advanced_options?.occupation || ''}
+              onChange={(value) => updateFormData({ 
+                advanced_options: { 
+                  ...formData.advanced_options,
+                  occupation: value || undefined
+                } 
+              })}
+              placeholder="Select or search for occupation..."
+            />
+          </div>
+          
+          {/* Personality Traits */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Personality Traits (select up to 3)
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {personalityTraitOptions.map((trait) => (
+                <button
+                  key={trait.value}
+                  type="button"
+                  onClick={() => togglePersonalityTrait(trait.value)}
+                  className={`px-2 py-1 text-xs rounded-full transition-colors ${
+                    formData.advanced_options?.personality_traits?.includes(trait.value)
+                      ? 'bg-indigo-100 text-indigo-800 border border-indigo-300 dark:bg-indigo-900 dark:text-indigo-200 dark:border-indigo-700'
+                      : 'bg-gray-100 text-gray-700 border border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'
+                  }`}
+                >
+                  {trait.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
       
-      {/* Randomize Button - Moved above Portrait Options */}
-      <div>
+      {/* Character Options Buttons */}
+      <div className="flex flex-wrap gap-3">
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={handleClearOptions}
+        >
+          Clear Options
+        </Button>
         <Button
           type="button"
           variant="secondary"
           onClick={handleRandomize}
         >
-          Randomize Character Options
+          Randomize Options
         </Button>
       </div>
       
-      {/* Portrait Options - Now below Advanced Options and Randomize Button */}
+      {/* Portrait Options */}
       <PortraitOptions />
     </div>
   );

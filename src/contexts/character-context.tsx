@@ -14,6 +14,7 @@ export interface Character {
   name: string;
   selected_traits: {
     genre?: string;
+    sub_genre?: string; // Added for sub-genre tracking
     gender?: 'male' | 'female' | 'nonbinary' | 'unknown';
     age_group?: 'child' | 'teen' | 'adult' | 'elder';
     moral_alignment?: 'good' | 'neutral' | 'evil';
@@ -21,7 +22,11 @@ export interface Character {
     species?: string;
     occupation?: string;
     social_class?: string;
-    personality_trait?: string;
+    personality_traits?: string[];
+    height?: string;
+    build?: string;
+    distinctive_features?: string;
+    homeland?: string;
   };
   added_traits: {
     [key: string]: string; // Additional traits AI added that weren't selected
@@ -55,6 +60,7 @@ export interface CharacterFormData {
   include_dialogue: boolean;
   include_items: boolean;
   genre?: string;
+  sub_genre?: string; // Added sub-genre field
   gender?: 'male' | 'female' | 'nonbinary' | 'unknown';
   age_group?: 'child' | 'teen' | 'adult' | 'elder';
   moral_alignment?: 'good' | 'neutral' | 'evil';
@@ -62,8 +68,12 @@ export interface CharacterFormData {
   advanced_options?: {
     species?: string;
     occupation?: string;
-    personality_trait?: string;
+    personality_traits?: string[]; // Changed from personality_trait
     social_class?: string;
+    height?: string;
+    build?: string;
+    distinctive_features?: string;
+    homeland?: string;
   };
   quest_options?: {
     reward_type?: string;
@@ -106,6 +116,7 @@ const defaultFormData: CharacterFormData = {
   include_dialogue: true,
   include_items: true,
   genre: undefined,
+  sub_genre: undefined, // Added sub-genre field
   gender: undefined, // Changed from empty string
   age_group: undefined, // Changed from empty string
   moral_alignment: undefined, // Changed from empty string
@@ -113,8 +124,12 @@ const defaultFormData: CharacterFormData = {
   advanced_options: {
     species: undefined,
     occupation: undefined,
-    personality_trait: undefined,
+    personality_traits: [], // Initialize as empty array
     social_class: undefined,
+    height: undefined,
+    build: undefined,
+    distinctive_features: undefined,
+    homeland: undefined
   },
   quest_options: {
     reward_type: undefined,

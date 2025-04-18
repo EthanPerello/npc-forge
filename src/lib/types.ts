@@ -2,6 +2,7 @@ export interface Character {
     name: string;
     selected_traits: {
       genre?: string;
+      sub_genre?: string; // Added for sub-genre tracking
       gender?: 'male' | 'female' | 'nonbinary' | 'unknown';
       age_group?: 'child' | 'teen' | 'adult' | 'elder';
       moral_alignment?: 'good' | 'neutral' | 'evil';
@@ -9,7 +10,11 @@ export interface Character {
       species?: string;
       occupation?: string;
       social_class?: string;
-      personality_trait?: string;
+      personality_traits?: string[];
+      height?: string;
+      build?: string;
+      distinctive_features?: string;
+      homeland?: string;
     };
     added_traits: {
       [key: string]: string; // Additional traits AI added that weren't selected
@@ -37,7 +42,26 @@ export interface Character {
     type?: string;
   }
   
-  export type Genre = 'fantasy' | 'sci-fi' | 'cyberpunk' | 'western' | 'modern' | 'horror';
+  // Update the Genre type to use the four core genres
+  export type Genre = 'fantasy' | 'sci-fi' | 'historical' | 'contemporary';
+
+  // Add SubGenreOption interface for the sub-genres
+  export interface SubGenreOption {
+    id: string;
+    label: string;
+    description: string;
+    example?: string;
+    parentGenreId?: string; // Reference to parent genre ID, useful when flattening
+  }
+
+  // Update TemplateOption to include sub-genres
+  export interface TemplateOption {
+    id: string;
+    label: string;
+    description: string;
+    example: string;
+    subGenres?: SubGenreOption[];
+  }
   
   export interface CharacterFormData {
     description: string;
@@ -45,6 +69,7 @@ export interface Character {
     include_dialogue: boolean;
     include_items: boolean;
     genre?: string;
+    sub_genre?: string; // Added sub-genre field
     gender?: 'male' | 'female' | 'nonbinary' | 'unknown';
     age_group?: 'child' | 'teen' | 'adult' | 'elder';
     moral_alignment?: 'good' | 'neutral' | 'evil';
@@ -52,8 +77,12 @@ export interface Character {
     advanced_options?: {
       species?: string;
       occupation?: string;
-      personality_trait?: string;
+      personality_traits?: string[]; // Changed from personality_trait to array
       social_class?: string;
+      height?: string;
+      build?: string;
+      distinctive_features?: string;
+      homeland?: string;
     };
     quest_options?: {
       reward_type?: string;
@@ -81,13 +110,6 @@ export interface Character {
   export interface GenerationResponse {
     character: Character;
     error?: string;
-  }
-  
-  export interface TemplateOption {
-    id: string;
-    label: string;
-    description: string;
-    example: string;
   }
   
   // Modified option interfaces for selects to allow empty string values

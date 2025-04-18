@@ -101,17 +101,39 @@ export function getCharacterTraitsArray(character: Character): string[] {
   if (character.selected_traits) {
     Object.entries(character.selected_traits).forEach(([key, value]) => {
       if (value) {
+        // Handle different key types
         if (key === 'genre') {
-          traits.push(`Genre: ${capitalizeFirstLetter(value)}`);
+          // Handle genre which might be string or string[]
+          if (typeof value === 'string') {
+            traits.push(`Genre: ${capitalizeFirstLetter(value)}`);
+          } else if (Array.isArray(value)) {
+            traits.push(`Genre: ${value.map(v => capitalizeFirstLetter(v)).join(', ')}`);
+          }
         } else if (key === 'gender') {
-          traits.push(`Gender: ${capitalizeFirstLetter(value)}`);
+          // Handle gender which should be a string
+          if (typeof value === 'string') {
+            traits.push(`Gender: ${capitalizeFirstLetter(value)}`);
+          }
         } else if (key === 'age_group') {
-          traits.push(`Age: ${capitalizeFirstLetter(value)}`);
+          // Handle age_group which should be a string
+          if (typeof value === 'string') {
+            traits.push(`Age: ${capitalizeFirstLetter(value)}`);
+          }
         } else if (key === 'moral_alignment') {
-          traits.push(`Alignment: ${capitalizeFirstLetter(value)}`);
+          // Handle moral_alignment which should be a string
+          if (typeof value === 'string') {
+            traits.push(`Alignment: ${capitalizeFirstLetter(value)}`);
+          }
         } else if (key === 'relationship_to_player') {
-          traits.push(`Relation: ${capitalizeFirstLetter(value.replace('_', ' '))}`);
-        } else {
+          // Handle relationship_to_player which should be a string
+          if (typeof value === 'string') {
+            traits.push(`Relation: ${capitalizeFirstLetter(value.replace('_', ' '))}`);
+          }
+        } else if (key === 'personality_traits' && Array.isArray(value)) {
+          // Handle personality_traits array
+          traits.push(`Traits: ${value.map(v => capitalizeFirstLetter(v)).join(', ')}`);
+        } else if (typeof value === 'string') {
+          // Handle any other string values
           traits.push(`${capitalizeFirstLetter(key.replace('_', ' '))}: ${value}`);
         }
       }
@@ -121,7 +143,9 @@ export function getCharacterTraitsArray(character: Character): string[] {
   // Add AI-added traits
   if (character.added_traits) {
     Object.entries(character.added_traits).forEach(([key, value]) => {
-      traits.push(`${capitalizeFirstLetter(key.replace('_', ' '))}: ${value}`);
+      if (typeof value === 'string') {
+        traits.push(`${capitalizeFirstLetter(key.replace('_', ' '))}: ${value}`);
+      }
     });
   }
   

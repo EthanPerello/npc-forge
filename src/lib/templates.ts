@@ -1,81 +1,112 @@
-import { TemplateOption } from './types';
+import { TemplateOption, SubGenreOption } from './types';
 
+// Define the core genres with their sub-genres
 export const GENRE_TEMPLATES: TemplateOption[] = [
   {
     id: 'fantasy',
     label: 'Fantasy',
-    description: 'Medieval-style worlds with magic, mythical creatures, and epic quests. Perfect for wizards, knights, elves, and dragons.',
-    example: 'A wise old elf who guards an ancient magical artifact deep in the enchanted forest. They possess powerful magic but have sworn to only use it to protect the natural balance.'
+    description: 'Worlds with magic, mythical creatures, and epic quests. Includes medieval fantasy, high fantasy, and magical realms.',
+    example: 'A wise old elf who guards an ancient magical artifact deep in the enchanted forest. They possess powerful magic but have sworn to only use it to protect the natural balance.',
+    subGenres: [
+      { id: 'high_fantasy', label: 'High Fantasy', description: 'Elaborate magical worlds with epic conflicts between good and evil' },
+      { id: 'dark_fantasy', label: 'Dark Fantasy', description: 'Grim settings with dangerous magic and morally ambiguous characters' },
+      { id: 'urban_fantasy', label: 'Urban Fantasy', description: 'Modern settings where magic and supernatural elements exist alongside our world' }
+    ]
   },
   {
     id: 'sci-fi',
-    label: 'Sci-Fi',
-    description: 'Futuristic settings with advanced technology, space travel, and alien species. Ideal for engineers, pilots, androids, and explorers.',
-    example: 'A rogue android engineer living on a space station who modifies tech beyond legal limits. They have developed unique upgrades that give them an edge but also make them a target.'
-  },
-  {
-    id: 'cyberpunk',
-    label: 'Cyberpunk',
-    description: 'Dystopian futures with high tech, low life, corporations, and digital realms. Great for hackers, corporate agents, street samurai, and fixers.',
-    example: 'A cybernetically enhanced hacker with a reputation for acquiring and selling classified information. They have connections throughout the city but are haunted by a job gone wrong.'
-  },
-  {
-    id: 'western',
-    label: 'Western',
-    description: 'Frontier settings with gunslingers, outlaws, sheriffs, and dusty towns. Perfect for creating frontier characters in harsh environments.',
-    example: 'A mysterious bounty hunter with scars from past conflicts who rarely speaks about their history. They are known for always getting their target but following a personal code of justice.'
-  },
-  {
-    id: 'modern',
-    label: 'Modern',
-    description: 'Contemporary settings with realistic characters and everyday scenarios, but with interesting twists and backgrounds.',
-    example: 'A coffee shop owner in a busy city who is secretly a retired intelligence operative. They have created a new life but occasionally use their skills to help people in trouble.'
-  },
-  {
-    id: 'horror',
-    label: 'Horror',
-    description: 'Frightening settings with supernatural elements, monsters, and suspense. Great for creating eerie or unsettling characters.',
-    example: 'A peculiar antique shop owner who deals in cursed or haunted objects. They know the history and danger of each item but have mysterious reasons for collecting them.'
-  },
-  {
-    id: 'post-apocalyptic',
-    label: 'Post-Apocalyptic',
-    description: 'Worlds after a major catastrophe where survivors struggle in harsh new realities. Perfect for wasteland wanderers, settlement leaders, and scavengers.',
-    example: 'A resourceful scavenger who travels between isolated settlements, trading salvaged technology and information about threats. They have developed unique survival skills and knowledge of safe routes.'
-  },
-  {
-    id: 'steampunk',
-    label: 'Steampunk',
-    description: 'Victorian-era aesthetics with advanced steam-powered technology, airships, and mechanical wonders.',
-    example: 'An eccentric inventor who creates extraordinary mechanical devices powered by steam and mysterious crystals. Their workshop is filled with half-finished contraptions and rare components.'
-  },
-  {
-    id: 'superhero',
-    label: 'Superhero',
-    description: 'Worlds where individuals with extraordinary abilities exist, either hiding among normal society or operating openly.',
-    example: 'A vigilante with the ability to temporarily borrow the skills of anyone they touch. They work as a gymnastics instructor by day, fighting crime at night while wrestling with the ethics of their power.'
+    label: 'Science Fiction',
+    description: 'Futuristic settings with advanced technology, space travel, and scientific themes. Includes space opera, cyberpunk, and post-apocalyptic worlds.',
+    example: 'A rogue android engineer living on a space station who modifies tech beyond legal limits. They have developed unique upgrades that give them an edge but also make them a target for corporate security forces.',
+    subGenres: [
+      { id: 'space_opera', label: 'Space Opera', description: 'Epic adventures across galaxies with advanced civilizations and technology' },
+      { id: 'cyberpunk', label: 'Cyberpunk', description: 'Dystopian futures with high technology, corporate control, and social inequality' },
+      { id: 'post_apocalyptic', label: 'Post-Apocalyptic', description: 'Settings after global catastrophes where survivors adapt to harsh new realities' }
+    ]
   },
   {
     id: 'historical',
     label: 'Historical',
-    description: 'Characters set in actual historical periods, from ancient civilizations to more recent history, with realistic details.',
-    example: 'An apprentice mapmaker in the 15th century who dreams of joining exploratory voyages. They have developed a reputation for accuracy and have begun collecting stories from sailors about lands beyond the known world.'
+    description: 'Settings based on actual historical periods from ancient civilizations to recent history. Includes medieval, renaissance, and various cultural settings.',
+    example: 'A skilled cartographer in 15th century Portugal who dreams of joining exploratory voyages. They have developed a reputation for accurate maps and have begun collecting stories from sailors about uncharted lands beyond the known world.',
+    subGenres: [
+      { id: 'medieval', label: 'Medieval', description: 'European Middle Ages with knights, castles, and feudal society' },
+      { id: 'ancient', label: 'Ancient Civilizations', description: 'Egyptian, Roman, Greek or other ancient cultures' },
+      { id: 'renaissance', label: 'Renaissance', description: 'Period of artistic and intellectual revival in Europe' },
+      { id: 'pirate_age', label: 'Age of Piracy', description: 'Golden age of piracy with sea adventures and treasure hunting' }
+    ]
   },
   {
-    id: 'military',
-    label: 'Military',
-    description: 'Characters in military organizations, whether modern, historical, or fictional, with appropriate ranks and specializations.',
-    example: 'A veteran special forces sergeant who now trains recruits, known for their demanding standards but genuine care for their soldiers. They carry physical and emotional scars from a mission that went catastrophically wrong.'
-  },
-  {
-    id: 'pirate',
-    label: 'Pirate',
-    description: 'Swashbuckling characters from the golden age of piracy, with ships, treasure hunts, and nautical adventures.',
-    example: 'A former naval navigator who became a pirate after being betrayed by their government. They have developed a reputation for fair treatment of captives and maintain a strict code among their diverse crew.'
+    id: 'contemporary',
+    label: 'Contemporary',
+    description: 'Modern-day settings with realistic characters and scenarios, possibly with supernatural or thriller elements added.',
+    example: 'A coffee shop owner in a busy city who is secretly a retired intelligence operative. They have created a new life but occasionally use their skills to help people in trouble who come to their café seeking refuge.',
+    subGenres: [
+      { id: 'modern_realistic', label: 'Modern Realistic', description: 'Everyday settings with realistic characters and situations' },
+      { id: 'supernatural', label: 'Contemporary Supernatural', description: 'Modern world with hidden supernatural elements' },
+      { id: 'thriller', label: 'Modern Thriller', description: 'Present-day settings with suspense, crime, or espionage' },
+      { id: 'horror', label: 'Horror', description: 'Modern settings with frightening or unsettling elements' }
+    ]
   }
 ];
 
-export const getTemplateExample = (genre: string): string => {
-  const template = GENRE_TEMPLATES.find(t => t.id === genre);
-  return template?.example || '';
-};
+// Get the full example based on genre ID
+export function getTemplateExample(genreId: string): string {
+  // First check if it's a main genre
+  const mainGenre = GENRE_TEMPLATES.find(t => t.id === genreId);
+  if (mainGenre?.example) {
+    return mainGenre.example;
+  }
+  
+  // If not found, check if it's a sub-genre
+  for (const genre of GENRE_TEMPLATES) {
+    if (genre.subGenres) {
+      for (const subGenre of genre.subGenres) {
+        if (subGenre.id === genreId) {
+          // If no specific example for the sub-genre, use the main genre example
+          return subGenre.example || genre.example;
+        }
+      }
+    }
+  }
+  
+  // Return a default example if nothing found
+  return 'A unique character with an interesting background and motivations. Consider their appearance, personality, and role in the world.';
+}
+
+// Get the parent genre of a sub-genre
+export function getParentGenre(subGenreId: string): string | undefined {
+  for (const genre of GENRE_TEMPLATES) {
+    if (genre.subGenres) {
+      if (genre.subGenres.some(sub => sub.id === subGenreId)) {
+        return genre.id;
+      }
+    }
+  }
+  return undefined;
+}
+
+// Get all sub-genres for a specific genre
+export function getSubGenres(genreId: string): SubGenreOption[] {
+  const genre = GENRE_TEMPLATES.find(g => g.id === genreId);
+  return genre?.subGenres || [];
+}
+
+// Get all sub-genres across all genres
+export function getAllSubGenres(): SubGenreOption[] {
+  let allSubGenres: SubGenreOption[] = [];
+  
+  GENRE_TEMPLATES.forEach(genre => {
+    if (genre.subGenres) {
+      // Add the parent genre id to each sub-genre for reference
+      const subGenresWithParent = genre.subGenres.map(sub => ({
+        ...sub,
+        parentGenreId: genre.id
+      }));
+      
+      allSubGenres = [...allSubGenres, ...subGenresWithParent];
+    }
+  });
+  
+  return allSubGenres;
+}

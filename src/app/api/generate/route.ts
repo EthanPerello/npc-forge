@@ -119,7 +119,11 @@ Return ONLY valid JSON with the following structure, and no other text or explan
   
   // Add genre info if available
   if (data.genre) {
-    prompt += `\n\nThe character should fit within the ${data.genre} genre.`;
+    if (data.sub_genre) {
+      prompt += `\n\nThe character should fit within the ${data.genre} genre, specifically the ${data.sub_genre} sub-genre.`;
+    } else {
+      prompt += `\n\nThe character should fit within the ${data.genre} genre.`;
+    }
   }
   
   // Add main character options if specified
@@ -139,8 +143,16 @@ Return ONLY valid JSON with the following structure, and no other text or explan
   
   if (data.advanced_options?.species) advancedTraits.push(`species: ${data.advanced_options.species}`);
   if (data.advanced_options?.occupation) advancedTraits.push(`occupation: ${data.advanced_options.occupation}`);
-  if (data.advanced_options?.personality_trait) advancedTraits.push(`personality trait: ${data.advanced_options.personality_trait}`);
   if (data.advanced_options?.social_class) advancedTraits.push(`social class: ${data.advanced_options.social_class}`);
+  if (data.advanced_options?.height) advancedTraits.push(`height: ${data.advanced_options.height}`);
+  if (data.advanced_options?.build) advancedTraits.push(`build: ${data.advanced_options.build}`);
+  if (data.advanced_options?.distinctive_features) advancedTraits.push(`distinctive features: ${data.advanced_options.distinctive_features}`);
+  if (data.advanced_options?.homeland) advancedTraits.push(`homeland: ${data.advanced_options.homeland}`);
+  
+  // Handle personality traits array
+  if (data.advanced_options?.personality_traits && data.advanced_options.personality_traits.length > 0) {
+    advancedTraits.push(`personality traits: ${data.advanced_options.personality_traits.join(', ')}`);
+  }
   
   if (advancedTraits.length > 0) {
     prompt += `\n\nAlso include these advanced traits: ${advancedTraits.join(', ')}.`;

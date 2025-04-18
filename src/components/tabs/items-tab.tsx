@@ -17,7 +17,7 @@ const itemCategoryOptions: ItemCategoryOption[] = [
   { value: 'food', label: 'Food & Drink' },
   { value: 'currency', label: 'Currency & Valuables' },
   { value: 'material', label: 'Crafting Materials' },
-  { value: 'tech', label: 'Technology & Gadgets', genre: ['sci-fi', 'cyberpunk'] },
+  { value: 'tech', label: 'Technology & Gadgets', genre: ['sci-fi'] },
   { value: 'magic', label: 'Magical Items', genre: ['fantasy'] }
 ];
 
