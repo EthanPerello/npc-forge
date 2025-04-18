@@ -5,6 +5,22 @@ All notable changes to NPC Forge will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2025-04-18
+
+### Added
+- "Clear Options" button that preserves description and portrait options
+- Advanced physical traits section (height, build, distinctive features)
+- Background & origin options (social class, homeland)
+- Multi-select personality traits system (up to 3 traits)
+- Searchable occupation dropdown with genre-based grouping
+
+### Changed
+- Enhanced genre system with four core genres and sub-genres
+- Replaced emoji icons with Lucide-based icons for genres
+- Implemented color-coded UI for genre categories
+- Updated templates.ts with improved examples and descriptions
+- Reorganized advanced options UI with logical sections
+
 ## [0.1.1] - 2025-04-17
 
 ### Added
@@ -23,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved dropdown components for more intuitive selection
 - Enhanced OpenAI prompt engineering for portraits
 
-## [0.1.0] - 2025-02-15
+## [0.1.0] - 2025-04-12
 
 ### Added
 - Initial release with core character generation functionality

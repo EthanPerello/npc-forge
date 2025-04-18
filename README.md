@@ -4,24 +4,31 @@ AI-powered character generator for games using OpenAI's models.
 
 ![NPC Forge Preview](images/npc-forge.png)
 
-## 🎮 [Try the Live Demo](https://npc-forge.vercel.app)
+## [Try the Live Demo](https://npc-forge.vercel.app)
 
-## 🎯 Project Overview
+## Project Overview
 
 NPC Forge is an AI-powered character generator for games. It allows creators to quickly generate detailed non-playable characters (NPCs) from simple descriptions or genre templates. The tool uses OpenAI's models to create complete character profiles including name, appearance, personality, inventory, abilities, quests, dialogue, and an AI-generated portrait.
 
-## 📋 Version Information
+## Version Information
 
-**Current Version**: v0.1.1 (April 2025)
+**Current Version**: v0.1.2 (April 18, 2025)
 
 ### Version History
-- **v0.1.1** - Portrait Customization Update (April 2025)
+- **v0.1.2** - UI Enhancement Update (April 18, 2025)
+  - Added "Clear Options" button for improved character creation workflow
+  - Enhanced genre system with improved sub-genre organization
+  - Added physical traits section (height, build, distinctive features)
+  - Implemented multi-select personality traits system (up to 3 traits)
+  - Improved occupation selector with genre-based categorization
+
+- **v0.1.1** - Portrait Customization Update (April 17, 2025)
   - Added portrait customization options (art style, mood, framing, background)
   - Implemented expandable UI sections for advanced options
   - Added searchable dropdown components for improved selection interfaces
   - Enhanced metadata and PWA support
 
-- **v0.1.0** - Initial release with core character generation functionality
+- **v0.1.0** - Initial release (April 12, 2025)
 
 ### Perfect For:
 - Game developers needing quick character concepts
@@ -29,13 +36,14 @@ NPC Forge is an AI-powered character generator for games. It allows creators to 
 - Creative writers looking for character inspiration
 - Anyone building interactive worlds or stories
 
-## 🚀 Features
+## Features
 
 ### Intuitive Character Creation
 Create detailed NPCs with just a text description or by selecting from genre templates:
 
 - **Simple Text Prompts**: Describe your character concept in plain language
-- **Genre Templates**: Quick-start options for Fantasy, Sci-Fi, Cyberpunk, Western, Modern, and Horror settings
+- **Genre Templates**: Quick-start options for Fantasy, Sci-Fi, Historical, and Contemporary settings
+- **Sub-Genre Selection**: Choose from specialized sub-genres within each major category
 - **Character Traits**: Customize gender, age, alignment, and relationship to player
 - **Advanced Options**: Fine-tune species, occupation, personality traits, and social class
 
@@ -62,7 +70,7 @@ Each generated character includes:
 - **JSON Export**: Download character data for use in your projects
 - **Responsive Design**: Works on desktop and mobile devices
 
-## 🔧 Technologies Used
+## Technologies Used
 
 - **Frontend**: 
   - Next.js 14 with App Router
@@ -79,7 +87,7 @@ Each generated character includes:
   - Responsive design principles
   - Optimized API usage
 
-## 🛠️ Development
+## Development
 
 ### Prerequisites
 - Node.js 18+
@@ -123,7 +131,7 @@ npc-forge/
 └── ...                  # Config files
 ```
 
-## 📋 Planned Features
+## Planned Features
 
 Future updates will include:
 
@@ -133,7 +141,7 @@ Future updates will include:
 - **Performance Optimizations** for faster generation
 - **Character Collections and Tags** for better organization
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Here's how you can help:
 
@@ -143,11 +151,11 @@ Contributions are welcome! Here's how you can help:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgements
+## Acknowledgements
 
 - [OpenAI](https://openai.com) for providing the API that powers the character generation
 - [Next.js](https://nextjs.org) for the React framework
