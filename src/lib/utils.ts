@@ -92,6 +92,29 @@ export function removeEmptyValues<T extends Record<string, any>>(obj: T): Partia
 }
 
 /**
+ * Format a trait key from snake_case or camelCase to Title Case with spaces
+ */
+export function formatTraitKey(key: string): string {
+  return key
+    .replace(/_/g, ' ')
+    .replace(/([A-Z])/g, ' $1')
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
+/**
+ * Format a trait value to be properly capitalized and without underscores
+ */
+export function formatTraitValue(value: string): string {
+  return value
+    .replace(/_/g, ' ')
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
+/**
  * Get character traits as a flat array of strings for display
  */
 export function getCharacterTraitsArray(character: Character): string[] {
@@ -105,36 +128,36 @@ export function getCharacterTraitsArray(character: Character): string[] {
         if (key === 'genre') {
           // Handle genre which might be string or string[]
           if (typeof value === 'string') {
-            traits.push(`Genre: ${capitalizeFirstLetter(value)}`);
+            traits.push(`Genre: ${formatTraitValue(value)}`);
           } else if (Array.isArray(value)) {
-            traits.push(`Genre: ${value.map(v => capitalizeFirstLetter(v)).join(', ')}`);
+            traits.push(`Genre: ${value.map(v => formatTraitValue(v)).join(', ')}`);
           }
         } else if (key === 'gender') {
           // Handle gender which should be a string
           if (typeof value === 'string') {
-            traits.push(`Gender: ${capitalizeFirstLetter(value)}`);
+            traits.push(`Gender: ${formatTraitValue(value)}`);
           }
         } else if (key === 'age_group') {
           // Handle age_group which should be a string
           if (typeof value === 'string') {
-            traits.push(`Age: ${capitalizeFirstLetter(value)}`);
+            traits.push(`Age: ${formatTraitValue(value)}`);
           }
         } else if (key === 'moral_alignment') {
           // Handle moral_alignment which should be a string
           if (typeof value === 'string') {
-            traits.push(`Alignment: ${capitalizeFirstLetter(value)}`);
+            traits.push(`Alignment: ${formatTraitValue(value)}`);
           }
         } else if (key === 'relationship_to_player') {
           // Handle relationship_to_player which should be a string
           if (typeof value === 'string') {
-            traits.push(`Relation: ${capitalizeFirstLetter(value.replace('_', ' '))}`);
+            traits.push(`Relation: ${formatTraitValue(value)}`);
           }
         } else if (key === 'personality_traits' && Array.isArray(value)) {
           // Handle personality_traits array
-          traits.push(`Traits: ${value.map(v => capitalizeFirstLetter(v)).join(', ')}`);
+          traits.push(`Traits: ${value.map(v => formatTraitValue(v)).join(', ')}`);
         } else if (typeof value === 'string') {
           // Handle any other string values
-          traits.push(`${capitalizeFirstLetter(key.replace('_', ' '))}: ${value}`);
+          traits.push(`${formatTraitKey(key)}: ${formatTraitValue(value)}`);
         }
       }
     });
@@ -144,7 +167,7 @@ export function getCharacterTraitsArray(character: Character): string[] {
   if (character.added_traits) {
     Object.entries(character.added_traits).forEach(([key, value]) => {
       if (typeof value === 'string') {
-        traits.push(`${capitalizeFirstLetter(key.replace('_', ' '))}: ${value}`);
+        traits.push(`${formatTraitKey(key)}: ${formatTraitValue(value)}`);
       }
     });
   }
@@ -198,4 +221,4 @@ export function sanitizeUserInput(input: string): string {
     
     // Trim leading/trailing whitespace
     return sanitized.trim();
-  }
+}
