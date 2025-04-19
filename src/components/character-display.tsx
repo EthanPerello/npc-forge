@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useCharacter } from '@/contexts/character-context';
 import TabInterface, { Tab } from '@/components/ui/tab-interface';
 import Button from '@/components/ui/button';
@@ -24,13 +24,21 @@ export default function CharacterDisplay() {
   
   const [activeTab, setActiveTab] = useState('profile');
   const [showJson, setShowJson] = useState(false);
+  const [refreshCounter, setRefreshCounter] = useState(0);
   
   // Reset to profile tab when character changes
   useEffect(() => {
     if (character) {
       setActiveTab('profile');
+      // Force refresh of usage counts whenever a character is generated
+      setRefreshCounter(prev => prev + 1);
     }
   }, [character]);
+  
+  // Callback for refreshing the count
+  const refreshUsageCount = useCallback(() => {
+    setRefreshCounter(prev => prev + 1);
+  }, []);
   
   if (!character) {
     return null;
@@ -152,7 +160,11 @@ export default function CharacterDisplay() {
             
             {/* Usage Limit Display */}
             <div className="mt-6">
-              <UsageLimitDisplay variant="detailed" />
+              <UsageLimitDisplay 
+                variant="detailed" 
+                refreshKey={refreshCounter} 
+                onRefresh={refreshUsageCount}
+              />
             </div>
           </div>
         </div>

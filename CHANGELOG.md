@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced error handling with specific messages for common API issues
 - Strengthened JSON response validation with required field checking
 
+### Fixed
+- Immediate update of usage count after character generation
+
 ## [0.1.2] - 2025-04-18
 
 ### Added

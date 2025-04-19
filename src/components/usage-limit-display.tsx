@@ -7,19 +7,23 @@ interface UsageLimitDisplayProps {
   variant?: 'compact' | 'detailed';
   showWhenFull?: boolean;
   className?: string;
+  refreshKey?: number; // Add a key to force refresh
+  onRefresh?: () => void; // Optional callback after refresh
 }
 
 export default function UsageLimitDisplay({ 
   variant = 'compact', 
   showWhenFull = true,
-  className = '' 
+  className = '',
+  refreshKey = 0,
+  onRefresh
 }: UsageLimitDisplayProps) {
   const [count, setCount] = useState(0);
   const [remaining, setRemaining] = useState(0);
   const [limit, setLimit] = useState(0);
   const [isClient, setIsClient] = useState(false);
   
-  // Update usage data on mount and when component is visible
+  // Update usage data on mount, refreshKey change, and when component is visible
   useEffect(() => {
     setIsClient(true);
     
@@ -31,6 +35,11 @@ export default function UsageLimitDisplay({
       setCount(count);
       setLimit(monthlyLimit);
       setRemaining(remainingGens);
+      
+      // Call refresh callback if provided
+      if (onRefresh) {
+        onRefresh();
+      }
     };
     
     // Initial update
@@ -43,7 +52,7 @@ export default function UsageLimitDisplay({
     return () => {
       window.removeEventListener('focus', handleFocus);
     };
-  }, []);
+  }, [refreshKey, onRefresh]);
   
   // Wait for client-side hydration
   if (!isClient) return null;
