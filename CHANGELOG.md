@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2025-04-19
+
 ### Added
 - Enhanced character randomization to include advanced options and sub-genres
 - Improved image generation with support for visual traits and prompt enhancements
