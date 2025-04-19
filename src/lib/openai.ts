@@ -95,6 +95,18 @@ export async function generateCharacter(systemPrompt: string, description: strin
   }
 }
 
+// Helper function to categorize if a trait is visual
+function isVisualTrait(key: string): boolean {
+  const visualTraits = [
+    'gender', 'age_group', 'species', 'height', 'build', 
+    'distinctive_features', 'appearance', 'skin', 'hair', 'eyes',
+    'face', 'body', 'clothing', 'attire', 'outfit', 'scar',
+    'tattoo', 'mark', 'accessory', 'jewelry', 'weapon'
+  ];
+  
+  return visualTraits.some(trait => key.toLowerCase().includes(trait));
+}
+
 export async function generatePortrait(character: Character): Promise<string> {
   try {
     // Gather appearance details from the character
@@ -103,22 +115,28 @@ export async function generatePortrait(character: Character): Promise<string> {
     // Get name and key traits
     const name = character.name || "character";
     
-    // Gather key traits from selected_traits - only include defined values
-    const traits: string[] = [];
+    // Gather visual traits from selected_traits
+    const visualTraits: string[] = [];
     
     if (character.selected_traits) {
-      // Only add the trait if it has a value
-      if (character.selected_traits.gender) 
-        traits.push(character.selected_traits.gender);
-      
-      if (character.selected_traits.age_group) 
-        traits.push(character.selected_traits.age_group);
-      
-      if (character.selected_traits.species) 
-        traits.push(character.selected_traits.species);
-      
-      if (character.selected_traits.occupation) 
-        traits.push(character.selected_traits.occupation);
+      Object.entries(character.selected_traits).forEach(([key, value]) => {
+        if (value && isVisualTrait(key)) {
+          if (typeof value === 'string') {
+            visualTraits.push(`${key.replace(/_/g, ' ')}: ${value}`);
+          }
+        }
+      });
+    }
+    
+    // Gather visual traits from added_traits
+    if (character.added_traits) {
+      Object.entries(character.added_traits).forEach(([key, value]) => {
+        if (value && isVisualTrait(key)) {
+          if (typeof value === 'string') {
+            visualTraits.push(`${key.replace(/_/g, ' ')}: ${value}`);
+          }
+        }
+      });
     }
     
     // Get portrait customization options - only include non-empty values
@@ -134,8 +152,8 @@ export async function generatePortrait(character: Character): Promise<string> {
     const background = portraitOptions.background ? `with a ${portraitOptions.background} background,` : '';
     
     // Create a prompt for the image generation
-    const imagePrompt = `Portrait of ${name}: ${appearanceText.substring(0, 300)}
-    ${traits.length > 0 ? `Key traits: ${traits.join(', ')}.` : ''}
+    const imagePrompt = `Portrait of ${name}: ${appearanceText.substring(0, 250)}
+    ${visualTraits.length > 0 ? `Important visual characteristics: ${visualTraits.join(', ')}.` : ''}
     ${artStyle} ${mood} ${framing} ${background}
     High quality, detailed character portrait, professional digital art.`;
 
