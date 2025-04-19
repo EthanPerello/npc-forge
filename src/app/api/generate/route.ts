@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateCharacter, generatePortrait } from '@/lib/openai';
 import { Character, CharacterFormData, GenerationResponse } from '@/lib/types';
-import { removeEmptyValues } from '@/lib/utils';
+import { removeEmptyValues, sanitizeUserInput } from '@/lib/utils';
 
 export const maxDuration = 60; // Set max duration to 60 seconds
 
@@ -16,6 +16,20 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generatio
         { error: 'Character description is required', character: null as any },
         { status: 400 }
       );
+    }
+    
+    // Sanitize the character description
+    data.description = sanitizeUserInput(data.description);
+    
+    // Also sanitize any other free-text inputs
+    if (data.advanced_options?.distinctive_features) {
+      data.advanced_options.distinctive_features = 
+        sanitizeUserInput(data.advanced_options.distinctive_features);
+    }
+    
+    if (data.advanced_options?.homeland) {
+      data.advanced_options.homeland = 
+        sanitizeUserInput(data.advanced_options.homeland);
     }
     
     // Clean form data by removing empty values
@@ -65,7 +79,9 @@ function buildSystemPrompt(data: Partial<CharacterFormData>): string {
   let prompt = `
 You are an expert RPG character generator. Generate a detailed NPC profile based on the description and parameters provided.
 
-Return ONLY valid JSON with the following structure, and no other text or explanation:
+IMPORTANT: You must only respond with valid JSON matching the structure below. Do not include any additional text, explanations, or commentary outside the JSON.
+
+Return ONLY valid JSON with the following structure:
 {
   "name": "Character Name",
   "selected_traits": {
@@ -211,6 +227,9 @@ Return ONLY valid JSON with the following structure, and no other text or explan
   
   // Add final guidance
   prompt += `\n\nBe creative, detailed, and ensure the character feels cohesive and interesting. The character should feel realistic and well-rounded, with a distinct personality and appearance that matches their background and traits.`;
+  
+  // Add reminder to only return JSON
+  prompt += `\n\nRemember: Your response must be ONLY the JSON object. Do not include any explanatory text before or after.`;
   
   return prompt;
 }

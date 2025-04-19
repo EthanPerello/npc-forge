@@ -183,3 +183,19 @@ export function debounce<T extends (...args: any[]) => any>(
     timeout = setTimeout(later, wait);
   };
 }
+
+/**
+ * Sanitizes user input to remove potential control characters and normalize whitespace
+ */
+export function sanitizeUserInput(input: string): string {
+    if (!input) return '';
+    
+    // Remove any control characters
+    let sanitized = input.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+    
+    // Normalize whitespace (but preserve paragraph breaks)
+    sanitized = sanitized.replace(/[ \t\v\f]+/g, ' ');
+    
+    // Trim leading/trailing whitespace
+    return sanitized.trim();
+  }

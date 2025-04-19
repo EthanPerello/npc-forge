@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Warning notices when approaching usage limits
 - Detailed usage statistics in character display
 - Monthly auto-reset of usage counters
+- Input sanitization to protect against malicious inputs
+- Field validation for generated character data to ensure completeness
+
+### Changed
+- Improved OpenAI prompt design to prevent prompt injection
+- Enhanced error handling with specific messages for common API issues
+- Strengthened JSON response validation with required field checking
 
 ## [0.1.2] - 2025-04-18
 
