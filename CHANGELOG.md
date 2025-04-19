@@ -29,6 +29,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Background & origin options (social class, homeland)
 - Multi-select personality traits system (up to 3 traits)
 - Searchable occupation dropdown with genre-based grouping
+- Development mode bypass for character generation limits to streamline development workflow
+- Helper function to identify visual traits for improved portrait generation
+- New utility functions for proper formatting and capitalization of character traits
+- Additional sub-genres for all core genres with detailed descriptions and examples
+- Enhanced randomization to include advanced character options
 
 ### Changed
 - Enhanced genre system with four core genres and sub-genres

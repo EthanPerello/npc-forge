@@ -15,6 +15,13 @@ interface UsageData {
 }
 
 /**
+ * Check if the app is running in development mode
+ */
+function isDevMode(): boolean {
+  return process.env.NODE_ENV === 'development';
+}
+
+/**
  * Get the current month key in YYYY-MM format
  */
 function getCurrentMonthKey(): string {
@@ -68,6 +75,12 @@ export function getUsageData(): UsageData {
  * Increment the usage count when a character is generated
  */
 export function incrementUsage(): UsageData {
+  // In development mode, don't actually increment the count
+  if (isDevMode()) {
+    console.log('[DEV MODE] Skipping usage increment');
+    return getUsageData();
+  }
+  
   const currentData = getUsageData();
   const updatedData: UsageData = {
     ...currentData,
@@ -87,6 +100,12 @@ export function incrementUsage(): UsageData {
  * Check if the user has reached their monthly limit
  */
 export function hasReachedLimit(customLimit?: number): boolean {
+  // In development mode, never reach the limit
+  if (isDevMode()) {
+    console.log('[DEV MODE] Bypassing usage limits');
+    return false;
+  }
+  
   const { count } = getUsageData();
   const limit = customLimit || DEFAULT_MONTHLY_LIMIT;
   return count >= limit;
@@ -96,6 +115,11 @@ export function hasReachedLimit(customLimit?: number): boolean {
  * Get the number of remaining generations for the current month
  */
 export function getRemainingGenerations(customLimit?: number): number {
+  // In development mode, always return a high number
+  if (isDevMode()) {
+    return 999;
+  }
+  
   const { count } = getUsageData();
   const limit = customLimit || DEFAULT_MONTHLY_LIMIT;
   return Math.max(0, limit - count);
@@ -105,6 +129,11 @@ export function getRemainingGenerations(customLimit?: number): number {
  * Get the current monthly limit
  */
 export function getMonthlyLimit(): number {
+  // In development mode, return a high number
+  if (isDevMode()) {
+    return 999;
+  }
+  
   return DEFAULT_MONTHLY_LIMIT;
 }
 
