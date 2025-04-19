@@ -8,6 +8,7 @@ import CharacterTab from '@/components/tabs/character-tab';
 import QuestsTab from '@/components/tabs/quests-tab';
 import DialogueTab from '@/components/tabs/dialogue-tab';
 import ItemsTab from '@/components/tabs/items-tab';
+import UsageLimitDisplay from '@/components/usage-limit-display';
 
 export default function MainFormTabs() {
   const { 
@@ -128,8 +129,8 @@ export default function MainFormTabs() {
         </div>
       )}
       
-      {/* Generate Button */}
-      <div className="flex justify-center mt-6">
+      {/* Generate Button and Usage Display */}
+      <div className="flex flex-col items-center mt-6 space-y-3">
         <Button
           variant="primary"
           size="lg"
@@ -140,6 +141,11 @@ export default function MainFormTabs() {
         >
           Generate Character
         </Button>
+        
+        {/* Add usage limit display */}
+        <div className="w-full flex justify-center mt-3">
+          <UsageLimitDisplay variant="compact" showWhenFull={true} />
+        </div>
       </div>
     </div>
   );

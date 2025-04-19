@@ -3,6 +3,7 @@
 import { CharacterProvider } from '@/contexts/character-context';
 import MainFormTabs from '@/components/main-form-tabs';
 import CharacterDisplay from '@/components/character-display';
+import UsageLimitsNotice from '@/components/usage-limits-notice';
 
 export default function Home() {
   return (
@@ -17,6 +18,9 @@ export default function Home() {
               AI-powered character generator for games
             </p>
           </header>
+          
+          {/* Usage Limits Notice */}
+          <UsageLimitsNotice />
           
           {/* Character Creation Form */}
           <section className="mb-12">
@@ -40,6 +44,9 @@ export default function Home() {
               >
                 GitHub Repository
               </a>
+            </p>
+            <p className="mt-3 text-xs">
+              Limited to 15 character generations per month per device.
             </p>
           </footer>
         </div>

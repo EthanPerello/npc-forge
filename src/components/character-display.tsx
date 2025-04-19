@@ -6,6 +6,7 @@ import TabInterface, { Tab } from '@/components/ui/tab-interface';
 import Button from '@/components/ui/button';
 import PortraitDisplay from '@/components/portrait-display';
 import JsonViewer from '@/components/json-viewer';
+import UsageLimitDisplay from '@/components/usage-limit-display';
 import { getCharacterTraitsArray } from '@/lib/utils';
 
 // Tab components for character display
@@ -148,6 +149,11 @@ export default function CharacterDisplay() {
                 />
               </div>
             )}
+            
+            {/* Usage Limit Display */}
+            <div className="mt-6">
+              <UsageLimitDisplay variant="detailed" />
+            </div>
           </div>
         </div>
       </div>
