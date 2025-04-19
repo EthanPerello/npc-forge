@@ -7,6 +7,7 @@ export interface Tab {
   label: string;
   content: ReactNode;
   disabled?: boolean;
+  icon?: ReactNode; // Added icon support
 }
 
 interface TabInterfaceProps {
@@ -58,17 +59,17 @@ export default function TabInterface({
 
   return (
     <div className={`w-full ${className}`}>
-      {/* Tab Navigation */}
-      <div className="flex mb-4 border-b border-gray-200 overflow-x-auto no-scrollbar dark:border-gray-700">
+      {/* Tab Navigation with enhanced styling */}
+      <div className="flex mb-6 overflow-x-auto no-scrollbar bg-gray-100 p-1 rounded-lg dark:bg-gray-700">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => !tab.disabled && handleTabChange(tab.id)}
             className={`
-              py-2 px-4 whitespace-nowrap transition-colors
+              py-2 px-4 whitespace-nowrap transition-all duration-200 rounded-md flex items-center
               ${activeTabId === tab.id 
-                ? 'text-indigo-600 border-b-2 border-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
-                : 'text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300'}
+                ? 'bg-white text-indigo-700 shadow-sm font-medium dark:bg-gray-800 dark:text-indigo-400' 
+                : 'text-gray-600 hover:text-gray-800 hover:bg-white/50 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-800/50'}
               ${tab.disabled 
                 ? 'opacity-50 cursor-not-allowed' 
                 : 'cursor-pointer'}
@@ -78,15 +79,25 @@ export default function TabInterface({
             aria-selected={activeTabId === tab.id}
             role="tab"
           >
+            {tab.icon && <span className="mr-1">{tab.icon}</span>}
             {tab.label}
           </button>
         ))}
       </div>
 
-      {/* Tab Content */}
-      <div className={`${contentClassName}`}>
+      {/* Tab Content with a subtle animation */}
+      <div className={`animate-fadeIn ${contentClassName}`}>
         {tabs.find(tab => tab.id === activeTabId)?.content}
       </div>
     </div>
   );
 }
+
+// Add this to your global CSS or inline it if needed
+// @keyframes fadeIn {
+//   from { opacity: 0; transform: translateY(5px); }
+//   to { opacity: 1; transform: translateY(0); }
+// }
+// .animate-fadeIn {
+//   animation: fadeIn 0.2s ease-in-out;
+// }

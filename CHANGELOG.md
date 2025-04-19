@@ -8,6 +8,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Welcome guide component with step-by-step instructions for new users
+- Success animation when character is successfully generated
+- Tooltips for form options to explain their purpose
+- Enhanced animations and transitions for better user experience
+- More Lucide icons throughout UI for consistent visual language
+- "Get Started" button in welcome guide that reveals the character creation form
+
+### Changed
+- Completely overhauled UI design with improved visual hierarchy and styling
+- Enhanced color scheme with consistent indigo/blue palette
+- Improved layout and spacing for better readability
+- Redesigned character card display with consistent styling
+- Enhanced tab interface with improved visual feedback
+- Improved mobile responsiveness across all components
+- Replaced emoji item icons with consistent Lucide icons
+
+### Fixed
+- Mobile responsiveness and layout issues
+- Improved tab interface behavior and styling
+
+## [0.1.3] - 2025-04-19
+
+### Added
 - Enhanced character randomization to include advanced options and sub-genres
 - Improved image generation with support for visual traits and prompt enhancements
 - Usage limit system with monthly caps, progress tracking, and warning notices
@@ -24,7 +47,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced error handling with more specific messages
 
 ### Fixed
-- Usage counter now updates immediately after character generation
 - Removed underscores and improved formatting in trait displays
 - Improved consistency in portrait generation prompts and responses
 

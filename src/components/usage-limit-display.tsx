@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getUsageData, getMonthlyLimit, getRemainingGenerations } from '@/lib/usage-limits';
 
 interface UsageLimitDisplayProps {
@@ -22,9 +22,13 @@ export default function UsageLimitDisplay({
   const [remaining, setRemaining] = useState(0);
   const [limit, setLimit] = useState(0);
   const [isClient, setIsClient] = useState(false);
+  const initialRender = useRef(true);
   
   // Update usage data on mount, refreshKey change, and when component is visible
   useEffect(() => {
+    // Avoid state updates during initial server-side rendering
+    if (typeof window === 'undefined') return;
+    
     setIsClient(true);
     
     const updateUsage = () => {
@@ -35,24 +39,32 @@ export default function UsageLimitDisplay({
       setCount(count);
       setLimit(monthlyLimit);
       setRemaining(remainingGens);
-      
-      // Call refresh callback if provided
-      if (onRefresh) {
-        onRefresh();
-      }
     };
     
     // Initial update
     updateUsage();
     
-    // Update when window gains focus
-    const handleFocus = () => updateUsage();
-    window.addEventListener('focus', handleFocus);
+    // Update when window gains focus - but only attach listener after first render
+    if (!initialRender.current) {
+      const handleFocus = () => updateUsage();
+      window.addEventListener('focus', handleFocus);
+      
+      return () => {
+        window.removeEventListener('focus', handleFocus);
+      };
+    }
     
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, [refreshKey, onRefresh]);
+    // Mark initial render complete
+    initialRender.current = false;
+    
+  }, [refreshKey]); // Remove onRefresh from dependency array
+  
+  // Call refresh callback in a separate effect to avoid infinite loops
+  useEffect(() => {
+    if (isClient && onRefresh && !initialRender.current) {
+      onRefresh();
+    }
+  }, [isClient, onRefresh]);
   
   // Wait for client-side hydration
   if (!isClient) return null;
