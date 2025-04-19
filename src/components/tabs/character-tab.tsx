@@ -17,9 +17,9 @@ import {
   SubGenreOption
 } from '@/lib/types';
 
-// Options for dropdown selects - all with "None" as first option
+// Options for dropdown selects - all with "Not specified" as first option
 const genderOptions: GenderOption[] = [
-  { value: '' as any, label: 'None' },
+  { value: '' as any, label: 'Not specified' },
   { value: 'male', label: 'Male' },
   { value: 'female', label: 'Female' },
   { value: 'nonbinary', label: 'Nonbinary' },
@@ -27,7 +27,7 @@ const genderOptions: GenderOption[] = [
 ];
 
 const ageGroupOptions: AgeGroupOption[] = [
-  { value: '' as any, label: 'None' },
+  { value: '' as any, label: 'Not specified' },
   { value: 'child', label: 'Child' },
   { value: 'teen', label: 'Teen' },
   { value: 'adult', label: 'Adult' },
@@ -35,14 +35,14 @@ const ageGroupOptions: AgeGroupOption[] = [
 ];
 
 const alignmentOptions: AlignmentOption[] = [
-  { value: '' as any, label: 'None' },
+  { value: '' as any, label: 'Not specified' },
   { value: 'good', label: 'Good' },
   { value: 'neutral', label: 'Neutral' },
   { value: 'evil', label: 'Evil' }
 ];
 
 const relationshipOptions: RelationshipOption[] = [
-  { value: '' as any, label: 'None' },
+  { value: '' as any, label: 'Not specified' },
   { value: 'ally', label: 'Ally' },
   { value: 'enemy', label: 'Enemy' },
   { value: 'neutral', label: 'Neutral' },
@@ -82,47 +82,71 @@ const socialClassOptions = [
   { value: 'outcast', label: 'Outcast/Outsider' }
 ];
 
-// Occupation options (for searchable dropdown)
+// Updated occupation options (for searchable dropdown)
 const occupationOptions = [
+  // General occupations (applicable to most genres)
+  { value: '', label: 'Not specified', group: 'General' },
+  { value: 'merchant', label: 'Merchant/Trader', group: 'General' },
+  { value: 'leader', label: 'Leader/Authority Figure', group: 'General' },
+  { value: 'craftsperson', label: 'Craftsperson/Artisan', group: 'General' },
+  { value: 'healer', label: 'Healer/Medic', group: 'General' },
+  { value: 'scholar', label: 'Scholar/Academic', group: 'General' },
+  { value: 'entertainer', label: 'Entertainer/Artist', group: 'General' },
+  { value: 'criminal', label: 'Criminal/Outlaw', group: 'General' },
+  { value: 'explorer', label: 'Explorer/Traveler', group: 'General' },
+  { value: 'guard', label: 'Guard/Protector', group: 'General' },
+  
   // Fantasy occupations
-  { value: 'wizard', label: 'Wizard', group: 'Fantasy' },
-  { value: 'knight', label: 'Knight', group: 'Fantasy' },
-  { value: 'ranger', label: 'Ranger', group: 'Fantasy' },
+  { value: 'wizard', label: 'Wizard/Mage', group: 'Fantasy' },
+  { value: 'knight', label: 'Knight/Warrior', group: 'Fantasy' },
+  { value: 'ranger', label: 'Ranger/Hunter', group: 'Fantasy' },
   { value: 'blacksmith', label: 'Blacksmith', group: 'Fantasy' },
   { value: 'alchemist', label: 'Alchemist', group: 'Fantasy' },
-  { value: 'bard', label: 'Bard', group: 'Fantasy' },
-  { value: 'cleric', label: 'Cleric', group: 'Fantasy' },
-  { value: 'druid', label: 'Druid', group: 'Fantasy' },
+  { value: 'bard', label: 'Bard/Minstrel', group: 'Fantasy' },
+  { value: 'cleric', label: 'Cleric/Priest', group: 'Fantasy' },
+  { value: 'druid', label: 'Druid/Nature Guardian', group: 'Fantasy' },
+  { value: 'noble', label: 'Noble/Royalty', group: 'Fantasy' },
+  { value: 'thief', label: 'Thief/Rogue', group: 'Fantasy' },
+  { value: 'innkeeper', label: 'Innkeeper/Tavern Owner', group: 'Fantasy' },
   
   // Sci-Fi occupations
-  { value: 'engineer', label: 'Engineer', group: 'Sci-Fi' },
-  { value: 'pilot', label: 'Pilot', group: 'Sci-Fi' },
-  { value: 'scientist', label: 'Scientist', group: 'Sci-Fi' },
+  { value: 'engineer', label: 'Engineer/Technician', group: 'Sci-Fi' },
+  { value: 'pilot', label: 'Pilot/Navigator', group: 'Sci-Fi' },
+  { value: 'scientist', label: 'Scientist/Researcher', group: 'Sci-Fi' },
   { value: 'bounty_hunter', label: 'Bounty Hunter', group: 'Sci-Fi' },
-  { value: 'android_technician', label: 'Android Technician', group: 'Sci-Fi' },
+  { value: 'ai_specialist', label: 'AI Specialist', group: 'Sci-Fi' },
   { value: 'space_trader', label: 'Space Trader', group: 'Sci-Fi' },
-  { value: 'colony_administrator', label: 'Colony Administrator', group: 'Sci-Fi' },
-  { value: 'xenobiologist', label: 'Xenobiologist', group: 'Sci-Fi' },
+  { value: 'colony_leader', label: 'Colony Leader', group: 'Sci-Fi' },
+  { value: 'security', label: 'Security Officer', group: 'Sci-Fi' },
+  { value: 'smuggler', label: 'Smuggler', group: 'Sci-Fi' },
+  { value: 'medic', label: 'Medic/Doctor', group: 'Sci-Fi' },
+  { value: 'hacker', label: 'Hacker/Netrunner', group: 'Sci-Fi' },
   
   // Historical occupations
-  { value: 'scholar', label: 'Scholar', group: 'Historical' },
-  { value: 'noble', label: 'Noble', group: 'Historical' },
-  { value: 'merchant', label: 'Merchant', group: 'Historical' },
-  { value: 'craftsperson', label: 'Craftsperson', group: 'Historical' },
   { value: 'farmer', label: 'Farmer', group: 'Historical' },
   { value: 'soldier', label: 'Soldier', group: 'Historical' },
-  { value: 'sailor', label: 'Sailor', group: 'Historical' },
+  { value: 'sailor', label: 'Sailor/Mariner', group: 'Historical' },
   { value: 'priest', label: 'Priest/Clergy', group: 'Historical' },
+  { value: 'scribe', label: 'Scribe/Record Keeper', group: 'Historical' },
+  { value: 'servant', label: 'Servant/Attendant', group: 'Historical' },
+  { value: 'hunter', label: 'Hunter/Trapper', group: 'Historical' },
+  { value: 'diplomat', label: 'Diplomat/Emissary', group: 'Historical' },
+  { value: 'explorer', label: 'Explorer', group: 'Historical' },
+  { value: 'trade_master', label: 'Guild Master/Trade Leader', group: 'Historical' },
   
   // Contemporary occupations
   { value: 'doctor', label: 'Doctor', group: 'Contemporary' },
-  { value: 'lawyer', label: 'Lawyer', group: 'Contemporary' },
-  { value: 'teacher', label: 'Teacher', group: 'Contemporary' },
+  { value: 'teacher', label: 'Teacher/Professor', group: 'Contemporary' },
   { value: 'police', label: 'Police Officer', group: 'Contemporary' },
-  { value: 'chef', label: 'Chef', group: 'Contemporary' },
+  { value: 'chef', label: 'Chef/Cook', group: 'Contemporary' },
   { value: 'artist', label: 'Artist', group: 'Contemporary' },
-  { value: 'programmer', label: 'Programmer', group: 'Contemporary' },
-  { value: 'journalist', label: 'Journalist', group: 'Contemporary' }
+  { value: 'programmer', label: 'Programmer/Developer', group: 'Contemporary' },
+  { value: 'journalist', label: 'Journalist/Reporter', group: 'Contemporary' },
+  { value: 'business', label: 'Business Owner', group: 'Contemporary' },
+  { value: 'athlete', label: 'Athlete', group: 'Contemporary' },
+  { value: 'lawyer', label: 'Lawyer', group: 'Contemporary' },
+  { value: 'musician', label: 'Musician', group: 'Contemporary' },
+  { value: 'driver', label: 'Driver/Pilot', group: 'Contemporary' }
 ];
 
 // Personality trait options
@@ -239,6 +263,13 @@ export default function CharacterTab() {
     setSelectedSubGenre(undefined);
   };
   
+  // Get a random item from an array, skipping index 0
+  const getRandomOption = (options: any[]) => {
+    // +1 to skip the "Not specified" option at index 0
+    const randomIndex = Math.floor(Math.random() * (options.length - 1)) + 1;
+    return options[randomIndex].value;
+  };
+  
   // Handle randomize function - does NOT modify portrait options
   const handleRandomize = () => {
     // Save portrait options and description to restore them later
@@ -259,23 +290,46 @@ export default function CharacterTab() {
     // Apply the genre selection
     handleGenreChange(randomGenre, randomSubGenre);
     
-    // Randomly select other options, selecting from index 1 and above (to skip "None")
-    const getRandomOption = (options: any[]) => {
-      // +1 to skip the "None" option at index 0
-      const randomIndex = Math.floor(Math.random() * (options.length - 1)) + 1;
-      return options[randomIndex].value;
-    };
-    
+    // Randomly select main options
     const randomGender = getRandomOption(genderOptions);
     const randomAge = getRandomOption(ageGroupOptions);
     const randomAlignment = getRandomOption(alignmentOptions);
     const randomRelationship = getRandomOption(relationshipOptions);
+    
+    // Randomly select advanced options too
+    const randomHeight = getRandomOption(heightOptions);
+    const randomBuild = getRandomOption(buildOptions);
+    const randomSocialClass = getRandomOption(socialClassOptions);
+    
+    // Random occupation - getting a valid occupation by skipping the first option
+    const validOccupations = occupationOptions.filter(option => 
+      option.value !== '' && 
+      (option.group === 'General' || option.group === randomGenre.id)
+    );
+    const randomOccupationIndex = Math.floor(Math.random() * validOccupations.length);
+    const randomOccupation = validOccupations[randomOccupationIndex].value;
+    
+    // Random personality traits - select 1-3 traits
+    const numTraits = Math.floor(Math.random() * 3) + 1; // 1 to 3 traits
+    const shuffledTraits = [...personalityTraitOptions].sort(() => 0.5 - Math.random());
+    const randomTraits = shuffledTraits.slice(0, numTraits).map(t => t.value);
     
     updateFormData({
       gender: randomGender,
       age_group: randomAge,
       moral_alignment: randomAlignment,
       relationship_to_player: randomRelationship,
+      advanced_options: {
+        occupation: randomOccupation,
+        height: randomHeight,
+        build: randomBuild,
+        social_class: randomSocialClass,
+        personality_traits: randomTraits,
+        // Keep these fields as is or initialize them
+        species: undefined,
+        distinctive_features: undefined,
+        homeland: undefined
+      },
       // Restore description and portrait options
       description: description,
       portrait_options: portraitOptions
