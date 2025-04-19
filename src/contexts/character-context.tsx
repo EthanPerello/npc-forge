@@ -204,6 +204,14 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     try {
+      // Import usage limits (done inside the function to avoid SSR issues)
+      const { hasReachedLimit, incrementUsage } = await import('@/lib/usage-limits');
+      
+      // Check if user has reached their monthly limit
+      if (hasReachedLimit()) {
+        throw new Error('You have reached your monthly character generation limit. Limits will reset at the beginning of next month.');
+      }
+
       // Call the API endpoint
       const response = await fetch('/api/generate', {
         method: 'POST',
@@ -220,6 +228,9 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
 
       const data = await response.json();
       setCharacter(data.character);
+      
+      // Increment usage count on successful generation
+      incrementUsage();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
       console.error('Error generating character:', err);

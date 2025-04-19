@@ -5,6 +5,15 @@ All notable changes to NPC Forge will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Usage limits to manage API costs (15 generations per month per device)
+- Progress bar showing usage and remaining generations
+- Warning notices when approaching usage limits
+- Detailed usage statistics in character display
+- Monthly auto-reset of usage counters
+
 ## [0.1.2] - 2025-04-18
 
 ### Added
