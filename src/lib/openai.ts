@@ -47,12 +47,31 @@ export async function generateCharacter(systemPrompt: string, description: strin
     try {
       // Parse the JSON
       const character: Character = JSON.parse(jsonMatch[0]);
+      
+      // Validate essential fields are present
+      const requiredFields = ['name', 'appearance', 'personality', 'backstory_hook'];
+      for (const field of requiredFields) {
+        if (!character[field as keyof Character]) {
+          throw new Error(`Generated character missing required field: ${field}`);
+        }
+      }
+      
       return character;
     } catch (parseError) {
       console.error("JSON parsing error:", parseError);
       // Try to clean the JSON string if parsing fails
       const cleaned = jsonMatch[0].replace(/[\u0000-\u001F]+/g, " ").trim();
-      return JSON.parse(cleaned); 
+      const character = JSON.parse(cleaned);
+      
+      // Still validate after cleaning
+      const requiredFields = ['name', 'appearance', 'personality', 'backstory_hook'];
+      for (const field of requiredFields) {
+        if (!character[field as keyof Character]) {
+          throw new Error(`Generated character missing required field: ${field}`);
+        }
+      }
+      
+      return character; 
     }
   } catch (error) {
     console.error("Error generating character:", error);
@@ -62,8 +81,13 @@ export async function generateCharacter(systemPrompt: string, description: strin
       if (error.stack) console.error(`Stack: ${error.stack}`);
     }
     
-    // Rethrow with more helpful error message
-    if (error instanceof Error) {
+    // Provide more specific error messages based on error type
+    const apiError = error as OpenAIError;
+    if (apiError.status === 429) {
+      throw new Error("OpenAI API rate limit exceeded. Please try again later.");
+    } else if (apiError.status === 400) {
+      throw new Error("OpenAI API rejected the request. Your description may contain inappropriate content.");
+    } else if (error instanceof Error) {
       throw new Error(`OpenAI API error: ${error.message}`);
     } else {
       throw new Error("An unknown error occurred while generating character");
@@ -136,9 +160,9 @@ export async function generatePortrait(character: Character): Promise<string> {
     
     // Provide a helpful error message for common issues
     if (apiError.status === 429) {
-      console.error("Rate limit exceeded for image generation. Consider waiting a minute before trying again.");
+      throw new Error("Rate limit exceeded for image generation. Please try again later.");
     } else if (apiError.status === 400) {
-      console.error("Bad request error. The image prompt may violate content policies.");
+      throw new Error("Bad request error. The image prompt may violate content policies.");
     }
     
     if (error instanceof Error) {
