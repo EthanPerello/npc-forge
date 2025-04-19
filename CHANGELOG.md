@@ -8,22 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Usage limits to manage API costs (15 generations per month per device)
-- Progress bar showing usage and remaining generations
-- Warning notices when approaching usage limits
-- Detailed usage statistics in character display
-- Monthly auto-reset of usage counters
-- Input sanitization to protect against malicious inputs
-- Field validation for generated character data to ensure completeness
+- Enhanced character randomization to include advanced options and sub-genres
+- Improved image generation with support for visual traits and prompt enhancements
+- Usage limit system with monthly caps, progress tracking, and warning notices
+- Developer tools: bypass generation limits in dev mode
+- New utility functions for trait formatting and visual processing
+- Input validation and sanitization for improved data safety and completeness
 
 ### Changed
-- Improved OpenAI prompt design to prevent prompt injection
-- Enhanced error handling with specific messages for common API issues
-- Strengthened JSON response validation with required field checking
-- Updated all dropdown menus to use "Not specified" instead of "None"
+- All dropdowns now use "Not specified" instead of "None"
+- Improved formatting and capitalization of trait values
+- Reworked genre templates with expanded sub-genres and clearer examples
+- Better OpenAI prompt design for resilience and clarity
+- Refined occupation list by genre; removed niche/uncommon roles
+- Enhanced error handling with more specific messages
 
 ### Fixed
-- Immediate update of usage count after character generation
+- Usage counter now updates immediately after character generation
+- Removed underscores and improved formatting in trait displays
+- Improved consistency in portrait generation prompts and responses
 
 ## [0.1.2] - 2025-04-18
 
@@ -33,11 +36,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Background & origin options (social class, homeland)
 - Multi-select personality traits system (up to 3 traits)
 - Searchable occupation dropdown with genre-based grouping
-- Development mode bypass for character generation limits to streamline development workflow
-- Helper function to identify visual traits for improved portrait generation
-- New utility functions for proper formatting and capitalization of character traits
-- Additional sub-genres for all core genres with detailed descriptions and examples
-- Enhanced randomization to include advanced character options
 
 ### Changed
 - Enhanced genre system with four core genres and sub-genres
