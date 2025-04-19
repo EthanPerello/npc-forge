@@ -4,9 +4,9 @@ import { useCharacter } from '@/contexts/character-context';
 import ExpandableSection from '@/components/ui/expandable-section';
 import Select from '@/components/ui/select';
 
-// Options for portrait customization with "None" as first option
+// Options for portrait customization with "Not specified" as first option
 const artStyleOptions = [
-  { value: '', label: 'None' },
+  { value: '', label: 'Not specified' },
   { value: 'realistic', label: 'Realistic' },
   { value: 'fantasy', label: 'Fantasy Art' },
   { value: 'anime', label: 'Anime/Manga' },
@@ -18,7 +18,7 @@ const artStyleOptions = [
 ];
 
 const moodOptions = [
-  { value: '', label: 'None' },
+  { value: '', label: 'Not specified' },
   { value: 'neutral', label: 'Neutral' },
   { value: 'happy', label: 'Happy/Smiling' },
   { value: 'serious', label: 'Serious' },
@@ -30,7 +30,7 @@ const moodOptions = [
 ];
 
 const framingOptions = [
-  { value: '', label: 'None' },
+  { value: '', label: 'Not specified' },
   { value: 'portrait', label: 'Portrait (Head/Shoulders)' },
   { value: 'bust', label: 'Bust (Upper Body)' },
   { value: 'full-body', label: 'Full Body' },
@@ -38,7 +38,7 @@ const framingOptions = [
 ];
 
 const backgroundOptions = [
-  { value: '', label: 'None' },
+  { value: '', label: 'Not specified' },
   { value: 'plain', label: 'Plain/Solid Color' },
   { value: 'gradient', label: 'Gradient' },
   { value: 'themed', label: 'Themed (Based on Character)' },

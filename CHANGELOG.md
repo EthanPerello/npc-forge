@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved OpenAI prompt design to prevent prompt injection
 - Enhanced error handling with specific messages for common API issues
 - Strengthened JSON response validation with required field checking
+- Updated all dropdown menus to use "Not specified" instead of "None"
 
 ### Fixed
 - Immediate update of usage count after character generation
