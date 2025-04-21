@@ -15,7 +15,6 @@ export default function Home() {
   // Force reset the localStorage flag in dev mode on first page load
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      console.log('Development mode detected in page.tsx');
       localStorage.removeItem('npc-forge-guide-dismissed');
     }
   }, []);

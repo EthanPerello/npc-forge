@@ -16,30 +16,21 @@ export default function WelcomeGuide({ onDismiss }: WelcomeGuideProps) {
   // First effect: detect environment and set mounted state
   useEffect(() => {
     setHasMounted(true);
-    
-    // Check if we're in development mode
-    // In Next.js, this should be 'development' in local dev
     const isDev = process.env.NODE_ENV === 'development';
     setIsDevEnvironment(isDev);
-    
-    // Debug log to confirm environment
-    console.log('Environment:', process.env.NODE_ENV, 'isDev:', isDev);
   }, []);
   
   // Second effect: handle visibility based on environment
   useEffect(() => {
-    // Skip if not mounted yet
     if (!hasMounted) return;
     
     if (isDevEnvironment) {
       // In development mode, always show the welcome guide
-      console.log('Development mode: Welcome guide should always show');
       setIsVisible(true);
     } else {
       // In production, check localStorage
       const dismissed = localStorage.getItem('npc-forge-guide-dismissed');
       if (dismissed === 'true') {
-        console.log('Production mode: Guide previously dismissed');
         setIsVisible(false);
         onDismiss();
       }
@@ -52,8 +43,6 @@ export default function WelcomeGuide({ onDismiss }: WelcomeGuideProps) {
     // Only save to localStorage in production mode
     if (!isDevEnvironment) {
       localStorage.setItem('npc-forge-guide-dismissed', 'true');
-    } else {
-      console.log('Dev mode: Not saving dismissal to localStorage');
     }
     
     onDismiss();
