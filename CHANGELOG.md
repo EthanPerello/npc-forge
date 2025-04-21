@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Mobile responsiveness and layout issues
 - Improved tab interface behavior and styling
+- Fixed infinite update loop in usage limit display
 
 ## [0.1.3] - 2025-04-19
 
