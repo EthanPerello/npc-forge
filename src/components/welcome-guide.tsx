@@ -8,43 +8,47 @@ interface WelcomeGuideProps {
   onDismiss: () => void;
 }
 
-// Helper function to check if we're in development mode
-function isDevMode(): boolean {
-  return process.env.NODE_ENV === 'development';
-}
-
 export default function WelcomeGuide({ onDismiss }: WelcomeGuideProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [hasMounted, setHasMounted] = useState(false);
+  const [isDevEnvironment, setIsDevEnvironment] = useState(false);
 
+  // First effect: detect environment and set mounted state
   useEffect(() => {
     setHasMounted(true);
+    const isDev = process.env.NODE_ENV === 'development';
+    setIsDevEnvironment(isDev);
+  }, []);
+  
+  // Second effect: handle visibility based on environment
+  useEffect(() => {
+    if (!hasMounted) return;
     
-    // In development mode, always show the welcome guide
-    if (isDevMode()) {
+    if (isDevEnvironment) {
+      // In development mode, always show the welcome guide
       setIsVisible(true);
-      return;
+    } else {
+      // In production, check localStorage
+      const dismissed = localStorage.getItem('npc-forge-guide-dismissed');
+      if (dismissed === 'true') {
+        setIsVisible(false);
+        onDismiss();
+      }
     }
-    
-    // In production, check localStorage
-    const dismissed = localStorage.getItem('npc-forge-guide-dismissed');
-    if (dismissed === 'true') {
-      setIsVisible(false);
-      onDismiss();
-    }
-  }, [onDismiss]);
+  }, [hasMounted, isDevEnvironment, onDismiss]);
 
   const handleDismiss = () => {
     setIsVisible(false);
     
     // Only save to localStorage in production mode
-    if (!isDevMode()) {
+    if (!isDevEnvironment) {
       localStorage.setItem('npc-forge-guide-dismissed', 'true');
     }
     
     onDismiss();
   };
 
+  // Early return if not mounted or not visible
   if (!hasMounted || !isVisible) return null;
 
   return (
@@ -53,7 +57,7 @@ export default function WelcomeGuide({ onDismiss }: WelcomeGuideProps) {
         <h2 className="text-xl font-bold text-white flex items-center">
           <Info className="mr-2 h-5 w-5" />
           Welcome to NPC Forge
-          {isDevMode() && <span className="ml-2 text-xs bg-yellow-400 text-black px-2 py-0.5 rounded-full">DEV MODE</span>}
+          {isDevEnvironment && <span className="ml-2 text-xs bg-yellow-400 text-black px-2 py-0.5 rounded-full">DEV MODE</span>}
         </h2>
         <button
           onClick={handleDismiss}

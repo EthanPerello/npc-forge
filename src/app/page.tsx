@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CharacterProvider } from '@/contexts/character-context';
 import MainFormTabs from '@/components/main-form-tabs';
 import CharacterDisplay from '@/components/character-display';
@@ -11,6 +11,13 @@ import { BookOpen } from 'lucide-react';
 export default function Home() {
   // Control visibility of the create character form
   const [showCreateForm, setShowCreateForm] = useState(false);
+  
+  // Force reset the localStorage flag in dev mode on first page load
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      localStorage.removeItem('npc-forge-guide-dismissed');
+    }
+  }, []);
 
   // Handle the welcome guide dismissal
   const handleWelcomeDismiss = () => {
