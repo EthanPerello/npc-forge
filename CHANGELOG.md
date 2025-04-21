@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced animations and transitions for better user experience
 - More Lucide icons throughout UI for consistent visual language
 - "Get Started" button in welcome guide that reveals the character creation form
+- Development mode enhancement: Welcome guide always shows in development environment for easier testing and development
 
 ### Changed
 - Completely overhauled UI design with improved visual hierarchy and styling
