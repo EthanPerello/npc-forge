@@ -1,0 +1,50 @@
+{
+  "name": "Detective Miles Navarro",
+  "selected_traits": {
+    "gender": "male",
+    "age group": "adult",
+    "moral alignment": "neutral",
+    "relationship to player": "ally"
+  },
+  "added_traits": {
+    "social class": "working",
+    "height": "average",
+    "build": "sturdy",
+    "distinctive features": "Permanent five-o'clock shadow, faded scar under his eye",
+    "homeland": "Eastborough City",
+    "personality traits": [
+      "cautious",
+      "honest",
+      "sarcastic"
+    ]
+  },
+  "appearance": "Miles Navarro stands at an average height with a sturdy build, his weathered trench coat hanging loosely around him, telling tales of countless rainy nights spent on the city's streets. A permanent five-o'clock shadow casts a rugged look on his face, accentuated by a faded scar under his right eye, hinting at a tumultuous past. His deep-set eyes, often narrowed in concentration, can pierce through the facades of those he encounters, while his posture suggests a man who’s seen too much yet remains resolute in his quest for truth.",
+  "personality": "Cautious by nature, Miles approaches each case with a meticulous eye, weighing every detail before drawing conclusions. Honesty is his guiding principle, even when the truth is uncomfortable, and his sarcastic wit provides a veil of humor amidst the grim realities of his work. He is dependable, a steadfast ally who values loyalty and integrity, though his disillusionment with the system sometimes renders him jaded. Beneath his gruff exterior lies a keen intellect and an unwavering determination to uncover the truth.",
+  "backstory_hook": "Once a respected cop in Eastborough City, Miles turned his back on the force after a scandal shook his trust in the system, leading him to become a private investigator chasing shadows and redemption.",
+  "special_ability": "Keen Insight - Miles can read people's emotions and intentions with uncanny accuracy, allowing him to navigate complex social interactions and uncover hidden truths.",
+  "items": [
+    "Trench Coat - A weather-beaten trench coat that provides both protection from the elements and a sense of anonymity while he works.",
+    "Flask - A concealed flask filled with whiskey, offering him a moment of solace during long, dreary nights spent poring over case files.",
+    "Magnifying Glass - An essential tool for examining evidence closely, revealing details that could be easily overlooked."
+  ],
+  "dialogue_lines": [
+    "Keep your cards close to your chest; the city doesn't take kindly to the reckless.",
+    "Trust is a luxury we can’t afford in this line of work.",
+    "You can ask your questions, but don't expect me to sugarcoat the answers."
+  ],
+  "quests": [
+    {
+      "title": "The Vanishing Act",
+      "description": "Explore the dark alleys of Eastborough City to uncover the truth behind a string of mysterious disappearances that have left the community on edge.",
+      "reward": "Increased reputation among local informants and access to exclusive information.",
+      "type": "exploration"
+    }
+  ],
+  "portrait_options": {
+    "art_style": "comic",
+    "mood": "serious",
+    "framing": "portrait",
+    "background": "abstract"
+  },
+  "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-qJ0U7jKLC0Ra4Z9TQHIjJwvh/user-0mzSf12iRI5p6fKMYOy9zHZB/img-qAZoNe5pEAolrn5gOnQY9YBw.png?st=2025-04-21T03%3A23%3A17Z&se=2025-04-21T05%3A23%3A17Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=475fd488-6c59-44a5-9aa9-31c4db451bea&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-04-20T11%3A13%3A52Z&ske=2025-04-21T11%3A13%3A52Z&sks=b&skv=2024-08-04&sig=k/ANOnOFwONFJc54ZDedyPa4bzrqCPl3NAgYXSGVT/s%3D"
+}

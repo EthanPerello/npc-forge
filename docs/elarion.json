@@ -1,0 +1,51 @@
+{
+  "name": "Elarion",
+  "selected_traits": {
+    "gender": "male",
+    "age group": "elder",
+    "moral alignment": "good",
+    "relationship to player": "mentor"
+  },
+  "added_traits": {
+    "occupation": "wizard",
+    "social class": "upper",
+    "height": "tall",
+    "build": "thin",
+    "distinctive features": "Glowing runes etched along his arms, only visible when he channels magic.",
+    "homeland": "Aerthalon, the Floating City",
+    "personality traits": [
+      "loyal",
+      "mysterious",
+      "wise"
+    ]
+  },
+  "appearance": "Elarion is a tall, thin figure with long silver hair that cascades down his back, framing a face marked by wisdom and serenity. His glowing violet eyes seem to pierce through the veil of reality, capturing the essence of all they behold. His skin is smooth and fair, with luminescent runes etched along his arms, only visible when he channels his formidable magic. He typically wears flowing robes adorned with intricate patterns that reflect the colors of the sky and stars, emphasizing his connection to the arcane and the ethereal.",
+  "personality": "Elarion possesses a calm and composed demeanor, radiating wisdom that comes from centuries of experience. Loyal to those he mentors, he often keeps a mysterious air about him, hinting at deep knowledge of the arcane and the history of his people. He speaks with a scholarly tone, drawing from an extensive reservoir of lore and stories, and finds joy in nurturing the potential of young heroes. Despite his vast knowledge, he carries the weight of untold secrets that shape his actions and decisions.",
+  "backstory_hook": "Once a celebrated hero during the Age of Titans, Elarion now guards the dangerous secrets of the past while shaping the future of new heroes in the floating city of Aerthalon.",
+  "special_ability": "Arcane Insight: Elarion can tap into the ancient knowledge of the cosmos, allowing him to reveal hidden truths and provide guidance based on visions from the past.",
+  "items": [
+    "Staff of Celestial Light: A rare staff that enhances Elarion's magical abilities, glowing with an inner light that illuminates dark places and reveals hidden paths.",
+    "Tome of Forgotten Lore: A rare book filled with the secrets of the ancient world, allowing Elarion to gain insight into lost spells and forgotten histories.",
+    "Amulet of Ethereal Whispers: A rare amulet that allows Elarion to communicate with spirits and gather information from the past, enhancing his wisdom further."
+  ],
+  "dialogue_lines": [
+    "Ah, young one, the path to wisdom is fraught with challenges, but I shall guide you as best I can.",
+    "The ancients spoke of trials that test the heart and mind; are you prepared to face them?",
+    "Knowledge is a double-edged sword; wield it with care, for its weight can crush the unprepared."
+  ],
+  "quests": [
+    {
+      "title": "The Secrets of the Past",
+      "description": "Investigate the ancient ruins beneath Aerthalon to uncover long-lost knowledge that may affect the future of our world.",
+      "reward": "Insight into the hidden truths of magic and history.",
+      "type": "investigate"
+    }
+  ],
+  "portrait_options": {
+    "art_style": "fantasy",
+    "mood": "serious",
+    "framing": "bust",
+    "background": "themed"
+  },
+  "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-qJ0U7jKLC0Ra4Z9TQHIjJwvh/user-0mzSf12iRI5p6fKMYOy9zHZB/img-lN0exi5LDflgTb20vkMMGbOf.png?st=2025-04-21T01%3A42%3A25Z&se=2025-04-21T03%3A42%3A25Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=475fd488-6c59-44a5-9aa9-31c4db451bea&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-04-20T20%3A01%3A32Z&ske=2025-04-21T20%3A01%3A32Z&sks=b&skv=2024-08-04&sig=o3OTXoL7eXCVKVsa/UYmbKJrNmWQZfR6IMEYi7nsfKk%3D"
+}

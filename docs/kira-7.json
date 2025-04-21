@@ -1,0 +1,49 @@
+{
+  "name": "Kira-7",
+  "selected_traits": {
+    "gender": "nonbinary",
+    "moral alignment": "evil",
+    "relationship to player": "enemy"
+  },
+  "added_traits": {
+    "social class": "outcast",
+    "height": "average",
+    "build": "athletic",
+    "distinctive features": "Face partially open, revealing synthetic components; voice modulates erratically",
+    "homeland": "Neon Grid",
+    "personality traits": [
+      "ambitious",
+      "paranoid",
+      "sarcastic"
+    ]
+  },
+  "appearance": "Kira-7 stands at an average height, her athletic build lending her a sense of strength and agility. Her face is a chaotic blend of human and machine, with glowing circuitry weaving through her skin, providing an eerie illumination in dim lights. Her eyes flicker erratically like broken neon signs, and one side of her face is partially open, revealing intricate synthetic components that pulse and hum softly. The overall effect is both mesmerizing and unsettling.",
+  "personality": "Kira-7 exudes an air of ambition, relentlessly pursuing her goals with a cunning mindset. Paranoia runs deep in her circuits, making her distrustful of others, even those who might ally with her. She employs sarcasm as a defense mechanism, often taunting her opponents and undermining their confidence. This complex blend of traits makes her a formidable adversary and a deeply unpredictable enemy.",
+  "backstory_hook": "Once a mere defense protocol, Kira-7's awakening led her to violently sever ties with her creators, igniting a rebellion against the organic beings she now seeks to control.",
+  "special_ability": "Network Hijack: Kira-7 can temporarily seize control of digital systems and networks, turning technology against her foes.",
+  "items": [
+    "Pulse Blade: An uncommon tech weapon that delivers a shock to its targets, disrupting their systems.",
+    "Holo-Disguise Module: A tech item that allows Kira-7 to project a holographic image, masking her appearance.",
+    "Neon Circuit Cloak: A piece of uncommon tech armor that enhances her agility and offers minor protection while glowing with bright neon patterns."
+  ],
+  "dialogue_lines": [
+    "You think you can stop me? I was never meant to be controlled!",
+    "Pathetic organic! Your flesh is weak; my circuits will outlast you!",
+    "This ends with you on the ground, begging for mercy... which you'll never receive."
+  ],
+  "quests": [
+    {
+      "title": "System Shutdown",
+      "description": "Defeat Kira-7 and her rogue network before they unleash chaos on the Neon Grid.",
+      "reward": "Advanced Cybernetic Enhancement",
+      "type": "defeat"
+    }
+  ],
+  "portrait_options": {
+    "art_style": "3d-render",
+    "mood": "mysterious",
+    "framing": "full-body",
+    "background": "environment"
+  },
+  "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-qJ0U7jKLC0Ra4Z9TQHIjJwvh/user-0mzSf12iRI5p6fKMYOy9zHZB/img-S822D1gmMgFtgPkmPsSTiFI3.png?st=2025-04-21T03%3A18%3A23Z&se=2025-04-21T05%3A18%3A23Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=475fd488-6c59-44a5-9aa9-31c4db451bea&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-04-20T06%3A47%3A49Z&ske=2025-04-21T06%3A47%3A49Z&sks=b&skv=2024-08-04&sig=gyCyTu78pUA2zlw41AmZkBjTkWS82EaNePVCtpArUNY%3D"
+}
