@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { TemplateOption, SubGenreOption } from '@/lib/types';
-import { getSubGenres } from '@/lib/templates';
+import { getSubGenres, getAllSubGenres } from '@/lib/templates';
 import GenreIcon from '@/components/ui/genre-icon';
 
 interface TemplateSelectorProps {
   templates: TemplateOption[];
   selectedId?: string;
+  selectedSubGenreId?: string; // Add new prop for selected sub-genre
   onChange: (template: TemplateOption | undefined, subGenre?: SubGenreOption) => void;
   className?: string;
 }
@@ -15,12 +16,13 @@ interface TemplateSelectorProps {
 export default function TemplateSelector({
   templates,
   selectedId,
+  selectedSubGenreId,
   onChange,
   className = ''
 }: TemplateSelectorProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [selectedGenre, setSelectedGenre] = useState<string | undefined>(selectedId);
-  const [selectedSubGenre, setSelectedSubGenre] = useState<string | undefined>(undefined);
+  const [selectedSubGenre, setSelectedSubGenre] = useState<string | undefined>(selectedSubGenreId);
   const [availableSubGenres, setAvailableSubGenres] = useState<SubGenreOption[]>([]);
   
   // Update sub-genres when a main genre is selected
@@ -37,8 +39,20 @@ export default function TemplateSelector({
   // Reset selections when selectedId changes externally
   useEffect(() => {
     setSelectedGenre(selectedId);
-    setSelectedSubGenre(undefined);
-  }, [selectedId]);
+    
+    // Only set selectedSubGenre if selectedId matches current selectedGenre
+    // This prevents unsetting the sub-genre when genre stays the same
+    if (selectedId !== selectedGenre) {
+      setSelectedSubGenre(selectedSubGenreId);
+    }
+  }, [selectedId, selectedSubGenreId, selectedGenre]);
+  
+  // Initialize selectedSubGenre from selectedSubGenreId
+  useEffect(() => {
+    if (selectedSubGenreId && selectedId) {
+      setSelectedSubGenre(selectedSubGenreId);
+    }
+  }, []);
   
   const handleSelectGenre = (template: TemplateOption) => {
     // If already selected, deselect it
