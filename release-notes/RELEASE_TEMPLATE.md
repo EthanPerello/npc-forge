@@ -2,16 +2,16 @@
 
 **Release Date:** YYYY-MM-DD
 
-One-sentence summary of what this version introduces or improves.
+Brief summary of what this version includes.
 
-## New Features
+## Added
+{{Added}}
 
-- ...
+## Changed
+{{Changed}}
 
-## Improvements
+## Fixed
+{{Fixed}}
 
-- ...
-
-## Bug Fixes
-
-- ...
+## Removed
+{{Removed}}
