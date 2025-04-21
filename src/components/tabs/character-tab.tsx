@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCharacter } from '@/contexts/character-context';
 import TemplateSelector from '@/components/template-selector';
 import Select from '@/components/ui/select';
@@ -346,6 +346,7 @@ export default function CharacterTab() {
         <TemplateSelector
           templates={GENRE_TEMPLATES}
           selectedId={formData.genre}
+          selectedSubGenreId={formData.sub_genre} // Pass the selected sub-genre ID
           onChange={handleGenreChange}
         />
       </div>
