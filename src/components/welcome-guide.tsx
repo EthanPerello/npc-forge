@@ -11,22 +11,55 @@ interface WelcomeGuideProps {
 export default function WelcomeGuide({ onDismiss }: WelcomeGuideProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [hasMounted, setHasMounted] = useState(false);
+  const [isDevEnvironment, setIsDevEnvironment] = useState(false);
 
+  // First effect: detect environment and set mounted state
   useEffect(() => {
     setHasMounted(true);
-    const dismissed = localStorage.getItem('npc-forge-guide-dismissed');
-    if (dismissed === 'true') {
-      setIsVisible(false);
-      onDismiss();
-    }
+    
+    // Check if we're in development mode
+    // In Next.js, this should be 'development' in local dev
+    const isDev = process.env.NODE_ENV === 'development';
+    setIsDevEnvironment(isDev);
+    
+    // Debug log to confirm environment
+    console.log('Environment:', process.env.NODE_ENV, 'isDev:', isDev);
   }, []);
+  
+  // Second effect: handle visibility based on environment
+  useEffect(() => {
+    // Skip if not mounted yet
+    if (!hasMounted) return;
+    
+    if (isDevEnvironment) {
+      // In development mode, always show the welcome guide
+      console.log('Development mode: Welcome guide should always show');
+      setIsVisible(true);
+    } else {
+      // In production, check localStorage
+      const dismissed = localStorage.getItem('npc-forge-guide-dismissed');
+      if (dismissed === 'true') {
+        console.log('Production mode: Guide previously dismissed');
+        setIsVisible(false);
+        onDismiss();
+      }
+    }
+  }, [hasMounted, isDevEnvironment, onDismiss]);
 
   const handleDismiss = () => {
     setIsVisible(false);
-    localStorage.setItem('npc-forge-guide-dismissed', 'true');
+    
+    // Only save to localStorage in production mode
+    if (!isDevEnvironment) {
+      localStorage.setItem('npc-forge-guide-dismissed', 'true');
+    } else {
+      console.log('Dev mode: Not saving dismissal to localStorage');
+    }
+    
     onDismiss();
   };
 
+  // Early return if not mounted or not visible
   if (!hasMounted || !isVisible) return null;
 
   return (
@@ -35,6 +68,7 @@ export default function WelcomeGuide({ onDismiss }: WelcomeGuideProps) {
         <h2 className="text-xl font-bold text-white flex items-center">
           <Info className="mr-2 h-5 w-5" />
           Welcome to NPC Forge
+          {isDevEnvironment && <span className="ml-2 text-xs bg-yellow-400 text-black px-2 py-0.5 rounded-full">DEV MODE</span>}
         </h2>
         <button
           onClick={handleDismiss}
