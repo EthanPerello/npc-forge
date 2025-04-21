@@ -7,8 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.3] - 2025-04-19
-
 ### Added
 - Welcome guide component with step-by-step instructions for new users
 - Success animation when character is successfully generated
