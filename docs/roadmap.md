@@ -48,20 +48,6 @@ The current version (v0.2.0) includes:
 
 **Target Release**: June 2025
 
-### 🔹 Version 0.5.0: Enhanced Portraits (Medium Priority)
-
-**Goals**: Better visual character representations
-
-#### Planned Features
-- Multiple portrait generation options
-- Alternative pose/expression options
-- Character editing from portrait feedback
-- Portrait style consistency improvements
-- Portrait regeneration without full character regeneration
-- Portrait gallery for each character
-
-**Target Release**: July 2025
-
 ---
 
 ## 🚧 Medium-Term Roadmap (3-6 Months)
@@ -162,7 +148,6 @@ These features are under consideration but not yet scheduled:
 
 ### Character Enhancements
 - Voice generation for dialogue lines
-- Animation capabilities for portraits
 - 3D character model generation
 - Character development over time (aging, experience)
 - Alternate reality versions of characters

@@ -1,7 +1,7 @@
 export default function FAQPage() {
     return (
       <div className="prose prose-blue max-w-none dark:prose-invert">
-        <h1>Frequently Asked Questions</h1>
+        <h1>Frequently Asked Questions (FAQ)</h1>
   
         <p className="lead text-lg text-gray-600 dark:text-gray-300">
           Find answers to common questions about NPC Forge.

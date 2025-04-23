@@ -65,7 +65,7 @@ export default function RoadmapPage() {
         {/* Version 0.4.0 */}
         <div className="mb-8 bg-white p-6 rounded-lg shadow border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
           <h3 className="text-xl font-semibold text-indigo-700 dark:text-indigo-400 mb-2">
-            Version 0.4.0: “Talk to NPC”
+            Version 0.4.0: "Talk to NPC"
           </h3>
           <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full dark:bg-blue-900/30 dark:text-blue-300 mb-4">
             High Priority
@@ -82,27 +82,6 @@ export default function RoadmapPage() {
             <li>Optional voice read-out (text-to-speech)</li>
           </ul>
           <p><strong>Target Release</strong>: June 2025</p>
-        </div>
-
-        {/* Version 0.5.0 */}
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
-            Version 0.5.0: Enhanced Portraits
-          </h3>
-          <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full dark:bg-gray-700 dark:text-gray-300 mb-4">
-            Medium Priority
-          </span>
-          <p className="mb-2"><strong>Goals</strong>: Better visual character representations</p>
-          <p className="font-medium mb-2">Planned Features:</p>
-          <ul className="list-disc pl-6 space-y-1 text-gray-700 dark:text-gray-300">
-            <li>Multiple portrait generation options</li>
-            <li>Alternative pose/expression options</li>
-            <li>Character editing from portrait feedback</li>
-            <li>Portrait style consistency improvements</li>
-            <li>Portrait regeneration without full character regeneration</li>
-            <li>Portrait gallery for each character</li>
-          </ul>
-          <p className="mt-4"><strong>Target Release</strong>: July 2025</p>
         </div>
       </section>
 
@@ -223,7 +202,6 @@ export default function RoadmapPage() {
             <h3 className="text-lg font-bold text-indigo-700 dark:text-indigo-400 mb-2">Character Enhancements</h3>
             <ul className="list-disc pl-5 space-y-1">
               <li>Voice generation for dialogue lines</li>
-              <li>Animation capabilities for portraits</li>
               <li>3D character model generation</li>
               <li>Character development over time (aging, experience)</li>
               <li>Alternate reality versions of characters</li>
