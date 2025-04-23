@@ -5,6 +5,49 @@ All notable changes to NPC Forge will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),  
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+---
+
+## [Unreleased]
+
+### Added
+- Fully integrated documentation system with sidebar and breadcrumb navigation
+- New documentation pages in the app:
+  - `/docs/how-to-use` – usage walkthrough for new users
+  - `/docs/character-examples` – downloadable JSON examples
+  - `/docs/generation-options` – full overview of generation settings
+  - `/docs/features` – all major and optional features explained
+  - `/docs/faq` – frequently asked questions
+  - `/docs/dev-setup` – instructions for local setup
+  - `/docs/architecture` – system and component structure
+  - `/docs/api` – endpoint descriptions and formats
+  - `/docs/security` – data handling and localStorage notes
+  - `/docs/contributing` – style and structure guidelines
+  - `/docs/testing` – setup and test structure
+  - `/docs/deployment` – build and deploy to Vercel
+  - `/docs/roadmap` – upcoming milestones
+  - `/docs/changelog` – version history
+  - `/docs/credits` – acknowledgments
+  - `/docs/license` – license details
+- Corresponding GitHub Markdown files added:
+  - `how-to-use.md`, `features.md`, `character-examples.md`, `api.md`, `architecture.md`, `security.md`, `contributing.md`, `testing.md`, `deployment.md`, `roadmap.md`, `changelog.md`, `credits.md`, `license.md`
+- Navigation enhancements:
+  - Collapsible sidebar with auto-expanding sections
+  - Breadcrumb navigation (`DocsNavigation`) synced with route
+  - Mobile toggle with backdrop
+  - Sticky, scrollable layout with bottom collapse button on desktop
+- Success message added after character generation (auto-dismisses after 3 seconds)
+
+### Changed
+- Character tab interface now auto-resets to the "Profile" tab after generation
+- Refactored `/docs` folder for separation between page and markdown content
+- Consolidated and renamed image and asset folders under the documentation system
+
+### Fixed
+- Welcome guide toggle now functions reliably in dev and production environments
+- `useEffect` behavior in `CharacterDisplay` now correctly resets and displays new characters
+
+---
+
 ## [0.1.4] - 2025-04-21
 
 ### Added
@@ -29,6 +72,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed infinite update loop in the usage limit display component.
 - Resolved layout issues affecting mobile views.
 - Improved tab behavior and styling consistency.
+
+---
 
 ## [0.1.3] - 2025-04-19
 
@@ -55,6 +100,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed underscores and improved capitalization in trait labels.
 - Improved portrait generation prompts for consistent formatting and detail.
 
+---
+
 ## [0.1.2] - 2025-04-18
 
 ### Added
@@ -70,6 +117,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Color-coded UI based on genre categories.
 - Reorganized advanced options into clear, logical sections.
 - Improved templates with clearer descriptions and examples.
+
+---
 
 ## [0.1.1] - 2025-04-17
 
@@ -89,6 +138,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Better dropdown UX with searchable and grouped entries.
 - Refined OpenAI prompt construction for portrait generation.
 
+---
+
 ## [0.1.0] - 2025-04-12
 
 ### Added
@@ -99,3 +150,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AI-generated portraits via DALL·E 3.
 - Export to JSON feature.
 - Fully responsive UI for desktop and mobile.
+
+---
+
+[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.1.4...HEAD  
+[0.1.4]: https://github.com/EthanPerello/npc-forge/compare/v0.1.3...v0.1.4  
+[0.1.3]: https://github.com/EthanPerello/npc-forge/compare/v0.1.2...v0.1.3  
+[0.1.2]: https://github.com/EthanPerello/npc-forge/compare/v0.1.1...v0.1.2  
+[0.1.1]: https://github.com/EthanPerello/npc-forge/compare/v0.1.0...v0.1.1  
+[0.1.0]: https://github.com/EthanPerello/npc-forge/releases/tag/v0.1.0

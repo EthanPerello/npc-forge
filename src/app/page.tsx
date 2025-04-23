@@ -9,8 +9,8 @@ import WelcomeGuide from '@/components/welcome-guide';
 import { BookOpen } from 'lucide-react';
 
 export default function Home() {
-  // Control visibility of the create character form
-  const [showCreateForm, setShowCreateForm] = useState(false);
+  // State for whether the welcome guide is visible
+  const [showWelcomeGuide, setShowWelcomeGuide] = useState(true);
   
   // Force reset the localStorage flag in dev mode on first page load
   useEffect(() => {
@@ -21,7 +21,14 @@ export default function Home() {
 
   // Handle the welcome guide dismissal
   const handleWelcomeDismiss = () => {
-    setShowCreateForm(true);
+    setShowWelcomeGuide(false);
+  };
+
+  // Handle the get started button
+  const handleGetStarted = () => {
+    setShowWelcomeGuide(false);
+    // We can do any additional actions here if needed
+    // For example, scroll to the form or focus on an input field
   };
 
   return (
@@ -38,18 +45,23 @@ export default function Home() {
             </div>
           </header>
           
-          {/* Welcome Guide for New Users */}
-          <WelcomeGuide onDismiss={handleWelcomeDismiss} />
+          {/* Welcome Guide - Only show if state is true */}
+          {showWelcomeGuide && (
+            <WelcomeGuide 
+              onDismiss={handleWelcomeDismiss} 
+              onGetStarted={handleGetStarted} 
+            />
+          )}
           
-          {/* Usage Limits Notice */}
+          {/* Usage Limits Notice - Always show */}
           <UsageLimitsNotice />
           
-          {/* Character Creation Form - Only show when welcome guide is dismissed */}
-          <section className={`mb-12 transition-all duration-500 ${showCreateForm ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none absolute'}`}>
+          {/* Character Creation Form - Always show, no conditional visibility */}
+          <section className="mb-12">
             <MainFormTabs />
           </section>
           
-          {/* Character Display */}
+          {/* Character Display - Always show */}
           <section>
             <CharacterDisplay />
           </section>
