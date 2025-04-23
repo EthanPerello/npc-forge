@@ -22,7 +22,7 @@ export default function ChangelogPage() {
           <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3">
             0.2.0
           </span>
-          <span>April 23, 2025 - Documentation Update</span>
+          <span>April 22, 2025 - Documentation Update</span>
         </h2>
         
         <div className="mb-4">
@@ -68,6 +68,11 @@ export default function ChangelogPage() {
             <li>Character tab interface now auto-resets to the "Profile" tab after generation</li>
             <li>Refactored <code>/docs</code> folder for separation between page and markdown content</li>
             <li>Consolidated and renamed image and asset folders under the documentation system</li>
+            <li>Redesigned homepage header: replaced static title text with layered hero layout</li>
+            <li>Added full-width character collage image (fanned-cards.png) with responsive styling</li>
+            <li>Adjusted header height and layout for better visual balance</li>
+            <li>Improved title text with larger typography, custom drop shadow, and enhanced positioning</li>
+            <li>Applied custom fade-in-up-slow animation for smoother entry effect</li>
           </ul>
         </div>
         
