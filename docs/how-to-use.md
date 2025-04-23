@@ -11,7 +11,7 @@ Start by selecting a genre template (Fantasy, Sci-Fi, Historical, or Contemporar
 Example description:
 > A scarred elven ranger who protects a sacred forest, harboring a secret connection to ancient magic.
 
-![Character Tab Selections](/images/docs/character-tab-selections.png)
+![Character Tab Selections](/images/character-tab-selections.png)
 
 ### 2. Customize character details
 
@@ -22,7 +22,7 @@ Use the tabs to customize your character's traits, quests, dialogue, and invento
 - **Dialogue Tab**: Set tone, context, and number of dialogue lines
 - **Items Tab**: Choose item categories, rarity, and number of items
 
-![Advanced Character Options](/images/docs/advanced-character-tab-selections.png)
+![Advanced Character Options](/images/advanced-character-tab-selections.png)
 
 For even more options, expand the "Advanced Options" section to specify:
 - Physical traits (height, build, distinctive features)
@@ -41,13 +41,13 @@ Click the "Generate Character" button. The AI will process your inputs and creat
 
 Review your character and use the tabs to explore all details. Download the JSON file to save your character for future reference.
 
-![Character Display](/images/docs/character-tab-results.png)
+![Character Display](/images/character-tab-results.png)
 
 ## Portrait Customization
 
 NPC Forge lets you customize how character portraits are generated:
 
-![Portrait Options](/images/docs/portrait-character-tab-selections.png)
+![Portrait Options](/images/portrait-character-tab-selections.png)
 
 - **Art Style**: Choose from realistic, fantasy art, anime, comic book, and more
 - **Expression/Mood**: Set facial expression (neutral, happy, serious, etc.)
