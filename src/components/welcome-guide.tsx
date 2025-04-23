@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Info, Target, MessageSquare, Bookmark, Download } from 'lucide-react';
-import Button from '@/components/ui/button';
+import { Info, Target, MessageSquare, Bookmark, Download, X } from 'lucide-react';
 
 interface WelcomeGuideProps {
   onDismiss: () => void;
+  onGetStarted: () => void;
 }
 
-export default function WelcomeGuide({ onDismiss }: WelcomeGuideProps) {
+export default function WelcomeGuide({ onDismiss, onGetStarted }: WelcomeGuideProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [hasMounted, setHasMounted] = useState(false);
   const [isDevEnvironment, setIsDevEnvironment] = useState(false);
@@ -25,7 +25,7 @@ export default function WelcomeGuide({ onDismiss }: WelcomeGuideProps) {
     if (!hasMounted) return;
     
     if (isDevEnvironment) {
-      // In development mode, always show the welcome guide
+      // Always show in dev mode (handled in Home component)
       setIsVisible(true);
     } else {
       // In production, check localStorage
@@ -48,6 +48,18 @@ export default function WelcomeGuide({ onDismiss }: WelcomeGuideProps) {
     onDismiss();
   };
 
+  const handleGetStarted = () => {
+    setIsVisible(false);
+    
+    // Only save to localStorage in production mode
+    if (!isDevEnvironment) {
+      localStorage.setItem('npc-forge-guide-dismissed', 'true');
+    }
+    
+    // Call the specific onGetStarted function
+    onGetStarted();
+  };
+
   // Early return if not mounted or not visible
   if (!hasMounted || !isVisible) return null;
 
@@ -64,14 +76,12 @@ export default function WelcomeGuide({ onDismiss }: WelcomeGuideProps) {
           className="text-white opacity-70 hover:opacity-100 transition-opacity"
           aria-label="Dismiss guide"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-          </svg>
+          <X className="h-5 w-5" />
         </button>
       </div>
 
       <div className="p-6">
-        <p className="text-gray-700 mb-4 dark:text-gray-300">
+        <p className="mb-4 text-gray-700 dark:text-gray-300">
           Create detailed NPCs for your games with AI. Just describe your character concept or use our templates to generate complete characters with personalities, quests, dialogue, and AI-generated portraits.
         </p>
 
@@ -118,14 +128,20 @@ export default function WelcomeGuide({ onDismiss }: WelcomeGuideProps) {
           </p>
         </div>
 
-        <div className="flex justify-end">
-          <Button 
+        <div className="flex justify-between">
+          <button 
             onClick={handleDismiss} 
-            variant="primary"
-            className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600"
+            className="px-4 py-2 bg-transparent border border-indigo-200 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors dark:border-indigo-800 dark:text-indigo-400 dark:hover:bg-indigo-900/20"
+          >
+            Close
+          </button>
+          
+          <button 
+            onClick={handleGetStarted} 
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors dark:bg-indigo-700 dark:hover:bg-indigo-600"
           >
             Get Started
-          </Button>
+          </button>
         </div>
       </div>
     </div>

@@ -1,167 +1,122 @@
 # NPC Forge
 
-AI-powered character generator for games using OpenAI's models.
+![NPC Forge Logo](/public/images/docs/npc-forge-logo.png)
 
-![NPC Forge Preview](images/npc-forge.png)
+NPC Forge is an AI-powered character generator for games, tabletop RPGs, and storytelling. Create detailed NPCs with personalities, quests, dialogue, items, and AI-generated portraits.
 
-## [Try the Live Demo](https://npc-forge.vercel.app)
+[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://github.com/EthanPerello/npc-forge/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Next.js](https://img.shields.io/badge/built%20with-Next.js%2015-black)](https://nextjs.org/)
+[![OpenAI](https://img.shields.io/badge/powered%20by-OpenAI-lightgrey)](https://openai.com/)
 
-## Project Overview
+## 🚀 Live Demo
 
-NPC Forge is an AI-powered character generator for games. It allows creators to quickly generate detailed non-playable characters (NPCs) from simple descriptions or genre templates. The tool uses OpenAI's models to create complete character profiles including name, appearance, personality, inventory, abilities, quests, dialogue, and an AI-generated portrait.
+Try NPC Forge live at: [https://npc-forge-ethan-perellos-projects.vercel.app/](https://npc-forge-ethan-perellos-projects.vercel.app/)
 
-## Version Information
+## ✨ Features
 
-**Current Version**: v0.1.2 (April 18, 2025)
+- Create detailed NPCs from simple descriptions or genre templates
+- Generate AI portraits with customizable style, mood, and framing
+- Build complete character profiles with:
+  - Appearance & personality descriptions
+  - Backstory hooks & special abilities
+  - Customizable quests with rewards
+  - Character-specific dialogue lines
+  - Item inventories with rarity options
+- Customize using an extensive set of options:
+  - Choose from 4 genres and 16 sub-genres
+  - Set traits like gender, age, alignment, and more
+  - Specify physical attributes and background elements
+  - Select personality traits
+- Export characters as JSON for use in your projects
+- Responsive design works on desktop and mobile
 
-### Version History
-- **v0.1.2** - UI Enhancement Update (April 18, 2025)
-  - Added "Clear Options" button for improved character creation workflow
-  - Enhanced genre system with improved sub-genre organization
-  - Added physical traits section (height, build, distinctive features)
-  - Implemented multi-select personality traits system (up to 3 traits)
-  - Improved occupation selector with genre-based categorization
+![NPC Forge Screenshot](/public/images/docs/character-tab-results.png)
 
-- **v0.1.1** - Portrait Customization Update (April 17, 2025)
-  - Added portrait customization options (art style, mood, framing, background)
-  - Implemented expandable UI sections for advanced options
-  - Added searchable dropdown components for improved selection interfaces
-  - Enhanced metadata and PWA support
+## 📋 Documentation
 
-- **v0.1.0** - Initial release (April 12, 2025)
+For comprehensive guides and documentation, check out:
 
-### Perfect For:
-- Game developers needing quick character concepts
-- Tabletop RPG players and game masters
-- Creative writers looking for character inspiration
-- Anyone building interactive worlds or stories
+- [How to Use NPC Forge](/docs/how-to-use.md) - Step-by-step guide to creating characters
+- [Character Examples](/docs/character-examples.md) - Sample characters across different genres
+- [Features Overview](/docs/features.md) - Complete list of available features
+- [Generation Options](/docs/generation-options.md) - Detailed breakdown of customization options
+- [FAQ](/docs/faq.md) - Answers to common questions
+- [Roadmap](/docs/roadmap.md) - Future development plans
 
-## Features
-
-### Intuitive Character Creation
-Create detailed NPCs with just a text description or by selecting from genre templates:
-
-- **Simple Text Prompts**: Describe your character concept in plain language
-- **Genre Templates**: Quick-start options for Fantasy, Sci-Fi, Historical, and Contemporary settings
-- **Sub-Genre Selection**: Choose from specialized sub-genres within each major category
-- **Character Traits**: Customize gender, age, alignment, and relationship to player
-- **Advanced Options**: Fine-tune species, occupation, personality traits, and social class
-
-### Portrait Customization
-Control how your character portraits are generated:
-
-- **Art Style Selection**: Choose from multiple styles including realistic, fantasy art, anime, comic book, and more
-- **Expression/Mood**: Set the character's facial expression to match their personality
-- **Framing Options**: Specify portrait (head/shoulders), bust, full-body, or action poses
-- **Background Styles**: Select from plain, gradient, themed, environmental, or abstract backgrounds
-
-### Comprehensive Character Profiles
-Each generated character includes:
-
-- **Personal Details**: Name, appearance, personality, backstory hook, and special abilities
-- **Dialogue**: Custom dialogue lines with configurable tone and context
-- **Quests**: Associated quests with titles, descriptions, and rewards
-- **Inventory**: Character items with customizable rarity and categories
-- **AI-Generated Portrait**: Visual representation using DALL-E 3
-
-### Easy to Use Interface
-- **Tabbed Navigation**: Separate tabs for character details, quests, dialogue, and items
-- **Interactive Form**: Toggle which elements to include in your character
-- **JSON Export**: Download character data for use in your projects
-- **Responsive Design**: Works on desktop and mobile devices
-
-## Technologies Used
-
-- **Frontend**: 
-  - Next.js 14 with App Router
-  - React & TypeScript
-  - Tailwind CSS for styling
-  - Context API for state management
-
-- **AI Integration**:
-  - OpenAI API (GPT-4o-mini for text generation)
-  - DALL-E 3 for portrait generation
-
-- **Development**:
-  - Modular component architecture
-  - Responsive design principles
-  - Optimized API usage
-
-## Development
+## 🛠️ Installation & Development
 
 ### Prerequisites
+
 - Node.js 18+
-- OpenAI API key
+- OpenAI API key (for development)
 
 ### Setup
-1. Clone the repository
+
+1. Clone the repository:
    ```bash
    git clone https://github.com/EthanPerello/npc-forge.git
    cd npc-forge
    ```
 
-2. Install dependencies
+2. Install dependencies:
    ```bash
    npm install
    ```
 
-3. Create a `.env.local` file with your OpenAI API key
+3. Create a `.env.local` file with your OpenAI API key:
    ```
    OPENAI_API_KEY=your-api-key-here
    ```
 
-4. Start the development server
+4. Start the development server:
    ```bash
    npm run dev
    ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Project Structure
-```
-npc-forge/
-├── src/
-│   ├── app/             # Next.js app router
-│   ├── components/      # UI components
-│   │   ├── tabs/        # Tab components for forms and display
-│   │   └── ui/          # Reusable UI components
-│   ├── contexts/        # React contexts
-│   └── lib/             # Utilities and configuration
-├── public/              # Static assets
-└── ...                  # Config files
-```
+For more detailed developer documentation, see [Dev Setup](/docs/dev-setup.md).
 
-## Planned Features
+## 🏗️ Project Architecture
 
-Future updates will include:
+NPC Forge is built with:
 
-- **"Talk to NPC" Chat Interface** for interactive character conversations
-- **Character Library** for saving and managing generated characters
-- **Additional Export Formats** (PDF, CSV, Unity-friendly)
-- **Performance Optimizations** for faster generation
-- **Character Collections and Tags** for better organization
+- **Next.js 15** - React framework with App Router
+- **TypeScript** - Type-safe JavaScript
+- **Tailwind CSS** - Utility-first CSS framework
+- **OpenAI API** - GPT-4o-mini for text generation, DALL-E 3 for images
+- **Lucide Icons** - SVG icon components
 
-## Contributing
+For more details, check out the [Architecture Documentation](/docs/architecture.md).
 
-Contributions are welcome! Here's how you can help:
+## 📊 Usage Limits
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+NPC Forge has a limit of 15 character generations per month per device to manage API costs. This applies to the hosted version only. If you run your own instance with your API key, you can set your own limits.
 
-## License
+## 🔗 Related Projects
+
+- [Ethan Perello's Portfolio](https://github.com/EthanPerello/ethanperello.github.io) - View more projects by the creator
+
+## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgements
+## 👏 Credits
 
-- [OpenAI](https://openai.com) for providing the API that powers the character generation
-- [Next.js](https://nextjs.org) for the React framework
-- [Tailwind CSS](https://tailwindcss.com) for the styling framework
-- [Vercel](https://vercel.com) for hosting the live demo
+- Created by [Ethan Perello](https://github.com/EthanPerello)
+- Character generation powered by [OpenAI API](https://openai.com/)
+- Built with [Next.js](https://nextjs.org/) and [Tailwind CSS](https://tailwindcss.com/)
+- Icons by [Lucide](https://lucide.dev/)
 
----
+This project was developed with assistance from AI tools including Claude and ChatGPT, which helped with code generation, debugging, and documentation.
 
-Created by [Ethan Perello](https://github.com/EthanPerello)
+## 🤝 Contributing
+
+Contributions are welcome! Please check out the [Contributing Guidelines](/docs/contributing.md) before getting started.
+
+For bug reports, feature requests, or questions, please [open an issue](https://github.com/EthanPerello/npc-forge/issues).
+
+## 📞 Contact
+
+For questions or feedback, contact Ethan Perello at [ethanperello@gmail.com](mailto:ethanperello@gmail.com).
