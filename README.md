@@ -31,7 +31,7 @@ Try NPC Forge live at: [https://npc-forge-ethan-perellos-projects.vercel.app/](h
 - Export characters as JSON for use in your projects
 - Responsive design works on desktop and mobile
 
-![NPC Forge Screenshot](/public/images/docs/character-tab-results.png)
+![NPC Forge Screenshot](/public/images/character-tab-results.png)
 
 ## 📋 Documentation
 
