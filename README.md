@@ -1,6 +1,6 @@
 # NPC Forge
 
-![NPC Forge Logo](/public/images/docs/npc-forge-logo.png)
+![Site Header](/public/images/site-header.png)
 
 NPC Forge is an AI-powered character generator for games, tabletop RPGs, and storytelling. Create detailed NPCs with personalities, quests, dialogue, items, and AI-generated portraits.
 
@@ -31,7 +31,7 @@ Try NPC Forge live at: [https://npc-forge-ethan-perellos-projects.vercel.app/](h
 - Export characters as JSON for use in your projects
 - Responsive design works on desktop and mobile
 
-![NPC Forge Screenshot](/public/images/docs/character-tab-results.png)
+![NPC Forge Screenshot](/public/images/character-tab-results.png)
 
 ## 📋 Documentation
 

@@ -22,7 +22,7 @@ export default function ChangelogPage() {
           <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3">
             0.2.0
           </span>
-          <span>April 22, 2025 - Documentation Update</span>
+          <span>April 23, 2025 - Documentation Update</span>
         </h2>
         
         <div className="mb-4">
