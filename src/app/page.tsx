@@ -35,7 +35,7 @@ export default function Home() {
     <CharacterProvider>
       <main className="min-h-screen py-8 px-4 bg-gradient-to-br from-indigo-50 via-indigo-50/30 to-blue-100 dark:from-gray-900 dark:via-indigo-950/30 dark:to-blue-950/20">
         <div className="container mx-auto max-w-full">
-        <header className="relative w-full h-[200px] sm:h-[220px] lg:h-[240px] mb-12 overflow-hidden">
+        <header className="relative w-full h-[200px] sm:h-[220px] lg:h-[240px] mb-12 overflow-hidden rounded-2xl shadow-lg">
           {/* Background glow */}
           <div className="absolute inset-0 bg-gradient-to-b from-indigo-900/80 via-indigo-800/40 to-transparent blur-2xl" />
 
@@ -48,7 +48,7 @@ export default function Home() {
 
           {/* Title */}
           {/* Gradient behind text */}
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-indigo-900/80 via-indigo-800/30 to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-indigo-900/80 via-indigo-800/30 to-transparent z-10 pointer-events-none rounded-b-2xl" />
           <div className="relative z-20 flex flex-col justify-center items-center h-full text-center px-4">
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]">
               NPC Forge
