@@ -26,7 +26,7 @@ export default function CharacterExamplesPage() {
           <h3 className="text-xl font-semibold mb-3">Elarion</h3>
           <div className="my-6 border rounded-lg overflow-hidden shadow-md">
             <Image
-              src="/images/docs/elarion.png"
+              src="/images/elarion.png"
               alt="Elarion – Fantasy Wizard"
               width={500}
               height={500}
@@ -69,7 +69,7 @@ export default function CharacterExamplesPage() {
           <h3 className="text-xl font-semibold mb-3">Kira-7</h3>
           <div className="my-6 border rounded-lg overflow-hidden shadow-md">
             <Image
-              src="/images/docs/kira-7.png"
+              src="/images/kira-7.png"
               alt="Kira-7 – Cyberpunk AI"
               width={500}
               height={500}
@@ -111,7 +111,7 @@ export default function CharacterExamplesPage() {
           <h3 className="text-xl font-semibold mb-3">Detective Miles Navarro</h3>
           <div className="my-6 border rounded-lg overflow-hidden shadow-md">
             <Image
-              src="/images/docs/detective-miles-navarro.png"
+              src="/images/detective-miles-navarro.png"
               alt="Detective Miles Navarro"
               width={500}
               height={500}

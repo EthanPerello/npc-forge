@@ -41,6 +41,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Character tab interface now auto-resets to the "Profile" tab after generation
 - Refactored `/docs` folder for separation between page and markdown content
 - Consolidated and renamed image and asset folders under the documentation system
+- Redesigned homepage header: replaced static title text with layered hero layout
+- Added full-width character collage image (fanned-cards.png) with responsive styling
+- Adjusted header height and layout for better visual balance
+- Improved title text with larger typography, custom drop shadow, and enhanced positioning
+- Applied custom fade-in-up-slow animation for smoother entry effect
 
 ### Fixed
 - Welcome guide toggle now functions reliably in dev and production environments

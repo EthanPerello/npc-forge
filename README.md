@@ -1,6 +1,6 @@
 # NPC Forge
 
-![NPC Forge Logo](/public/images/docs/npc-forge-logo.png)
+![Site Header](/public/images/site-header.png)
 
 NPC Forge is an AI-powered character generator for games, tabletop RPGs, and storytelling. Create detailed NPCs with personalities, quests, dialogue, items, and AI-generated portraits.
 

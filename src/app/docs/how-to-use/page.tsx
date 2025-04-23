@@ -27,7 +27,7 @@ export default function HowToUsePage() {
       </blockquote>
       <div className="my-8 border rounded-lg overflow-hidden shadow-md">
         <Image
-          src="/images/docs/character-tab-selections.png"
+          src="/images/character-tab-selections.png"
           alt="Character Tab Selections"
           width={800}
           height={500}
@@ -47,7 +47,7 @@ export default function HowToUsePage() {
       </ul>
       <div className="my-8 border rounded-lg overflow-hidden shadow-md">
         <Image
-          src="/images/docs/advanced-character-tab-selections.png"
+          src="/images/advanced-character-tab-selections.png"
           alt="Advanced Character Options"
           width={800}
           height={500}
@@ -71,7 +71,7 @@ export default function HowToUsePage() {
       </p>
       <div className="my-8 border rounded-lg overflow-hidden shadow-md">
         <Image
-          src="/images/docs/character-tab-results.png"
+          src="/images/character-tab-results.png"
           alt="Character Display Results"
           width={800}
           height={500}
@@ -86,7 +86,7 @@ export default function HowToUsePage() {
       </p>
       <div className="my-8 border rounded-lg overflow-hidden shadow-md">
         <Image
-          src="/images/docs/portrait-character-tab-selections.png"
+          src="/images/portrait-character-tab-selections.png"
           alt="Portrait Options"
           width={800}
           height={500}

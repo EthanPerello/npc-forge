@@ -111,3 +111,17 @@ body {
   width: 100%;
   max-width: 100%;
 }
+
+@keyframes fade-in-up-slow {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up-slow {
+  animation: fade-in-up-slow 1.8s ease-out forwards;
+}

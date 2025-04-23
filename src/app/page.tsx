@@ -35,15 +35,32 @@ export default function Home() {
     <CharacterProvider>
       <main className="min-h-screen py-8 px-4 bg-gradient-to-br from-indigo-50 via-indigo-50/30 to-blue-100 dark:from-gray-900 dark:via-indigo-950/30 dark:to-blue-950/20">
         <div className="container mx-auto max-w-full">
-          <header className="mb-8 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-700 dark:from-indigo-400 dark:to-blue-500">
+        <header className="relative w-full h-[200px] sm:h-[220px] lg:h-[240px] mb-12 overflow-hidden">
+          {/* Background glow */}
+          <div className="absolute inset-0 bg-gradient-to-b from-indigo-900/80 via-indigo-800/40 to-transparent blur-2xl" />
+
+          {/* Fanned Cards Image */}
+          <img
+            src="/images/fanned-cards.png"
+            alt="Fanned NPC character cards"
+            className="absolute inset-0 w-full h-full object-cover object-[center_20%] opacity-0 animate-fade-in-up-slow drop-shadow-2xl"
+          />
+
+          {/* Title */}
+          {/* Gradient behind text */}
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-indigo-900/80 via-indigo-800/30 to-transparent z-10 pointer-events-none" />
+          <div className="relative z-20 flex flex-col justify-center items-center h-full text-center px-4">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]">
               NPC Forge
             </h1>
-            <div className="flex items-center justify-center mt-2 text-gray-700 dark:text-gray-300">
-              <BookOpen className="h-5 w-5 mr-2 text-indigo-500" />
-              <p>AI-powered character generator for games</p>
-            </div>
-          </header>
+            <p className="mt-2 text-lg sm:text-xl lg:text-2xl font-medium text-indigo-100 drop-shadow-sm">
+              AI-powered character generator for games
+            </p>
+          </div>
+        </header>
+
+
+
           
           {/* Welcome Guide - Only show if state is true */}
           {showWelcomeGuide && (
