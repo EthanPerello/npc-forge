@@ -6,7 +6,7 @@ This page showcases examples of NPCs created with NPC Forge. Each demonstrates d
 
 ### Elarion
 
-![Elarion](/images/docs/elarion.png)
+![Elarion](/docs/images/elarion.png)
 
 **Genre**: Fantasy (High Fantasy)  
 **Traits**: Male, Elder, Good, Mentor, Wizard
@@ -32,7 +32,7 @@ Arcane Insight: Elarion can tap into the ancient knowledge of the cosmos, allowi
 
 ### Kira-7
 
-![Kira-7](/images/docs/kira-7.png)
+![Kira-7](/docs/images/kira-7.png)
 
 **Genre**: Sci-Fi (Cyberpunk)  
 **Traits**: Nonbinary, Evil, Enemy, Outcast
@@ -58,7 +58,7 @@ Network Hijack: Kira-7 can temporarily seize control of digital systems and netw
 
 ### Detective Miles Navarro
 
-![Detective Miles Navarro](/images/docs/detective-miles-navarro.png)
+![Detective Miles Navarro](/docs/images/detective-miles-navarro.png)
 
 **Genre**: Contemporary (Mystery & Thriller)  
 **Traits**: Male, Adult, Neutral, Ally, Detective
