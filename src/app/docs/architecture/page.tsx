@@ -4,15 +4,15 @@ import { Layers, Code, Server, Database, Layout, FileText, Book, Shield } from '
 
 export default function ArchitecturePage() {
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Architecture Overview</h1>
+    <div className="max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">Architecture Overview</h1>
       
-      <p className="lead mb-8">
+      <p className="lead mb-8 text-gray-700 dark:text-gray-300 text-lg">
         This document provides an overview of NPC Forge's architecture, explaining the key components and how they interact to create AI-powered character generation for game developers and storytellers.
       </p>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">System Architecture</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">System Architecture</h2>
         
         <p className="mb-4 text-gray-700 dark:text-gray-300">
           NPC Forge is a Next.js 14 application with a React frontend and serverless API endpoints. It's designed to work primarily as a client-side application that communicates with the OpenAI API for character and portrait generation, with key business logic handled in API routes.
@@ -20,15 +20,15 @@ export default function ArchitecturePage() {
       </div>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Key Components</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Key Components</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <div className="flex items-center mb-3">
               <Layout className="h-5 w-5 text-indigo-600 mr-2 dark:text-indigo-400" />
-              <h3 className="text-lg font-medium">Frontend (Client-Side)</h3>
+              <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">Frontend (Client-Side)</h3>
             </div>
-            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
+            <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
               <li>React components for tabbed interface</li>
               <li>Form handling for character customization</li>
               <li>State management with React Context</li>
@@ -38,12 +38,12 @@ export default function ArchitecturePage() {
             </ul>
           </div>
           
-          <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <div className="flex items-center mb-3">
               <Server className="h-5 w-5 text-indigo-600 mr-2 dark:text-indigo-400" />
-              <h3 className="text-lg font-medium">Backend (Serverless)</h3>
+              <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">Backend (Serverless)</h3>
             </div>
-            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
+            <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
               <li>Next.js API routes for OpenAI integration</li>
               <li>Character generation prompt engineering</li>
               <li>Portrait generation with DALL-E 3</li>
@@ -53,12 +53,12 @@ export default function ArchitecturePage() {
             </ul>
           </div>
           
-          <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <div className="flex items-center mb-3">
               <Database className="h-5 w-5 text-indigo-600 mr-2 dark:text-indigo-400" />
-              <h3 className="text-lg font-medium">External Services</h3>
+              <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">External Services</h3>
             </div>
-            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
+            <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
               <li>OpenAI API for text generation (GPT-4o-mini)</li>
               <li>OpenAI API for image generation (DALL-E 3)</li>
               <li>Vercel for hosting and deployment</li>
@@ -68,10 +68,10 @@ export default function ArchitecturePage() {
       </div>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Project Structure</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Project Structure</h2>
         
-        <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700 mb-6">
-          <h3 className="text-lg font-medium mb-3">Directory Organization</h3>
+        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm mb-6 dark:bg-gray-800 dark:border-gray-700">
+          <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Directory Organization</h3>
           <p className="mb-4 text-gray-700 dark:text-gray-300">
             The project follows Next.js 14 App Router conventions with a well-organized structure:
           </p>
@@ -105,8 +105,8 @@ export default function ArchitecturePage() {
           </div>
         </div>
         
-        <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700 mb-6">
-          <h3 className="text-lg font-medium mb-3">Frontend Components</h3>
+        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm mb-6 dark:bg-gray-800 dark:border-gray-700">
+          <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Frontend Components</h3>
           <p className="mb-2 text-gray-700 dark:text-gray-300">
             The application is organized into reusable components located in the <code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/src/components/</code> directory:
           </p>
@@ -140,12 +140,12 @@ export default function ArchitecturePage() {
           </div>
         </div>
         
-        <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700 mb-6">
-          <h3 className="text-lg font-medium mb-3">State Management</h3>
+        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm mb-6 dark:bg-gray-800 dark:border-gray-700">
+          <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">State Management</h3>
           <p className="mb-2 text-gray-700 dark:text-gray-300">
             NPC Forge uses React Context for state management:
           </p>
-          <div className="bg-gray-50 p-3 rounded-md dark:bg-gray-800">
+          <div className="bg-gray-50 p-3 rounded-md dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
             <p className="text-gray-800 dark:text-gray-200 font-medium">/src/contexts/character-context.tsx</p>
             <p className="text-gray-600 text-sm dark:text-gray-400">Manages character generation state including:</p>
             <ul className="list-disc list-inside text-sm text-gray-600 dark:text-gray-400">
@@ -159,12 +159,12 @@ export default function ArchitecturePage() {
           </div>
         </div>
         
-        <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
-          <h3 className="text-lg font-medium mb-3">API Structure</h3>
+        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+          <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">API Structure</h3>
           <p className="mb-2 text-gray-700 dark:text-gray-300">
             API endpoints are located in the <code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/src/app/api/</code> directory:
           </p>
-          <div className="bg-gray-50 p-3 rounded-md dark:bg-gray-800">
+          <div className="bg-gray-50 p-3 rounded-md dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
             <p className="text-gray-800 dark:text-gray-200 font-medium">/src/app/api/generate/route.ts</p>
             <p className="text-gray-600 text-sm dark:text-gray-400">Handles character generation requests:</p>
             <ul className="list-disc list-inside text-sm text-gray-600 dark:text-gray-400">
@@ -179,34 +179,34 @@ export default function ArchitecturePage() {
       </div>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Core Libraries and Utilities</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Core Libraries and Utilities</h2>
         
         <p className="mb-4 text-gray-700 dark:text-gray-300">
           The <code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/src/lib/</code> directory contains essential utility modules:
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div className="p-3 bg-gray-50 rounded-md dark:bg-gray-800">
+          <div className="p-3 bg-gray-50 rounded-md border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
             <p className="text-gray-800 dark:text-gray-200 font-medium">/src/lib/openai.ts</p>
             <p className="text-gray-600 text-sm dark:text-gray-400">API client wrappers for GPT and DALL-E integration</p>
           </div>
           
-          <div className="p-3 bg-gray-50 rounded-md dark:bg-gray-800">
+          <div className="p-3 bg-gray-50 rounded-md border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
             <p className="text-gray-800 dark:text-gray-200 font-medium">/src/lib/templates.ts</p>
             <p className="text-gray-600 text-sm dark:text-gray-400">Prompt templates and default examples</p>
           </div>
           
-          <div className="p-3 bg-gray-50 rounded-md dark:bg-gray-800">
+          <div className="p-3 bg-gray-50 rounded-md border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
             <p className="text-gray-800 dark:text-gray-200 font-medium">/src/lib/types.ts</p>
             <p className="text-gray-600 text-sm dark:text-gray-400">Shared TypeScript type definitions</p>
           </div>
           
-          <div className="p-3 bg-gray-50 rounded-md dark:bg-gray-800">
+          <div className="p-3 bg-gray-50 rounded-md border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
             <p className="text-gray-800 dark:text-gray-200 font-medium">/src/lib/usage-limits.ts</p>
             <p className="text-gray-600 text-sm dark:text-gray-400">Quota tracking logic using localStorage</p>
           </div>
           
-          <div className="p-3 bg-gray-50 rounded-md dark:bg-gray-800">
+          <div className="p-3 bg-gray-50 rounded-md border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
             <p className="text-gray-800 dark:text-gray-200 font-medium">/src/lib/utils.ts</p>
             <p className="text-gray-600 text-sm dark:text-gray-400">General helper functions (formatting, validation)</p>
           </div>
@@ -214,7 +214,7 @@ export default function ArchitecturePage() {
       </div>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Data Flow</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Data Flow</h2>
         
         <ol className="space-y-4 list-decimal list-inside text-gray-700 dark:text-gray-300">
           <li>
@@ -245,12 +245,12 @@ export default function ArchitecturePage() {
       </div>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Security Considerations</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Security Considerations</h2>
         
-        <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
           <div className="flex items-center mb-3">
             <Shield className="h-5 w-5 text-indigo-600 mr-2 dark:text-indigo-400" />
-            <h3 className="text-lg font-medium">Security Measures</h3>
+            <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">Security Measures</h3>
           </div>
           <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
             <li>API key stored securely in environment variables</li>
@@ -263,9 +263,9 @@ export default function ArchitecturePage() {
       </div>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Core Libraries and Dependencies</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Core Libraries and Dependencies</h2>
         
-        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
           <ul className="space-y-2 text-gray-700 dark:text-gray-300">
             <li><strong>Next.js 14</strong>: React framework with App Router</li>
             <li><strong>React</strong>: UI library with hooks for state management</li>
@@ -277,35 +277,35 @@ export default function ArchitecturePage() {
         </div>
       </div>
       
-      <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 dark:bg-blue-900/20 dark:border-blue-800">
-        <h2 className="text-xl font-semibold mb-2 text-blue-700 dark:text-blue-300">Related Documentation</h2>
-        <ul className="list-disc list-inside space-y-1 text-blue-600 dark:text-blue-400">
+      <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800 mb-8">
+        <h2 className="text-xl font-semibold mb-2 text-indigo-700 dark:text-indigo-300">Related Documentation</h2>
+        <ul className="list-disc list-inside space-y-1 text-indigo-600 dark:text-indigo-400">
           <li>
-            <Link href="/docs/api" className="underline hover:text-blue-800 dark:hover:text-blue-300">
+            <Link href="/docs/api" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               API Documentation
             </Link>
             {" "}for details about OpenAI integration
           </li>
           <li>
-            <Link href="/docs/prompts" className="underline hover:text-blue-800 dark:hover:text-blue-300">
+            <Link href="/docs/prompts" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               Prompt Engineering
             </Link>
             {" "}for information about GPT and DALL-E prompts
           </li>
           <li>
-            <Link href="/docs/dev-setup" className="underline hover:text-blue-800 dark:hover:text-blue-300">
+            <Link href="/docs/dev-setup" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               Development Setup
             </Link>
             {" "}for environment configuration and local setup
           </li>
           <li>
-            <Link href="/docs/security" className="underline hover:text-blue-800 dark:hover:text-blue-300">
+            <Link href="/docs/security" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               Security Documentation
             </Link>
             {" "}for information about security measures
           </li>
           <li>
-            <Link href="/docs/roadmap" className="underline hover:text-blue-800 dark:hover:text-blue-300">
+            <Link href="/docs/roadmap" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               Development Roadmap
             </Link>
             {" "}for future architecture plans
