@@ -3,27 +3,27 @@ import Link from 'next/link';
 
 export default function CreditsPage() {
   return (
-    <div className="prose prose-blue dark:prose-invert max-w-none px-6 py-8">
-
-      {/* Page Title */}
-      <h1 className="text-4xl font-extrabold mb-6">Credits &amp; Acknowledgements</h1>
-      <p className="lead text-lg text-gray-600 dark:text-gray-300 mb-8">
-        NPC Forge has been made possible through the contributions, tools, and resources from many individuals and organizations. This page acknowledges all those who have helped make this project a reality.
+    <div className="max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">Credits &amp; Acknowledgements</h1>
+      
+      <p className="lead mb-8 text-gray-700 dark:text-gray-300 text-lg">
+        NPC Forge has been made possible through the contributions, tools, and resources from many individuals and organizations. This document acknowledges all those who have helped make this project a reality.
       </p>
 
       {/* Core Development */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold text-indigo-700 dark:text-indigo-400 mb-4">Core Development</h2>
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-          <p>NPC Forge was created and is maintained by:</p>
-          <div className="flex flex-col sm:flex-row gap-6 items-center mt-4">
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Core Development</h2>
+        
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+          <p className="text-gray-700 dark:text-gray-300 mb-4">NPC Forge was created and is maintained by:</p>
+          <div className="flex flex-col sm:flex-row gap-6 items-center">
             <div className="flex-shrink-0">
               <div className="w-24 h-24 rounded-full bg-indigo-100 flex items-center justify-center dark:bg-indigo-900/50">
                 <span className="text-3xl text-indigo-600 dark:text-indigo-400">EP</span>
               </div>
             </div>
             <div>
-              <h3 className="text-xl font-semibold mb-1">Ethan Perello</h3>
+              <h3 className="text-xl font-semibold mb-1 text-gray-800 dark:text-gray-200">Ethan Perello</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-2">Design, Development, Documentation</p>
               <div className="flex flex-wrap gap-3 text-sm">
                 <a
@@ -52,14 +52,15 @@ export default function CreditsPage() {
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* AI Assistance */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold text-indigo-700 dark:text-indigo-400 mb-4">AI Assistance</h2>
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-          <p>NPC Forge’s development was significantly assisted by AI tools:</p>
-          <ul className="mt-4 space-y-4 text-gray-700 dark:text-gray-300">
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">AI Assistance</h2>
+        
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+          <p className="text-gray-700 dark:text-gray-300 mb-4">NPC Forge's development was significantly assisted by AI tools:</p>
+          <ul className="space-y-4 text-gray-700 dark:text-gray-300">
             <li className="flex items-start">
               <div className="h-6 w-6 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 mr-3 dark:bg-purple-900/50 dark:text-purple-400">
                 C
@@ -91,12 +92,13 @@ export default function CreditsPage() {
             </p>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* Technologies */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold text-indigo-700 dark:text-indigo-400 mb-4">Technologies</h2>
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Technologies</h2>
+        
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
           <ul className="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
             <li>Next.js – React framework</li>
             <li>React – UI library</li>
@@ -106,50 +108,54 @@ export default function CreditsPage() {
             <li>Lucide Icons – SVG icon library</li>
           </ul>
         </div>
-      </section>
+      </div>
 
       {/* Character Generation */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold text-indigo-700 dark:text-indigo-400 mb-4">Character Generation</h2>
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Character Generation</h2>
+        
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
           <ul className="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
             <li>OpenAI GPT-4o-mini – Text generation</li>
             <li>OpenAI DALL·E 3 – Portrait generation</li>
           </ul>
         </div>
-      </section>
+      </div>
 
       {/* Special Thanks */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold text-indigo-700 dark:text-indigo-400 mb-4">Special Thanks</h2>
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Special Thanks</h2>
+        
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
           <ul className="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
             <li>The open-source community for the libraries and tools that make this project possible</li>
             <li>Early users for invaluable feedback and bug reports</li>
             <li>The tabletop RPG and game-dev communities for ongoing inspiration</li>
           </ul>
         </div>
-      </section>
+      </div>
 
       {/* Example Characters */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold text-indigo-700 dark:text-indigo-400 mb-4">Example Characters</h2>
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Example Characters</h2>
+        
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
           <ul className="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
             <li><strong>Elarion</strong> – Fantasy High Wizard</li>
             <li><strong>Kira-7</strong> – Sci-Fi Cybernetic Antagonist</li>
             <li><strong>Detective Miles Navarro</strong> – Contemporary Mystery Character</li>
           </ul>
           <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-            All portraits generated via DALL·E 3 using NPC Forge’s portrait system.
+            All portraits generated via DALL·E 3 using NPC Forge's portrait system.
           </p>
         </div>
-      </section>
+      </div>
 
       {/* Learning Resources */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold text-indigo-700 dark:text-indigo-400 mb-4">Learning Resources</h2>
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Learning Resources</h2>
+        
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
           <ul className="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
             <li>
               <Link href="https://nextjs.org/docs" target="_blank" className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400">
@@ -178,26 +184,28 @@ export default function CreditsPage() {
             </li>
           </ul>
         </div>
-      </section>
+      </div>
 
       {/* Installation & Development */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold text-indigo-700 dark:text-indigo-400 mb-4">Installation &amp; Development</h2>
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-          <p>
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Installation &amp; Development</h2>
+        
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+          <p className="text-gray-700 dark:text-gray-300">
             For detailed setup instructions, see the&nbsp;
             <Link href="/docs/dev-setup" className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400">
               Dev Setup guide
             </Link>.
           </p>
         </div>
-      </section>
+      </div>
 
       {/* Contributing */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold text-indigo-700 dark:text-indigo-400 mb-4">Contributing</h2>
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-          <p>
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Contributing</h2>
+        
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+          <p className="text-gray-700 dark:text-gray-300">
             Contributions are welcome! Read our&nbsp;
             <Link href="/docs/contributing" className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400">
               Contributing Guidelines
@@ -212,21 +220,51 @@ export default function CreditsPage() {
             </a>.
           </p>
         </div>
-      </section>
+      </div>
 
       {/* Contact */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold text-indigo-700 dark:text-indigo-400 mb-4">Contact</h2>
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-          <p>
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Contact</h2>
+        
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+          <p className="text-gray-700 dark:text-gray-300">
             For questions or feedback, email&nbsp;
             <a href="mailto:ethanperello@gmail.com" className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400">
               ethanperello@gmail.com
             </a>.
           </p>
         </div>
-      </section>
-
+      </div>
+      
+      <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800 mb-8">
+        <h2 className="text-xl font-semibold mb-2 text-indigo-700 dark:text-indigo-300">Related Documentation</h2>
+        <ul className="list-disc list-inside space-y-1 text-indigo-600 dark:text-indigo-400">
+          <li>
+            <Link href="/docs/contributing" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Contributing Guidelines
+            </Link>
+            {" "}for how to get involved
+          </li>
+          <li>
+            <Link href="/docs/license" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              License Information
+            </Link>
+            {" "}for legal details
+          </li>
+          <li>
+            <Link href="/docs/roadmap" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Development Roadmap
+            </Link>
+            {" "}for future plans
+          </li>
+          <li>
+            <Link href="/docs/dev-setup" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Development Setup
+            </Link>
+            {" "}for getting started with development
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }

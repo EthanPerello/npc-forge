@@ -2,13 +2,11 @@ import Link from 'next/link';
 
 export default function ChangelogPage() {
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6 text-indigo-800 dark:text-indigo-400">
-        Changelog
-      </h1>
+    <div className="max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">Changelog</h1>
       
-      <p className="mb-6 text-gray-700 dark:text-gray-300">
-        All notable changes to NPC Forge will be documented on this page.
+      <p className="lead mb-8 text-gray-700 dark:text-gray-300 text-lg">
+        All notable changes to NPC Forge are documented on this page.
         The format is based on <a href="https://keepachangelog.com/en/1.0.0/" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
           Keep a Changelog
         </a>, and this project adheres to <a href="https://semver.org/spec/v2.0.0.html" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
@@ -17,15 +15,15 @@ export default function ChangelogPage() {
       </p>
       
       {/* Documentation Update - 0.2.0 */}
-      <div className="mb-12 pb-8 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-300 flex items-center">
+      <div className="mb-10 pb-8 border-b border-gray-200 dark:border-gray-700">
+        <h2 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
           <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3">
             0.2.0
           </span>
           <span>April 22, 2025 - Documentation Update</span>
         </h2>
         
-        <div className="mb-4">
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 mb-4">
           <h3 className="text-lg font-medium mb-2 text-green-600 dark:text-green-400">Added</h3>
           <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
             <li>Fully integrated documentation system with sidebar and breadcrumb navigation</li>
@@ -62,7 +60,7 @@ export default function ChangelogPage() {
           </ul>
         </div>
         
-        <div className="mb-4">
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 mb-4">
           <h3 className="text-lg font-medium mb-2 text-blue-600 dark:text-blue-400">Changed</h3>
           <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
             <li>Character tab interface now auto-resets to the "Profile" tab after generation</li>
@@ -76,7 +74,7 @@ export default function ChangelogPage() {
           </ul>
         </div>
         
-        <div>
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
           <h3 className="text-lg font-medium mb-2 text-red-600 dark:text-red-400">Fixed</h3>
           <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
             <li>Welcome guide toggle now functions reliably in dev and production environments</li>
@@ -87,14 +85,14 @@ export default function ChangelogPage() {
       
       {/* Welcome Guide & UI Overhaul - 0.1.4 */}
       <div className="mb-10 pb-8 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-300 flex items-center">
+        <h2 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
           <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3">
             0.1.4
           </span>
           <span>April 21, 2025 - Welcome Guide & UI Overhaul</span>
         </h2>
         
-        <div className="mb-4">
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 mb-4">
           <h3 className="text-lg font-medium mb-2 text-green-600 dark:text-green-400">Added</h3>
           <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
             <li>Welcome guide component with step-by-step instructions for new users</li>
@@ -107,7 +105,7 @@ export default function ChangelogPage() {
           </ul>
         </div>
         
-        <div className="mb-4">
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 mb-4">
           <h3 className="text-lg font-medium mb-2 text-blue-600 dark:text-blue-400">Changed</h3>
           <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
             <li>Complete UI redesign with improved layout, spacing, and visual hierarchy</li>
@@ -119,7 +117,7 @@ export default function ChangelogPage() {
           </ul>
         </div>
         
-        <div>
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
           <h3 className="text-lg font-medium mb-2 text-red-600 dark:text-red-400">Fixed</h3>
           <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
             <li>Sub-genre selection now persists when switching between tabs in the character creation form</li>
@@ -132,14 +130,14 @@ export default function ChangelogPage() {
       
       {/* Advanced Randomization - 0.1.3 */}
       <div className="mb-10 pb-8 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-300 flex items-center">
+        <h2 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
           <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3">
             0.1.3
           </span>
           <span>April 19, 2025 - Advanced Randomization</span>
         </h2>
         
-        <div className="mb-4">
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 mb-4">
           <h3 className="text-lg font-medium mb-2 text-green-600 dark:text-green-400">Added</h3>
           <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
             <li>Advanced character randomization with support for sub-genres and visual traits</li>
@@ -157,7 +155,7 @@ export default function ChangelogPage() {
           </ul>
         </div>
         
-        <div className="mb-4">
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 mb-4">
           <h3 className="text-lg font-medium mb-2 text-blue-600 dark:text-blue-400">Changed</h3>
           <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
             <li>Replaced "None" with "Not specified" across all dropdowns</li>
@@ -169,7 +167,7 @@ export default function ChangelogPage() {
           </ul>
         </div>
         
-        <div>
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
           <h3 className="text-lg font-medium mb-2 text-red-600 dark:text-red-400">Fixed</h3>
           <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
             <li>Removed underscores and improved capitalization in trait labels</li>
@@ -180,14 +178,14 @@ export default function ChangelogPage() {
       
       {/* UI & Customization - 0.1.2 */}
       <div className="mb-10 pb-8 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-300 flex items-center">
+        <h2 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
           <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3">
             0.1.2
           </span>
           <span>April 18, 2025 - UI & Customization</span>
         </h2>
         
-        <div className="mb-4">
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 mb-4">
           <h3 className="text-lg font-medium mb-2 text-green-600 dark:text-green-400">Added</h3>
           <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
             <li>"Clear Options" button that preserves custom description and portrait selections</li>
@@ -198,7 +196,7 @@ export default function ChangelogPage() {
           </ul>
         </div>
         
-        <div className="mb-4">
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
           <h3 className="text-lg font-medium mb-2 text-blue-600 dark:text-blue-400">Changed</h3>
           <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
             <li>Upgraded genre system with expanded sub-genres</li>
@@ -212,14 +210,14 @@ export default function ChangelogPage() {
       
       {/* Portrait Customization - 0.1.1 */}
       <div className="mb-10 pb-8 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-300 flex items-center">
+        <h2 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
           <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3">
             0.1.1
           </span>
           <span>April 17, 2025 - Portrait Customization</span>
         </h2>
         
-        <div className="mb-4">
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 mb-4">
           <h3 className="text-lg font-medium mb-2 text-green-600 dark:text-green-400">Added</h3>
           <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
             <li>Portrait customization options:
@@ -237,7 +235,7 @@ export default function ChangelogPage() {
           </ul>
         </div>
         
-        <div className="mb-4">
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
           <h3 className="text-lg font-medium mb-2 text-blue-600 dark:text-blue-400">Changed</h3>
           <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
             <li>UI reorganization for improved clarity and navigation</li>
@@ -249,14 +247,14 @@ export default function ChangelogPage() {
       
       {/* Initial Release - 0.1.0 */}
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-300 flex items-center">
+        <h2 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
           <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3">
             0.1.0
           </span>
           <span>April 12, 2025 - Initial Release</span>
         </h2>
         
-        <div>
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
           <h3 className="text-lg font-medium mb-2 text-green-600 dark:text-green-400">Added</h3>
           <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
             <li>Initial release with full character generation engine</li>
@@ -270,13 +268,34 @@ export default function ChangelogPage() {
         </div>
       </div>
       
-      <div className="mt-12 pt-6 border-t border-gray-200 dark:border-gray-700">
-        <Link 
-          href="/docs"
-          className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 flex items-center"
-        >
-          ← Back to Documentation
-        </Link>
+      <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800 mb-8">
+        <h2 className="text-xl font-semibold mb-2 text-indigo-700 dark:text-indigo-300">Related Documentation</h2>
+        <ul className="list-disc list-inside space-y-1 text-indigo-600 dark:text-indigo-400">
+          <li>
+            <Link href="/docs/roadmap" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Development Roadmap
+            </Link>
+            {" "}for future plans
+          </li>
+          <li>
+            <Link href="/docs/features" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Features Overview
+            </Link>
+            {" "}for current capabilities
+          </li>
+          <li>
+            <Link href="/docs/contributing" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Contributing Guidelines
+            </Link>
+            {" "}for how to help with development
+          </li>
+          <li>
+            <Link href="/docs" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Documentation Home
+            </Link>
+            {" "}for all documentation
+          </li>
+        </ul>
       </div>
     </div>
   );
