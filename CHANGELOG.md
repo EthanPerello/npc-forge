@@ -1,8 +1,23 @@
+# Changelog
+
+All notable changes to NPC Forge will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
 ## [Unreleased]
 
+### Changed
+- Standardized documentation styling across all pages:
+  - Consistent header formatting and section structure
+  - Unified card layouts, colors, and spacing
+  - Standardized text colors, link styles, and content formatting
+  - Added consistent "Related Documentation" sections
+  - Fixed responsive layout issues on mobile devices
+- Corrected Next.js version reference from 15 to 14 throughout documentation
+- Fixed date inconsistencies in release information
 
-
-## [0.2.0] - 2025-04-23
+## [0.2.0] - 2025-04-22
 
 ### Added
 - Fully integrated documentation system with sidebar and breadcrumb navigation
@@ -46,9 +61,6 @@
 - Welcome guide toggle now functions reliably in dev and production environments
 - `useEffect` behavior in `CharacterDisplay` now correctly resets and displays new characters
 
----
-
-
 ## [0.1.4] - 2025-04-21
 
 ### Added
@@ -73,8 +85,6 @@
 - Fixed infinite update loop in the usage limit display component.
 - Resolved layout issues affecting mobile views.
 - Improved tab behavior and styling consistency.
-
----
 
 ## [0.1.3] - 2025-04-19
 
@@ -101,8 +111,6 @@
 - Removed underscores and improved capitalization in trait labels.
 - Improved portrait generation prompts for consistent formatting and detail.
 
----
-
 ## [0.1.2] - 2025-04-18
 
 ### Added
@@ -118,8 +126,6 @@
 - Color-coded UI based on genre categories.
 - Reorganized advanced options into clear, logical sections.
 - Improved templates with clearer descriptions and examples.
-
----
 
 ## [0.1.1] - 2025-04-17
 
@@ -139,8 +145,6 @@
 - Better dropdown UX with searchable and grouped entries.
 - Refined OpenAI prompt construction for portrait generation.
 
----
-
 ## [0.1.0] - 2025-04-12
 
 ### Added
@@ -152,11 +156,10 @@
 - Export to JSON feature.
 - Fully responsive UI for desktop and mobile.
 
----
-
-[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.1.4...HEAD  
-[0.1.4]: https://github.com/EthanPerello/npc-forge/compare/v0.1.3...v0.1.4  
-[0.1.3]: https://github.com/EthanPerello/npc-forge/compare/v0.1.2...v0.1.3  
-[0.1.2]: https://github.com/EthanPerello/npc-forge/compare/v0.1.1...v0.1.2  
-[0.1.1]: https://github.com/EthanPerello/npc-forge/compare/v0.1.0...v0.1.1  
+[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/EthanPerello/npc-forge/compare/v0.1.4...v0.2.0
+[0.1.4]: https://github.com/EthanPerello/npc-forge/compare/v0.1.3...v0.1.4
+[0.1.3]: https://github.com/EthanPerello/npc-forge/compare/v0.1.2...v0.1.3
+[0.1.2]: https://github.com/EthanPerello/npc-forge/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/EthanPerello/npc-forge/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/EthanPerello/npc-forge/releases/tag/v0.1.0

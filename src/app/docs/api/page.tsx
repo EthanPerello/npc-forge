@@ -1,12 +1,12 @@
 import Link from 'next/link';
-import { Server, Code, AlertTriangle, Check } from 'lucide-react';
+import { Server, Code, AlertTriangle, Check, Database, Shield } from 'lucide-react';
 
 export default function ApiPage() {
   return (
     <div>
       <h1 className="text-3xl font-bold mb-6">API Documentation</h1>
       
-      <p className="lead mb-8">
+      <p className="lead mb-8 text-gray-700 dark:text-gray-300">
         This document describes the internal API structure and functionality of NPC Forge. It's intended for developers who want to understand how the application works or contribute to its development.
       </p>
       
@@ -86,7 +86,7 @@ export default function ApiPage() {
         <h2 className="text-2xl font-semibold mb-4">Response</h2>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
             <div className="flex items-center mb-2">
               <Check className="h-5 w-5 text-green-600 mr-2 dark:text-green-400" />
               <h3 className="text-lg font-medium text-green-800 dark:text-green-300">Success Response (200 OK)</h3>
@@ -121,7 +121,7 @@ export default function ApiPage() {
             </div>
           </div>
           
-          <div>
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
             <div className="flex items-center mb-2">
               <AlertTriangle className="h-5 w-5 text-red-600 mr-2 dark:text-red-400" />
               <h3 className="text-lg font-medium text-red-800 dark:text-red-300">Error Response (400/500)</h3>
@@ -144,9 +144,9 @@ export default function ApiPage() {
         </p>
         
         <div className="mb-6">
-          <h3 className="text-lg font-medium mb-3">Key Functions</h3>
+          <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Key Functions</h3>
           
-          <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
             <h4 className="font-medium text-gray-800 mb-2 dark:text-gray-200">POST Handler</h4>
             <p className="text-gray-700 mb-2 dark:text-gray-300">
               The main handler for processing generation requests:
@@ -220,7 +220,7 @@ export default function ApiPage() {
         </p>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
             <h4 className="font-medium text-gray-800 mb-2 dark:text-gray-200">Character Generation</h4>
             <div className="bg-gray-800 text-gray-200 p-3 rounded-lg overflow-auto max-h-48 text-sm font-mono dark:bg-gray-900">
 {`export async function generateCharacter(systemPrompt: string, description: string): Promise<Character> {
@@ -247,7 +247,7 @@ export default function ApiPage() {
             </div>
           </div>
           
-          <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
             <h4 className="font-medium text-gray-800 mb-2 dark:text-gray-200">Portrait Generation</h4>
             <div className="bg-gray-800 text-gray-200 p-3 rounded-lg overflow-auto max-h-48 text-sm font-mono dark:bg-gray-900">
 {`export async function generatePortrait(character: Character): Promise<string> {
@@ -284,11 +284,14 @@ export default function ApiPage() {
       <div className="mb-10">
         <h2 className="text-2xl font-semibold mb-4">Usage Limits Integration</h2>
         
-        <p className="mb-4 text-gray-700 dark:text-gray-300">
-          The application includes a client-side usage tracking system in <code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/src/lib/usage-limits.ts</code>.
-        </p>
-        
-        <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+          <div className="flex items-center mb-3">
+            <Database className="h-5 w-5 text-indigo-600 mr-2 dark:text-indigo-400" />
+            <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">Client-Side Usage Tracking</h3>
+          </div>
+          <p className="mb-3 text-gray-700 dark:text-gray-300">
+            The application includes a client-side usage tracking system in <code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/src/lib/usage-limits.ts</code>.
+          </p>
           <div className="bg-gray-800 text-gray-200 p-3 rounded-lg overflow-auto max-h-48 text-sm font-mono dark:bg-gray-900">
 {`// Get the current usage data from localStorage
 export function getUsageData(): UsageData {
@@ -332,24 +335,48 @@ export function getUsageData(): UsageData {
           </div>
         </div>
       </div>
+
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4">Security Considerations</h2>
+        
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+          <div className="flex items-center mb-3">
+            <Shield className="h-5 w-5 text-indigo-600 mr-2 dark:text-indigo-400" />
+            <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">API Security Measures</h3>
+          </div>
+          <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
+            <li>Input sanitization to prevent malicious content</li>
+            <li>Server-side API key storage using environment variables</li>
+            <li>Validation of incoming requests to ensure proper data structure</li>
+            <li>Error handling that prevents information disclosure</li>
+            <li>Rate limiting through usage tracking</li>
+          </ul>
+        </div>
+      </div>
       
-      <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 dark:bg-blue-900/20 dark:border-blue-800">
-        <h2 className="text-xl font-semibold mb-2 text-blue-700 dark:text-blue-300">Related Documentation</h2>
-        <ul className="list-disc list-inside space-y-1 text-blue-600 dark:text-blue-400">
+      <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800">
+        <h2 className="text-xl font-semibold mb-2 text-indigo-700 dark:text-indigo-300">Related Documentation</h2>
+        <ul className="list-disc list-inside space-y-1 text-indigo-600 dark:text-indigo-400">
           <li>
-            <Link href="/docs/architecture" className="underline hover:text-blue-800 dark:hover:text-blue-300">
+            <Link href="/docs/architecture" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               Architecture Overview
             </Link>
             {" "}for high-level system design
           </li>
           <li>
-            <Link href="/docs/prompts" className="underline hover:text-blue-800 dark:hover:text-blue-300">
+            <Link href="/docs/prompts" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               OpenAI Prompts
             </Link>
             {" "}for details on prompt engineering
           </li>
           <li>
-            <Link href="/docs/contributing" className="underline hover:text-blue-800 dark:hover:text-blue-300">
+            <Link href="/docs/security" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Security Documentation
+            </Link>
+            {" "}for complete security details
+          </li>
+          <li>
+            <Link href="/docs/contributing" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               Contributing Guidelines
             </Link>
             {" "}for contribution workflows

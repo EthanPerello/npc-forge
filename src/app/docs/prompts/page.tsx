@@ -3,15 +3,15 @@ import { MessageSquare, Image, Lightbulb, Shield, Check } from 'lucide-react';
 
 export default function PromptsPage() {
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Prompt Engineering</h1>
+    <div className="max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">Prompt Engineering</h1>
       
-      <p className="lead mb-8">
+      <p className="lead mb-8 text-gray-700 dark:text-gray-300 text-lg">
         This document provides insights into the prompt engineering techniques used in NPC Forge to generate characters, portraits, and related elements.
       </p>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Overview</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Overview</h2>
         
         <p className="mb-4 text-gray-700 dark:text-gray-300">
           NPC Forge uses carefully constructed prompts to communicate with OpenAI's models. The prompts are designed to:
@@ -26,12 +26,12 @@ export default function PromptsPage() {
       </div>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Character Generation Prompts</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Character Generation Prompts</h2>
         
-        <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700 mb-6">
+        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 mb-6">
           <div className="flex items-center mb-3">
             <MessageSquare className="h-5 w-5 text-indigo-600 mr-2 dark:text-indigo-400" />
-            <h3 className="text-lg font-medium">Base System Prompt Structure</h3>
+            <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">Base System Prompt Structure</h3>
           </div>
           <p className="mb-3 text-gray-700 dark:text-gray-300">
             The system prompt for character generation follows this basic structure:
@@ -60,8 +60,8 @@ Return ONLY valid JSON with the following structure:
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
-            <h3 className="text-lg font-medium mb-3">Dynamic Prompt Components</h3>
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Dynamic Prompt Components</h3>
             <p className="mb-2 text-gray-700 dark:text-gray-300">
               Additional fields are added based on user selections:
             </p>
@@ -107,8 +107,8 @@ Return ONLY valid JSON with the following structure:
             </div>
           </div>
           
-          <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
-            <h3 className="text-lg font-medium mb-3">Genre and Trait Guidance</h3>
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Genre and Trait Guidance</h3>
             <div className="space-y-3">
               <div>
                 <h4 className="font-medium text-gray-800 dark:text-gray-200">Genre Guidance</h4>
@@ -142,8 +142,8 @@ Return ONLY valid JSON with the following structure:
           </div>
         </div>
         
-        <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
-          <h3 className="text-lg font-medium mb-2">Creativity Encouragement</h3>
+        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+          <h3 className="text-lg font-medium mb-2 text-indigo-700 dark:text-indigo-400">Creativity Encouragement</h3>
           <p className="text-gray-700 dark:text-gray-300">
             The prompt ends with guidance to ensure quality:
           </p>
@@ -154,12 +154,12 @@ Return ONLY valid JSON with the following structure:
       </div>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Portrait Generation Prompts</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Portrait Generation Prompts</h2>
         
-        <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700 mb-6">
+        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 mb-6">
           <div className="flex items-center mb-3">
             <Image className="h-5 w-5 text-indigo-600 mr-2 dark:text-indigo-400" />
-            <h3 className="text-lg font-medium">Portrait Prompt Structure</h3>
+            <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">Portrait Prompt Structure</h3>
           </div>
           <p className="mb-3 text-gray-700 dark:text-gray-300">
             Portrait generation uses a different prompt structure focused on visual elements:
@@ -172,8 +172,8 @@ High quality, detailed character portrait, professional digital art.`}
           </div>
         </div>
         
-        <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
-          <h3 className="text-lg font-medium mb-3">Visual Traits Extraction</h3>
+        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+          <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Visual Traits Extraction</h3>
           <p className="mb-2 text-gray-700 dark:text-gray-300">
             The portrait generation process extracts visual traits from the character data:
           </p>
@@ -194,13 +194,13 @@ function isVisualTrait(key: string): boolean {
       </div>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Prompt Engineering Techniques</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Prompt Engineering Techniques</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <div className="flex items-center mb-3">
               <Check className="h-5 w-5 text-indigo-600 mr-2 dark:text-indigo-400" />
-              <h3 className="text-lg font-medium">Format Enforcement</h3>
+              <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">Format Enforcement</h3>
             </div>
             <p className="text-gray-700 dark:text-gray-300">
               The prompts use specific language to enforce the desired output format:
@@ -211,10 +211,10 @@ Do not include any additional text, explanations, or commentary outside the JSON
             </div>
           </div>
           
-          <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <div className="flex items-center mb-3">
               <Lightbulb className="h-5 w-5 text-indigo-600 mr-2 dark:text-indigo-400" />
-              <h3 className="text-lg font-medium">Field Definitions</h3>
+              <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">Field Definitions</h3>
             </div>
             <p className="text-gray-700 dark:text-gray-300">
               Each field in the expected output is clearly defined:
@@ -224,10 +224,10 @@ Do not include any additional text, explanations, or commentary outside the JSON
             </div>
           </div>
           
-          <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <div className="flex items-center mb-3">
               <Shield className="h-5 w-5 text-indigo-600 mr-2 dark:text-indigo-400" />
-              <h3 className="text-lg font-medium">Input Sanitization</h3>
+              <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">Input Sanitization</h3>
             </div>
             <p className="text-gray-700 dark:text-gray-300">
               Before sending to the API, inputs are sanitized:
@@ -244,10 +244,10 @@ if (data.advanced_options?.distinctive_features) {
             </div>
           </div>
           
-          <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <div className="flex items-center mb-3">
               <MessageSquare className="h-5 w-5 text-indigo-600 mr-2 dark:text-indigo-400" />
-              <h3 className="text-lg font-medium">Null Handling</h3>
+              <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">Null Handling</h3>
             </div>
             <p className="text-gray-700 dark:text-gray-300">
               The prompt system handles undefined or null values by removing them:
@@ -261,10 +261,10 @@ const cleanedData = removeEmptyValues(data);`}
       </div>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Example Prompts</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Example Prompts</h2>
         
-        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-6 dark:bg-gray-800 dark:border-gray-700">
-          <h3 className="text-lg font-medium mb-3 text-gray-800 dark:text-gray-200">Simple Character Prompt</h3>
+        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm mb-6 dark:bg-gray-800 dark:border-gray-700">
+          <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Simple Character Prompt</h3>
           <div className="bg-gray-800 text-gray-200 p-3 rounded-lg overflow-auto max-h-96 text-sm font-mono dark:bg-gray-900">
 {`You are an expert RPG character generator. Generate a detailed NPC profile based on the description and parameters provided.
 
@@ -297,8 +297,8 @@ Remember: Your response must be ONLY the JSON object. Do not include any explana
           </div>
         </div>
         
-        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-          <h3 className="text-lg font-medium mb-3 text-gray-800 dark:text-gray-200">Portrait Prompt Example</h3>
+        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+          <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Portrait Prompt Example</h3>
           <div className="bg-gray-800 text-gray-200 p-3 rounded-lg overflow-auto max-h-72 text-sm font-mono dark:bg-gray-900">
 {`Portrait of Thalindra Silverleaf: Tall and lithe, with angular features framed by long silver-blonde hair that cascades down her back, adorned with small braids and leaf ornaments. Her almond-shaped eyes are a piercing emerald green that seem to glow slightly in dim light. She wears fitted leather armor dyed in various shades of green and brown, expertly crafted to blend with the forest surroundings.
 
@@ -311,71 +311,83 @@ High quality, detailed character portrait, professional digital art.`}
       </div>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Best Practices</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Best Practices</h2>
         
         <p className="mb-4 text-gray-700 dark:text-gray-300">
           When modifying prompts or developing new features, follow these best practices:
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-3 bg-indigo-50 rounded-lg dark:bg-indigo-900/20">
-            <p className="text-indigo-800 font-medium dark:text-indigo-300">1. Be Explicit</p>
-            <p className="text-indigo-700 text-sm dark:text-indigo-400">
+          <div className="p-3 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <p className="text-indigo-700 font-medium dark:text-indigo-400">1. Be Explicit</p>
+            <p className="text-gray-700 text-sm dark:text-gray-300">
               Clearly state what you want the model to do
             </p>
           </div>
           
-          <div className="p-3 bg-indigo-50 rounded-lg dark:bg-indigo-900/20">
-            <p className="text-indigo-800 font-medium dark:text-indigo-300">2. Structure Output</p>
-            <p className="text-indigo-700 text-sm dark:text-indigo-400">
+          <div className="p-3 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <p className="text-indigo-700 font-medium dark:text-indigo-400">2. Structure Output</p>
+            <p className="text-gray-700 text-sm dark:text-gray-300">
               Define the expected format precisely
             </p>
           </div>
           
-          <div className="p-3 bg-indigo-50 rounded-lg dark:bg-indigo-900/20">
-            <p className="text-indigo-800 font-medium dark:text-indigo-300">3. Provide Context</p>
-            <p className="text-indigo-700 text-sm dark:text-indigo-400">
+          <div className="p-3 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <p className="text-indigo-700 font-medium dark:text-indigo-400">3. Provide Context</p>
+            <p className="text-gray-700 text-sm dark:text-gray-300">
               Include relevant information about the character
             </p>
           </div>
           
-          <div className="p-3 bg-indigo-50 rounded-lg dark:bg-indigo-900/20">
-            <p className="text-indigo-800 font-medium dark:text-indigo-300">4. Balance Constraints</p>
-            <p className="text-indigo-700 text-sm dark:text-indigo-400">
+          <div className="p-3 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <p className="text-indigo-700 font-medium dark:text-indigo-400">4. Balance Constraints</p>
+            <p className="text-gray-700 text-sm dark:text-gray-300">
               Guide without being too restrictive
             </p>
           </div>
           
-          <div className="p-3 bg-indigo-50 rounded-lg dark:bg-indigo-900/20">
-            <p className="text-indigo-800 font-medium dark:text-indigo-300">5. Test Thoroughly</p>
-            <p className="text-indigo-700 text-sm dark:text-indigo-400">
+          <div className="p-3 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <p className="text-indigo-700 font-medium dark:text-indigo-400">5. Test Thoroughly</p>
+            <p className="text-gray-700 text-sm dark:text-gray-300">
               Try prompts with different inputs
             </p>
           </div>
           
-          <div className="p-3 bg-indigo-50 rounded-lg dark:bg-indigo-900/20">
-            <p className="text-indigo-800 font-medium dark:text-indigo-300">6. Optimize Tokens</p>
-            <p className="text-indigo-700 text-sm dark:text-indigo-400">
+          <div className="p-3 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <p className="text-indigo-700 font-medium dark:text-indigo-400">6. Optimize Tokens</p>
+            <p className="text-gray-700 text-sm dark:text-gray-300">
               Keep prompts efficient to reduce API costs
             </p>
           </div>
         </div>
       </div>
       
-      <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 dark:bg-blue-900/20 dark:border-blue-800">
-        <h2 className="text-xl font-semibold mb-2 text-blue-700 dark:text-blue-300">Related Documentation</h2>
-        <ul className="list-disc list-inside space-y-1 text-blue-600 dark:text-blue-400">
+      <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800 mb-8">
+        <h2 className="text-xl font-semibold mb-2 text-indigo-700 dark:text-indigo-300">Related Documentation</h2>
+        <ul className="list-disc list-inside space-y-1 text-indigo-600 dark:text-indigo-400">
           <li>
-            <Link href="/docs/api" className="underline hover:text-blue-800 dark:hover:text-blue-300">
+            <Link href="/docs/api" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               API Documentation
             </Link>
             {" "}for details on the API implementation
           </li>
           <li>
-            <Link href="/docs/architecture" className="underline hover:text-blue-800 dark:hover:text-blue-300">
+            <Link href="/docs/architecture" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               Architecture Overview
             </Link>
             {" "}for high-level system design
+          </li>
+          <li>
+            <Link href="/docs/security" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Security Documentation
+            </Link>
+            {" "}for information about input sanitization
+          </li>
+          <li>
+            <Link href="/docs/character-examples" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Character Examples
+            </Link>
+            {" "}to see prompt results
           </li>
         </ul>
       </div>
