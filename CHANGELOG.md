@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Implemented complete dark mode toggle system:
+  - Created ThemeContext for managing light, dark, and system themes
+  - Added a ThemeToggle button for switching themes
+  - Integrated theme switching with Tailwind CSS using the .dark class
+  - Persisted user theme preference with localStorage
+  - Applied smooth theme transitions across the app
+
 ### Changed
 - Standardized documentation styling across all pages:
   - Consistent header formatting and section structure
@@ -16,6 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed responsive layout issues on mobile devices
 - Corrected Next.js version reference from 15 to 14 throughout documentation
 - Fixed date inconsistencies in release information
+- Updated ClientLayout to include ThemeProvider and reposition toggle button
+- Updated RootLayout to handle dynamic theme colors and suppress hydration warnings
+-Enhanced globals.css for dark mode transitions and theme-aware UI components
 
 ## [0.2.0] - 2025-04-22
 
