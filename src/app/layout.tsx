@@ -64,12 +64,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-icon.png" />
-        <meta name="theme-color" content="#6366F1" />
+        {/* Updated to use CSS variables */}
+        <meta name="theme-color" content="var(--background)" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

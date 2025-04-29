@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { ThemeProvider } from '@/contexts/theme-context';
+import ThemeToggle from './ui/theme-toggle';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -19,12 +21,17 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   }, []);
 
   return (
-    <main 
-      className={`min-h-screen transition-all duration-300 ${
-        isExpanded ? 'lg:pl-64' : 'lg:pl-16'
-      }`}
-    >
-      {children}
-    </main>
+    <ThemeProvider>
+      <div
+        className={`min-h-screen transition-all duration-300 ${
+          isExpanded ? 'lg:pl-64' : 'lg:pl-16'
+        }`}
+      >
+        <div className="fixed top-4 right-4 z-50">
+          <ThemeToggle />
+        </div>
+        {children}
+      </div>
+    </ThemeProvider>
   );
 }
