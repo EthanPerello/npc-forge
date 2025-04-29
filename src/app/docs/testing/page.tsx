@@ -3,41 +3,41 @@ import { Beaker, CheckCircle, AlertCircle, Monitor } from 'lucide-react';
 
 export default function TestingPage() {
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Testing Guide</h1>
+    <div className="max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">Testing Guide</h1>
       
-      <p className="lead mb-8">
+      <p className="lead mb-8 text-gray-700 dark:text-gray-300 text-lg">
         This document outlines the testing approach for NPC Forge, including manual testing procedures, potential automated testing strategies, and best practices for ensuring quality.
       </p>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Current Testing Approach</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Current Testing Approach</h2>
         
         <p className="mb-4 text-gray-700 dark:text-gray-300">
           NPC Forge currently relies on manual testing for quality assurance. This document provides structured procedures to ensure thorough testing across all features.
         </p>
         
-        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 mb-6 dark:bg-blue-900/20 dark:border-blue-800">
-          <h3 className="text-lg font-medium text-blue-800 mb-2 dark:text-blue-300 flex items-center">
+        <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg mb-6 dark:bg-indigo-900/20 dark:border-indigo-800">
+          <h3 className="text-lg font-medium text-indigo-700 mb-2 dark:text-indigo-300 flex items-center">
             <Beaker className="h-5 w-5 mr-2" />
             Testing Philosophy
           </h3>
-          <p className="text-blue-700 dark:text-blue-400">
+          <p className="text-indigo-600 dark:text-indigo-400">
             Our approach prioritizes thorough testing of the user experience and API integrations to ensure that character generation delivers consistent, high-quality results while maintaining a smooth, intuitive interface.
           </p>
         </div>
       </div>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Manual Testing Checklist</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Manual Testing Checklist</h2>
         
         <div className="space-y-8">
           {/* Core Functionality */}
           <div>
-            <h3 className="text-xl font-medium mb-3 text-indigo-700 dark:text-indigo-300">Core Functionality</h3>
+            <h3 className="text-xl font-medium mb-3 text-indigo-700 dark:text-indigo-400">Core Functionality</h3>
             
             <div className="space-y-4">
-              <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+              <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
                 <h4 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Character Generation</h4>
                 <ul className="space-y-2">
                   <li className="flex items-start">
@@ -79,7 +79,7 @@ export default function TestingPage() {
                 </ul>
               </div>
               
-              <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+              <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
                 <h4 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Portrait Generation</h4>
                 <ul className="space-y-2">
                   <li className="flex items-start">
@@ -109,7 +109,7 @@ export default function TestingPage() {
                 </ul>
               </div>
               
-              <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+              <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
                 <h4 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Usage Limits</h4>
                 <ul className="space-y-2">
                   <li className="flex items-start">
@@ -143,10 +143,10 @@ export default function TestingPage() {
           
           {/* User Interface */}
           <div>
-            <h3 className="text-xl font-medium mb-3 text-indigo-700 dark:text-indigo-300">User Interface</h3>
+            <h3 className="text-xl font-medium mb-3 text-indigo-700 dark:text-indigo-400">User Interface</h3>
             
             <div className="space-y-4">
-              <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+              <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
                 <h4 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Form Controls</h4>
                 <ul className="space-y-2">
                   <li className="flex items-start">
@@ -176,7 +176,7 @@ export default function TestingPage() {
                 </ul>
               </div>
               
-              <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+              <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
                 <h4 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Responsive Design</h4>
                 <ul className="space-y-2">
                   <li className="flex items-start">
@@ -210,9 +210,9 @@ export default function TestingPage() {
           
           {/* Edge Cases */}
           <div>
-            <h3 className="text-xl font-medium mb-3 text-indigo-700 dark:text-indigo-300">Edge Cases</h3>
+            <h3 className="text-xl font-medium mb-3 text-indigo-700 dark:text-indigo-400">Edge Cases</h3>
             
-            <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+            <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
               <ul className="space-y-2">
                 <li className="flex items-start">
                   <div className="flex-shrink-0 h-5 w-5 relative top-0.5">
@@ -251,43 +251,43 @@ export default function TestingPage() {
       </div>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Manual Testing Procedure</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Manual Testing Procedure</h2>
         
         <p className="mb-4 text-gray-700 dark:text-gray-300">
           Follow this procedure when testing new features or changes:
         </p>
         
         <div className="space-y-4">
-          <div className="p-4 bg-indigo-50 rounded-lg dark:bg-indigo-900/20">
-            <h3 className="text-lg font-medium mb-2 text-indigo-700 dark:text-indigo-300 flex items-center">
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-2 text-indigo-700 dark:text-indigo-400 flex items-center">
               <CheckCircle className="h-5 w-5 mr-2" />
               Preparation
             </h3>
-            <ul className="list-disc list-inside space-y-1 text-indigo-600 dark:text-indigo-400">
+            <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
               <li>Start with a clean development environment</li>
               <li>Ensure you have the latest code</li>
-              <li>Set up the <code className="bg-indigo-100 p-1 rounded dark:bg-indigo-800">.env.local</code> file with your OpenAI API key</li>
+              <li>Set up the <code className="bg-gray-100 p-1 rounded dark:bg-gray-800">.env.local</code> file with your OpenAI API key</li>
             </ul>
           </div>
           
-          <div className="p-4 bg-indigo-50 rounded-lg dark:bg-indigo-900/20">
-            <h3 className="text-lg font-medium mb-2 text-indigo-700 dark:text-indigo-300 flex items-center">
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-2 text-indigo-700 dark:text-indigo-400 flex items-center">
               <CheckCircle className="h-5 w-5 mr-2" />
               Basic Testing
             </h3>
-            <ul className="list-disc list-inside space-y-1 text-indigo-600 dark:text-indigo-400">
+            <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
               <li>Test the happy path (expected inputs and workflow)</li>
               <li>Verify outputs match expected results</li>
               <li>Check UI rendering and interactions</li>
             </ul>
           </div>
           
-          <div className="p-4 bg-indigo-50 rounded-lg dark:bg-indigo-900/20">
-            <h3 className="text-lg font-medium mb-2 text-indigo-700 dark:text-indigo-300 flex items-center">
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-2 text-indigo-700 dark:text-indigo-400 flex items-center">
               <AlertCircle className="h-5 w-5 mr-2" />
               Edge Case Testing
             </h3>
-            <ul className="list-disc list-inside space-y-1 text-indigo-600 dark:text-indigo-400">
+            <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
               <li>Test with minimal inputs</li>
               <li>Test with extreme inputs</li>
               <li>Test with unexpected inputs</li>
@@ -295,12 +295,12 @@ export default function TestingPage() {
             </ul>
           </div>
           
-          <div className="p-4 bg-indigo-50 rounded-lg dark:bg-indigo-900/20">
-            <h3 className="text-lg font-medium mb-2 text-indigo-700 dark:text-indigo-300 flex items-center">
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-2 text-indigo-700 dark:text-indigo-400 flex items-center">
               <Monitor className="h-5 w-5 mr-2" />
               Cross-browser Testing
             </h3>
-            <ul className="list-disc list-inside space-y-1 text-indigo-600 dark:text-indigo-400">
+            <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
               <li>Verify functionality in Chrome, Firefox, Safari, and Edge</li>
               <li>Check for rendering differences</li>
               <li>Verify responsive breakpoints work across browsers</li>
@@ -310,14 +310,14 @@ export default function TestingPage() {
       </div>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Future Automated Testing</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Future Automated Testing</h2>
         
         <p className="mb-4 text-gray-700 dark:text-gray-300">
           While NPC Forge currently relies on manual testing, future development should include automated testing. Here are recommendations for implementing automated tests:
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
             <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Unit Tests</h3>
             <p className="text-gray-700 dark:text-gray-300 mb-2">Implement unit tests for:</p>
             <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 text-sm">
@@ -333,7 +333,7 @@ export default function TestingPage() {
             </ul>
           </div>
           
-          <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
             <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Integration Tests</h3>
             <p className="text-gray-700 dark:text-gray-300 mb-2">Implement integration tests for:</p>
             <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 text-sm">
@@ -348,7 +348,7 @@ export default function TestingPage() {
             </ul>
           </div>
           
-          <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
             <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-2">E2E Tests</h3>
             <p className="text-gray-700 dark:text-gray-300 mb-2">Implement end-to-end tests for:</p>
             <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 text-sm">
@@ -363,7 +363,7 @@ export default function TestingPage() {
             </ul>
           </div>
           
-          <div className="p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
             <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Visual Regression Tests</h3>
             <p className="text-gray-700 dark:text-gray-300 mb-2">Consider visual regression tests for:</p>
             <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 text-sm">
@@ -380,26 +380,32 @@ export default function TestingPage() {
         </div>
       </div>
       
-      <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 dark:bg-blue-900/20 dark:border-blue-800">
-        <h2 className="text-xl font-semibold mb-2 text-blue-700 dark:text-blue-300">Related Documentation</h2>
-        <ul className="list-disc list-inside space-y-1 text-blue-600 dark:text-blue-400">
+      <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800 mb-8">
+        <h2 className="text-xl font-semibold mb-2 text-indigo-700 dark:text-indigo-300">Related Documentation</h2>
+        <ul className="list-disc list-inside space-y-1 text-indigo-600 dark:text-indigo-400">
           <li>
-            <Link href="/docs/contributing" className="underline hover:text-blue-800 dark:hover:text-blue-300">
+            <Link href="/docs/contributing" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               Contributing Guidelines
             </Link>
             {" "}for contribution workflows
           </li>
           <li>
-            <Link href="/docs/deployment" className="underline hover:text-blue-800 dark:hover:text-blue-300">
+            <Link href="/docs/deployment" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               Deployment Guide
             </Link>
             {" "}for deployment procedures
           </li>
           <li>
-            <Link href="/docs/architecture" className="underline hover:text-blue-800 dark:hover:text-blue-300">
+            <Link href="/docs/architecture" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               Architecture Overview
             </Link>
             {" "}for system understanding
+          </li>
+          <li>
+            <Link href="/docs/dev-setup" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Development Setup
+            </Link>
+            {" "}for local environment configuration
           </li>
         </ul>
       </div>
