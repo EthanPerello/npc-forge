@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Book, Code, User, FileText, Settings, HelpCircle, Calendar, Map, ShieldCheck, CodeSquare, Bell, Layers, Server, FileJson, Award } from 'lucide-react';
 
 export const metadata = {
   title: 'NPC Forge Documentation',
@@ -7,122 +8,257 @@ export const metadata = {
 
 export default function DocsIndexPage() {
   return (
-    <div className="prose prose-blue dark:prose-invert max-w-none px-6 py-8">
-      <h1 className="text-4xl font-extrabold mb-4">NPC Forge Documentation</h1>
-      <p className="lead text-lg text-gray-600 dark:text-gray-300 mb-8">
-        Welcome to the NPC Forge documentation. Here you'll find user guides, example characters, and developer references to help you get the most out of the app.
+    <div className="max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">NPC Forge Documentation</h1>
+      
+      <p className="lead mb-8 text-gray-700 dark:text-gray-300 text-lg">
+        Welcome to the NPC Forge documentation. Here you'll find comprehensive guides, examples, and developer references to help you get the most out of this AI-powered character generator.
       </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        {/* User Guides Card */}
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-          <h2 className="text-2xl font-semibold mb-4 text-indigo-600">User Guides</h2>
-          <ul className="space-y-4">
-            <li>
-              <Link href="/docs/how-to-use" className="text-xl font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
+      
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-6 text-indigo-700 dark:text-indigo-400 flex items-center">
+          <User className="h-5 w-5 mr-2" />
+          User Guides
+        </h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <Book className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/how-to-use" className="hover:text-indigo-800 dark:hover:text-indigo-300">
                 How to Use NPC Forge
               </Link>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Step-by-step guide to creating characters.</p>
-            </li>
-            <li>
-              <Link href="/docs/character-examples" className="text-xl font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              Step-by-step guide to creating detailed NPCs for your games and stories.
+            </p>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <FileText className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/character-examples" className="hover:text-indigo-800 dark:hover:text-indigo-300">
                 Character Examples
               </Link>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Sample NPCs across genres with downloadable JSON.</p>
-            </li>
-            <li>
-              <Link href="/docs/generation-options" className="text-xl font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              Sample NPCs across different genres with downloadable JSON files.
+            </p>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <Settings className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/generation-options" className="hover:text-indigo-800 dark:hover:text-indigo-300">
                 Generation Options
               </Link>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Detailed breakdown of customization options.</p>
-            </li>
-            <li>
-              <Link href="/docs/features" className="text-xl font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
-                Features
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              Detailed breakdown of all character customization settings and options.
+            </p>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <Layers className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/features" className="hover:text-indigo-800 dark:hover:text-indigo-300">
+                Features Overview
               </Link>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Overview of core and advanced capabilities.</p>
-            </li>
-            <li>
-              <Link href="/docs/faq" className="text-xl font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
-                FAQ
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              Comprehensive guide to all available features and capabilities.
+            </p>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <HelpCircle className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/faq" className="hover:text-indigo-800 dark:hover:text-indigo-300">
+                Frequently Asked Questions
               </Link>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Answers to common questions.</p>
-            </li>
-          </ul>
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              Answers to common questions about usage, limits, and features.
+            </p>
+          </div>
         </div>
-
-        {/* Developer Reference Card */}
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-          <h2 className="text-2xl font-semibold mb-4 text-indigo-600">Developer Documentation</h2>
-          <ul className="space-y-4">
-            <li>
-              <Link href="/docs/dev-setup" className="text-xl font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
+      </div>
+      
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-6 text-indigo-700 dark:text-indigo-400 flex items-center">
+          <Code className="h-5 w-5 mr-2" />
+          Developer Documentation
+        </h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <CodeSquare className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/dev-setup" className="hover:text-indigo-800 dark:hover:text-indigo-300">
                 Development Setup
               </Link>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Local environment and project setup.</p>
-            </li>
-            <li>
-              <Link href="/docs/architecture" className="text-xl font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
-                Architecture
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              Local environment setup, prerequisites, and project configuration.
+            </p>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <Layers className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/architecture" className="hover:text-indigo-800 dark:hover:text-indigo-300">
+                Architecture Overview
               </Link>
-              <p className="text-sm text-gray-600 dark:text-gray-400">High-level system structure and flow.</p>
-            </li>
-            <li>
-              <Link href="/docs/api" className="text-xl font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              High-level system structure, component organization, and data flow.
+            </p>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <Server className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/api" className="hover:text-indigo-800 dark:hover:text-indigo-300">
                 API Reference
               </Link>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Endpoints and request/response formats.</p>
-            </li>
-            <li>
-              <Link href="/docs/security" className="text-xl font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
-                Security
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              Endpoints, request formats, responses, and OpenAI integration details.
+            </p>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <ShieldCheck className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/security" className="hover:text-indigo-800 dark:hover:text-indigo-300">
+                Security Documentation
               </Link>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Input validation and data privacy practices.</p>
-            </li>
-            <li>
-              <Link href="/docs/contributing" className="text-xl font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
-                Contributing
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              Input validation, data privacy practices, and security considerations.
+            </p>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <FileText className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/contributing" className="hover:text-indigo-800 dark:hover:text-indigo-300">
+                Contributing Guidelines
               </Link>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Guidelines for code and doc contributions.</p>
-            </li>
-            <li>
-              <Link href="/docs/testing" className="text-xl font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
-                Testing
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              How to contribute code, documentation, and report issues.
+            </p>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <Bell className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/testing" className="hover:text-indigo-800 dark:hover:text-indigo-300">
+                Testing Guide
               </Link>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Manual and automated test procedures.</p>
-            </li>
-            <li>
-              <Link href="/docs/deployment" className="text-xl font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
-                Deployment
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              Manual and automated test procedures and best practices.
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-6 text-indigo-700 dark:text-indigo-400 flex items-center">
+          <Map className="h-5 w-5 mr-2" />
+          Project Information
+        </h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <Server className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/deployment" className="hover:text-indigo-800 dark:hover:text-indigo-300">
+                Deployment Guide
               </Link>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Deploying to Vercel and other platforms.</p>
-            </li>
-            <li>
-              <Link href="/docs/roadmap" className="text-xl font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
-                Roadmap
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              Instructions for deploying to Vercel and other platforms.
+            </p>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <Map className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/roadmap" className="hover:text-indigo-800 dark:hover:text-indigo-300">
+                Development Roadmap
               </Link>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Upcoming features and release timelines.</p>
-            </li>
-            <li>
-              <Link href="/docs/changelog" className="text-xl font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              Upcoming features, release plans, and long-term vision.
+            </p>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <Calendar className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/changelog" className="hover:text-indigo-800 dark:hover:text-indigo-300">
                 Changelog
               </Link>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Version history and updates.</p>
-            </li>
-            <li>
-              <Link href="/docs/credits" className="text-xl font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              Version history with details of all updates and changes.
+            </p>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <Award className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/credits" className="hover:text-indigo-800 dark:hover:text-indigo-300">
                 Credits
               </Link>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Acknowledgments and third-party credits.</p>
-            </li>
-            <li>
-              <Link href="/docs/license" className="text-xl font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
-                License
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              Acknowledgments and contributors to the project.
+            </p>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <FileJson className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/license" className="hover:text-indigo-800 dark:hover:text-indigo-300">
+                License Information
               </Link>
-              <p className="text-sm text-gray-600 dark:text-gray-400">MIT License details.</p>
-            </li>
-          </ul>
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              MIT License details and third-party attributions.
+            </p>
+          </div>
         </div>
+      </div>
+      
+      <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800 mb-8">
+        <h2 className="text-xl font-semibold mb-2 text-indigo-700 dark:text-indigo-300">Getting Started</h2>
+        <p className="mb-4 text-indigo-600 dark:text-indigo-400">
+          New to NPC Forge? We recommend checking out these pages first:
+        </p>
+        <ul className="list-disc list-inside space-y-1 text-indigo-600 dark:text-indigo-400">
+          <li>
+            <Link href="/docs/how-to-use" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              How to Use NPC Forge
+            </Link>
+            {" "}for getting started quickly
+          </li>
+          <li>
+            <Link href="/docs/features" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Features Overview
+            </Link>
+            {" "}to explore all available capabilities
+          </li>
+          <li>
+            <Link href="/docs/character-examples" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Character Examples
+            </Link>
+            {" "}to see what's possible
+          </li>
+        </ul>
       </div>
     </div>
   );
