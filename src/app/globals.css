@@ -5,8 +5,14 @@
   --foreground: #171717;
 }
 
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+/* Media query remains as fallback for system preference */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.light) {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
@@ -85,6 +91,12 @@ body {
   opacity: 1;
 }
 
+/* Dark mode aware tooltip */
+.dark .tooltip .tooltip-text {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #000;
+}
+
 /* Gradient text utilities */
 .gradient-text {
   background-clip: text;
@@ -106,6 +118,10 @@ body {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
+.dark .hover-shadow:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+}
+
 /* Full-width section class */
 .full-width-section {
   width: 100%;
@@ -124,4 +140,9 @@ body {
 }
 .animate-fade-in-up-slow {
   animation: fade-in-up-slow 1.8s ease-out forwards;
+}
+
+/* Theme transition */
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
