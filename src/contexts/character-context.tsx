@@ -13,7 +13,8 @@ import {
   CharacterFormData, 
   Quest, 
   OpenAIModel,
-  PortraitOptions
+  PortraitOptions,
+  ImageModel
 } from '@/lib/types';
 import { DEFAULT_MODEL } from '@/lib/models';
 import { DEFAULT_IMAGE_MODEL } from '@/lib/image-models';
@@ -88,31 +89,48 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
 
   // Update form data
   const updateFormData = useCallback((data: Partial<CharacterFormData>) => {
-    setFormData(prev => ({
-      ...prev,
-      ...data,
-      // Handle nested objects properly
-      advanced_options: {
-        ...prev.advanced_options,
-        ...(data.advanced_options || {})
-      },
-      quest_options: {
-        ...prev.quest_options,
-        ...(data.quest_options || {})
-      },
-      dialogue_options: {
-        ...prev.dialogue_options,
-        ...(data.dialogue_options || {})
-      },
-      item_options: {
-        ...prev.item_options,
-        ...(data.item_options || {})
-      },
-      portrait_options: {
-        ...prev.portrait_options,
-        ...(data.portrait_options || {})
+    setFormData(prev => {
+      // Create a new state object
+      const newState = { ...prev, ...data };
+      
+      // Handle nested objects specially to preserve existing values
+      if (data.advanced_options) {
+        newState.advanced_options = {
+          ...prev.advanced_options,
+          ...data.advanced_options
+        };
       }
-    }));
+      
+      if (data.quest_options) {
+        newState.quest_options = {
+          ...prev.quest_options,
+          ...data.quest_options
+        };
+      }
+      
+      if (data.dialogue_options) {
+        newState.dialogue_options = {
+          ...prev.dialogue_options,
+          ...data.dialogue_options
+        };
+      }
+      
+      if (data.item_options) {
+        newState.item_options = {
+          ...prev.item_options,
+          ...data.item_options
+        };
+      }
+      
+      if (data.portrait_options) {
+        newState.portrait_options = {
+          ...prev.portrait_options,
+          ...data.portrait_options
+        };
+      }
+      
+      return newState;
+    });
   }, []);
 
   // Reset form to defaults
@@ -129,10 +147,17 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
       // Import usage limits (done inside the function to avoid SSR issues)
       const { hasReachedLimit, incrementUsage } = await import('@/lib/usage-limits');
       
-      // Check if user has reached their monthly limit for the selected model
-      const model = formData.model || DEFAULT_MODEL;
-      if (hasReachedLimit(model)) {
-        throw new Error(`You have reached your monthly limit for ${model} generations. Try a different model or wait until next month.`);
+      // Get selected models
+      const textModel = formData.model || DEFAULT_MODEL;
+      const imageModel = formData.portrait_options?.image_model || DEFAULT_IMAGE_MODEL;
+      
+      // Check if user has reached their monthly limit for either model
+      if (hasReachedLimit(textModel)) {
+        throw new Error(`You've reached your monthly limit for ${textModel} character generations. Try a different model tier or wait until next month.`);
+      }
+      
+      if (hasReachedLimit(imageModel as ImageModel)) {
+        throw new Error(`You've reached your monthly limit for ${imageModel} portrait generations. Try a different model tier or wait until next month.`);
       }
 
       // Call the API endpoint
@@ -152,8 +177,9 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
       const data = await response.json();
       setCharacter(data.character);
       
-      // Increment usage count on successful generation
-      incrementUsage(model);
+      // Increment usage count for both models on successful generation
+      incrementUsage(textModel);
+      incrementUsage(imageModel as ImageModel);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
       console.error('Error generating character:', err);
