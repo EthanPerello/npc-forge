@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2025-04-29
+
 ### Added
 - Delayed feedback message system:
   - Displays after 3 seconds of character generation to manage user expectations.
@@ -41,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed date inconsistencies in release information
 - Updated ClientLayout to include ThemeProvider and reposition toggle button
 - Updated RootLayout to handle dynamic theme colors and suppress hydration warnings
--Enhanced globals.css for dark mode transitions and theme-aware UI components
+- Enhanced globals.css for dark mode transitions and theme-aware UI components
 
 ## [0.2.0] - 2025-04-22
 
@@ -182,7 +184,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Export to JSON feature.
 - Fully responsive UI for desktop and mobile.
 
-[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/EthanPerello/npc-forge/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/EthanPerello/npc-forge/compare/v0.1.4...v0.2.0
 [0.1.4]: https://github.com/EthanPerello/npc-forge/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/EthanPerello/npc-forge/compare/v0.1.2...v0.1.3
