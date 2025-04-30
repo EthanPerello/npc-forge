@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Usage limit display and notification components now compare the user's selected text and image models
+- Displays whichever selected model has fewer remaining generations (e.g., "7 Portrait Premium generations remaining")
 
 ## [0.2.1] - 2025-04-29
 

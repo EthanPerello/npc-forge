@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { getUsageData, getMonthlyLimit, getRemainingGenerations } from '@/lib/usage-limits';
+import { useCharacter } from '@/contexts/character-context';
+import { getModelConfig } from '@/lib/models';
+import { getImageModelConfig } from '@/lib/image-models';
 
 interface UsageLimitDisplayProps {
   variant?: 'compact' | 'detailed';
@@ -18,9 +21,17 @@ export default function UsageLimitDisplay({
   refreshKey = 0,
   onRefresh
 }: UsageLimitDisplayProps) {
-  const [count, setCount] = useState(0);
-  const [remaining, setRemaining] = useState<number | string>(0);
-  const [limit, setLimit] = useState<number | string>(0);
+  const { formData } = useCharacter();
+  const [mostLimitedInfo, setMostLimitedInfo] = useState<{
+    modelType: 'text' | 'image';
+    modelId: string;
+    modelName: string;
+    count: number;
+    limit: number | string;
+    remaining: number | string;
+    label: string;
+    emoji: string;
+  } | null>(null);
   const [isClient, setIsClient] = useState(false);
   const initialRender = useRef(true);
   
@@ -32,13 +43,78 @@ export default function UsageLimitDisplay({
     setIsClient(true);
     
     const updateUsage = () => {
-      const { count } = getUsageData();
-      const monthlyLimit = getMonthlyLimit();
-      const remainingGens = getRemainingGenerations();
+      // Get the selected models
+      const textModel = formData.model;
+      const imageModel = formData.portrait_options?.image_model;
       
-      setCount(count);
-      setLimit(monthlyLimit);
-      setRemaining(remainingGens);
+      if (!textModel && !imageModel) return;
+      
+      // Get text model info
+      let textRemaining: number | string = Infinity;
+      let textModelInfo = null;
+      
+      if (textModel) {
+        const textModelConfig = getModelConfig(textModel);
+        const textUsageData = getUsageData(textModel);
+        const textLimit = getMonthlyLimit(textModel);
+        textRemaining = getRemainingGenerations(textModel);
+        
+        textModelInfo = {
+          modelType: 'text' as const,
+          modelId: textModel,
+          modelName: textModel,
+          count: textUsageData.count,
+          limit: textLimit,
+          remaining: textRemaining,
+          label: textModelConfig.label,
+          emoji: textModelConfig.emoji
+        };
+      }
+      
+      // Get image model info
+      let imageRemaining: number | string = Infinity;
+      let imageModelInfo = null;
+      
+      if (imageModel) {
+        const imageModelConfig = getImageModelConfig(imageModel);
+        const imageUsageData = getUsageData(imageModel);
+        const imageLimit = getMonthlyLimit(imageModel);
+        imageRemaining = getRemainingGenerations(imageModel);
+        
+        imageModelInfo = {
+          modelType: 'image' as const,
+          modelId: imageModel,
+          modelName: imageModel,
+          count: imageUsageData.count,
+          limit: imageLimit,
+          remaining: imageRemaining,
+          label: imageModelConfig.label,
+          emoji: imageModelConfig.emoji
+        };
+      }
+      
+      // Compare to find the most limited option
+      // If one is "Unlimited", use the other
+      // If both are numbers, use the smaller one
+      // If both are "Unlimited", use text model
+      
+      if (textRemaining === "Unlimited" && imageRemaining === "Unlimited") {
+        setMostLimitedInfo(textModelInfo);
+      }
+      else if (textRemaining === "Unlimited") {
+        setMostLimitedInfo(imageModelInfo);
+      }
+      else if (imageRemaining === "Unlimited") {
+        setMostLimitedInfo(textModelInfo);
+      }
+      else if (typeof textRemaining === 'number' && typeof imageRemaining === 'number') {
+        // Both are numbers, choose the smaller one
+        setMostLimitedInfo(textRemaining <= imageRemaining ? textModelInfo : imageModelInfo);
+      }
+      else {
+        // Fallback in case of unexpected types
+        setMostLimitedInfo(textModelInfo || imageModelInfo);
+      }
     };
     
     // Initial update
@@ -57,7 +133,7 @@ export default function UsageLimitDisplay({
     // Mark initial render complete
     initialRender.current = false;
     
-  }, [refreshKey]); // Remove onRefresh from dependency array
+  }, [refreshKey, formData.model, formData.portrait_options?.image_model]); // Add model dependencies
   
   // Call refresh callback in a separate effect to avoid infinite loops
   useEffect(() => {
@@ -66,8 +142,11 @@ export default function UsageLimitDisplay({
     }
   }, [isClient, onRefresh]);
   
-  // Wait for client-side hydration
-  if (!isClient) return null;
+  // Wait for client-side hydration or for most limited info to be determined
+  if (!isClient || !mostLimitedInfo) return null;
+  
+  // Destructure the most limited info
+  const { count, limit, remaining, modelType, modelName, label, emoji } = mostLimitedInfo;
   
   // Don't show anything if no usage and showWhenFull is false
   if (count === 0 && !showWhenFull) return null;
@@ -84,7 +163,27 @@ export default function UsageLimitDisplay({
     return 'bg-green-500';
   };
   
+  // Create a readable label for the limit message
+  const limitTypeLabel = modelType === 'text' ? 'Characters' : 'Portraits';
+  
   if (variant === 'compact') {
+    // If unlimited, show a simpler message
+    if (remaining === "Unlimited") {
+      return (
+        <div className={`text-sm flex items-center ${className}`}>
+          <div className="w-32 bg-gray-200 rounded-full h-2.5 mr-2 dark:bg-gray-700">
+            <div 
+              className="h-2.5 rounded-full bg-green-500" 
+              style={{ width: '0%' }}
+            ></div>
+          </div>
+          <span className="text-gray-600 dark:text-gray-400">
+            {emoji} Unlimited {limitTypeLabel}
+          </span>
+        </div>
+      );
+    }
+    
     return (
       <div className={`text-sm flex items-center ${className}`}>
         <div className="w-32 bg-gray-200 rounded-full h-2.5 mr-2 dark:bg-gray-700">
@@ -94,8 +193,33 @@ export default function UsageLimitDisplay({
           ></div>
         </div>
         <span className="text-gray-600 dark:text-gray-400">
-          {remaining === "Unlimited" ? "∞" : remaining} left
+          {emoji} {remaining} {limitTypeLabel} remaining
         </span>
+      </div>
+    );
+  }
+  
+  // For detailed variant
+  if (remaining === "Unlimited") {
+    return (
+      <div className={`p-4 bg-white rounded-lg shadow-md dark:bg-gray-800 ${className}`}>
+        <h3 className="text-lg font-medium text-gray-800 mb-2 dark:text-white">
+          {emoji} {label} {limitTypeLabel}
+        </h3>
+        
+        <div className="mb-1 flex justify-between text-sm">
+          <span className="text-gray-700 dark:text-gray-300">
+            Unlimited usage
+          </span>
+        </div>
+        
+        <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+          <div className="h-2.5 rounded-full bg-green-500" style={{ width: '0%' }}></div>
+        </div>
+        
+        <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 italic">
+          Powered by {modelName}
+        </div>
       </div>
     );
   }
@@ -103,15 +227,15 @@ export default function UsageLimitDisplay({
   return (
     <div className={`p-4 bg-white rounded-lg shadow-md dark:bg-gray-800 ${className}`}>
       <h3 className="text-lg font-medium text-gray-800 mb-2 dark:text-white">
-        Character Generation Limit
+        {emoji} {label} {limitTypeLabel}
       </h3>
       
       <div className="mb-1 flex justify-between text-sm">
         <span className="text-gray-700 dark:text-gray-300">
-          {count} of {limit === "Unlimited" ? "∞" : limit} used this month
+          {count} of {limit} used this month
         </span>
         <span className={remaining === 0 ? 'text-red-500 font-medium' : 'text-gray-600 dark:text-gray-400'}>
-          {remaining === "Unlimited" ? "∞" : remaining} remaining
+          {remaining} remaining
         </span>
       </div>
       
@@ -122,13 +246,17 @@ export default function UsageLimitDisplay({
         ></div>
       </div>
       
+      <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 italic">
+        Powered by {modelName}
+      </div>
+      
       {remaining === 0 && (
         <p className="mt-2 text-sm text-red-600 dark:text-red-400">
-          You've reached your monthly limit. Limits will reset at the beginning of next month.
+          You've reached your monthly limit. Try selecting a different model or wait until next month.
         </p>
       )}
       
-      {remaining !== "Unlimited" && remaining !== 0 && (typeof remaining === 'number' && remaining <= 3) && (
+      {remaining !== 0 && (typeof remaining === 'number' && remaining <= 3) && (
         <p className="mt-2 text-sm text-yellow-600 dark:text-yellow-400">
           You're approaching your monthly limit. Use your remaining generations wisely!
         </p>
