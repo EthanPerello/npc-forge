@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateCharacter, generatePortrait } from '@/lib/openai';
-import { Character, CharacterFormData, GenerationResponse } from '@/lib/types';
+import { Character, CharacterFormData, GenerationResponse, OpenAIModel } from '@/lib/types';
 import { removeEmptyValues, sanitizeUserInput } from '@/lib/utils';
+import { incrementUsage, hasReachedLimit } from '@/lib/usage-limits';
+import { DEFAULT_MODEL } from '@/lib/models';
 
 export const maxDuration = 60; // Set max duration to 60 seconds
 
@@ -15,6 +17,20 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generatio
       return NextResponse.json(
         { error: 'Character description is required', character: null as any },
         { status: 400 }
+      );
+    }
+    
+    // Use the selected model or fall back to default
+    const model: OpenAIModel = data.model || DEFAULT_MODEL;
+    
+    // Check if user has reached limit for the selected model
+    if (hasReachedLimit(model)) {
+      return NextResponse.json(
+        { 
+          error: `You've reached your monthly limit for ${model} generations. Try a different model or come back next month.`,
+          character: null as any
+        },
+        { status: 429 }
       );
     }
     
@@ -40,8 +56,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generatio
     // Build system prompt
     const systemPrompt = buildSystemPrompt(cleanedData);
     
-    // Generate character
-    const character = await generateCharacter(systemPrompt, data.description);
+    // Generate character with the selected model
+    const character = await generateCharacter(systemPrompt, data.description, model);
     
     // Generate portrait if successful
     if (character) {
@@ -57,6 +73,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generatio
         console.error('Failed to generate portrait:', portraitError);
         // Continue without portrait if it fails
       }
+      
+      // Increment usage counter for the selected model
+      incrementUsage(model);
     }
     
     return NextResponse.json({ character });

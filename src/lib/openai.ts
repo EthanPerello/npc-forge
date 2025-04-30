@@ -1,5 +1,7 @@
 import OpenAI from 'openai';
-import { Character } from './types';
+import { Character, OpenAIModel, ImageModel } from './types';
+import { DEFAULT_MODEL } from './models';
+import { DEFAULT_IMAGE_MODEL } from './image-models';
 
 // Initialize the OpenAI client with timeout settings
 const openai = new OpenAI({
@@ -17,13 +19,17 @@ interface OpenAIError {
   type?: string;
 }
 
-export async function generateCharacter(systemPrompt: string, description: string): Promise<Character> {
+export async function generateCharacter(
+  systemPrompt: string, 
+  description: string,
+  model: OpenAIModel = DEFAULT_MODEL
+): Promise<Character> {
   try {
-    console.log(`Generating character with model: gpt-4o-mini`);
+    console.log(`Generating character with model: ${model}`);
 
-    // Call the OpenAI API with GPT-4o-mini (good balance of quality and quota)
+    // Call the OpenAI API with the selected model
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Higher quota than gpt-4o
+      model: model, // Use the selected model
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: description }
@@ -142,6 +148,9 @@ export async function generatePortrait(character: Character): Promise<string> {
     // Get portrait customization options - only include non-empty values
     const portraitOptions = character.portrait_options || {};
     
+    // Use selected image model or default
+    const imageModel: ImageModel = (portraitOptions.image_model as ImageModel) || DEFAULT_IMAGE_MODEL;
+    
     // Debug: Log the portrait options to verify they're being passed correctly
     console.log("Portrait options received:", JSON.stringify(portraitOptions, null, 2));
     
@@ -157,15 +166,25 @@ export async function generatePortrait(character: Character): Promise<string> {
     ${artStyle} ${mood} ${framing} ${background}
     High quality, detailed character portrait, professional digital art.`;
 
-    console.log("Generating character portrait with DALL-E-3");
+    console.log(`Generating character portrait with ${imageModel}`);
     console.log("Portrait prompt:", imagePrompt); // Debug the actual prompt being sent
     
+    // Use different options based on which image model is selected
+    let quality: "standard" | "hd" = "standard";
+    let size: "1024x1024" | "1792x1024" | "1024x1792" = "1024x1024";
+    
+    // For specific models, adjust settings
+    if (imageModel === 'gpt-image-1') {
+      // High quality setting for premium tier
+      quality = "hd";
+    }
+    
     const response = await openai.images.generate({
-      model: "dall-e-3", // Using the best model for quality
+      model: imageModel, // Use the selected image model
       prompt: imagePrompt,
       n: 1,
-      size: "1024x1024",
-      quality: "standard", // Use "hd" for better quality if needed
+      size: size,
+      quality: quality,
       // No timeout parameter here, we use the client-level timeout
     });
 

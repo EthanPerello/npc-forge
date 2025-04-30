@@ -1,17 +1,25 @@
 /**
  * Utility for tracking and managing character generation usage limits
- * Uses localStorage to track generations on a per-month basis
+ * Uses localStorage to track generations on a per-model basis
  */
 
+import { OpenAIModel, ImageModel } from './types';
+import { getModelConfig, DEFAULT_MODEL, MODEL_CONFIGS } from './models';
+import { getImageModelConfig, DEFAULT_IMAGE_MODEL, IMAGE_MODEL_CONFIGS } from './image-models';
+
 // Constants
-const STORAGE_KEY = 'npc-forge-usage';
-const DEFAULT_MONTHLY_LIMIT = 15; // Default limit of 15 generations per month
+const STORAGE_KEY_PREFIX = 'npc-forge-usage';
 
 // Define usage data structure
 interface UsageData {
   count: number;         // Number of generations this month
   monthKey: string;      // Current month identifier (YYYY-MM format)
   lastUpdated: string;   // ISO date string of last update
+}
+
+// Map to store usage data for each model
+interface AllUsageData {
+  [modelId: string]: UsageData;
 }
 
 /**
@@ -30,9 +38,16 @@ function getCurrentMonthKey(): string {
 }
 
 /**
- * Get the current usage data from localStorage
+ * Get the storage key for a specific model
  */
-export function getUsageData(): UsageData {
+function getStorageKey(model: string): string {
+  return `${STORAGE_KEY_PREFIX}-${model}`;
+}
+
+/**
+ * Get the current usage data for a specific model from localStorage
+ */
+export function getUsageData(model: OpenAIModel | ImageModel = DEFAULT_MODEL): UsageData {
   // Default data for new users
   const defaultData: UsageData = {
     count: 0,
@@ -46,8 +61,9 @@ export function getUsageData(): UsageData {
   }
   
   try {
-    // Try to get and parse stored data
-    const storedData = localStorage.getItem(STORAGE_KEY);
+    // Try to get and parse stored data for the specific model
+    const storageKey = getStorageKey(model);
+    const storedData = localStorage.getItem(storageKey);
     if (!storedData) return defaultData;
     
     const parsedData: UsageData = JSON.parse(storedData);
@@ -60,28 +76,47 @@ export function getUsageData(): UsageData {
         monthKey: currentMonthKey,
         lastUpdated: new Date().toISOString()
       };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(resetData));
+      localStorage.setItem(storageKey, JSON.stringify(resetData));
       return resetData;
     }
     
     return parsedData;
   } catch (error) {
-    console.error('Error reading usage data:', error);
+    console.error(`Error reading usage data for model ${model}:`, error);
     return defaultData;
   }
 }
 
 /**
- * Increment the usage count when a character is generated
+ * Get usage data for all models
  */
-export function incrementUsage(): UsageData {
+export function getAllUsageData(): AllUsageData {
+  const allData: AllUsageData = {};
+  
+  // Get data for each configured model
+  MODEL_CONFIGS.forEach(config => {
+    allData[config.id] = getUsageData(config.id);
+  });
+  
+  // Get data for image models too
+  IMAGE_MODEL_CONFIGS.forEach(config => {
+    allData[config.id] = getUsageData(config.id);
+  });
+  
+  return allData;
+}
+
+/**
+ * Increment the usage count for a specific model
+ */
+export function incrementUsage(model: OpenAIModel | ImageModel = DEFAULT_MODEL): UsageData {
   // In development mode, don't actually increment the count
   if (isDevMode()) {
-    console.log('[DEV MODE] Skipping usage increment');
-    return getUsageData();
+    console.log(`[DEV MODE] Skipping usage increment for model ${model}`);
+    return getUsageData(model);
   }
   
-  const currentData = getUsageData();
+  const currentData = getUsageData(model);
   const updatedData: UsageData = {
     ...currentData,
     count: currentData.count + 1,
@@ -90,58 +125,128 @@ export function incrementUsage(): UsageData {
   
   // Save to localStorage if available
   if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
+    const storageKey = getStorageKey(model);
+    localStorage.setItem(storageKey, JSON.stringify(updatedData));
   }
   
   return updatedData;
 }
 
 /**
- * Check if the user has reached their monthly limit
+ * Check if the user has reached their monthly limit for a specific model
  */
-export function hasReachedLimit(customLimit?: number): boolean {
+export function hasReachedLimit(model: OpenAIModel | ImageModel = DEFAULT_MODEL): boolean {
   // In development mode, never reach the limit
   if (isDevMode()) {
-    console.log('[DEV MODE] Bypassing usage limits');
+    console.log(`[DEV MODE] Bypassing usage limits for model ${model}`);
     return false;
   }
   
-  const { count } = getUsageData();
-  const limit = customLimit || DEFAULT_MONTHLY_LIMIT;
-  return count >= limit;
+  // Check if model is a text model or image model
+  const isTextModel = MODEL_CONFIGS.some(config => config.id === model);
+  const isImageModel = IMAGE_MODEL_CONFIGS.some(config => config.id === model);
+  
+  // Get the monthly limit based on model type
+  let monthlyLimit: number;
+  if (isTextModel) {
+    monthlyLimit = getModelConfig(model as OpenAIModel).monthlyLimit;
+  } else if (isImageModel) {
+    monthlyLimit = getImageModelConfig(model as ImageModel).monthlyLimit;
+  } else {
+    // Default to a reasonable limit if model not found
+    monthlyLimit = 15;
+  }
+  
+  // If monthly limit is Infinity, the user never reaches the limit
+  if (monthlyLimit === Infinity) {
+    return false;
+  }
+  
+  const { count } = getUsageData(model);
+  return count >= monthlyLimit;
 }
 
 /**
- * Get the number of remaining generations for the current month
+ * Get the number of remaining generations for the current month for a specific model
  */
-export function getRemainingGenerations(customLimit?: number): number {
-  // In development mode, always return a high number
+export function getRemainingGenerations(model: OpenAIModel | ImageModel = DEFAULT_MODEL): number | string {
+  // In development mode, always return unlimited
   if (isDevMode()) {
-    return 999;
+    return "Unlimited";
   }
   
-  const { count } = getUsageData();
-  const limit = customLimit || DEFAULT_MONTHLY_LIMIT;
-  return Math.max(0, limit - count);
+  // Check if model is a text model or image model
+  const isTextModel = MODEL_CONFIGS.some(config => config.id === model);
+  const isImageModel = IMAGE_MODEL_CONFIGS.some(config => config.id === model);
+  
+  // Get the monthly limit based on model type
+  let monthlyLimit: number;
+  if (isTextModel) {
+    monthlyLimit = getModelConfig(model as OpenAIModel).monthlyLimit;
+  } else if (isImageModel) {
+    monthlyLimit = getImageModelConfig(model as ImageModel).monthlyLimit;
+  } else {
+    // Default to a reasonable limit if model not found
+    monthlyLimit = 15;
+  }
+  
+  // If monthly limit is Infinity, return "Unlimited"
+  if (monthlyLimit === Infinity) {
+    return "Unlimited";
+  }
+  
+  const { count } = getUsageData(model);
+  return Math.max(0, monthlyLimit - count);
 }
 
 /**
- * Get the current monthly limit
+ * Get the monthly limit for a specific model
  */
-export function getMonthlyLimit(): number {
-  // In development mode, return a high number
+export function getMonthlyLimit(model: OpenAIModel | ImageModel = DEFAULT_MODEL): number | string {
+  // In development mode, return "Unlimited"
   if (isDevMode()) {
-    return 999;
+    return "Unlimited";
   }
   
-  return DEFAULT_MONTHLY_LIMIT;
+  // Check if model is a text model or image model
+  const isTextModel = MODEL_CONFIGS.some(config => config.id === model);
+  const isImageModel = IMAGE_MODEL_CONFIGS.some(config => config.id === model);
+  
+  // Get the monthly limit based on model type
+  let monthlyLimit: number;
+  if (isTextModel) {
+    monthlyLimit = getModelConfig(model as OpenAIModel).monthlyLimit;
+  } else if (isImageModel) {
+    monthlyLimit = getImageModelConfig(model as ImageModel).monthlyLimit;
+  } else {
+    // Default to a reasonable limit if model not found
+    monthlyLimit = 15;
+  }
+  
+  // If monthly limit is Infinity, return "Unlimited"
+  if (monthlyLimit === Infinity) {
+    return "Unlimited";
+  }
+  
+  return monthlyLimit;
 }
 
 /**
  * Clear usage data (for testing purposes)
  */
-export function clearUsageData(): void {
+export function clearUsageData(model?: OpenAIModel | ImageModel): void {
   if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-    localStorage.removeItem(STORAGE_KEY);
+    if (model) {
+      // Clear for specific model
+      localStorage.removeItem(getStorageKey(model));
+    } else {
+      // Clear for all models
+      MODEL_CONFIGS.forEach(config => {
+        localStorage.removeItem(getStorageKey(config.id));
+      });
+      IMAGE_MODEL_CONFIGS.forEach(config => {
+        localStorage.removeItem(getStorageKey(config.id));
+      });
+    }
   }
 }

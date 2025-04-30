@@ -8,95 +8,15 @@ import {
   ReactNode, 
   useMemo 
 } from 'react';
-
-// Updated character and form data types based on project design document
-export interface Character {
-  name: string;
-  selected_traits: {
-    genre?: string;
-    sub_genre?: string; // Added for sub-genre tracking
-    gender?: 'male' | 'female' | 'nonbinary' | 'unknown';
-    age_group?: 'child' | 'teen' | 'adult' | 'elder';
-    moral_alignment?: 'good' | 'neutral' | 'evil';
-    relationship_to_player?: 'ally' | 'enemy' | 'neutral' | 'mentor' | 'rival' | 'betrayer';
-    species?: string;
-    occupation?: string;
-    social_class?: string;
-    personality_traits?: string[];
-    height?: string;
-    build?: string;
-    distinctive_features?: string;
-    homeland?: string;
-  };
-  added_traits: {
-    [key: string]: string; // Additional traits AI added that weren't selected
-  };
-  appearance: string; // Now a freeform paragraph
-  personality: string; // Now a freeform paragraph
-  backstory_hook: string; // 1-2 sentence hook
-  special_ability?: string;
-  items?: string[];
-  dialogue_lines?: string[];
-  quests?: Quest[];
-  image_url?: string;
-  portrait_options?: {
-    art_style?: string;
-    mood?: string;
-    framing?: string;
-    background?: string;
-  };
-}
-
-export interface Quest {
-  title: string;
-  description: string;
-  reward: string;
-  type?: string;
-}
-
-export interface CharacterFormData {
-  description: string;
-  include_quests: boolean;
-  include_dialogue: boolean;
-  include_items: boolean;
-  genre?: string;
-  sub_genre?: string; // Added sub-genre field
-  gender?: 'male' | 'female' | 'nonbinary' | 'unknown';
-  age_group?: 'child' | 'teen' | 'adult' | 'elder';
-  moral_alignment?: 'good' | 'neutral' | 'evil';
-  relationship_to_player?: 'ally' | 'enemy' | 'neutral' | 'mentor' | 'rival' | 'betrayer';
-  advanced_options?: {
-    species?: string;
-    occupation?: string;
-    personality_traits?: string[]; // Changed from personality_trait
-    social_class?: string;
-    height?: string;
-    build?: string;
-    distinctive_features?: string;
-    homeland?: string;
-  };
-  quest_options?: {
-    reward_type?: string;
-    number_of_quests?: number;
-    quest_type?: string;
-  };
-  dialogue_options?: {
-    number_of_lines?: number;
-    tone?: string;
-    context?: string;
-  };
-  item_options?: {
-    number_of_items?: number;
-    rarity_distribution?: string;
-    item_categories?: string[];
-  };
-  portrait_options?: {
-    art_style?: string;
-    mood?: string;
-    framing?: string;
-    background?: string;
-  };
-}
+import { 
+  Character, 
+  CharacterFormData, 
+  Quest, 
+  OpenAIModel,
+  PortraitOptions
+} from '@/lib/types';
+import { DEFAULT_MODEL } from '@/lib/models';
+import { DEFAULT_IMAGE_MODEL } from '@/lib/image-models';
 
 interface CharacterContextType {
   character: Character | null;
@@ -121,6 +41,7 @@ const defaultFormData: CharacterFormData = {
   age_group: undefined, // Changed from empty string
   moral_alignment: undefined, // Changed from empty string
   relationship_to_player: undefined, // Changed from empty string
+  model: DEFAULT_MODEL, // Default model for text generation
   advanced_options: {
     species: undefined,
     occupation: undefined,
@@ -151,6 +72,7 @@ const defaultFormData: CharacterFormData = {
     mood: '',
     framing: '',
     background: '',
+    image_model: DEFAULT_IMAGE_MODEL, // Default model for image generation
   },
 };
 
@@ -207,9 +129,10 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
       // Import usage limits (done inside the function to avoid SSR issues)
       const { hasReachedLimit, incrementUsage } = await import('@/lib/usage-limits');
       
-      // Check if user has reached their monthly limit
-      if (hasReachedLimit()) {
-        throw new Error('You have reached your monthly character generation limit. Limits will reset at the beginning of next month.');
+      // Check if user has reached their monthly limit for the selected model
+      const model = formData.model || DEFAULT_MODEL;
+      if (hasReachedLimit(model)) {
+        throw new Error(`You have reached your monthly limit for ${model} generations. Try a different model or wait until next month.`);
       }
 
       // Call the API endpoint
@@ -230,7 +153,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
       setCharacter(data.character);
       
       // Increment usage count on successful generation
-      incrementUsage();
+      incrementUsage(model);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
       console.error('Error generating character:', err);

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { getRemainingGenerations } from '@/lib/usage-limits';
 
 export default function UsageLimitsNotice() {
-  const [remaining, setRemaining] = useState<number | null>(null);
+  const [remaining, setRemaining] = useState<number | string | null>(null);
   const [isClient, setIsClient] = useState(false);
   
   useEffect(() => {
@@ -22,8 +22,8 @@ export default function UsageLimitsNotice() {
     return () => window.removeEventListener('focus', handleFocus);
   }, []);
   
-  // Don't render during SSR or if we have plenty of generations left
-  if (!isClient || remaining === null || remaining > 3) {
+  // Don't render during SSR or if we have plenty of generations left or unlimited
+  if (!isClient || remaining === null || remaining === "Unlimited" || (typeof remaining === 'number' && remaining > 3)) {
     return null;
   }
   

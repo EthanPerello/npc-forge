@@ -3,6 +3,9 @@
 import { useCharacter } from '@/contexts/character-context';
 import ExpandableSection from '@/components/ui/expandable-section';
 import Select from '@/components/ui/select';
+import ImageModelSelector from '@/components/image-model-selector';
+import { DEFAULT_IMAGE_MODEL } from '@/lib/image-models';
+import { ImageModel } from '@/lib/types';
 
 // Options for portrait customization with "Not specified" as first option
 const artStyleOptions = [
@@ -56,17 +59,32 @@ export default function PortraitOptions() {
         art_style: '',
         mood: '',
         framing: '',
-        background: '',
+        background: ''
       }
     });
   }
+  
+  // Handle image model change
+  const handleImageModelChange = (model: ImageModel) => {
+    // Create a new portrait_options object with the existing values plus the image_model
+    updateFormData({ 
+      portrait_options: { 
+        ...(formData.portrait_options || {}),
+        art_style: formData.portrait_options?.art_style || '',
+        mood: formData.portrait_options?.mood || '',
+        framing: formData.portrait_options?.framing || '',
+        background: formData.portrait_options?.background || '',
+        image_model: model
+      } 
+    });
+  };
   
   // Handle option changes
   const handleArtStyleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     updateFormData({ 
       portrait_options: { 
-        ...formData.portrait_options,
+        ...(formData.portrait_options || {}),
         art_style: value
       } 
     });
@@ -76,7 +94,7 @@ export default function PortraitOptions() {
     const value = e.target.value;
     updateFormData({ 
       portrait_options: { 
-        ...formData.portrait_options,
+        ...(formData.portrait_options || {}),
         mood: value
       } 
     });
@@ -86,7 +104,7 @@ export default function PortraitOptions() {
     const value = e.target.value;
     updateFormData({ 
       portrait_options: { 
-        ...formData.portrait_options,
+        ...(formData.portrait_options || {}),
         framing: value
       } 
     });
@@ -96,7 +114,7 @@ export default function PortraitOptions() {
     const value = e.target.value;
     updateFormData({ 
       portrait_options: { 
-        ...formData.portrait_options,
+        ...(formData.portrait_options || {}),
         background: value
       } 
     });
@@ -111,6 +129,12 @@ export default function PortraitOptions() {
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
           Customize how the AI portrait of your character will be generated.
         </p>
+        
+        {/* Image Model Selector */}
+        <ImageModelSelector 
+          value={(formData.portrait_options?.image_model as ImageModel) || DEFAULT_IMAGE_MODEL}
+          onChange={handleImageModelChange}
+        />
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Select
