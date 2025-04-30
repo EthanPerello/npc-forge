@@ -1,108 +1,78 @@
-#!/usr/bin/env ts-node
-
+import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
+import readline from 'readline';
 
-const version = process.argv[2];
-if (!version) {
-  console.error('❌ Usage: npm run release <version>');
-  process.exit(1);
+// Helper for input prompts
+function prompt(query: string): Promise<string> {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise(resolve => rl.question(query, answer => {
+    rl.close();
+    resolve(answer.trim());
+  }));
 }
 
-const tagName = `v${version}`;
-const today = new Date().toISOString().split('T')[0];
-const changelogPath = path.join(process.cwd(), 'CHANGELOG.md');
-const templatePath = path.join(process.cwd(), 'release-notes/RELEASE_TEMPLATE.md');
-const releaseNotePath = path.join(process.cwd(), `release-notes/${tagName}.md`);
+async function run() {
+  const version = process.argv[2] || await prompt('🔢 Enter version (e.g., 0.2.1): ');
+  const title = process.argv[3] || await prompt('📝 Enter title (e.g., UI Polish and Fixes): ');
+  const summary = await prompt('📄 Enter summary (Markdown, one paragraph): ');
 
-const updateChangelog = (version: string, date: string): string => {
-  const changelog = fs.readFileSync(changelogPath, 'utf8');
-  const unreleasedPattern = /## \[Unreleased\]\s*/;
-  const unreleasedMatch = changelog.match(unreleasedPattern);
+  const tag = `v${version}`;
+  const today = new Date().toISOString().split('T')[0];
+  const releaseNotePath = `release-notes/${tag}.md`;
 
-  if (!unreleasedMatch) {
-    console.error('❌ No [Unreleased] section found in CHANGELOG.md');
-    process.exit(1);
-  }
+  // Compose release note
+  const note = `# NPC Forge ${tag} – ${title}
 
-  const parts = changelog.split(unreleasedPattern);
-  const unreleasedContent = parts[1].split(/^## \[/m)[0].trim();
+**Release Date:** ${today}
 
-  const newVersionBlock = `## [${version}] - ${date}\n\n${unreleasedContent}\n`;
-  const remainingChangelog = parts[1].replace(unreleasedContent, '').trimStart();
+${summary}
 
-  const updatedChangelog = [
-    '## [Unreleased]',
-    '',
-    newVersionBlock,
-    remainingChangelog,
-  ].join('\n\n');
+## Added
+- _TBD_
 
-  fs.writeFileSync(changelogPath, updatedChangelog);
-  console.log('✅ CHANGELOG.md updated');
-  return unreleasedContent;
-};
+## Changed
+- _TBD_
 
-const generateReleaseNote = (version: string, date: string, content: string) => {
-  let template = fs.readFileSync(templatePath, 'utf8');
-  template = template
-    .replace(/vX\.Y\.Z/g, `v${version}`)
-    .replace(/YYYY-MM-DD/g, date);
+## Fixed
+- _TBD_
 
-  // Simple placeholder replacement for each section
-  const sections = {
-    Added: '',
-    Changed: '',
-    Fixed: '',
-    Removed: '',
-  };
+---
 
-  let currentSection: keyof typeof sections | null = null;
-  for (const line of content.split('\n')) {
-    const match = line.match(/^### (Added|Changed|Fixed|Removed)/);
-    if (match) {
-      currentSection = match[1] as keyof typeof sections;
-      continue;
-    }
+## Removed
+None.
+`;
 
-    if (currentSection && line.trim().startsWith('-')) {
-      sections[currentSection] += line + '\n';
-    }
-  }
-
-  for (const key in sections) {
-    const value = sections[key as keyof typeof sections].trim() || 'None.';
-    template = template.replace(`{{${key}}}`, value);
-  }
-
-  fs.writeFileSync(releaseNotePath, template);
+  // Write release note
+  fs.writeFileSync(releaseNotePath, note);
   console.log(`✅ Release note created at: ${releaseNotePath}`);
-};
 
-const commitAndTag = (version: string) => {
-  execSync('git add .', { stdio: 'inherit' });
-  execSync(`git commit -m "chore: release v${version}"`, { stdio: 'inherit' });
-  execSync(`git tag v${version}`, { stdio: 'inherit' });
-  execSync(`git push origin main`, { stdio: 'inherit' });
-  execSync(`git push origin v${version}`, { stdio: 'inherit' });
-  console.log('✅ Git commit, tag, and push completed');
-};
+  // Append to changelog
+  fs.appendFileSync('CHANGELOG.md', `\n## [${tag}] - ${today}\n- ${title}\n`);
+  console.log(`✅ CHANGELOG.md updated`);
 
-const createGithubRelease = (version: string) => {
-  execSync(`gh release create v${version} --title "NPC Forge v${version}" --notes-file ${releaseNotePath}`, {
-    stdio: 'inherit',
-  });
-  console.log('🚀 GitHub release created');
-};
+  // Git tag & push
+  try {
+    execSync(`git add . && git commit -m "chore: release ${tag}"`);
+  } catch {
+    console.warn('⚠️ Git commit skipped (nothing new to commit?)');
+  }
 
-const run = () => {
-  console.log(`📦 Releasing v${version}...`);
+  try {
+    execSync(`git tag ${tag}`);
+  } catch {
+    console.warn(`⚠️ Tag ${tag} already exists. Skipping tag creation.`);
+  }
 
-  const unreleasedContent = updateChangelog(version, today);
-  generateReleaseNote(version, today, unreleasedContent);
-  commitAndTag(version);
-  createGithubRelease(version);
-};
+  execSync(`git push origin main --tags`);
+
+  // GitHub Release
+  try {
+    execSync(`gh release create ${tag} -F ${releaseNotePath} -t "NPC Forge ${tag} – ${title}"`, { stdio: 'inherit' });
+    console.log('🎉 GitHub release published!');
+  } catch {
+    console.error('❌ Failed to create GitHub release. Is the tag already released?');
+  }
+}
 
 run();
