@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Genre, CharacterFormData } from '@/lib/types';
 import { GENRE_TEMPLATES, getTemplateExample } from '@/lib/templates';
+import DelayedLoadingMessage from '@/components/delayed-loading-message';
 
 interface CharacterFormProps {
   onSubmit: (data: CharacterFormData) => void;
@@ -122,6 +123,12 @@ export default function CharacterForm({ onSubmit, isLoading }: CharacterFormProp
             {isLoading ? 'Generating...' : 'Generate Character'}
           </button>
         </div>
+        
+        {/* Delayed Loading Message - only shows after 3 seconds of loading */}
+        <DelayedLoadingMessage 
+          isLoading={isLoading} 
+          message="Character generation may take a second... Creating your unique NPC with AI."
+        />
       </form>
     </div>
   );

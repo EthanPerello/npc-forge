@@ -8,13 +8,16 @@ import { GENRE_TEMPLATES, getTemplateExample } from '@/lib/templates';
 import Button from '@/components/ui/button';
 import PortraitOptions from '@/components/tabs/portrait-options';
 import SearchableSelect from '@/components/ui/searchable-select';
+import ModelSelector from '@/components/model-selector';
+import { DEFAULT_MODEL } from '@/lib/models';
 import { 
   GenderOption,
   AgeGroupOption,
   AlignmentOption,
   RelationshipOption,
   TemplateOption,
-  SubGenreOption
+  SubGenreOption,
+  OpenAIModel
 } from '@/lib/types';
 
 // Options for dropdown selects - all with "Not specified" as first option
@@ -178,6 +181,14 @@ export default function CharacterTab() {
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const [selectedSubGenre, setSelectedSubGenre] = useState<SubGenreOption | undefined>(undefined);
   
+  // Update formData when model changes
+  const handleModelChange = (newModel: OpenAIModel) => {
+    updateFormData({ 
+      ...formData,
+      model: newModel 
+    });
+  };
+  
   // Handle template and sub-genre selection
   const handleGenreChange = (template: TemplateOption | undefined, subGenre?: SubGenreOption) => {
     const genre = template?.id;
@@ -235,6 +246,7 @@ export default function CharacterTab() {
     // Save portrait options and description to preserve them
     const portraitOptions = formData.portrait_options;
     const description = formData.description;
+    const currentModel = formData.model;  // Save the current model selection
     
     // Reset character options
     updateFormData({
@@ -256,7 +268,8 @@ export default function CharacterTab() {
       },
       // Restore preserved values
       description: description,
-      portrait_options: portraitOptions
+      portrait_options: portraitOptions,
+      model: currentModel  // Keep the model selection
     });
     
     // Reset sub-genre state
@@ -270,11 +283,12 @@ export default function CharacterTab() {
     return options[randomIndex].value;
   };
   
-  // Handle randomize function - does NOT modify portrait options
+  // Handle randomize function - does NOT modify portrait options or model selection
   const handleRandomize = () => {
-    // Save portrait options and description to restore them later
+    // Save portrait options, description, and model to restore them later
     const portraitOptions = formData.portrait_options;
     const description = formData.description;
+    const currentModel = formData.model;
     
     // Randomly select a main genre
     const randomIndex = Math.floor(Math.random() * GENRE_TEMPLATES.length);
@@ -330,14 +344,21 @@ export default function CharacterTab() {
         distinctive_features: undefined,
         homeland: undefined
       },
-      // Restore description and portrait options
+      // Restore description, portrait options, and model
       description: description,
-      portrait_options: portraitOptions
+      portrait_options: portraitOptions,
+      model: currentModel
     });
   };
   
   return (
     <div className="space-y-6">
+      {/* Model Selection */}
+      <ModelSelector 
+        value={formData.model || DEFAULT_MODEL} 
+        onChange={handleModelChange} 
+      />
+      
       {/* Genre Selection */}
       <div>
         <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">

@@ -9,6 +9,7 @@ import QuestsTab from '@/components/tabs/quests-tab';
 import DialogueTab from '@/components/tabs/dialogue-tab';
 import ItemsTab from '@/components/tabs/items-tab';
 import UsageLimitDisplay from '@/components/usage-limit-display';
+import DelayedLoadingMessage from '@/components/delayed-loading-message';
 import { User, MessageSquare, Package, BookOpen, Zap } from 'lucide-react';
 
 export default function MainFormTabs() {
@@ -144,6 +145,14 @@ export default function MainFormTabs() {
           </svg>
           <span>{error}</span>
         </div>
+      )}
+      
+      {/* Delayed loading message */}
+      {isLoading && (
+        <DelayedLoadingMessage 
+          isLoading={isLoading} 
+          message="Character generation may take a second... Creating your unique NPC with AI."
+        />
       )}
       
       {/* Generate Button and Usage Display with enhanced styling */}

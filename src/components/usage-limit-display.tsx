@@ -19,8 +19,8 @@ export default function UsageLimitDisplay({
   onRefresh
 }: UsageLimitDisplayProps) {
   const [count, setCount] = useState(0);
-  const [remaining, setRemaining] = useState(0);
-  const [limit, setLimit] = useState(0);
+  const [remaining, setRemaining] = useState<number | string>(0);
+  const [limit, setLimit] = useState<number | string>(0);
   const [isClient, setIsClient] = useState(false);
   const initialRender = useRef(true);
   
@@ -73,7 +73,9 @@ export default function UsageLimitDisplay({
   if (count === 0 && !showWhenFull) return null;
   
   // Calculate percentage for progress bar
-  const usagePercentage = Math.min(100, Math.round((count / limit) * 100));
+  const usagePercentage = typeof limit === 'string' && limit === 'Unlimited' 
+    ? 0 // If unlimited, show 0% used
+    : Math.min(100, Math.round((count / (limit as number)) * 100));
   
   // Determine color based on usage percentage
   const getColorClass = () => {
@@ -92,7 +94,7 @@ export default function UsageLimitDisplay({
           ></div>
         </div>
         <span className="text-gray-600 dark:text-gray-400">
-          {remaining} left
+          {remaining === "Unlimited" ? "∞" : remaining} left
         </span>
       </div>
     );
@@ -106,10 +108,10 @@ export default function UsageLimitDisplay({
       
       <div className="mb-1 flex justify-between text-sm">
         <span className="text-gray-700 dark:text-gray-300">
-          {count} of {limit} used this month
+          {count} of {limit === "Unlimited" ? "∞" : limit} used this month
         </span>
         <span className={remaining === 0 ? 'text-red-500 font-medium' : 'text-gray-600 dark:text-gray-400'}>
-          {remaining} remaining
+          {remaining === "Unlimited" ? "∞" : remaining} remaining
         </span>
       </div>
       
@@ -126,7 +128,7 @@ export default function UsageLimitDisplay({
         </p>
       )}
       
-      {remaining <= 3 && remaining > 0 && (
+      {remaining !== "Unlimited" && remaining !== 0 && (typeof remaining === 'number' && remaining <= 3) && (
         <p className="mt-2 text-sm text-yellow-600 dark:text-yellow-400">
           You're approaching your monthly limit. Use your remaining generations wisely!
         </p>

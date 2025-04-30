@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Delayed feedback message system:
+  - Displays after 3 seconds of character generation to manage user expectations.
+- Model selector for text generation:
+  - Supports `gpt-4o-mini`, `gpt-4.1-mini`, and `gpt-4o` with usage tiers and monthly limits.
+- Image model selector for portraits:
+  - Supports `dall-e-2`, `dall-e-3`, and `gpt-image-1` with matching tier system.
+- Visual model selection UI:
+  - Tiered design with emoji indicators (🟢🟡🔴), model names, and descriptions.
+- Per-model usage limits:
+  - Tracked in localStorage, with automatic resets per month.
+  - Unlimited usage for the cheapest tier.
+- Development bypass for all usage limits for testing purposes.
 - Implemented complete dark mode toggle system:
   - Created ThemeContext for managing light, dark, and system themes
   - Added a ThemeToggle button for switching themes
@@ -16,6 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Applied smooth theme transitions across the app
 
 ### Changed
+- Refactored context and form components to support model selection.
+- Simplified tier display while retaining full model name transparency.
+- Updated usage-limit utilities for both image and text models.
 - Standardized documentation styling across all pages:
   - Consistent header formatting and section structure
   - Unified card layouts, colors, and spacing

@@ -1,0 +1,68 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { ImageModel } from '@/lib/types';
+import { IMAGE_MODEL_CONFIGS, DEFAULT_IMAGE_MODEL } from '@/lib/image-models';
+import { getRemainingGenerations } from '@/lib/usage-limits';
+
+interface ImageModelSelectorProps {
+  value: ImageModel;
+  onChange: (model: ImageModel) => void;
+}
+
+export default function ImageModelSelector({ value, onChange }: ImageModelSelectorProps) {
+  const [remaining, setRemaining] = useState<Record<string, number | string>>({});
+  
+  // Initialize with default model if none selected
+  const selectedModel = value || DEFAULT_IMAGE_MODEL;
+  
+  // Get remaining generations for each model when component mounts
+  useEffect(() => {
+    const remainingCounts: Record<string, number | string> = {};
+    IMAGE_MODEL_CONFIGS.forEach(config => {
+      remainingCounts[config.id] = getRemainingGenerations(config.id);
+    });
+    setRemaining(remainingCounts);
+  }, []);
+  
+  return (
+    <div className="mb-4">
+      <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+        Portrait Generation Model
+      </label>
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+        {IMAGE_MODEL_CONFIGS.map((config) => (
+          <div 
+            key={config.id}
+            onClick={() => onChange(config.id as ImageModel)}
+            className={`
+              cursor-pointer border rounded-lg p-3 transition-colors
+              ${selectedModel === config.id 
+                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30' 
+                : 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600'}
+            `}
+          >
+            <div className="flex justify-between items-center mb-1">
+              <h3 className="font-medium">
+                {config.emoji} {config.label}
+              </h3>
+              <span className={`text-xs px-2 py-1 rounded-full ${
+                selectedModel === config.id 
+                  ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-800 dark:text-indigo-100' 
+                  : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+              }`}>
+                {remaining[config.id] === "Unlimited" ? "∞" : `${remaining[config.id]}`} left
+              </span>
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400">
+              {config.description}
+            </p>
+            <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 italic">
+              Powered by {config.id}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
