@@ -97,7 +97,7 @@ export default function TemplateSelector({
               relative p-3 text-center rounded-lg cursor-pointer border transition-all
               ${selectedGenre === template.id 
                 ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 dark:border-indigo-400' 
-                : 'border-gray-200 hover:border-indigo-300 hover:bg-indigo-50/50 dark:border-gray-700 dark:hover:border-indigo-700 dark:hover:bg-indigo-900/20'}
+                : 'border-gray-300 hover:border-indigo-300 hover:bg-indigo-50/50 dark:border-gray-700 dark:hover:border-indigo-700 dark:hover:bg-indigo-900/20'}
             `}
             onClick={() => handleSelectGenre(template)}
             onMouseEnter={() => setHoveredId(template.id)}
@@ -112,7 +112,7 @@ export default function TemplateSelector({
                 }`} 
               />
             </div>
-            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <div className="text-sm font-medium text-gray-800 dark:text-gray-100">
               {template.label}
             </div>
           </div>
@@ -122,7 +122,7 @@ export default function TemplateSelector({
       {/* Sub-Genre Selection - Only show when a main genre is selected */}
       {selectedGenre && availableSubGenres.length > 0 && (
         <div className="mt-2">
-          <h4 className="text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">
+          <h4 className="text-sm font-medium text-gray-800 mb-2 dark:text-gray-300">
             {templates.find(t => t.id === selectedGenre)?.label} Sub-genres
           </h4>
           <div className="flex flex-wrap gap-2">
@@ -133,7 +133,7 @@ export default function TemplateSelector({
                   px-2 py-1 text-xs rounded-full transition-colors border
                   ${selectedSubGenre === subGenre.id
                     ? 'bg-indigo-100 text-indigo-800 border-indigo-300 dark:bg-indigo-900 dark:text-indigo-200 dark:border-indigo-700'
-                    : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'}
+                    : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'}
                 `}
                 onClick={() => handleSelectSubGenre(subGenre)}
               >
@@ -144,21 +144,23 @@ export default function TemplateSelector({
         </div>
       )}
       
-      {/* Description panel */}
+      {/* Description panel with high contrast text */}
       {(hoveredId || selectedGenre || selectedSubGenre) && (
-        <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-sm dark:bg-gray-800 dark:border-gray-700">
-          {/* Show sub-genre description if selected */}
-          {selectedSubGenre && (
-            availableSubGenres.find(s => s.id === selectedSubGenre)?.description
-          )}
-          {/* Show hovered genre description */}
-          {!selectedSubGenre && hoveredId && (
-            templates.find(t => t.id === hoveredId)?.description
-          )}
-          {/* Show selected genre description */}
-          {!selectedSubGenre && !hoveredId && selectedGenre && (
-            templates.find(t => t.id === selectedGenre)?.description
-          )}
+        <div className="p-3 bg-gray-50 rounded-lg border border-gray-300 text-sm dark:bg-gray-800 dark:border-gray-700">
+          <div className="text-gray-800 dark:text-gray-200">
+            {/* Show sub-genre description if selected */}
+            {selectedSubGenre && (
+              availableSubGenres.find(s => s.id === selectedSubGenre)?.description
+            )}
+            {/* Show hovered genre description */}
+            {!selectedSubGenre && hoveredId && (
+              templates.find(t => t.id === hoveredId)?.description
+            )}
+            {/* Show selected genre description */}
+            {!selectedSubGenre && !hoveredId && selectedGenre && (
+              templates.find(t => t.id === selectedGenre)?.description
+            )}
+          </div>
         </div>
       )}
     </div>

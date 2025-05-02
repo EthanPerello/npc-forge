@@ -1,122 +1,85 @@
 'use client';
 
-import { SelectHTMLAttributes, ReactNode, forwardRef, useId } from 'react';
+import React, { forwardRef } from 'react';
+import { cn } from '@/lib/utils';
 
-export interface SelectOption {
+interface SelectOption {
   value: string;
   label: string;
   disabled?: boolean;
 }
 
-interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'size'> {
-  options: SelectOption[];
+export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'onChange'> {
   label?: string;
+  options: SelectOption[];
   helperText?: string;
   error?: string;
-  size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
-  icon?: ReactNode;
+  containerClassName?: string;
+  labelClassName?: string;
+  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({
-    options,
     label,
+    options,
     helperText,
     error,
-    size = 'md',
+    className,
     fullWidth = false,
-    icon,
-    className = '',
-    id,
+    containerClassName,
+    labelClassName,
+    onChange,
     ...props
   }, ref) => {
-    // Generate a stable unique ID using useId hook
-    const uniqueId = useId();
-    const inputId = id || `select-${uniqueId}`;
-    
-    // Define sizes
-    const sizeClasses = {
-      sm: 'py-1.5 text-sm',
-      md: 'py-2 text-base',
-      lg: 'py-2.5 text-lg',
-    };
-    
     return (
-      <div className={`${fullWidth ? 'w-full' : 'w-auto'}`}>
+      <div className={cn('mb-4', fullWidth ? 'w-full' : '', containerClassName)}>
         {label && (
-          <label 
-            htmlFor={inputId} 
-            className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+          <label
+            htmlFor={props.id}
+            className={cn(
+              'block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200',
+              labelClassName
+            )}
           >
             {label}
+            {props.required && <span className="text-red-600 ml-1">*</span>}
           </label>
         )}
-        
-        {/* Select container with positioning context */}
-        <div className="relative">
-          {/* Left icon if provided */}
-          {icon && (
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              {icon}
-            </div>
+
+        <select
+          className={cn(
+            'px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm appearance-none text-gray-800',
+            'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500',
+            'disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed',
+            'dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200',
+            error && 'border-red-500 focus:ring-red-500 focus:border-red-500',
+            fullWidth ? 'w-full' : '',
+            className
           )}
-          
-          {/* Select element - positioned to cover the entire area */}
-          <select
-            id={inputId}
-            ref={ref}
-            className={`
-              block w-full ${sizeClasses[size]} 
-              ${icon ? 'pl-10' : 'pl-4'} 
-              pr-10
-              border border-gray-300 
-              rounded-md 
-              bg-white
-              text-gray-900
-              appearance-none /* Hide default arrow in most browsers */
-              focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-              ${error ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}
-              ${props.disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}
-              dark:bg-gray-700 dark:border-gray-600 dark:text-white
-              ${className}
-            `}
-            {...props}
-          >
-            {options.map((option) => (
-              <option 
-                key={option.value} 
-                value={option.value}
-                disabled={option.disabled}
-              >
-                {option.label}
-              </option>
-            ))}
-          </select>
-          
-          {/* Custom arrow - positioned as overlay with pointer-events-none */}
-          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-            <svg 
-              className="h-5 w-5 text-gray-400" 
-              xmlns="http://www.w3.org/2000/svg" 
-              viewBox="0 0 20 20" 
-              fill="currentColor"
-              aria-hidden="true"
+          ref={ref}
+          onChange={onChange}
+          {...props}
+        >
+          {options.map((option) => (
+            <option
+              key={option.value}
+              value={option.value}
+              disabled={option.disabled}
+              className="text-gray-900 dark:text-gray-200 bg-white dark:bg-gray-800"
             >
-              <path 
-                fillRule="evenodd" 
-                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
-                clipRule="evenodd" 
-              />
-            </svg>
-          </div>
-        </div>
-        
-        {/* Helper text or error message */}
-        {(helperText || error) && (
-          <p className={`mt-1 text-sm ${error ? 'text-red-600' : 'text-gray-500 dark:text-gray-400'}`}>
-            {error || helperText}
-          </p>
+              {option.label}
+            </option>
+          ))}
+        </select>
+
+        {helperText && !error && (
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{helperText}</p>
+        )}
+
+        {error && (
+          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>
         )}
       </div>
     );

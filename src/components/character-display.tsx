@@ -95,7 +95,7 @@ export default function CharacterDisplay() {
   const traits = getCharacterTraitsArray(character);
   
   return (
-    <div className="w-full bg-white rounded-xl shadow-lg overflow-hidden border border-blue-100 dark:bg-gray-800 dark:border-gray-700 mt-8 transition-all duration-300">
+    <div className="w-full bg-card rounded-xl shadow-lg overflow-hidden border border-theme mt-8 transition-all duration-300">
       {/* Success Message */}
       {showSuccessMessage && (
         <div className="bg-green-50 text-green-700 p-3 text-center border-b border-green-100 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800/50 flex items-center justify-center">
@@ -112,7 +112,7 @@ export default function CharacterDisplay() {
         <div className="md:flex gap-6">
           {/* Portrait Section with improved styling */}
           <div className="md:w-1/3 mb-6 md:mb-0">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-xl shadow-md dark:from-gray-800 dark:to-gray-700">
+            <div className="bg-secondary p-3 rounded-xl shadow-md">
               <PortraitDisplay 
                 imageUrl={character.image_url} 
                 name={character.name} 
@@ -128,7 +128,7 @@ export default function CharacterDisplay() {
                   {traits.map((trait, index) => (
                     <span 
                       key={index} 
-                      className="bg-white px-2 py-1 rounded-md text-sm border border-blue-100 shadow-sm dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+                      className="bg-card px-2 py-1 rounded-md text-sm border border-theme shadow-sm"
                     >
                       {trait}
                     </span>
@@ -188,7 +188,7 @@ export default function CharacterDisplay() {
                 variant="detailed" 
                 refreshKey={refreshCounter} 
                 onRefresh={refreshUsageCount}
-                className="bg-blue-50 dark:bg-blue-900/20"
+                className="bg-secondary"
               />
             </div>
           </div>

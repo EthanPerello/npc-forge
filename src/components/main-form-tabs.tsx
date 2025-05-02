@@ -73,55 +73,55 @@ export default function MainFormTabs() {
   ];
   
   return (
-    <div className="w-full bg-white rounded-xl shadow-md overflow-hidden p-6 border border-indigo-100 dark:bg-gray-800 dark:border-gray-700">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800 flex items-center justify-center dark:text-white">
+    <div className="w-full bg-card rounded-xl shadow-md overflow-hidden p-6 border border-theme">
+      <h2 className="text-2xl font-bold mb-4 flex items-center justify-center">
         <User className="h-6 w-6 mr-2 text-indigo-600 dark:text-indigo-400" />
         Create Your NPC
       </h2>
       
       {/* Feature toggles with improved styling */}
-      <div className="mb-6 bg-indigo-50 p-4 rounded-lg border border-indigo-100 dark:bg-indigo-900/20 dark:border-indigo-800/50">
-        <p className="text-sm text-gray-700 mb-3 dark:text-gray-300">
+      <div className="mb-6 bg-secondary p-4 rounded-lg border border-theme">
+        <p className="text-sm text-muted mb-3">
           Select what to include in your character:
         </p>
         <div className="flex flex-wrap gap-3 justify-center">
-          <div className="flex items-center bg-white px-3 py-2 rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+          <div className="flex items-center bg-card px-3 py-2 rounded-lg border border-theme">
             <input
               type="checkbox"
               id="include-quests"
               checked={formData.include_quests}
               onChange={handleToggleQuests}
-              className="rounded text-indigo-600 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600"
+              className="rounded text-indigo-600 focus:ring-indigo-500 bg-secondary border-theme"
             />
-            <label htmlFor="include-quests" className="text-sm ml-2 text-gray-700 dark:text-gray-300 flex items-center">
+            <label htmlFor="include-quests" className="text-sm ml-2 flex items-center">
               <BookOpen className="h-4 w-4 mr-1 text-indigo-500" />
               Quests
             </label>
           </div>
           
-          <div className="flex items-center bg-white px-3 py-2 rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+          <div className="flex items-center bg-card px-3 py-2 rounded-lg border border-theme">
             <input
               type="checkbox"
               id="include-dialogue"
               checked={formData.include_dialogue}
               onChange={handleToggleDialogue}
-              className="rounded text-indigo-600 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600"
+              className="rounded text-indigo-600 focus:ring-indigo-500 bg-secondary border-theme"
             />
-            <label htmlFor="include-dialogue" className="text-sm ml-2 text-gray-700 dark:text-gray-300 flex items-center">
+            <label htmlFor="include-dialogue" className="text-sm ml-2 flex items-center">
               <MessageSquare className="h-4 w-4 mr-1 text-indigo-500" />
               Dialogue
             </label>
           </div>
           
-          <div className="flex items-center bg-white px-3 py-2 rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+          <div className="flex items-center bg-card px-3 py-2 rounded-lg border border-theme">
             <input
               type="checkbox"
               id="include-items"
               checked={formData.include_items}
               onChange={handleToggleItems}
-              className="rounded text-indigo-600 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600"
+              className="rounded text-indigo-600 focus:ring-indigo-500 bg-secondary border-theme"
             />
-            <label htmlFor="include-items" className="text-sm ml-2 text-gray-700 dark:text-gray-300 flex items-center">
+            <label htmlFor="include-items" className="text-sm ml-2 flex items-center">
               <Package className="h-4 w-4 mr-1 text-indigo-500" />
               Items
             </label>
@@ -171,7 +171,7 @@ export default function MainFormTabs() {
         
         {/* Description to make it clear what happens next */}
         {!isLoading && (
-          <p className="text-sm text-gray-600 mt-2 dark:text-gray-400">
+          <p className="text-sm text-muted mt-2">
             Character will appear below after generation
           </p>
         )}
@@ -181,7 +181,7 @@ export default function MainFormTabs() {
           <UsageLimitDisplay 
             variant="compact" 
             showWhenFull={true} 
-            className="bg-white px-3 py-1 rounded-full shadow-sm border border-gray-200 dark:bg-gray-700 dark:border-gray-600" 
+            className="bg-card px-3 py-1 rounded-full shadow-sm border border-theme" 
           />
         </div>
       </div>

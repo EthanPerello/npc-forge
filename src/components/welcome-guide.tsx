@@ -64,7 +64,7 @@ export default function WelcomeGuide({ onDismiss, onGetStarted }: WelcomeGuidePr
   if (!hasMounted || !isVisible) return null;
 
   return (
-    <div className="w-full bg-gradient-to-br from-indigo-50 to-blue-100 rounded-xl shadow-md border border-indigo-200 mb-8 overflow-hidden dark:from-indigo-950 dark:to-blue-900 dark:border-indigo-800">
+    <div className="welcome-guide w-full rounded-xl shadow-md border border-indigo-300 mb-8 overflow-hidden bg-white dark:bg-gray-800 dark:border-indigo-800">
       <div className="bg-indigo-600 px-6 py-4 flex justify-between items-center dark:bg-indigo-700">
         <h2 className="text-xl font-bold text-white flex items-center">
           <Info className="mr-2 h-5 w-5" />
@@ -81,12 +81,12 @@ export default function WelcomeGuide({ onDismiss, onGetStarted }: WelcomeGuidePr
       </div>
 
       <div className="p-6">
-        <p className="mb-4 text-gray-700 dark:text-gray-300">
+        <p className="mb-4 text-gray-900 dark:text-gray-200">
           Create detailed NPCs for your games with AI. Just describe your character concept or use our templates to generate complete characters with personalities, quests, dialogue, and AI-generated portraits.
         </p>
 
         <div className="mb-6">
-          <h3 className="text-lg font-semibold text-indigo-800 mb-3 dark:text-indigo-300">How to Create a Character:</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-3 dark:text-indigo-300">How to Create a Character:</h3>
           <div className="grid gap-4 md:grid-cols-2">
             {[
               {
@@ -110,20 +110,23 @@ export default function WelcomeGuide({ onDismiss, onGetStarted }: WelcomeGuidePr
                 desc: 'Download your character as JSON for your game'
               }
             ].map((step, idx) => (
-              <div key={idx} className="bg-white p-4 rounded-lg border border-gray-200 flex dark:bg-gray-800 dark:border-gray-700">
+              <div key={idx} className="bg-gray-100 p-4 rounded-lg border border-gray-200 flex dark:bg-gray-700 dark:border-gray-600">
                 <div className="mr-3 text-indigo-600 dark:text-indigo-400">{step.icon}</div>
                 <div>
-                  <h4 className="font-medium text-gray-800 dark:text-gray-200">{step.title}</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{step.desc}</p>
+                  <h4 className="font-medium text-gray-900 dark:text-gray-200">{step.title}</h4>
+                  <p className="text-sm text-gray-800 dark:text-gray-300">{step.desc}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-indigo-100 p-4 rounded-lg mb-4 dark:bg-indigo-900/30">
-          <h3 className="text-sm font-medium text-indigo-800 mb-1 dark:text-indigo-300">Try This Example:</h3>
-          <p className="text-sm text-indigo-700 italic dark:text-indigo-300">
+        {/* Example box with significantly improved contrast */}
+        <div className="bg-indigo-100 p-4 rounded-lg mb-4 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700">
+          <h3 className="text-sm font-bold text-gray-800 mb-2 dark:text-indigo-100">
+            Try This Example:
+          </h3>
+          <p className="text-sm font-medium text-gray-800 dark:text-indigo-100">
             "A scarred elven ranger who protects a sacred forest, harboring a secret connection to ancient magic."
           </p>
         </div>
@@ -131,7 +134,7 @@ export default function WelcomeGuide({ onDismiss, onGetStarted }: WelcomeGuidePr
         <div className="flex justify-between">
           <button 
             onClick={handleDismiss} 
-            className="px-4 py-2 bg-transparent border border-indigo-200 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors dark:border-indigo-800 dark:text-indigo-400 dark:hover:bg-indigo-900/20"
+            className="px-4 py-2 bg-transparent border border-indigo-200 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors dark:border-indigo-700 dark:text-indigo-400 dark:hover:bg-indigo-900/20"
           >
             Close
           </button>

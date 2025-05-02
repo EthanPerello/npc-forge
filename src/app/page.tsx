@@ -53,15 +53,12 @@ export default function Home() {
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]">
               NPC Forge
             </h1>
-            <p className="mt-2 text-lg sm:text-xl lg:text-2xl font-medium text-indigo-100 drop-shadow-sm">
+            <p className="mt-2 text-lg sm:text-xl lg:text-2xl font-medium text-white drop-shadow-sm">
               AI-powered character generator for games
             </p>
           </div>
         </header>
 
-
-
-          
           {/* Welcome Guide - Only show if state is true */}
           {showWelcomeGuide && (
             <WelcomeGuide 
