@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Fixed portrait generation errors by omitting unsupported parameters for DALL·E-2 and conditionally applying model-specific options.
+- Corrected the randomize button behavior to ensure the character description updates reliably alongside the selected genre.
+- Improved text contrast and accessibility in light mode across multiple components, including form labels, documentation content, and example text.
+
+### Changed
+- Refactored theme styling system to use standardized CSS variables and utility classes (`bg-card`, `text-muted`, `border-theme`, etc.) for consistent appearance across light and dark modes.
+- Simplified randomization logic in `character-form.tsx` to eliminate fragile state timing patterns.
+- Updated global styles to improve visibility for UI elements like subgenre text, welcome guide examples, and tabbed panels in light mode.
+
 ## [0.2.1] - 2025-04-30
 
 ### Added

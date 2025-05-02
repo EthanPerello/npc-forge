@@ -1,44 +1,47 @@
 'use client';
 
 import { useState, ReactNode } from 'react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 interface ExpandableSectionProps {
   title: string;
   children: ReactNode;
   defaultExpanded?: boolean;
-  titleClassName?: string;
-  contentClassName?: string;
+  className?: string;
 }
 
-export default function ExpandableSection({
-  title,
-  children,
+export default function ExpandableSection({ 
+  title, 
+  children, 
   defaultExpanded = false,
-  titleClassName = '',
-  contentClassName = ''
+  className = ''
 }: ExpandableSectionProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
-
+  
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+  
   return (
-    <div className="border border-gray-200 rounded-lg dark:border-gray-700">
+    <div className={`border rounded-lg overflow-hidden ${className}`}>
       <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className={`w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-t-lg dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors ${titleClassName}`}
-        aria-expanded={isExpanded}
+        onClick={toggleExpand}
+        className="w-full flex items-center justify-between p-4 text-left bg-white border-b border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 expandable-section-title"
       >
-        <span className="font-medium text-gray-700 dark:text-gray-300">{title}</span>
-        <svg 
-          className={`w-5 h-5 transition-transform duration-200 text-gray-500 dark:text-gray-400 ${isExpanded ? 'transform rotate-180' : ''}`} 
-          fill="none" 
-          viewBox="0 0 24 24" 
-          stroke="currentColor"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+        <h3 className="text-base font-medium text-gray-900 dark:text-gray-200">
+          {title}
+        </h3>
+        <span>
+          {isExpanded ? (
+            <ChevronDown className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+          ) : (
+            <ChevronRight className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+          )}
+        </span>
       </button>
       
       {isExpanded && (
-        <div className={`p-4 bg-white dark:bg-gray-800 rounded-b-lg ${contentClassName}`}>
+        <div className="p-4 bg-white dark:bg-gray-800 animate-fadeIn">
           {children}
         </div>
       )}

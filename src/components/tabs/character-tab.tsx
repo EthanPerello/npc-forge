@@ -1,214 +1,392 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { GENRE_TEMPLATES, getTemplateExample } from '@/lib/templates';
+import { getSubGenres } from '@/lib/templates';
 import { useCharacter } from '@/contexts/character-context';
 import TemplateSelector from '@/components/template-selector';
-import Select from '@/components/ui/select';
-import { GENRE_TEMPLATES, getTemplateExample } from '@/lib/templates';
-import Button from '@/components/ui/button';
-import PortraitOptions from '@/components/tabs/portrait-options';
-import SearchableSelect from '@/components/ui/searchable-select';
 import ModelSelector from '@/components/model-selector';
-import { DEFAULT_MODEL } from '@/lib/models';
+import PortraitOptions from '@/components/tabs/portrait-options';
+import ExpandableSection from '@/components/ui/expandable-section';
+import Select from '@/components/ui/select';
+import SearchableSelect from '@/components/ui/searchable-select';
+import Checkbox from '@/components/ui/checkbox';
+import { getModelByTier } from '@/lib/models';
 import { 
-  GenderOption,
-  AgeGroupOption,
-  AlignmentOption,
-  RelationshipOption,
-  TemplateOption,
-  SubGenreOption,
-  OpenAIModel
+  TemplateOption, 
+  SubGenreOption, 
+  OpenAIModel, 
+  PersonalityOption,
 } from '@/lib/types';
+import { ChangeEvent } from 'react';
 
-// Options for dropdown selects - all with "Not specified" as first option
-const genderOptions: GenderOption[] = [
-  { value: '' as any, label: 'Not specified' },
+// Gender options with specific typings
+const genderOptions = [
+  { value: '', label: 'Not specified' },
   { value: 'male', label: 'Male' },
   { value: 'female', label: 'Female' },
-  { value: 'nonbinary', label: 'Nonbinary' },
-  { value: 'unknown', label: 'Unknown' }
-];
+  { value: 'nonbinary', label: 'Non-binary' },
+  { value: 'unknown', label: 'Unknown/Other' },
+] as const;
 
-const ageGroupOptions: AgeGroupOption[] = [
-  { value: '' as any, label: 'Not specified' },
+// Age group options with specific typings
+const ageGroupOptions = [
+  { value: '', label: 'Not specified' },
   { value: 'child', label: 'Child' },
-  { value: 'teen', label: 'Teen' },
+  { value: 'teen', label: 'Teen/Young Adult' },
   { value: 'adult', label: 'Adult' },
-  { value: 'elder', label: 'Elder' }
-];
+  { value: 'elder', label: 'Elder' },
+] as const;
 
-const alignmentOptions: AlignmentOption[] = [
-  { value: '' as any, label: 'Not specified' },
+// Moral alignment options with specific typings
+const alignmentOptions = [
+  { value: '', label: 'Not specified' },
   { value: 'good', label: 'Good' },
   { value: 'neutral', label: 'Neutral' },
-  { value: 'evil', label: 'Evil' }
-];
+  { value: 'evil', label: 'Evil' },
+] as const;
 
-const relationshipOptions: RelationshipOption[] = [
-  { value: '' as any, label: 'Not specified' },
-  { value: 'ally', label: 'Ally' },
-  { value: 'enemy', label: 'Enemy' },
-  { value: 'neutral', label: 'Neutral' },
-  { value: 'mentor', label: 'Mentor' },
-  { value: 'rival', label: 'Rival' },
-  { value: 'betrayer', label: 'Betrayer' }
-];
-
-// Physical trait options
-const heightOptions = [
+// Relationship to player options with specific typings
+const relationshipOptions = [
   { value: '', label: 'Not specified' },
-  { value: 'very_short', label: 'Very Short' },
-  { value: 'short', label: 'Short' },
-  { value: 'average', label: 'Average Height' },
-  { value: 'tall', label: 'Tall' },
-  { value: 'very_tall', label: 'Very Tall' }
+  { value: 'ally', label: 'Ally/Friend' },
+  { value: 'enemy', label: 'Enemy/Antagonist' },
+  { value: 'neutral', label: 'Neutral/Stranger' },
+  { value: 'mentor', label: 'Mentor/Guide' },
+  { value: 'rival', label: 'Rival/Competitor' },
+  { value: 'betrayer', label: 'Betrayer/Double Agent' },
+] as const;
+
+// Common species by genre
+const speciesOptions = [
+  // Fantasy species
+  { value: 'human', label: 'Human', genre: ['fantasy', 'historical', 'contemporary'] },
+  { value: 'elf', label: 'Elf', genre: ['fantasy'] },
+  { value: 'dwarf', label: 'Dwarf', genre: ['fantasy'] },
+  { value: 'halfling', label: 'Halfling', genre: ['fantasy'] },
+  { value: 'orc', label: 'Orc', genre: ['fantasy'] },
+  { value: 'goblin', label: 'Goblin', genre: ['fantasy'] },
+  { value: 'tiefling', label: 'Tiefling', genre: ['fantasy'] },
+  { value: 'dragonborn', label: 'Dragonborn', genre: ['fantasy'] },
+  
+  // Sci-fi species
+  { value: 'android', label: 'Android', genre: ['sci-fi'] },
+  { value: 'alien', label: 'Alien', genre: ['sci-fi'] },
+  { value: 'mutant', label: 'Mutant', genre: ['sci-fi'] },
+  { value: 'cyborg', label: 'Cyborg', genre: ['sci-fi'] },
+  { value: 'ai', label: 'Artificial Intelligence', genre: ['sci-fi'] },
+  { value: 'clone', label: 'Clone', genre: ['sci-fi'] },
 ];
 
-const buildOptions = [
-  { value: '', label: 'Not specified' },
-  { value: 'thin', label: 'Thin/Slender' },
-  { value: 'athletic', label: 'Athletic/Toned' },
-  { value: 'average', label: 'Average Build' },
-  { value: 'sturdy', label: 'Sturdy/Solid' },
-  { value: 'muscular', label: 'Muscular' },
-  { value: 'heavy', label: 'Heavy/Large' }
+// More occupations by genre
+const occupationOptions = [
+  // Fantasy occupations
+  { value: 'wizard', label: 'Wizard/Mage' },
+  { value: 'warrior', label: 'Warrior' },
+  { value: 'knight', label: 'Knight' },
+  { value: 'ranger', label: 'Ranger/Hunter' },
+  { value: 'bard', label: 'Bard' },
+  { value: 'cleric', label: 'Cleric/Priest' },
+  { value: 'merchant', label: 'Merchant' },
+  { value: 'blacksmith', label: 'Blacksmith' },
+  { value: 'thief', label: 'Thief/Rogue' },
+  { value: 'alchemist', label: 'Alchemist' },
+  { value: 'druid', label: 'Druid' },
+  { value: 'noble', label: 'Noble' },
+  { value: 'farmer', label: 'Farmer' },
+  { value: 'guard', label: 'Guard' },
+  { value: 'healer', label: 'Healer' },
+  { value: 'scholar', label: 'Scholar' },
+  
+  // Sci-fi occupations
+  { value: 'pilot', label: 'Pilot' },
+  { value: 'engineer', label: 'Engineer' },
+  { value: 'scientist', label: 'Scientist' },
+  { value: 'hacker', label: 'Hacker' },
+  { value: 'soldier', label: 'Soldier' },
+  { value: 'medic', label: 'Medic/Doctor' },
+  { value: 'bounty_hunter', label: 'Bounty Hunter' },
+  { value: 'trader', label: 'Trader' },
+  { value: 'explorer', label: 'Explorer' },
+  { value: 'colonist', label: 'Colonist' },
+  { value: 'diplomat', label: 'Diplomat' },
+  { value: 'smuggler', label: 'Smuggler' },
+  
+  // Contemporary occupations
+  { value: 'police', label: 'Police Officer' },
+  { value: 'doctor', label: 'Doctor' },
+  { value: 'teacher', label: 'Teacher' },
+  { value: 'artist', label: 'Artist' },
+  { value: 'businessman', label: 'Business Person' },
+  { value: 'programmer', label: 'Programmer' },
+  { value: 'athlete', label: 'Athlete' },
+  { value: 'cook', label: 'Chef/Cook' },
+  { value: 'journalist', label: 'Journalist' },
+  { value: 'lawyer', label: 'Lawyer' },
+];
+
+// Personality traits
+const personalityTraitOptions: PersonalityOption[] = [
+  { value: 'brave', label: 'Brave' },
+  { value: 'cautious', label: 'Cautious' },
+  { value: 'cheerful', label: 'Cheerful' },
+  { value: 'rude', label: 'Rude' },
+  { value: 'loyal', label: 'Loyal' },
+  { value: 'dishonest', label: 'Dishonest' },
+  { value: 'kind', label: 'Kind' },
+  { value: 'cruel', label: 'Cruel' },
+  { value: 'proud', label: 'Proud' },
+  { value: 'humble', label: 'Humble' },
+  { value: 'optimistic', label: 'Optimistic' },
+  { value: 'pessimistic', label: 'Pessimistic' },
+  { value: 'shy', label: 'Shy' },
+  { value: 'outgoing', label: 'Outgoing' },
+  { value: 'lazy', label: 'Lazy' },
+  { value: 'hardworking', label: 'Hardworking' },
+  { value: 'intelligent', label: 'Intelligent' },
+  { value: 'foolish', label: 'Foolish' },
+  { value: 'serious', label: 'Serious' },
+  { value: 'playful', label: 'Playful' },
+  { value: 'mystical', label: 'Mystical' },
+  { value: 'practical', label: 'Practical' },
+  { value: 'greedy', label: 'Greedy' },
+  { value: 'generous', label: 'Generous' },
 ];
 
 // Social class options
 const socialClassOptions = [
   { value: '', label: 'Not specified' },
-  { value: 'lower', label: 'Lower Class' },
-  { value: 'working', label: 'Working Class' },
-  { value: 'middle', label: 'Middle Class' },
-  { value: 'upper_middle', label: 'Upper-middle Class' },
-  { value: 'upper', label: 'Upper Class/Nobility' },
-  { value: 'outcast', label: 'Outcast/Outsider' }
+  { value: 'lower_class', label: 'Lower Class/Poor' },
+  { value: 'working_class', label: 'Working Class' },
+  { value: 'middle_class', label: 'Middle Class' },
+  { value: 'upper_class', label: 'Upper Class/Wealthy' },
+  { value: 'nobility', label: 'Nobility/Aristocracy' },
+  { value: 'royalty', label: 'Royalty' },
+  { value: 'outcast', label: 'Outcast/Exile' },
+  { value: 'varied', label: 'Varied/Complex' },
 ];
 
-// Updated occupation options (for searchable dropdown)
-const occupationOptions = [
-  // General occupations (applicable to most genres)
-  { value: '', label: 'Not specified', group: 'General' },
-  { value: 'merchant', label: 'Merchant/Trader', group: 'General' },
-  { value: 'leader', label: 'Leader/Authority Figure', group: 'General' },
-  { value: 'craftsperson', label: 'Craftsperson/Artisan', group: 'General' },
-  { value: 'healer', label: 'Healer/Medic', group: 'General' },
-  { value: 'scholar', label: 'Scholar/Academic', group: 'General' },
-  { value: 'entertainer', label: 'Entertainer/Artist', group: 'General' },
-  { value: 'criminal', label: 'Criminal/Outlaw', group: 'General' },
-  { value: 'explorer', label: 'Explorer/Traveler', group: 'General' },
-  { value: 'guard', label: 'Guard/Protector', group: 'General' },
-  
-  // Fantasy occupations
-  { value: 'wizard', label: 'Wizard/Mage', group: 'Fantasy' },
-  { value: 'knight', label: 'Knight/Warrior', group: 'Fantasy' },
-  { value: 'ranger', label: 'Ranger/Hunter', group: 'Fantasy' },
-  { value: 'blacksmith', label: 'Blacksmith', group: 'Fantasy' },
-  { value: 'alchemist', label: 'Alchemist', group: 'Fantasy' },
-  { value: 'bard', label: 'Bard/Minstrel', group: 'Fantasy' },
-  { value: 'cleric', label: 'Cleric/Priest', group: 'Fantasy' },
-  { value: 'druid', label: 'Druid/Nature Guardian', group: 'Fantasy' },
-  { value: 'noble', label: 'Noble/Royalty', group: 'Fantasy' },
-  { value: 'thief', label: 'Thief/Rogue', group: 'Fantasy' },
-  { value: 'innkeeper', label: 'Innkeeper/Tavern Owner', group: 'Fantasy' },
-  
-  // Sci-Fi occupations
-  { value: 'engineer', label: 'Engineer/Technician', group: 'Sci-Fi' },
-  { value: 'pilot', label: 'Pilot/Navigator', group: 'Sci-Fi' },
-  { value: 'scientist', label: 'Scientist/Researcher', group: 'Sci-Fi' },
-  { value: 'bounty_hunter', label: 'Bounty Hunter', group: 'Sci-Fi' },
-  { value: 'ai_specialist', label: 'AI Specialist', group: 'Sci-Fi' },
-  { value: 'space_trader', label: 'Space Trader', group: 'Sci-Fi' },
-  { value: 'colony_leader', label: 'Colony Leader', group: 'Sci-Fi' },
-  { value: 'security', label: 'Security Officer', group: 'Sci-Fi' },
-  { value: 'smuggler', label: 'Smuggler', group: 'Sci-Fi' },
-  { value: 'medic', label: 'Medic/Doctor', group: 'Sci-Fi' },
-  { value: 'hacker', label: 'Hacker/Netrunner', group: 'Sci-Fi' },
-  
-  // Historical occupations
-  { value: 'farmer', label: 'Farmer', group: 'Historical' },
-  { value: 'soldier', label: 'Soldier', group: 'Historical' },
-  { value: 'sailor', label: 'Sailor/Mariner', group: 'Historical' },
-  { value: 'priest', label: 'Priest/Clergy', group: 'Historical' },
-  { value: 'scribe', label: 'Scribe/Record Keeper', group: 'Historical' },
-  { value: 'servant', label: 'Servant/Attendant', group: 'Historical' },
-  { value: 'hunter', label: 'Hunter/Trapper', group: 'Historical' },
-  { value: 'diplomat', label: 'Diplomat/Emissary', group: 'Historical' },
-  { value: 'explorer', label: 'Explorer', group: 'Historical' },
-  { value: 'trade_master', label: 'Guild Master/Trade Leader', group: 'Historical' },
-  
-  // Contemporary occupations
-  { value: 'doctor', label: 'Doctor', group: 'Contemporary' },
-  { value: 'teacher', label: 'Teacher/Professor', group: 'Contemporary' },
-  { value: 'police', label: 'Police Officer', group: 'Contemporary' },
-  { value: 'chef', label: 'Chef/Cook', group: 'Contemporary' },
-  { value: 'artist', label: 'Artist', group: 'Contemporary' },
-  { value: 'programmer', label: 'Programmer/Developer', group: 'Contemporary' },
-  { value: 'journalist', label: 'Journalist/Reporter', group: 'Contemporary' },
-  { value: 'business', label: 'Business Owner', group: 'Contemporary' },
-  { value: 'athlete', label: 'Athlete', group: 'Contemporary' },
-  { value: 'lawyer', label: 'Lawyer', group: 'Contemporary' },
-  { value: 'musician', label: 'Musician', group: 'Contemporary' },
-  { value: 'driver', label: 'Driver/Pilot', group: 'Contemporary' }
+// Height options
+const heightOptions = [
+  { value: '', label: 'Not specified' },
+  { value: 'very_short', label: 'Very Short' },
+  { value: 'short', label: 'Short' },
+  { value: 'average', label: 'Average' },
+  { value: 'tall', label: 'Tall' },
+  { value: 'very_tall', label: 'Very Tall' },
 ];
 
-// Personality trait options
-const personalityTraitOptions = [
-  { value: 'brave', label: 'Brave' },
-  { value: 'cautious', label: 'Cautious' },
-  { value: 'curious', label: 'Curious' },
-  { value: 'determined', label: 'Determined' },
-  { value: 'friendly', label: 'Friendly' },
-  { value: 'honest', label: 'Honest' },
-  { value: 'humorous', label: 'Humorous' },
-  { value: 'loyal', label: 'Loyal' },
-  { value: 'mysterious', label: 'Mysterious' },
-  { value: 'proud', label: 'Proud' },
-  { value: 'reckless', label: 'Reckless' },
-  { value: 'sarcastic', label: 'Sarcastic' },
-  { value: 'shy', label: 'Shy' },
-  { value: 'suspicious', label: 'Suspicious' },
-  { value: 'wise', label: 'Wise' },
-  { value: 'greedy', label: 'Greedy' },
-  { value: 'ambitious', label: 'Ambitious' },
-  { value: 'paranoid', label: 'Paranoid' },
-  { value: 'optimistic', label: 'Optimistic' },
-  { value: 'pessimistic', label: 'Pessimistic' }
+// Build options
+const buildOptions = [
+  { value: '', label: 'Not specified' },
+  { value: 'thin', label: 'Thin/Slender' },
+  { value: 'athletic', label: 'Athletic/Toned' },
+  { value: 'average', label: 'Average' },
+  { value: 'heavy', label: 'Heavy/Stocky' },
+  { value: 'muscular', label: 'Muscular/Strong' },
 ];
+
+// Define valid gender types
+type ValidGender = 'male' | 'female' | 'nonbinary' | 'unknown' | undefined;
+
+// Define valid age group types
+type ValidAgeGroup = 'child' | 'teen' | 'adult' | 'elder' | undefined;
+
+// Define valid alignment types
+type ValidAlignment = 'good' | 'neutral' | 'evil' | undefined;
+
+// Define valid relationship types
+type ValidRelationship = 'ally' | 'enemy' | 'neutral' | 'mentor' | 'rival' | 'betrayer' | undefined;
+
+// These utility functions parse and validate values from form controls
+function parseGender(value: string): ValidGender {
+  if (value === '') return undefined;
+  return ['male', 'female', 'nonbinary', 'unknown'].includes(value) 
+    ? value as ValidGender 
+    : undefined;
+}
+
+function parseAgeGroup(value: string): ValidAgeGroup {
+  if (value === '') return undefined;
+  return ['child', 'teen', 'adult', 'elder'].includes(value) 
+    ? value as ValidAgeGroup 
+    : undefined;
+}
+
+function parseAlignment(value: string): ValidAlignment {
+  if (value === '') return undefined;
+  return ['good', 'neutral', 'evil'].includes(value) 
+    ? value as ValidAlignment 
+    : undefined;
+}
+
+function parseRelationship(value: string): ValidRelationship {
+  if (value === '') return undefined;
+  return ['ally', 'enemy', 'neutral', 'mentor', 'rival', 'betrayer'].includes(value) 
+    ? value as ValidRelationship 
+    : undefined;
+}
+
+// Interfaces for structured options
+interface OptionValue {
+  value: string;
+  label: string;
+}
+
+// Custom interface for our components
+interface CustomSelectProps {
+  id?: string;
+  value: any;
+  onChange: (value: any) => void;
+  options?: any[];
+  placeholder?: string;
+  isMulti?: boolean;
+  isCreatable?: boolean;
+  className?: string;
+}
+
+// CSS class to match the other form elements styling
+const formElementClass = "bg-gray-100 text-gray-800 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600";
 
 export default function CharacterTab() {
   const { formData, updateFormData } = useCharacter();
-  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
-  const [selectedSubGenre, setSelectedSubGenre] = useState<SubGenreOption | undefined>(undefined);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   
-  // Update formData when model changes
-  const handleModelChange = (newModel: OpenAIModel) => {
-    updateFormData({ 
-      ...formData,
-      model: newModel 
+  // Handle template change
+  const handleTemplateChange = (template: TemplateOption | undefined, subGenre?: SubGenreOption) => {
+    // Update genre and optionally sub-genre
+    if (template) {
+      updateFormData({ 
+        genre: template.id,
+        sub_genre: subGenre ? subGenre.id : undefined
+      });
+      
+      // If the description field is empty, populate it with an example
+      if (!formData.description || formData.description.trim() === '') {
+        const example = subGenre && subGenre.example 
+          ? subGenre.example 
+          : getTemplateExample(template.id);
+        updateFormData({ description: example });
+      }
+    } else {
+      updateFormData({ 
+        genre: undefined,
+        sub_genre: undefined
+      });
+    }
+  };
+  
+  // Handle basic character fields
+  const handleGenderChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (value === '') {
+      updateFormData({ gender: undefined });
+    } else if (isValidGender(value)) {
+      updateFormData({ gender: value as 'male' | 'female' | 'nonbinary' | 'unknown' });
+    }
+  };
+  
+  const handleAgeGroupChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (value === '') {
+      updateFormData({ age_group: undefined });
+    } else if (isValidAgeGroup(value)) {
+      updateFormData({ age_group: value as 'child' | 'teen' | 'adult' | 'elder' });
+    }
+  };
+  
+  const handleAlignmentChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (value === '') {
+      updateFormData({ moral_alignment: undefined });
+    } else if (isValidAlignment(value)) {
+      updateFormData({ moral_alignment: value as 'good' | 'neutral' | 'evil' });
+    }
+  };
+  
+  const handleRelationshipChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (value === '') {
+      updateFormData({ relationship_to_player: undefined });
+    } else if (isValidRelationship(value)) {
+      updateFormData({ relationship_to_player: value as 'ally' | 'enemy' | 'neutral' | 'mentor' | 'rival' | 'betrayer' });
+    }
+  };
+  
+  // Handle advanced options
+  const handleSpeciesChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    updateFormData({
+      advanced_options: {
+        ...formData.advanced_options,
+        species: e.target.value || undefined
+      }
     });
   };
   
-  // Handle template and sub-genre selection
-  const handleGenreChange = (template: TemplateOption | undefined, subGenre?: SubGenreOption) => {
-    const genre = template?.id;
-    setSelectedSubGenre(subGenre);
+  // Updated for proper typing
+  const handleOccupationChange = (option: OptionValue | null | string) => {
+    let occupationValue: string | undefined;
     
-    // Update form data with main genre and sub-genre if applicable
-    updateFormData({ 
-      genre,
-      sub_genre: subGenre?.id
-    });
-    
-    // If a genre is selected and description is empty, suggest an example
-    if (genre && !formData.description.trim()) {
-      // Use sub-genre example if available, otherwise use main genre example
-      if (subGenre?.example) {
-        updateFormData({ description: subGenre.example });
-      } else if (genre) {
-        updateFormData({ description: getTemplateExample(genre) });
-      }
+    // Handle different possible input types
+    if (typeof option === 'string') {
+      occupationValue = option || undefined;
+    } else if (option && typeof option === 'object' && 'value' in option) {
+      occupationValue = option.value;
+    } else {
+      occupationValue = undefined;
     }
+    
+    updateFormData({
+      advanced_options: {
+        ...formData.advanced_options,
+        occupation: occupationValue
+      }
+    });
+  };
+  
+  const handleSocialClassChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    updateFormData({
+      advanced_options: {
+        ...formData.advanced_options,
+        social_class: e.target.value || undefined
+      }
+    });
+  };
+  
+  const handleHeightChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    updateFormData({
+      advanced_options: {
+        ...formData.advanced_options,
+        height: e.target.value || undefined
+      }
+    });
+  };
+  
+  const handleBuildChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    updateFormData({
+      advanced_options: {
+        ...formData.advanced_options,
+        build: e.target.value || undefined
+      }
+    });
+  };
+  
+  const handleDistinctiveFeaturesChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    updateFormData({
+      advanced_options: {
+        ...formData.advanced_options,
+        distinctive_features: e.target.value || undefined
+      }
+    });
+  };
+  
+  const handleHomelandChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    updateFormData({
+      advanced_options: {
+        ...formData.advanced_options,
+        homeland: e.target.value || undefined
+      }
+    });
   };
   
   // Helper function to toggle personality traits (limit to 3)
@@ -241,19 +419,86 @@ export default function CharacterTab() {
     });
   };
   
-  // Handle clear options function - preserves description and portrait options
-  const handleClearOptions = () => {
-    // Save portrait options and description to preserve them
-    const portraitOptions = formData.portrait_options;
-    const description = formData.description;
-    const currentModel = formData.model;  // Save the current model selection
+  const handleModelChange = (model: OpenAIModel) => {
+    updateFormData({ model });
+  };
+  
+  // Function to handle the randomize button click - IMPROVED VERSION
+  const handleRandomize = () => {
+    // Get random values for the basic fields
+    const randomGenderOption = getRandomOption(genderOptions.filter(option => option.value !== ''));
+    const randomAgeOption = getRandomOption(ageGroupOptions.filter(option => option.value !== ''));
+    const randomAlignmentOption = getRandomOption(alignmentOptions.filter(option => option.value !== ''));
+    const randomRelationshipOption = getRandomOption(relationshipOptions.filter(option => option.value !== ''));
     
-    // Reset character options
+    // Parse the random values to ensure they're valid
+    const gender = parseGender(randomGenderOption.value);
+    const age_group = parseAgeGroup(randomAgeOption.value);
+    const moral_alignment = parseAlignment(randomAlignmentOption.value);
+    const relationship_to_player = parseRelationship(randomRelationshipOption.value);
+    
+    // Get a random genre
+    const randomGenreTemplate = getRandomOption(GENRE_TEMPLATES);
+    const randomGenre = randomGenreTemplate.id;
+    
+    // Potentially select a sub-genre if available
+    const subGenres = getSubGenres(randomGenre);
+    const randomSubGenre = subGenres.length > 0 ? getRandomOption(subGenres) : undefined;
+    
+    // Get genre-appropriate species
+    const appropriateSpecies = speciesOptions.filter(
+      species => !species.genre || species.genre.includes(randomGenre as any)
+    );
+    const randomSpecies = getRandomOption(appropriateSpecies);
+    
+    // Get random personality traits (2-3)
+    const numTraits = Math.floor(Math.random() * 2) + 2; // 2-3 traits
+    const shuffledTraits = [...personalityTraitOptions].sort(() => 0.5 - Math.random());
+    const randomTraits = shuffledTraits.slice(0, numTraits);
+    
+    // Get other random values
+    const randomSocialClass = getRandomOption(socialClassOptions.filter(option => option.value));
+    const randomHeight = getRandomOption(heightOptions.filter(option => option.value));
+    const randomBuild = getRandomOption(buildOptions.filter(option => option.value));
+    
+    // Get the description example for this genre/subgenre
+    const exampleText = randomSubGenre && randomSubGenre.example 
+      ? randomSubGenre.example 
+      : getTemplateExample(randomGenre);
+    
+    // Important: Set the description DIRECTLY in this function instead of relying on effects
+    // This single updateFormData call will update all fields at once including the description
+    // Note: We're preserving the current model as requested
     updateFormData({
+      description: exampleText,  // Set the example text directly
+      genre: randomGenre,
+      sub_genre: randomSubGenre ? randomSubGenre.id : undefined,
+      gender,
+      age_group,
+      moral_alignment,
+      relationship_to_player,
+      model: formData.model, // Preserve the current model selection
+      advanced_options: {
+        species: randomSpecies.value,
+        personality_traits: randomTraits.map(trait => trait.value),
+        social_class: randomSocialClass.value,
+        height: randomHeight.value,
+        build: randomBuild.value,
+        distinctive_features: '',
+        homeland: '',
+        occupation: ''
+      }
+    });
+  };
+  
+  // Clear all options and revert to defaults
+  const handleClearOptions = () => {
+    updateFormData({
+      description: '',  // Also clear the description
       genre: undefined,
       sub_genre: undefined,
       gender: undefined,
-      age_group: undefined,
+      age_group: undefined, 
       moral_alignment: undefined,
       relationship_to_player: undefined,
       advanced_options: {
@@ -265,293 +510,309 @@ export default function CharacterTab() {
         build: undefined,
         distinctive_features: undefined,
         homeland: undefined
-      },
-      // Restore preserved values
-      description: description,
-      portrait_options: portraitOptions,
-      model: currentModel  // Keep the model selection
-    });
-    
-    // Reset sub-genre state
-    setSelectedSubGenre(undefined);
-  };
-  
-  // Get a random item from an array, skipping index 0
-  const getRandomOption = (options: any[]) => {
-    // +1 to skip the "Not specified" option at index 0
-    const randomIndex = Math.floor(Math.random() * (options.length - 1)) + 1;
-    return options[randomIndex].value;
-  };
-  
-  // Handle randomize function - does NOT modify portrait options or model selection
-  const handleRandomize = () => {
-    // Save portrait options, description, and model to restore them later
-    const portraitOptions = formData.portrait_options;
-    const description = formData.description;
-    const currentModel = formData.model;
-    
-    // Randomly select a main genre
-    const randomIndex = Math.floor(Math.random() * GENRE_TEMPLATES.length);
-    const randomGenre = GENRE_TEMPLATES[randomIndex];
-    
-    // Randomly select a sub-genre if available
-    let randomSubGenre: SubGenreOption | undefined = undefined;
-    if (randomGenre.subGenres && randomGenre.subGenres.length > 0) {
-      const randomSubIndex = Math.floor(Math.random() * randomGenre.subGenres.length);
-      randomSubGenre = randomGenre.subGenres[randomSubIndex];
-    }
-    
-    // Apply the genre selection
-    handleGenreChange(randomGenre, randomSubGenre);
-    
-    // Randomly select main options
-    const randomGender = getRandomOption(genderOptions);
-    const randomAge = getRandomOption(ageGroupOptions);
-    const randomAlignment = getRandomOption(alignmentOptions);
-    const randomRelationship = getRandomOption(relationshipOptions);
-    
-    // Randomly select advanced options too
-    const randomHeight = getRandomOption(heightOptions);
-    const randomBuild = getRandomOption(buildOptions);
-    const randomSocialClass = getRandomOption(socialClassOptions);
-    
-    // Random occupation - getting a valid occupation by skipping the first option
-    const validOccupations = occupationOptions.filter(option => 
-      option.value !== '' && 
-      (option.group === 'General' || option.group === randomGenre.id)
-    );
-    const randomOccupationIndex = Math.floor(Math.random() * validOccupations.length);
-    const randomOccupation = validOccupations[randomOccupationIndex].value;
-    
-    // Random personality traits - select 1-3 traits
-    const numTraits = Math.floor(Math.random() * 3) + 1; // 1 to 3 traits
-    const shuffledTraits = [...personalityTraitOptions].sort(() => 0.5 - Math.random());
-    const randomTraits = shuffledTraits.slice(0, numTraits).map(t => t.value);
-    
-    updateFormData({
-      gender: randomGender,
-      age_group: randomAge,
-      moral_alignment: randomAlignment,
-      relationship_to_player: randomRelationship,
-      advanced_options: {
-        occupation: randomOccupation,
-        height: randomHeight,
-        build: randomBuild,
-        social_class: randomSocialClass,
-        personality_traits: randomTraits,
-        // Keep these fields as is or initialize them
-        species: undefined,
-        distinctive_features: undefined,
-        homeland: undefined
-      },
-      // Restore description, portrait options, and model
-      description: description,
-      portrait_options: portraitOptions,
-      model: currentModel
+      }
     });
   };
+  
+  // Helper function to get a random option from an array
+  function getRandomOption<T>(options: T[]): T {
+    const randomIndex = Math.floor(Math.random() * options.length);
+    return options[randomIndex];
+  }
+  
+  // Create option object for occupation to pass to SearchableSelect
+  const createOccupationOption = () => {
+    if (!formData.advanced_options?.occupation) return null;
+    
+    return {
+      value: formData.advanced_options.occupation,
+      label: formData.advanced_options.occupation
+    };
+  };
+  
+  // Selected personality traits for SearchableSelect
+  const selectedPersonalityTraits = personalityTraitOptions.filter(option => 
+    formData.advanced_options?.personality_traits?.includes(option.value)
+  );
+  
+  // Type narrowing functions for options
+  function isValidGender(value: string): boolean {
+    return genderOptions.some(option => option.value === value);
+  }
+  
+  function isValidAgeGroup(value: string): boolean {
+    return ageGroupOptions.some(option => option.value === value);
+  }
+  
+  function isValidAlignment(value: string): boolean {
+    return alignmentOptions.some(option => option.value === value);
+  }
+  
+  function isValidRelationship(value: string): boolean {
+    return relationshipOptions.some(option => option.value === value);
+  }
   
   return (
     <div className="space-y-6">
-      {/* Model Selection */}
-      <ModelSelector 
-        value={formData.model || DEFAULT_MODEL} 
-        onChange={handleModelChange} 
-      />
-      
-      {/* Genre Selection */}
+      {/* Template Selector */}
       <div>
-        <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-          Genre (Optional)
-        </label>
-        <TemplateSelector
-          templates={GENRE_TEMPLATES}
+        <h3 className="text-base font-medium mb-2 text-gray-900 dark:text-gray-200">Genre (Optional)</h3>
+        <TemplateSelector 
+          templates={GENRE_TEMPLATES} 
           selectedId={formData.genre}
-          selectedSubGenreId={formData.sub_genre} // Pass the selected sub-genre ID
-          onChange={handleGenreChange}
+          selectedSubGenreId={formData.sub_genre}
+          onChange={handleTemplateChange}
         />
       </div>
       
-      {/* Character Description */}
+      {/* Character Description - FIXED FOR LIGHT MODE */}
+<div>
+  <label htmlFor="description" className="block text-base font-medium mb-2 text-gray-900 dark:text-gray-200">
+    Character Description <span className="text-red-500">*</span>
+  </label>
+  
+  {/* Example of Good Description - High Contrast Box */}
+  <div className="mb-3 bg-indigo-100 dark:bg-gray-800 p-4 rounded-lg border border-indigo-200 dark:border-gray-700">
+    <div className="text-indigo-900 dark:text-gray-200 text-sm mb-2 font-semibold">Example of a good description:</div>
+    <div className="text-indigo-800 dark:text-gray-300 text-sm italic">
+      A scarred elven ranger who protects a sacred forest, harboring a secret connection to ancient magic that causes plants to grow in her footsteps. She wears leather armor adorned with living vines and carries a bow made from a branch of the oldest tree in the forest.
+    </div>
+  </div>
+  
+  {/* Helpful instruction text with better contrast */}
+  <div className="mb-3">
+    <p className="text-gray-800 dark:text-gray-300 text-sm">
+      The free-text description field allows you to provide specific details about your character. More detailed descriptions typically result in more tailored characters.
+    </p>
+  </div>
+  
+  <textarea
+    id="description"
+    rows={6}
+    value={formData.description || ''}
+    onChange={(e) => updateFormData({ description: e.target.value })}
+    placeholder="Describe your character or concept... (e.g., A wise old wizard with a mysterious past)"
+    className="w-full p-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-500 dark:placeholder-gray-400"
+    required
+  />
+</div>
+      
+      {/* Basic Character Traits */}
       <div>
-        <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-          Character Description <span className="text-red-500">*</span>
-        </label>
-        <textarea
-          id="description"
-          rows={5}
-          className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          placeholder="Describe your character or concept... (e.g., A wise old wizard with a mysterious past)"
-          value={formData.description}
-          onChange={(e) => updateFormData({ description: e.target.value })}
-        />
+        <h3 className="text-base font-medium mb-3 text-gray-900 dark:text-gray-200">Basic Traits</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="gender" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
+              Gender
+            </label>
+            <select
+              id="gender"
+              value={formData.gender || ''}
+              onChange={handleGenderChange}
+              className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
+            >
+              {genderOptions.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div>
+            <label htmlFor="age-group" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
+              Age
+            </label>
+            <select
+              id="age-group"
+              value={formData.age_group || ''}
+              onChange={handleAgeGroupChange}
+              className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
+            >
+              {ageGroupOptions.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div>
+            <label htmlFor="moral-alignment" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
+              Moral Alignment
+            </label>
+            <select
+              id="moral-alignment"
+              value={formData.moral_alignment || ''}
+              onChange={handleAlignmentChange}
+              className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
+            >
+              {alignmentOptions.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div>
+            <label htmlFor="relationship" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
+              Relationship to Player
+            </label>
+            <select
+              id="relationship"
+              value={formData.relationship_to_player || ''}
+              onChange={handleRelationshipChange}
+              className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
+            >
+              {relationshipOptions.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
       
-      {/* Main Character Options */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Gender */}
-        <Select
-          label="Gender"
-          options={genderOptions}
-          value={formData.gender || ''}
-          onChange={(e) => updateFormData({ 
-            gender: e.target.value ? e.target.value as any : undefined 
-          })}
-        />
-        
-        {/* Age Group */}
-        <Select
-          label="Age"
-          options={ageGroupOptions}
-          value={formData.age_group || ''}
-          onChange={(e) => updateFormData({ 
-            age_group: e.target.value ? e.target.value as any : undefined 
-          })}
-        />
-        
-        {/* Moral Alignment */}
-        <Select
-          label="Moral Alignment"
-          options={alignmentOptions}
-          value={formData.moral_alignment || ''}
-          onChange={(e) => updateFormData({ 
-            moral_alignment: e.target.value ? e.target.value as any : undefined 
-          })}
-        />
-        
-        {/* Relationship to Player */}
-        <Select
-          label="Relationship to Player"
-          options={relationshipOptions}
-          value={formData.relationship_to_player || ''}
-          onChange={(e) => updateFormData({ 
-            relationship_to_player: e.target.value ? e.target.value as any : undefined 
-          })}
-        />
-      </div>
-      
-      {/* Advanced Options Toggle */}
+      {/* Advanced Options Button */}
       <div>
         <button
           type="button"
-          onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
-          className="flex items-center text-sm text-indigo-600 hover:text-indigo-800 focus:outline-none dark:text-indigo-400 dark:hover:text-indigo-300"
+          onClick={() => setShowAdvanced(!showAdvanced)}
+          className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium flex items-center"
         >
-          <span>{showAdvancedOptions ? 'Hide' : 'Show'} Advanced Options</span>
-          <svg 
-            className={`ml-1 h-4 w-4 transform transition-transform ${showAdvancedOptions ? 'rotate-180' : ''}`} 
-            xmlns="http://www.w3.org/2000/svg" 
-            viewBox="0 0 20 20" 
-            fill="currentColor"
+          {showAdvanced ? 'Hide Advanced Options' : 'Show Advanced Options'}
+          <svg
+            className={`ml-1 h-5 w-5 transform transition-transform ${showAdvanced ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            <path 
-              fillRule="evenodd" 
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
-              clipRule="evenodd" 
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
           </svg>
         </button>
       </div>
       
-      {/* Advanced Options Panel */}
-      {showAdvancedOptions && (
-        <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Advanced Character Options
-          </h3>
+      {/* Advanced Options */}
+      {showAdvanced && (
+        <div className="bg-gray-50 p-4 rounded-lg border border-gray-300 animate-fadeIn dark:bg-gray-800 dark:border-gray-700">
+          <h3 className="text-base font-semibold mb-4 text-gray-900 dark:text-gray-200">Advanced Character Options</h3>
           
-          {/* Physical Traits Section */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-medium text-gray-600 dark:text-gray-400">Physical Traits</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Select
-                label="Height"
-                options={heightOptions}
-                value={formData.advanced_options?.height || ''}
-                onChange={(e) => updateFormData({ 
-                  advanced_options: { 
-                    ...formData.advanced_options,
-                    height: e.target.value || undefined 
-                  } 
-                })}
-              />
-              <Select
-                label="Build"
-                options={buildOptions}
-                value={formData.advanced_options?.build || ''}
-                onChange={(e) => updateFormData({ 
-                  advanced_options: { 
-                    ...formData.advanced_options,
-                    build: e.target.value || undefined 
-                  } 
-                })}
-              />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label htmlFor="species" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
+                Species
+              </label>
+              <select
+                id="species"
+                value={formData.advanced_options?.species || ''}
+                onChange={handleSpeciesChange}
+                className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
+              >
+                <option value="">Not specified</option>
+                {speciesOptions.map(option => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
             </div>
+            
+            <div>
+              <label htmlFor="social-class" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
+                Social Class
+              </label>
+              <select
+                id="social-class"
+                value={formData.advanced_options?.social_class || ''}
+                onChange={handleSocialClassChange}
+                className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
+              >
+                {socialClassOptions.map(option => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="height" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
+                Height
+              </label>
+              <select
+                id="height"
+                value={formData.advanced_options?.height || ''}
+                onChange={handleHeightChange}
+                className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
+              >
+                {heightOptions.map(option => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
+              <label htmlFor="build" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
+                Build
+              </label>
+              <select
+                id="build"
+                value={formData.advanced_options?.build || ''}
+                onChange={handleBuildChange}
+                className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
+              >
+                {buildOptions.map(option => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          
+          {/* Distinctive Features */}
+          <div className="mb-4">
+            <label htmlFor="distinctive-features" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
+              Distinctive Features (Optional)
+            </label>
             <textarea
-              placeholder="Distinctive features (scars, tattoos, unusual characteristics)..."
-              className="w-full p-2 border border-gray-300 rounded-md text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              id="distinctive-features"
+              rows={3}
               value={formData.advanced_options?.distinctive_features || ''}
-              onChange={(e) => updateFormData({ 
-                advanced_options: { 
-                  ...formData.advanced_options,
-                  distinctive_features: e.target.value || undefined 
-                } 
-              })}
-              rows={2}
+              onChange={handleDistinctiveFeaturesChange}
+              placeholder="Scars, tattoos, unusual eye color, etc."
+              className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400"
             />
           </div>
           
-          {/* Background Elements */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-medium text-gray-600 dark:text-gray-400">Background & Origin</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Select
-                label="Social Class"
-                options={socialClassOptions}
-                value={formData.advanced_options?.social_class || ''}
-                onChange={(e) => updateFormData({ 
-                  advanced_options: { 
-                    ...formData.advanced_options,
-                    social_class: e.target.value || undefined 
-                  } 
-                })}
-              />
-              <input
-                type="text"
-                placeholder="Homeland/Origin"
-                className="w-full p-2 border border-gray-300 rounded-md text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                value={formData.advanced_options?.homeland || ''}
-                onChange={(e) => updateFormData({ 
-                  advanced_options: { 
-                    ...formData.advanced_options,
-                    homeland: e.target.value || undefined 
-                  } 
-                })}
-              />
-            </div>
+          {/* Homeland/Origin */}
+          <div className="mb-4">
+            <label htmlFor="homeland" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
+              Homeland/Origin (Optional)
+            </label>
+            <textarea
+              id="homeland"
+              rows={3}
+              value={formData.advanced_options?.homeland || ''}
+              onChange={handleHomelandChange}
+              placeholder="Where they came from or grew up"
+              className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400"
+            />
           </div>
           
-          {/* Searchable Occupation Dropdown */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {/* Occupation - Now in its own row */}
+          <div className="mt-4">
+            <label htmlFor="occupation" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
               Occupation
             </label>
-            <SearchableSelect
-              options={occupationOptions}
-              value={formData.advanced_options?.occupation || ''}
-              onChange={(value) => updateFormData({ 
-                advanced_options: { 
-                  ...formData.advanced_options,
-                  occupation: value || undefined
-                } 
-              })}
-              placeholder="Select or search for occupation..."
-            />
+            <div id="occupation" className="w-full">
+              {/* @ts-ignore - Using improved SearchableSelect */}
+              <SearchableSelect
+                options={occupationOptions}
+                value={formData.advanced_options?.occupation || ''}
+                onChange={(value: string) => updateFormData({ 
+                  advanced_options: { 
+                    ...formData.advanced_options,
+                    occupation: value || undefined 
+                  } 
+                })}
+                placeholder="Select or search for an occupation..."
+                className="w-full"
+              />
+            </div>
           </div>
           
-          {/* Personality Traits */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {/* Personality Traits - Now in its own row at the bottom */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-1">
               Personality Traits (select up to 3)
             </label>
             <div className="flex flex-wrap gap-2">
@@ -574,23 +835,30 @@ export default function CharacterTab() {
         </div>
       )}
       
-      {/* Character Options Buttons */}
-      <div className="flex flex-wrap gap-3">
-        <Button
+      {/* Action Buttons with better contrast */}
+      <div className="flex space-x-4">
+        <button
           type="button"
-          variant="secondary"
           onClick={handleClearOptions}
+          className="py-2 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 border border-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
         >
           Clear Options
-        </Button>
-        <Button
+        </button>
+        
+        <button
           type="button"
-          variant="secondary"
           onClick={handleRandomize}
+          className="py-2 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 border border-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
         >
           Randomize Options
-        </Button>
+        </button>
       </div>
+      
+      {/* AI Model Selector */}
+      <ModelSelector 
+        value={formData.model || 'gpt-4o-mini'}
+        onChange={handleModelChange}
+      />
       
       {/* Portrait Options */}
       <PortraitOptions />

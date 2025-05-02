@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import defaultTheme from 'tailwindcss/defaultTheme';
 
 // Define the theme options and context state type
 type Theme = 'light' | 'dark' | 'system';

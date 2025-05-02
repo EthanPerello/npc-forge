@@ -149,7 +149,7 @@ const NavItem = ({ item, depth = 0, isOpen = false, toggleOpen, isFullSidebar, t
         <div 
           className={`
             w-10 h-10 flex justify-center items-center rounded-md cursor-pointer
-            ${isActive ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300' : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400'}
+            ${isActive ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300' : 'hover:bg-secondary text-muted'}
           `}
           onClick={(e) => {
             handleItemClick(e);
@@ -168,7 +168,7 @@ const NavItem = ({ item, depth = 0, isOpen = false, toggleOpen, isFullSidebar, t
       <div 
         className={`
           flex justify-between items-center w-full px-4 py-2 rounded-md cursor-pointer mb-1
-          ${isActive ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}
+          ${isActive ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300' : 'hover:bg-secondary'}
           ${depth === 0 ? 'font-medium' : ''}
           ${depth === 2 ? 'text-sm' : ''}
         `}
@@ -195,14 +195,14 @@ const NavItem = ({ item, depth = 0, isOpen = false, toggleOpen, isFullSidebar, t
         </div>
         
         {hasChildren && (
-          <span className="text-gray-500">
+          <span className="text-muted">
             {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
           </span>
         )}
       </div>
       
       {isOpen && hasChildren && item.items && (
-        <div className={`pl-4 ml-2 border-l border-gray-200 dark:border-gray-700 ${depth === 1 ? 'ml-4' : ''}`}>
+        <div className={`pl-4 ml-2 border-l border-theme ${depth === 1 ? 'ml-4' : ''}`}>
           {item.items.map((child, index) => (
             <NavItemWithState 
               key={index} 
@@ -305,13 +305,13 @@ export default function DocsSidebar() {
         <button
           id="mobile-sidebar-toggle"
           onClick={() => setIsMobileOpen(!isMobileOpen)}
-          className="flex items-center justify-center w-10 h-10 bg-white border border-gray-200 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700"
+          className="flex items-center justify-center w-10 h-10 bg-card border border-theme rounded-md shadow-sm"
           aria-label="Toggle navigation"
         >
           {isMobileOpen ? (
-            <X className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+            <X className="h-5 w-5 text-muted" />
           ) : (
-            <Menu className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+            <Menu className="h-5 w-5 text-muted" />
           )}
         </button>
       </div>
@@ -321,13 +321,13 @@ export default function DocsSidebar() {
         <button
           id="sidebar-toggle-button"
           onClick={toggleSidebar}
-          className="flex items-center justify-center w-10 h-10 bg-white border border-gray-200 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700"
+          className="flex items-center justify-center w-10 h-10 bg-card border border-theme rounded-md shadow-sm"
           aria-label="Toggle sidebar"
         >
           {isExpanded ? (
-            <ChevronLeft className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+            <ChevronLeft className="h-5 w-5 text-muted" />
           ) : (
-            <ChevronRight className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+            <ChevronRight className="h-5 w-5 text-muted" />
           )}
         </button>
       </div>
@@ -338,7 +338,7 @@ export default function DocsSidebar() {
         className={`
           fixed top-0 left-0 z-40 h-screen pt-16
           transition-all duration-300 ease-in-out
-          bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700
+          bg-card border-r border-theme
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'} 
           lg:translate-x-0
           ${isExpanded ? 'lg:w-64' : 'lg:w-16'}
@@ -348,10 +348,10 @@ export default function DocsSidebar() {
           {/* Title - only show when expanded */}
           {isExpanded && (
             <div className="mb-6">
-              <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2">
+              <h2 className="text-xl font-bold mb-2">
                 NPC Forge
               </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-muted">
                 Documentation and Guides
               </p>
             </div>
@@ -370,10 +370,10 @@ export default function DocsSidebar() {
           
           {/* Expand/Collapse button at bottom - only show in desktop expanded view */}
           {isExpanded && (
-            <div className="pt-4 border-t border-gray-200 dark:border-gray-700 mt-auto">
+            <div className="pt-4 border-t border-theme mt-auto">
               <button
                 onClick={toggleSidebar}
-                className="w-full flex items-center justify-center p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
+                className="w-full flex items-center justify-center p-2 text-muted hover:bg-secondary rounded-md"
                 aria-label="Collapse sidebar"
               >
                 <ChevronLeft className="h-5 w-5 mr-2" />

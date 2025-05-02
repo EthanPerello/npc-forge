@@ -49,28 +49,38 @@ export default function CharacterForm({ onSubmit, isLoading }: CharacterFormProp
     }
   };
 
+  // Direct, forceful approach to ensure randomize works
   const handleRandomize = () => {
+    // Get a random genre
     const randomIndex = Math.floor(Math.random() * GENRE_TEMPLATES.length);
     const randomGenre = GENRE_TEMPLATES[randomIndex].id as Genre;
+    
+    // Get example text for this genre
+    const example = getTemplateExample(randomGenre);
+    
+    // Update both state values directly 
     setGenre(randomGenre);
-    setDescription(getTemplateExample(randomGenre));
+    setDescription(example);
+    
+    // Debugging
+    console.log(`Randomized: Genre=${randomGenre}, Example=${example}`);
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-4 bg-white rounded-lg shadow-md dark:bg-gray-800">
-      <h2 className="text-2xl font-bold mb-4 text-center text-gray-800 dark:text-white">
+    <div className="w-full max-w-2xl mx-auto p-4 bg-card rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-4 text-center">
         Create Your NPC
       </h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Genre Selection */}
         <div>
-          <label htmlFor="genre" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label htmlFor="genre" className="block mb-2 text-sm font-medium">
             Genre (Optional)
           </label>
           <select
             id="genre"
-            className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            className="w-full p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
             value={genre || ''}
             onChange={handleGenreChange}
           >
@@ -82,7 +92,7 @@ export default function CharacterForm({ onSubmit, isLoading }: CharacterFormProp
             ))}
           </select>
           {genre && (
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
               {GENRE_TEMPLATES.find(t => t.id === genre)?.description}
             </p>
           )}
@@ -90,13 +100,13 @@ export default function CharacterForm({ onSubmit, isLoading }: CharacterFormProp
 
         {/* Character Description */}
         <div>
-          <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label htmlFor="description" className="block mb-2 text-sm font-medium">
             Character Description
           </label>
           <textarea
             id="description"
             rows={5}
-            className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            className="w-full p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
             placeholder="Describe your character or concept... (e.g., A wise old wizard with a mysterious past)"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -110,7 +120,8 @@ export default function CharacterForm({ onSubmit, isLoading }: CharacterFormProp
           <button
             type="button"
             onClick={handleRandomize}
-            className="flex-1 py-2 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+            className="flex-1 py-2 px-4 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 
+                      bg-secondary border border-theme dark:text-gray-200"
             disabled={isLoading}
           >
             Randomize

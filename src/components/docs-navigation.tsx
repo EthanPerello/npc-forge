@@ -2,66 +2,58 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronRight, Home } from 'lucide-react';
 
-// Function to get a readable name from a URL path segment
-const getReadableName = (segment: string): string => {
-  if (!segment) return 'Home';
+interface DocsNavigationProps {
+  className?: string;
+}
+
+export default function DocsNavigation({ className = '' }: DocsNavigationProps) {
+  const pathname = usePathname();
   
-  // Handle special cases
-  if (segment === 'docs') return 'Documentation';
+  // Determine if we're on the docs home page
+  const isDocsHome = pathname === '/docs';
   
+  // Extract the current doc section, like "how-to-use" or "features"
+  const currentSection = pathname.split('/').pop();
+  
+  return (
+    <nav className={`flex items-center text-sm font-medium mb-6 ${className}`}>
+      <Link 
+        href="/" 
+        className="text-gray-900 hover:text-indigo-600 dark:text-gray-200 dark:hover:text-indigo-400"
+      >
+        Home
+      </Link>
+      
+      <span className="mx-2 text-gray-500 dark:text-gray-400">/</span>
+      
+      {isDocsHome ? (
+        <span className="text-indigo-600 dark:text-indigo-400">Documentation</span>
+      ) : (
+        <>
+          <Link 
+            href="/docs" 
+            className="text-gray-900 hover:text-indigo-600 dark:text-gray-200 dark:hover:text-indigo-400"
+          >
+            Documentation
+          </Link>
+          
+          <span className="mx-2 text-gray-500 dark:text-gray-400">/</span>
+          
+          <span className="text-indigo-600 dark:text-indigo-400">
+            {formatSectionName(currentSection || '')}
+          </span>
+        </>
+      )}
+    </nav>
+  );
+}
+
+// Helper function to format section names for display
+function formatSectionName(section: string): string {
   // Replace hyphens with spaces and capitalize each word
-  return segment
+  return section
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
-};
-
-export default function DocsNavigation() {
-  const pathname = usePathname();
-  
-  // Skip empty segments and create breadcrumb items
-  const segments = pathname.split('/').filter(Boolean);
-  const breadcrumbs = segments.map((segment, index) => {
-    const href = `/${segments.slice(0, index + 1).join('/')}`;
-    const label = getReadableName(segment);
-    
-    return { href, label };
-  });
-  
-  // Add home as the first item
-  breadcrumbs.unshift({ href: '/', label: 'Home' });
-  
-  return (
-    <nav className="flex py-3 px-5 text-gray-700 bg-gray-50 rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 mb-6" aria-label="Breadcrumb">
-      <ol className="inline-flex items-center space-x-1 md:space-x-3 flex-wrap">
-        {breadcrumbs.map((breadcrumb, index) => (
-          <li key={breadcrumb.href} className="inline-flex items-center">
-            {index === 0 ? (
-              // Home item
-              <Link 
-                href={breadcrumb.href}
-                className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
-              >
-                <Home className="w-4 h-4 mr-2" />
-                {breadcrumb.label}
-              </Link>
-            ) : (
-              // Other items
-              <>
-                <ChevronRight className="w-5 h-5 text-gray-400" />
-                <Link 
-                  href={breadcrumb.href}
-                  className="ml-1 text-sm font-medium text-gray-700 hover:text-indigo-600 md:ml-2 dark:text-gray-400 dark:hover:text-indigo-400"
-                >
-                  {breadcrumb.label}
-                </Link>
-              </>
-            )}
-          </li>
-        ))}
-      </ol>
-    </nav>
-  );
 }

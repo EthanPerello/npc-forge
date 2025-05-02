@@ -1,20 +1,78 @@
-@import "tailwindcss";
+/* Target the specific example text div */
+.light .mb-3.bg-indigo-100.dark\:bg-gray-800 .text-indigo-800.dark\:text-gray-300.text-sm.italic,
+.light div.bg-indigo-100 div.text-indigo-800,
+.light .bg-indigo-100 .text-indigo-800,
+.light .mb-3.bg-indigo-100 div.italic {
+  color: #0f172a !important; /* Very dark text in light mode */
+}/* Make "Welcome to NPC Forge" header always white */
+.welcome-guide h2.text-xl.font-bold,
+.welcome-guide .bg-indigo-600 h2,
+.bg-indigo-600 h2,
+.bg-indigo-700 h2 {
+  color: white !important;
+}/* Make main page background plain white in light mode */
+.light main.bg-gradient-to-br {
+  background: white !important;
+  background-image: none !important;
+}/* Fix "For best results" message on generation options page */
+.light .bg-yellow-50.p-4.rounded-md.border.border-yellow-200,
+.light .bg-yellow-50.p-4.rounded-lg.border.border-yellow-200 {
+  background-color: #fee2e2 !important; /* Light red background */
+  border-color: #fecaca !important; /* Light red border */
+}
+
+.light .bg-yellow-50.p-4.rounded-md.border.border-yellow-200 *,
+.light .bg-yellow-50.p-4.rounded-lg.border.border-yellow-200 * {
+  color: #b91c1c !important; /* Red text */
+}/* Fix numbered steps on character examples page */
+.light .flex.items-start .flex-shrink-0.h-6.w-6.rounded-full.bg-indigo-100,
+.light .flex.items-start .h-6.w-6.rounded-full.bg-indigo-100 {
+  background-color: #e5e7eb !important; /* Light gray background */
+}
+
+.light .flex.items-start .flex-shrink-0.h-6.w-6.rounded-full.bg-indigo-100 *,
+.light .flex.items-start .h-6.w-6.rounded-full.bg-indigo-100 * {
+  color: #0f172a !important; /* Very dark text */
+}/* Fix character description example text in light mode */
+.light .bg-gray-50.p-4.rounded-md.border.border-gray-200 p.text-gray-700.italic,
+.light .p-4.border.border-gray-200.rounded-lg.shadow-sm p.italic,
+.light p.text-gray-700.italic {
+  color: #1e293b !important; /* Dark text color */
+}@import "tailwindcss";
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1a1a1a; /* Darker text for better contrast in light mode */
+  --background-card: #ffffff;
+  --background-secondary: #f5f7fa;
+  --border-light: #d1d5db;
+  --text-muted: #4b5563; /* Dark enough for light mode legibility */
+  --text-description: #374151; /* Even darker for important descriptive text */
+  --text-heading: #111827; /* Very dark for headings */
 }
 
 .dark {
   --background: #0a0a0a;
-  --foreground: #ededed;
+  --foreground: #f3f4f6; /* Slightly less stark than pure white */
+  --background-card: #1f2937;
+  --background-secondary: #111827;
+  --border-light: #374151;
+  --text-muted: #9ca3af;
+  --text-description: #d1d5db; /* Light enough for good dark mode legibility */
+  --text-heading: #f9fafb; /* Very light for headings */
 }
 
 /* Media query remains as fallback for system preference */
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #f3f4f6;
+    --background-card: #1f2937;
+    --background-secondary: #111827;
+    --border-light: #374151;
+    --text-muted: #9ca3af;
+    --text-description: #d1d5db;
+    --text-heading: #f9fafb;
   }
 }
 
@@ -145,4 +203,582 @@ body {
 /* Theme transition */
 body {
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom theme-aware utility classes */
+.bg-card {
+  background-color: var(--background-card);
+}
+
+.bg-secondary {
+  background-color: var(--background-secondary);
+}
+
+.border-theme {
+  border-color: var(--border-light);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-description {
+  color: var(--text-description);
+}
+
+.text-heading {
+  color: var(--text-heading);
+}
+
+/* Force form elements to use correct theme colors */
+input, select, textarea {
+  color: var(--foreground);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* Improve documentation page text contrast */
+.docs-content h1, .docs-content h2, .docs-content h3 {
+  color: var(--text-heading);
+}
+
+.docs-content p, .docs-content li {
+  color: var(--text-description);
+}
+
+/* Example boxes */
+.example-box {
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.example-box .example-title {
+  font-weight: 600;
+  color: var(--text-heading);
+  margin-bottom: 0.5rem;
+}
+
+.example-box .example-content {
+  color: var(--text-description);
+  font-style: italic;
+}
+
+/* Theme toggle button improvements */
+button.hover\:bg-gray-200:hover {
+  background-color: #e5e7eb !important; /* Lighter gray for better contrast with icon */
+}
+
+.dark button.hover\:bg-gray-800:hover {
+  background-color: #1f2937 !important;
+}
+
+/* Improve text contrast in light mode */
+.text-gray-700 {
+  color: var(--text-description);
+}
+
+.text-gray-800 {
+  color: var(--text-heading);
+}
+
+/* Ensure form labels have proper contrast */
+label.text-gray-700, label.text-sm {
+  color: var(--text-heading) !important;
+}
+
+/* Dark mode-aware textarea */
+textarea {
+  color: var(--foreground);
+  background-color: var(--background-card);
+  border-color: var(--border-light);
+}
+
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* Fix genre buttons for better visibility */
+.border-gray-300:not(.border-indigo-500) {
+  color: var(--foreground);
+}
+
+/* Fix template selector texts */
+[class*="cursor-pointer"] h3.font-medium {
+  color: var(--text-heading) !important;
+}
+
+/* Ensure model descriptions are visible */
+.text-xs.text-gray-600 {
+  color: var(--text-description);
+}
+
+/* Docs navigation contrast fix */
+.docs-navigation a {
+  color: var(--text-heading) !important;
+}
+
+/* Fix docs sidebar links */
+#docs-sidebar a, #docs-sidebar span {
+  color: var(--text-heading) !important;
+}
+
+#docs-sidebar .text-muted {
+  color: var(--text-muted) !important;
+}
+
+/* Make docs section headers more visible */
+.docs-content h2, .docs-content h3 {
+  color: var(--text-heading) !important;
+  font-weight: 600;
+}
+
+/* Make expandable section titles visible */
+.expandable-section-title {
+  color: var(--text-heading) !important;
+}
+
+/* Make main title and subtitle text white in both modes */
+h1.text-4xl.md\:text-5xl.lg\:text-6xl.font-bold,
+h1.text-5xl.sm\:text-6xl.lg\:text-7xl.font-extrabold.tracking-tight,
+p.mt-2.text-lg.sm\:text-xl.lg\:text-2xl.font-medium,
+header h1,
+header p,
+.main-title,
+.main-subtitle {
+  color: white !important;
+}
+
+/* ===== CRITICAL FIXES FOR LIGHT MODE BACKGROUNDS ===== */
+
+/* Fix welcome guide in light mode */
+.light .welcome-guide {
+  background-color: white !important;
+}
+
+.light .welcome-guide .text-gray-800 {
+  color: #1e293b !important;
+}
+
+.light .welcome-guide .text-gray-900 {
+  color: #0f172a !important;
+}
+
+/* Fix welcome guide step boxes in light mode */
+.light .welcome-guide .grid.gap-4 .bg-gray-100,
+.light .welcome-guide .grid.gap-4 .dark\:bg-gray-700 {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light .welcome-guide .grid.gap-4 .font-medium,
+.light .welcome-guide .grid.gap-4 .text-gray-900, 
+.light .welcome-guide .grid.gap-4 .text-gray-800,
+.light .welcome-guide .grid.gap-4 .text-sm {
+  color: #0f172a !important;
+}
+
+/* Fix "Try This Example" box in welcome guide */
+.light .welcome-guide .bg-indigo-100,
+.light .welcome-guide .dark\:bg-indigo-900\/50 {
+  background-color: #f1f5f9 !important;
+}
+
+.light .welcome-guide h3.text-sm.font-bold.text-indigo-900,
+.light .welcome-guide p.text-sm.font-medium.text-indigo-800 {
+  color: #1e293b !important;
+}
+
+/* Fix "How to Create a Character" heading in welcome guide */
+.light .welcome-guide h3.text-lg.font-semibold.text-indigo-800 {
+  color: #1e293b !important;
+}
+
+/* Fix the main navigation tabs */
+.light [role="tablist"] {
+  background-color: #f8fafc !important;
+}
+
+.light [role="tab"] {
+  color: #1e293b !important;
+}
+
+.light [role="tab"][aria-selected="true"] {
+  background-color: white !important;
+  color: #4f46e5 !important;
+}
+
+/* Fix the character description example box in light mode */
+.light .mb-3.bg-gray-800, .light .mb-3.bg-gray-700 {
+  background-color: #f0f9ff !important; /* Light blue background */
+  border-color: #bfdbfe !important;
+}
+
+.light .mb-3.bg-gray-800 *, .light .mb-3.bg-gray-700 * {
+  color: #1e40af !important; /* Dark blue text */
+}
+
+/* Fix clear options and randomize options buttons in light mode */
+.light button.bg-gray-200 {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Fix portrait customization in light and dark mode */
+.light .portrait-section {
+  border: none !important;
+}
+
+.light .portrait-section > div {
+  background-color: white !important;
+}
+
+.dark .portrait-section {
+  border: none !important;
+}
+
+/* Fix text in light mode for example boxes on doc pages */
+.light .docs-content .bg-gray-800, 
+.light .docs-content .bg-gray-700,
+.light .docs-content .bg-gray-900 {
+  background-color: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.light .docs-content .bg-gray-800 *, 
+.light .docs-content .bg-gray-700 *,
+.light .docs-content .bg-gray-900 * {
+  color: #1e293b !important;
+}
+
+/* Fix model cards in light mode */
+.light .border-gray-700 {
+  border-color: #e2e8f0 !important;
+}
+
+/* Fix specific color issues on doc pages for light mode */
+.light .character-traits span {
+  background-color: #f1f5f9 !important;
+  color: #1e293b !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Ensure expandable sections in light mode have proper backgrounds */
+.light .bg-gray-800 {
+  background-color: #f8fafc !important;
+}
+
+.light .bg-gray-700 {
+  background-color: #f8fafc !important;
+}
+
+/* Fix the character form tabs in light mode */
+.light [id^="headlessui-tabs-panel-"] {
+  background-color: white !important;
+}
+
+/* Make any missed dark elements light in light mode */
+.light .bg-gray-900 {
+  background-color: #f8fafc !important;
+}
+
+/* Fix portrait customization area specifically */
+.light #portrait-customization,
+.light #portrait-customization > div {
+  background-color: white !important;
+}
+
+.light #portrait-customization .bg-blue-900\/30 {
+  background-color: #dbeafe !important; /* Light blue background */
+}
+
+.light #portrait-customization .text-blue-300 {
+  color: #1e40af !important; /* Dark blue text */
+}
+
+/* ==== NEW FIXES ADDED FOR LIGHT MODE ISSUES ==== */
+
+/* Fix subgenre buttons in light mode */
+.light button.bg-indigo-100,
+.light button.dark\:bg-indigo-900,
+.light button.bg-gray-100 {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Fix basic traits and character description labels */
+.light label.block.mb-2,
+.light h4.font-semibold {
+  color: #0f172a !important;
+}
+
+/* Fix character description good example box */
+.light .bg-gray-50.p-4.rounded-md.border,
+.light .bg-yellow-50.p-4.rounded-md.border {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light .bg-gray-50.p-4.rounded-md.border *,
+.light .bg-yellow-50.p-4.rounded-md.border * {
+  color: #0f172a !important;
+}
+
+/* Fix Advanced Character Options dropdown */
+.light .expandable-section-title,
+.light .p-4.bg-gray-800.dark\:bg-gray-700 {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.light .expandable-section h3.text-base.font-medium.text-gray-900 {
+  color: #0f172a !important;
+}
+
+/* Fix trait selection buttons in light mode */
+.light .flex.flex-wrap.gap-2 button,
+.light .flex.flex-wrap.gap-3 button {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Fix occupation dropdown in light mode */
+.light [class*="cursor-pointer"].bg-gray-100,
+.light [class*="cursor-pointer"].dark\:bg-gray-700 {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.light [class*="cursor-pointer"] span:not(.ring-indigo-500) {
+  color: #0f172a !important;
+}
+
+/* Fix portrait customization dropdowns */
+.light #portrait-customization [class*="cursor-pointer"],
+.light .bg-gray-100.text-gray-800 {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Fix "Powered by" model text */
+.light .text-xs.text-gray-500,
+.light .mt-1.text-xs.text-gray-500,
+.light .mt-1.text-gray-500,
+.light .text-xs.text-gray-600 {
+  color: #0f172a !important;
+}
+
+/* Fix progress bar background in light mode */
+.light .w-32.bg-gray-200.rounded-full,
+.light .w-full.bg-gray-200.rounded-full {
+  background-color: #e2e8f0 !important;
+}
+
+.light .text-gray-600 {
+  color: #0f172a !important;
+}
+
+/* Fix generated character section tabs */
+.light .character-display [role="tablist"] {
+  background-color: #f8fafc !important;
+}
+
+.light .character-display [role="tab"] {
+  color: #1e293b !important;
+}
+
+.light .character-display [role="tab"][aria-selected="true"] {
+  background-color: white !important;
+  color: #4f46e5 !important;
+}
+
+/* Fix generated character display sections */
+.light .bg-white.p-4.rounded-lg,
+.light .bg-gray-50.p-4.rounded-lg,
+.light .space-y-6 .bg-white.p-4.rounded-lg {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light .bg-white.p-4.rounded-lg h3,
+.light .bg-white.p-4.rounded-lg p,
+.light .bg-gray-50.p-4.rounded-lg h3,
+.light .bg-gray-50.p-4.rounded-lg p,
+.light .space-y-6 .bg-white.p-4.rounded-lg h3,
+.light .space-y-6 .bg-white.p-4.rounded-lg p {
+  color: #0f172a !important;
+}
+
+/* Fix JSON viewer in light mode */
+.light .bg-gray-100.rounded-lg p {
+  color: #0f172a !important;
+}
+
+.light .bg-gray-100.rounded-lg .bg-gray-200 {
+  background-color: #e2e8f0 !important;
+}
+
+/* Fix main docs page title */
+.light .docs-content h1.text-3xl,
+.light h1.text-3xl.font-bold.mb-6 {
+  color: #0f172a !important;
+}
+
+/* Fix docs navigation menu */
+.light .docs-navigation,
+.light .breadcrumbs {
+  color: #0f172a !important;
+}
+
+.light .docs-navigation a,
+.light .breadcrumbs a,
+.light .breadcrumbs span {
+  color: #0f172a !important;
+}
+
+/* Fix character examples page */
+.light .character-examples h1,
+.light .character-examples .lead,
+.light .character-examples h2 {
+  color: #0f172a !important;
+}
+
+.light .character-examples .bg-gray-50.p-4.rounded-md.border {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light .character-examples .bg-gray-50.p-4.rounded-md.border * {
+  color: #0f172a !important;
+}
+
+/* Fix "Tip" sections */
+.light .bg-yellow-50.p-4.rounded-md.border {
+  background-color: #fef3c7 !important;
+  border-color: #fbbf24 !important;
+}
+
+.light .bg-yellow-50.p-4.rounded-md.border p,
+.light .bg-yellow-50.p-4.rounded-md.border strong {
+  color: #92400e !important;
+}
+
+/* Fix all documentation pages sections */
+.light .docs-content .p-4.border.border-gray-200.rounded-lg,
+.light .docs-content .p-4.bg-white.border.border-gray-200.rounded-lg,
+.light .docs-content .grid.gap-6 .p-4.bg-white.border.border-gray-200.rounded-lg,
+.light .docs-content .grid.gap-6 .p-4.border.border-gray-200.rounded-lg {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light .docs-content .p-4.border.border-gray-200.rounded-lg *,
+.light .docs-content .p-4.bg-white.border.border-gray-200.rounded-lg *,
+.light .docs-content .grid.gap-6 .p-4.bg-white.border.border-gray-200.rounded-lg *,
+.light .docs-content .grid.gap-6 .p-4.border.border-gray-200.rounded-lg * {
+  color: #0f172a !important;
+}
+
+/* Fix example code blocks on doc pages */
+.light .docs-content .bg-gray-800.text-gray-200.p-3.rounded-md,
+.light .docs-content .bg-gray-800.text-gray-200.p-4.rounded-lg {
+  background-color: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+.light .docs-content .bg-gray-800.text-gray-200.p-3.rounded-md *,
+.light .docs-content .bg-gray-800.text-gray-200.p-4.rounded-lg * {
+  color: #334155 !important;
+}
+
+/* Make sure all docs page h1-h3 headers are dark in light mode */
+.light .docs-content h1,
+.light .docs-content h2,
+.light .docs-content h3,
+.light h1.text-3xl.font-bold.mb-6.text-gray-900.dark\:text-gray-100,
+.light h2.text-2xl.font-semibold.mb-4.text-indigo-700.dark\:text-indigo-400 {
+  color: #0f172a !important;
+}
+
+/* Make sure all inline code blocks have proper light mode styling */
+.light code.bg-gray-100.p-1.rounded.dark\:bg-gray-800 {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+/* Fix feature boxes on roadmap and other pages */
+.light .grid.grid-cols-1.md\:grid-cols-2.gap-6 .p-4.bg-gray-50.rounded-lg.border,
+.light .grid.grid-cols-1.md\:grid-cols-3.gap-6 .p-4.bg-gray-50.rounded-lg.border,
+.light .p-4.bg-gray-50.rounded-lg.border {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light .grid.grid-cols-1.md\:grid-cols-2.gap-6 .p-4.bg-gray-50.rounded-lg.border *,
+.light .grid.grid-cols-1.md\:grid-cols-3.gap-6 .p-4.bg-gray-50.rounded-lg.border *,
+.light .p-4.bg-gray-50.rounded-lg.border * {
+  color: #0f172a !important;
+}
+
+/* Fix headers on all pages */
+.light .text-3xl.font-bold.mb-6,
+.light .text-2xl.font-semibold.mb-4,
+.light .text-xl.font-medium.mb-3 {
+  color: #0f172a !important;
+}
+
+/* Fix any remaining dark text/background issues */
+.light .bg-gray-800,
+.light .bg-gray-900,
+.light .bg-gray-700,
+.light .dark\:bg-gray-800,
+.light .dark\:bg-gray-900,
+.light .dark\:bg-gray-700 {
+  background-color: #f8fafc !important;
+}
+
+.light .text-gray-200,
+.light .text-gray-100,
+.light .text-white,
+.light .dark\:text-gray-200,
+.light .dark\:text-gray-100,
+.light .dark\:text-white {
+  color: #0f172a !important;
+}
+
+/* Fix background of related documentation sections */
+.light .p-4.bg-indigo-50.rounded-lg.border.border-indigo-200 {
+  background-color: #f0f9ff !important;
+  border-color: #bfdbfe !important;
+}
+
+.light .p-4.bg-indigo-50.rounded-lg.border.border-indigo-200 * {
+  color: #1e40af !important;
+}
+
+/* Fix security contact section */
+.light .p-4.bg-red-50.rounded-lg.border.border-red-200 {
+  background-color: #fef2f2 !important;
+  border-color: #fecaca !important;
+}
+
+.light .p-4.bg-red-50.rounded-lg.border.border-red-200 * {
+  color: #b91c1c !important;
+}
+
+/* Fix character profiles info box */
+.light .bg-blue-50.p-4.rounded-lg.border.border-blue-100.text-sm.text-blue-700 {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+}
+
+.light .bg-blue-50.p-4.rounded-lg.border.border-blue-100.text-sm.text-blue-700 * {
+  color: #1e3a8a !important;
 }

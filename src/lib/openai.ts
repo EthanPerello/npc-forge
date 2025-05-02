@@ -169,24 +169,23 @@ export async function generatePortrait(character: Character): Promise<string> {
     console.log(`Generating character portrait with ${imageModel}`);
     console.log("Portrait prompt:", imagePrompt); // Debug the actual prompt being sent
     
-    // Use different options based on which image model is selected
-    let quality: "standard" | "hd" = "standard";
-    let size: "1024x1024" | "1792x1024" | "1024x1792" = "1024x1024";
-    
-    // For specific models, adjust settings
-    if (imageModel === 'gpt-image-1') {
-      // High quality setting for premium tier
-      quality = "hd";
-    }
-    
-    const response = await openai.images.generate({
-      model: imageModel, // Use the selected image model
+    // Base configuration for all models
+    const generateOptions: any = {
+      model: imageModel,
       prompt: imagePrompt,
       n: 1,
-      size: size,
-      quality: quality,
-      // No timeout parameter here, we use the client-level timeout
-    });
+      size: "1024x1024"
+    };
+    
+    // Only add quality parameter for models that support it
+    if (imageModel === 'gpt-image-1') {
+      generateOptions.quality = "hd";
+    } else if (imageModel === 'dall-e-3') {
+      generateOptions.quality = "standard";
+    }
+    // DALL-E-2 doesn't support the quality parameter, so we omit it
+    
+    const response = await openai.images.generate(generateOptions);
 
     return response.data[0].url || '';
   } catch (error) {
