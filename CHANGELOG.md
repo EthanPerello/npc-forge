@@ -7,17 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-- Fixed portrait generation errors by omitting unsupported parameters for DALL·E-2 and conditionally applying model-specific options.
-- Corrected the randomize button behavior to ensure the character description updates reliably alongside the selected genre.
-- Improved text contrast and accessibility in light mode across multiple components, including form labels, documentation content, and example text.
+## [0.2.2] - 2025-05-01
+
+### Added
+- New CSS utility classes: `text-description`, `bg-secondary`, `border-theme`, and additional variants for consistent theme support.
+- Example-specific selectors in `globals.css` to improve the readability of dynamic example content in light mode.
 
 ### Changed
 - Refactored theme styling system to use standardized CSS variables and utility classes (`bg-card`, `text-muted`, `border-theme`, etc.) for consistent appearance across light and dark modes.
 - Simplified randomization logic in `character-form.tsx` to eliminate fragile state timing patterns.
 - Updated global styles to improve visibility for UI elements like subgenre text, welcome guide examples, and tabbed panels in light mode.
 
-## [0.2.1] - 2025-04-30
+### Fixed
+- Fixed portrait generation errors by omitting unsupported parameters for DALL·E-2 and conditionally applying model-specific options.
+- Corrected the randomize button behavior to ensure the character description updates reliably alongside the selected genre.
+- Improved text contrast and accessibility in light mode across multiple components, including form labels, documentation content, and example text.
+
+## [0.2.1] - 2025-04-29
 
 ### Added
 - Delayed feedback message system:
@@ -197,7 +203,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Export to JSON feature.
 - Fully responsive UI for desktop and mobile.
 
-[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.2.2...HEAD  
+[0.2.2]: https://github.com/EthanPerello/npc-forge/compare/v0.2.1...v0.2.2  
 [0.2.1]: https://github.com/EthanPerello/npc-forge/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/EthanPerello/npc-forge/compare/v0.1.4...v0.2.0
 [0.1.4]: https://github.com/EthanPerello/npc-forge/compare/v0.1.3...v0.1.4
