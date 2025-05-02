@@ -1,6 +1,5 @@
 import { execSync } from 'child_process';
 import fs from 'fs';
-import path from 'path';
 import readline from 'readline';
 
 // Helper for input prompts
@@ -12,6 +11,67 @@ function prompt(query: string): Promise<string> {
   }));
 }
 
+// Helper to extract unreleased changes from changelog
+function extractUnreleasedChanges(): { changes: string, categories: { [key: string]: string[] } } {
+  const changelog = fs.readFileSync('CHANGELOG.md', 'utf-8');
+  
+  // Find the unreleased section
+  const unreleasedMatch = changelog.match(/## \[Unreleased\]\s*\n([\s\S]*?)(?=\n## \[\d|$)/);
+  
+  if (!unreleasedMatch || !unreleasedMatch[1]) {
+    console.warn('⚠️ No unreleased changes found in CHANGELOG.md');
+    return { changes: '', categories: {} };
+  }
+  
+  // Extract the changes
+  const changes = unreleasedMatch[1].trim();
+  
+  // Parse categories (Added, Changed, Fixed, etc.)
+  const categories: { [key: string]: string[] } = {};
+  const categoryMatches = [...changes.matchAll(/### (\w+)\s*\n([\s\S]*?)(?=\n### |\n## |\n$)/g)];
+  
+  if (categoryMatches.length === 0) {
+    // If no categories are found, try to extract bullet points directly
+    const items = changes.split('\n')
+      .filter(line => line.trim().startsWith('-'))
+      .map(line => line.trim());
+    
+    if (items.length > 0) {
+      categories['General'] = items;
+    }
+  } else {
+    // Process each category
+    for (const match of categoryMatches) {
+      const category = match[1];
+      const items = match[2].split('\n')
+        .filter(line => line.trim().startsWith('-'))
+        .map(line => line.trim());
+      
+      if (items.length > 0) {
+        categories[category] = items;
+      }
+    }
+  }
+  
+  return { changes, categories };
+}
+
+// Update changelog by moving unreleased changes to a new version
+function updateChangelog(version: string, date: string, title: string): void {
+  const changelog = fs.readFileSync('CHANGELOG.md', 'utf-8');
+  
+  // Create new version header
+  const newVersionHeader = `## [v${version}] - ${date}\n- ${title}\n`;
+  
+  // Replace the unreleased section with a new version section keeping the unreleased header
+  const updatedChangelog = changelog.replace(
+    /## \[Unreleased\]\s*\n([\s\S]*?)(?=\n## \[\d|$)/,
+    `## [Unreleased]\n\n${newVersionHeader}\n$1`
+  );
+  
+  fs.writeFileSync('CHANGELOG.md', updatedChangelog);
+}
+
 async function run() {
   const version = process.argv[2] || await prompt('🔢 Enter version (e.g., 0.2.1): ');
   const title = process.argv[3] || await prompt('📝 Enter title (e.g., UI Polish and Fixes): ');
@@ -21,58 +81,82 @@ async function run() {
   const today = new Date().toISOString().split('T')[0];
   const releaseNotePath = `release-notes/${tag}.md`;
 
-  // Compose release note
-  const note = `# NPC Forge ${tag} – ${title}
-
-**Release Date:** ${today}
-
-${summary}
-
-## Added
-- _TBD_
-
-## Changed
-- _TBD_
-
-## Fixed
-- _TBD_
-
----
-
-## Removed
-None.
-`;
+  // Extract unreleased changes
+  const { changes, categories } = extractUnreleasedChanges();
+  
+  // Build release note content
+  let releaseNoteContent = `# NPC Forge ${tag} – ${title}\n\n**Release Date:** ${today}\n\n${summary}\n\n`;
+  
+  // Add categories from changelog
+  if (Object.keys(categories).length > 0) {
+    for (const [category, items] of Object.entries(categories)) {
+      releaseNoteContent += `## ${category}\n${items.join('\n')}\n\n`;
+    }
+  } else {
+    // Add placeholder sections if no changes were found
+    releaseNoteContent += `## Added\n- _TBD_\n\n## Changed\n- _TBD_\n\n## Fixed\n- _TBD_\n\n`;
+  }
+  
+  releaseNoteContent += `---\n\n## Removed\nNone.\n`;
 
   // Write release note
-  fs.writeFileSync(releaseNotePath, note);
+  fs.writeFileSync(releaseNotePath, releaseNoteContent);
   console.log(`✅ Release note created at: ${releaseNotePath}`);
 
-  // Append to changelog
-  fs.appendFileSync('CHANGELOG.md', `\n## [${tag}] - ${today}\n- ${title}\n`);
+  // Update changelog by moving unreleased changes to the new version
+  updateChangelog(version, today, title);
   console.log(`✅ CHANGELOG.md updated`);
 
-  // Git tag & push
+  // Git commit, tag & push
   try {
-    execSync(`git add . && git commit -m "chore: release ${tag}"`);
-  } catch {
-    console.warn('⚠️ Git commit skipped (nothing new to commit?)');
+    // Explicitly add the changelog and release notes file
+    execSync(`git add CHANGELOG.md "${releaseNotePath}"`);
+    console.log(`✅ Added CHANGELOG.md and ${releaseNotePath} to git staging`);
+    
+    // Add any other changes that might be part of the release
+    execSync(`git add .`);
+    
+    // Commit the changes
+    execSync(`git commit -m "chore: release ${tag}"`);
+    console.log(`✅ Changes committed`);
+  } catch (error) {
+    console.warn('⚠️ Git commit failed:', error);
+    console.log('Try committing manually:');
+    console.log(`git add CHANGELOG.md "${releaseNotePath}" && git commit -m "chore: release ${tag}"`);
   }
 
   try {
     execSync(`git tag ${tag}`);
-  } catch {
-    console.warn(`⚠️ Tag ${tag} already exists. Skipping tag creation.`);
+    console.log(`✅ Tag ${tag} created`);
+  } catch (error) {
+    console.warn(`⚠️ Tag ${tag} creation failed:`, error);
   }
 
-  execSync(`git push origin main --tags`);
+  try {
+    // Push both the main branch and the tags to ensure everything is updated
+    execSync(`git push origin main`);
+    console.log(`✅ Changes pushed to main branch`);
+    
+    execSync(`git push origin ${tag}`);
+    console.log(`✅ Tag ${tag} pushed to origin`);
+  } catch (error) {
+    console.error('❌ Failed to push changes:', error);
+    console.log('Try pushing manually:');
+    console.log(`git push origin main && git push origin ${tag}`);
+  }
 
   // GitHub Release
   try {
     execSync(`gh release create ${tag} -F ${releaseNotePath} -t "NPC Forge ${tag} – ${title}"`, { stdio: 'inherit' });
     console.log('🎉 GitHub release published!');
-  } catch {
-    console.error('❌ Failed to create GitHub release. Is the tag already released?');
+  } catch (error) {
+    console.error('❌ Failed to create GitHub release:', error);
+    console.log('You can manually create a release using:');
+    console.log(`gh release create ${tag} -F ${releaseNotePath} -t "NPC Forge ${tag} – ${title}"`);
   }
 }
 
-run();
+run().catch(error => {
+  console.error('❌ Script failed:', error);
+  process.exit(1);
+});
