@@ -27,7 +27,7 @@ const genderOptions = [
   { value: 'female', label: 'Female' },
   { value: 'nonbinary', label: 'Non-binary' },
   { value: 'unknown', label: 'Unknown/Other' },
-] as const;
+];
 
 // Age group options with specific typings
 const ageGroupOptions = [
@@ -36,7 +36,7 @@ const ageGroupOptions = [
   { value: 'teen', label: 'Teen/Young Adult' },
   { value: 'adult', label: 'Adult' },
   { value: 'elder', label: 'Elder' },
-] as const;
+];
 
 // Moral alignment options with specific typings
 const alignmentOptions = [
@@ -44,7 +44,7 @@ const alignmentOptions = [
   { value: 'good', label: 'Good' },
   { value: 'neutral', label: 'Neutral' },
   { value: 'evil', label: 'Evil' },
-] as const;
+];
 
 // Relationship to player options with specific typings
 const relationshipOptions = [
@@ -55,7 +55,7 @@ const relationshipOptions = [
   { value: 'mentor', label: 'Mentor/Guide' },
   { value: 'rival', label: 'Rival/Competitor' },
   { value: 'betrayer', label: 'Betrayer/Double Agent' },
-] as const;
+];
 
 // Common species by genre
 const speciesOptions = [
@@ -601,69 +601,37 @@ export default function CharacterTab() {
       <div>
         <h3 className="text-base font-medium mb-3 text-gray-900 dark:text-gray-200">Basic Traits</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="gender" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
-              Gender
-            </label>
-            <select
-              id="gender"
-              value={formData.gender || ''}
-              onChange={handleGenderChange}
-              className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-            >
-              {genderOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-          </div>
+          <Select
+            id="gender"
+            label="Gender"
+            options={genderOptions}
+            value={formData.gender || ''}
+            onChange={handleGenderChange}
+          />
           
-          <div>
-            <label htmlFor="age-group" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
-              Age
-            </label>
-            <select
-              id="age-group"
-              value={formData.age_group || ''}
-              onChange={handleAgeGroupChange}
-              className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-            >
-              {ageGroupOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-          </div>
+          <Select
+            id="age-group"
+            label="Age"
+            options={ageGroupOptions}
+            value={formData.age_group || ''}
+            onChange={handleAgeGroupChange}
+          />
           
-          <div>
-            <label htmlFor="moral-alignment" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
-              Moral Alignment
-            </label>
-            <select
-              id="moral-alignment"
-              value={formData.moral_alignment || ''}
-              onChange={handleAlignmentChange}
-              className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-            >
-              {alignmentOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-          </div>
+          <Select
+            id="moral-alignment"
+            label="Moral Alignment"
+            options={alignmentOptions}
+            value={formData.moral_alignment || ''}
+            onChange={handleAlignmentChange}
+          />
           
-          <div>
-            <label htmlFor="relationship" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
-              Relationship to Player
-            </label>
-            <select
-              id="relationship"
-              value={formData.relationship_to_player || ''}
-              onChange={handleRelationshipChange}
-              className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-            >
-              {relationshipOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-          </div>
+          <Select
+            id="relationship"
+            label="Relationship to Player"
+            options={relationshipOptions}
+            value={formData.relationship_to_player || ''}
+            onChange={handleRelationshipChange}
+          />
         </div>
       </div>
       
@@ -692,70 +660,37 @@ export default function CharacterTab() {
           <h3 className="text-base font-semibold mb-4 text-gray-900 dark:text-gray-200">Advanced Character Options</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label htmlFor="species" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
-                Species
-              </label>
-              <select
-                id="species"
-                value={formData.advanced_options?.species || ''}
-                onChange={handleSpeciesChange}
-                className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-              >
-                <option value="">Not specified</option>
-                {speciesOptions.map(option => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
-                ))}
-              </select>
-            </div>
+            <Select
+              id="species"
+              label="Species"
+              options={[{ value: '', label: 'Not specified' }, ...speciesOptions]}
+              value={formData.advanced_options?.species || ''}
+              onChange={handleSpeciesChange}
+            />
             
-            <div>
-              <label htmlFor="social-class" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
-                Social Class
-              </label>
-              <select
-                id="social-class"
-                value={formData.advanced_options?.social_class || ''}
-                onChange={handleSocialClassChange}
-                className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-              >
-                {socialClassOptions.map(option => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
-                ))}
-              </select>
-            </div>
+            <Select
+              id="social-class"
+              label="Social Class"
+              options={socialClassOptions}
+              value={formData.advanced_options?.social_class || ''}
+              onChange={handleSocialClassChange}
+            />
 
-            <div>
-              <label htmlFor="height" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
-                Height
-              </label>
-              <select
-                id="height"
-                value={formData.advanced_options?.height || ''}
-                onChange={handleHeightChange}
-                className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-              >
-                {heightOptions.map(option => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
-                ))}
-              </select>
-            </div>
+            <Select
+              id="height"
+              label="Height"
+              options={heightOptions}
+              value={formData.advanced_options?.height || ''}
+              onChange={handleHeightChange}
+            />
             
-            <div>
-              <label htmlFor="build" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-300">
-                Build
-              </label>
-              <select
-                id="build"
-                value={formData.advanced_options?.build || ''}
-                onChange={handleBuildChange}
-                className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-              >
-                {buildOptions.map(option => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
-                ))}
-              </select>
-            </div>
+            <Select
+              id="build"
+              label="Build"
+              options={buildOptions}
+              value={formData.advanced_options?.build || ''}
+              onChange={handleBuildChange}
+            />
           </div>
           
           {/* Distinctive Features */}

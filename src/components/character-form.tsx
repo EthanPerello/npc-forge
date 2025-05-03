@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Genre, CharacterFormData } from '@/lib/types';
 import { GENRE_TEMPLATES, getTemplateExample } from '@/lib/templates';
 import DelayedLoadingMessage from '@/components/delayed-loading-message';
+import Select from '@/components/ui/select';
 
 interface CharacterFormProps {
   onSubmit: (data: CharacterFormData) => void;
@@ -73,30 +74,22 @@ export default function CharacterForm({ onSubmit, isLoading }: CharacterFormProp
       </h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Genre Selection */}
-        <div>
-          <label htmlFor="genre" className="block mb-2 text-sm font-medium">
-            Genre (Optional)
-          </label>
-          <select
-            id="genre"
-            className="w-full p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
-            value={genre || ''}
-            onChange={handleGenreChange}
-          >
-            <option value="">Select a genre (optional)</option>
-            {GENRE_TEMPLATES.map((template) => (
-              <option key={template.id} value={template.id}>
-                {template.label}
-              </option>
-            ))}
-          </select>
-          {genre && (
-            <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
-              {GENRE_TEMPLATES.find(t => t.id === genre)?.description}
-            </p>
-          )}
-        </div>
+        {/* Genre Selection - Now using the enhanced Select component */}
+        <Select
+          id="genre"
+          label="Genre (Optional)"
+          options={[
+            { value: '', label: 'Select a genre (optional)' },
+            ...GENRE_TEMPLATES.map(template => ({
+              value: template.id,
+              label: template.label
+            }))
+          ]}
+          value={genre || ''}
+          onChange={handleGenreChange}
+          helperText={genre ? GENRE_TEMPLATES.find(t => t.id === genre)?.description : undefined}
+          className="bg-secondary"
+        />
 
         {/* Character Description */}
         <div>
