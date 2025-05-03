@@ -138,73 +138,41 @@ export default function PortraitOptions() {
         />
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="art-style" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-200">
-              Art Style
-            </label>
-            <select
-              id="art-style"
-              value={formData.portrait_options?.art_style || ''}
-              onChange={handleArtStyleChange}
-              className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-            >
-              {artStyleOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-            <p className="mt-1 text-xs text-gray-700 dark:text-gray-400">Visual style of the character portrait</p>
-          </div>
+          <Select
+            id="art-style"
+            label="Art Style"
+            options={artStyleOptions}
+            value={formData.portrait_options?.art_style || ''}
+            onChange={handleArtStyleChange}
+            helperText="Visual style of the character portrait"
+          />
           
-          <div>
-            <label htmlFor="mood" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-200">
-              Expression/Mood
-            </label>
-            <select
-              id="mood"
-              value={formData.portrait_options?.mood || ''}
-              onChange={handleMoodChange}
-              className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-            >
-              {moodOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-            <p className="mt-1 text-xs text-gray-700 dark:text-gray-400">Character's facial expression</p>
-          </div>
+          <Select
+            id="mood"
+            label="Expression/Mood"
+            options={moodOptions}
+            value={formData.portrait_options?.mood || ''}
+            onChange={handleMoodChange}
+            helperText="Character's facial expression"
+          />
           
-          <div>
-            <label htmlFor="framing" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-200">
-              Framing
-            </label>
-            <select
-              id="framing"
-              value={formData.portrait_options?.framing || ''}
-              onChange={handleFramingChange}
-              className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-            >
-              {framingOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-            <p className="mt-1 text-xs text-gray-700 dark:text-gray-400">How much of the character is shown</p>
-          </div>
+          <Select
+            id="framing"
+            label="Framing"
+            options={framingOptions}
+            value={formData.portrait_options?.framing || ''}
+            onChange={handleFramingChange}
+            helperText="How much of the character is shown"
+          />
           
-          <div>
-            <label htmlFor="background" className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-200">
-              Background
-            </label>
-            <select
-              id="background"
-              value={formData.portrait_options?.background || ''}
-              onChange={handleBackgroundChange}
-              className="w-full p-2 bg-white text-gray-900 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-            >
-              {backgroundOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-            <p className="mt-1 text-xs text-gray-700 dark:text-gray-400">Style of the portrait's background</p>
-          </div>
+          <Select
+            id="background"
+            label="Background"
+            options={backgroundOptions}
+            value={formData.portrait_options?.background || ''}
+            onChange={handleBackgroundChange}
+            helperText="Style of the portrait's background"
+          />
         </div>
         
         <div className="mt-4 p-3 bg-blue-50 text-blue-700 rounded-md text-sm dark:bg-blue-900/30 dark:text-blue-300">
