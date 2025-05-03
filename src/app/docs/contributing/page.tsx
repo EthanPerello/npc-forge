@@ -275,23 +275,23 @@ Brief explanation of what this PR does.
           </p>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-            <div className="bg-indigo-50 p-2 rounded border border-indigo-100 dark:bg-indigo-900/20 dark:border-indigo-800">
-              <code className="text-indigo-700 dark:text-indigo-300">features.md</code>
+            <div className="bg-indigo-100 p-2 rounded border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800">
+              <code className="text-indigo-900 dark:text-indigo-300 font-medium">features.md</code>
             </div>
-            <div className="bg-indigo-50 p-2 rounded border border-indigo-100 dark:bg-indigo-900/20 dark:border-indigo-800">
-              <code className="text-indigo-700 dark:text-indigo-300">how-to-use.md</code>
+            <div className="bg-indigo-100 p-2 rounded border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800">
+              <code className="text-indigo-900 dark:text-indigo-300 font-medium">how-to-use.md</code>
             </div>
-            <div className="bg-indigo-50 p-2 rounded border border-indigo-100 dark:bg-indigo-900/20 dark:border-indigo-800">
-              <code className="text-indigo-700 dark:text-indigo-300">api.md</code>
+            <div className="bg-indigo-100 p-2 rounded border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800">
+              <code className="text-indigo-900 dark:text-indigo-300 font-medium">api.md</code>
             </div>
-            <div className="bg-indigo-50 p-2 rounded border border-indigo-100 dark:bg-indigo-900/20 dark:border-indigo-800">
-              <code className="text-indigo-700 dark:text-indigo-300">security.md</code>
+            <div className="bg-indigo-100 p-2 rounded border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800">
+              <code className="text-indigo-900 dark:text-indigo-300 font-medium">security.md</code>
             </div>
-            <div className="bg-indigo-50 p-2 rounded border border-indigo-100 dark:bg-indigo-900/20 dark:border-indigo-800">
-              <code className="text-indigo-700 dark:text-indigo-300">architecture.md</code>
+            <div className="bg-indigo-100 p-2 rounded border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800">
+              <code className="text-indigo-900 dark:text-indigo-300 font-medium">architecture.md</code>
             </div>
-            <div className="bg-indigo-50 p-2 rounded border border-indigo-100 dark:bg-indigo-900/20 dark:border-indigo-800">
-              <code className="text-indigo-700 dark:text-indigo-300">README.md</code>
+            <div className="bg-indigo-100 p-2 rounded border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800">
+              <code className="text-indigo-900 dark:text-indigo-300 font-medium">README.md</code>
             </div>
           </div>
         </div>

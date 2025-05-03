@@ -98,8 +98,8 @@ export default function CharacterDisplay() {
     <div className="w-full bg-card rounded-xl shadow-lg overflow-hidden border border-theme mt-8 transition-all duration-300">
       {/* Success Message */}
       {showSuccessMessage && (
-        <div className="bg-green-50 text-green-700 p-3 text-center border-b border-green-100 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800/50 flex items-center justify-center">
-          <Award className="h-5 w-5 mr-2 text-green-500" />
+        <div className="bg-green-50 text-green-800 p-3 text-center border-b border-green-100 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800/50 flex items-center justify-center font-semibold">
+          <Award className="h-5 w-5 mr-2 text-green-600 dark:text-green-400" />
           Character successfully generated!
         </div>
       )}
@@ -154,7 +154,7 @@ export default function CharacterDisplay() {
                 onClick={downloadCharacterJSON}
                 leftIcon={<Download className="h-5 w-5" />}
                 variant="primary"
-                className="bg-gradient-to-r from-blue-500 to-blue-700 border-0 hover:from-blue-600 hover:to-blue-800"
+                className="bg-gradient-to-r from-blue-500 to-blue-700 border-0 hover:from-blue-600 hover:to-blue-800 text-white"
               >
                 Download JSON
               </Button>

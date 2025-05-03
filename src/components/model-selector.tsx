@@ -46,13 +46,16 @@ export default function ModelSelector({ value, onChange }: ModelSelectorProps) {
               <h3 className="font-medium">
                 {config.emoji} {config.label}
               </h3>
-              <span className={`text-xs px-2 py-1 rounded-full ${
-                selectedModel === config.id 
-                  ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-800 dark:text-indigo-100' 
-                  : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-              }`}>
-                {remaining[config.id] === "Unlimited" ? "∞" : `${remaining[config.id]}`} left
-              </span>
+              {/* Use different classes to avoid the global CSS override */}
+              {selectedModel === config.id ? (
+                <span className="model-badge-selected text-xs px-2 py-1 rounded-full">
+                  {remaining[config.id] === "Unlimited" ? "∞" : `${remaining[config.id]}`} left
+                </span>
+              ) : (
+                <span className="model-badge-unselected text-xs px-2 py-1 rounded-full">
+                  {remaining[config.id] === "Unlimited" ? "∞" : `${remaining[config.id]}`} left
+                </span>
+              )}
             </div>
             <p className="text-xs text-gray-600 dark:text-gray-400">
               {config.description}

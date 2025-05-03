@@ -17,7 +17,7 @@ export default function ChangelogPage() {
       {/* Documentation Update - 0.2.0 */}
       <div className="mb-10 pb-8 border-b border-gray-200 dark:border-gray-700">
         <h2 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-          <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3">
+          <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-900 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3 font-bold">
             0.2.0
           </span>
           <span>April 22, 2025 - Documentation Update</span>
@@ -86,7 +86,7 @@ export default function ChangelogPage() {
       {/* Welcome Guide & UI Overhaul - 0.1.4 */}
       <div className="mb-10 pb-8 border-b border-gray-200 dark:border-gray-700">
         <h2 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-          <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3">
+          <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-900 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3 font-bold">
             0.1.4
           </span>
           <span>April 21, 2025 - Welcome Guide & UI Overhaul</span>
@@ -131,7 +131,7 @@ export default function ChangelogPage() {
       {/* Advanced Randomization - 0.1.3 */}
       <div className="mb-10 pb-8 border-b border-gray-200 dark:border-gray-700">
         <h2 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-          <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3">
+          <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-900 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3 font-bold">
             0.1.3
           </span>
           <span>April 19, 2025 - Advanced Randomization</span>
@@ -179,7 +179,7 @@ export default function ChangelogPage() {
       {/* UI & Customization - 0.1.2 */}
       <div className="mb-10 pb-8 border-b border-gray-200 dark:border-gray-700">
         <h2 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-          <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3">
+          <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-900 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3 font-bold">
             0.1.2
           </span>
           <span>April 18, 2025 - UI & Customization</span>
@@ -211,7 +211,7 @@ export default function ChangelogPage() {
       {/* Portrait Customization - 0.1.1 */}
       <div className="mb-10 pb-8 border-b border-gray-200 dark:border-gray-700">
         <h2 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-          <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3">
+          <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-900 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3 font-bold">
             0.1.1
           </span>
           <span>April 17, 2025 - Portrait Customization</span>
@@ -248,7 +248,7 @@ export default function ChangelogPage() {
       {/* Initial Release - 0.1.0 */}
       <div className="mb-10">
         <h2 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-          <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3">
+          <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-900 dark:text-indigo-300 text-sm py-1 px-2 rounded mr-3 font-bold">
             0.1.0
           </span>
           <span>April 12, 2025 - Initial Release</span>

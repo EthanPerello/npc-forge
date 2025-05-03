@@ -758,7 +758,7 @@ export default function CharacterTab() {
                   onClick={() => togglePersonalityTrait(trait.value)}
                   className={`px-2 py-1 text-xs rounded-full transition-colors ${
                     formData.advanced_options?.personality_traits?.includes(trait.value)
-                      ? 'bg-indigo-100 text-indigo-800 border border-indigo-300 dark:bg-indigo-900 dark:text-indigo-200 dark:border-indigo-700'
+                      ? 'bg-indigo-100 text-indigo-800 border border-indigo-300 dark:bg-indigo-900 dark:text-indigo-200 dark:border-indigo-700 font-medium shadow-sm'
                       : 'bg-gray-100 text-gray-700 border border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'
                   }`}
                 >

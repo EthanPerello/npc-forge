@@ -782,3 +782,356 @@ header p,
 .light .bg-blue-50.p-4.rounded-lg.border.border-blue-100.text-sm.text-blue-700 * {
   color: #1e3a8a !important;
 }
+
+/* Fix "Get Started" button text in light mode */
+.welcome-guide button.bg-indigo-600,
+.light .welcome-guide button.bg-indigo-600 {
+  color: white !important;
+}
+
+/* Fix "Generate Character" button text in light mode */
+button.bg-indigo-600,
+button.bg-gradient-to-r,
+.light button.bg-indigo-600,
+.light button.bg-gradient-to-r {
+  color: white !important;
+}
+
+/* Fix "Download JSON" button text in light mode */
+a.bg-indigo-600,
+.light a.bg-indigo-600,
+.light a.inline-flex.items-center.px-4.py-2.bg-indigo-600,
+.light a.inline-flex.items-center.px-4.py-2.bg-indigo-600 * {
+  color: white !important;
+}
+
+/* Fix "POST /api/generate" text in API page */
+.light .p-4.bg-indigo-50.border-l-4.border-indigo-500 h3.text-lg.font-semibold.text-indigo-800,
+.light .p-4.bg-indigo-50.border-l-4.border-indigo-500 p.text-indigo-700 {
+  color: #3730a3 !important; /* Darker indigo for better contrast */
+}
+
+/* Fix code/file references in contributing page */
+.light .bg-indigo-50.p-2.rounded.border.border-indigo-100 code,
+.light code.text-indigo-700 {
+  color: #3730a3 !important; /* Darker indigo for better contrast */
+}
+
+/* Fix version numbers in changelog */
+.light span.bg-indigo-100.dark\:bg-indigo-900\/50.text-indigo-800.dark\:text-indigo-300,
+.light .bg-indigo-100.text-indigo-800 {
+  color: #312e81 !important; /* Much darker indigo for better contrast */
+}
+
+/* Fix portrait customization tip text in light mode */
+.light .mt-4.p-3.bg-blue-50.text-blue-700,
+.light .mt-4.p-3.bg-blue-50.text-blue-700 p,
+.light .p-3.bg-blue-50.text-blue-700.rounded-md.text-sm,
+.light .p-3.bg-blue-50.text-blue-700.rounded-md.text-sm p {
+  color: #1e3a8a !important; /* Darker blue for better contrast */
+}
+
+/* Make personality trait buttons more distinct when selected in light mode */
+.light button.bg-indigo-100.text-indigo-800.border.border-indigo-300 {
+  background-color: #a5b4fc !important; /* More vibrant background */
+  color: #312e81 !important; /* Darker text */
+  border-color: #6366f1 !important; /* More visible border */
+  font-weight: 500 !important; /* Make text bolder */
+}
+/* Fix roadmap page "High Priority" badge text */
+.light span.inline-block.bg-blue-100.text-blue-800.text-xs.px-2.py-1.rounded-full,
+.light .inline-block.bg-blue-100.text-blue-800 {
+  color: #1e3a8a !important; /* Much darker blue */
+  font-weight: 500 !important;
+}
+
+/* Fix delayed loading message for better contrast */
+.light .mt-4.p-3.bg-yellow-50.text-yellow-700.rounded-md.text-sm,
+.light .p-3.bg-yellow-50.text-yellow-700,
+.light .bg-yellow-50.text-yellow-700 p {
+  color: #92400e !important; /* Much darker amber/yellow */
+  font-weight: 500 !important;
+}
+
+/* Fix selection in usage limit display */
+.light .bg-indigo-100.text-indigo-800.border.border-indigo-300 span,
+.light .text-indigo-800 {
+  color: #1e3a8a !important; /* Darker indigo for better light mode contrast */
+}
+
+/* Make sure "Download JSON" button text is white */
+.light a.bg-gradient-to-r.from-blue-500.to-blue-700,
+.light button.bg-gradient-to-r.from-blue-500.to-blue-700,
+.light a.bg-gradient-to-r.from-blue-500.to-blue-700 *,
+.light button.bg-gradient-to-r.from-blue-500.to-blue-700 * {
+  color: white !important;
+}
+
+/* Make quest type tag text white in light mode */
+.light span.inline-block.bg-indigo-100.text-indigo-800.text-xs.px-2.py-1.rounded,
+.light .inline-block.bg-indigo-900.text-indigo-200 {
+  background-color: #4f46e5 !important; /* Indigo 600 */
+  color: white !important;
+  border-color: #4338ca !important; /* Indigo 700 */
+}
+
+/* Fix portrait customization tip */
+.light .mt-4.p-3.bg-blue-50.text-blue-700.rounded-md.text-sm,
+.light .mt-4.p-3.bg-blue-50.text-blue-700.rounded-md.text-sm p,
+.light .mt-4.p-3.bg-blue-50.text-blue-700.rounded-md.text-sm strong {
+  color: #1e3a8a !important; /* Very dark blue */
+  font-weight: 500 !important;
+}
+
+/* Fix API page endpoint display */
+.light .p-4.bg-indigo-50.border-l-4.border-indigo-500.mb-6 h3,
+.light .p-4.bg-indigo-50.border-l-4.border-indigo-500.mb-6 p {
+  color: #312e81 !important; /* Indigo 900 - very dark */
+  font-weight: 600 !important;
+}
+
+/* Fix Contributing page file references */
+.light .bg-indigo-100.p-2.rounded.border.border-indigo-200 code,
+.light .bg-indigo-100.p-2.rounded code {
+  color: #312e81 !important; /* Indigo 900 - very dark */
+  font-weight: 600 !important;
+}
+
+/* Fix Changelog page version numbers */
+.light span.bg-indigo-100.dark\:bg-indigo-900\/50.text-indigo-900.dark\:text-indigo-300,
+.light span.bg-indigo-100 {
+  color: #312e81 !important; /* Indigo 900 - very dark */
+  font-weight: 700 !important;
+}
+
+/* Fix all buttons with blue gradients */
+button.bg-gradient-to-r.from-blue-500.to-blue-700,
+button.bg-gradient-to-r.from-blue-600.to-blue-800,
+a.bg-gradient-to-r.from-blue-500.to-blue-700,
+.light button.bg-gradient-to-r.from-blue-500.to-blue-700,
+.light button.bg-gradient-to-r.from-blue-600.to-blue-800,
+.light a.bg-gradient-to-r.from-blue-500.to-blue-700 {
+  color: white !important;
+}
+
+/* Fix model selection "∞ left" text with ultra-high specificity */
+.light span.text-gray-600.dark\:text-gray-400,
+.light span.text-gray-600,
+.light div.text-sm.flex.items-center span,
+.light div.text-sm.flex.items-center span.text-gray-600 {
+  color: #1f2937 !important; /* Gray 800 - very dark gray */
+  font-weight: 500 !important;
+}
+
+/* More specific fix for quest type tag */
+.light span.inline-block.bg-indigo-100.text-indigo-800,
+.light div.mb-3 span.inline-block,
+.light div.mb-3 span.inline-block.bg-indigo-100 {
+  background-color: #4f46e5 !important; /* Indigo 600 */
+  color: white !important;
+  border: 1px solid #4338ca !important; /* Indigo 700 */
+}
+
+/* Ultra specific fix for portrait customization tip */
+.light div.mt-4.p-3.bg-blue-50,
+.light div.mt-4.p-3.bg-blue-50 p,
+.light div.mt-4.p-3.bg-blue-50 strong,
+.light div.mt-4.p-3.bg-blue-50.text-blue-900 {
+  color: #1e3a8a !important; /* Blue 900 - very dark */
+  font-weight: 600 !important;
+}
+
+/* Ultra specific fix for delayed loading message */
+.light div.mt-4.p-3.bg-yellow-50,
+.light div.mt-4.p-3.bg-yellow-50 p,
+.light div.mt-4.p-3.bg-yellow-50.text-yellow-900,
+.light div.mt-4.p-3.bg-yellow-50.animate-pulse {
+  color: #92400e !important; /* Amber 900 - very dark */
+  font-weight: 600 !important;
+  border: 1px solid #fbbf24 !important;
+}
+
+/* Fix success message text */
+.light div.bg-green-50.text-green-700,
+.light div.bg-green-50.text-green-700 *,
+.light div.bg-green-50.text-green-700.p-3.text-center {
+  color: #15803d !important; /* Green 700 - dark green */
+  font-weight: 600 !important;
+}
+/* Final fixes for the remaining issues */
+
+/* Fix model selector "∞ left" text in selection area */
+.light button.px-3.py-1.rounded-md.text-xs.font-medium,
+.light button[class*="text-xs font-medium"],
+.light button.bg-green-100.text-green-800,
+.light button.bg-blue-100.text-blue-800,
+.light button.bg-indigo-100.text-indigo-800 {
+  background-color: #4f46e5 !important; /* Indigo 600 */
+  color: white !important;
+  border: 1px solid #4338ca !important; /* Indigo 700 */
+}
+
+/* Fix success message color in light mode */
+.light .bg-green-50.text-green-800,
+.light div.bg-green-50.text-green-800,
+.light div.bg-green-50.text-green-800 * {
+  background-color: #dcfce7 !important; /* Light green background */
+  color: #166534 !important; /* Dark green text */
+  border-color: #bbf7d0 !important; /* Light green border */
+  font-weight: 600 !important;
+}
+
+/* Fix the yellow box around delayed loading message */
+.light .mt-4.p-3.bg-yellow-50.text-yellow-900.rounded-md.text-sm.font-bold.border.border-yellow-300,
+.light div.mt-4.p-3.bg-yellow-50 {
+  background-color: #fef9c3 !important; /* Yellow 100 */
+  color: #854d0e !important; /* Yellow 800 */
+  border-color: #fef9c3 !important; /* Same as background - eliminate visible border */
+  font-weight: 600 !important;
+}
+
+/* Add these final fixes to globals.css */
+
+/* Fix success message text */
+.light div.bg-green-50.text-green-800,
+.light div.bg-green-50.text-green-800 p,
+.light div.bg-green-50 * {
+  background-color: #dcfce7 !important; /* Green 100 */
+  color: #166534 !important; /* Green 800 - very dark green */
+  border-color: #bbf7d0 !important; /* Green 200 */
+  font-weight: 600 !important;
+}
+
+/* Very specific selector for the success message */
+.light div.bg-green-50.text-green-800.p-3.text-center.border-b.border-green-100 {
+  background-color: #dcfce7 !important;
+  color: #166534 !important;
+  border-color: #bbf7d0 !important;
+}
+
+/* Ensure there's no border in the loading message */
+.light .mt-4.p-3.bg-amber-50.text-amber-800 {
+  border: none !important;
+}
+
+/* Make delayed loading message red in light mode */
+.light .mt-4.p-3.bg-red-50.text-red-700,
+.light .mt-4.p-3.bg-red-50.text-red-700 p,
+.light .mt-4.p-3.bg-red-50,
+.light .mt-4.p-3[class*="bg-red-50"],
+.light .animate-pulse[class*="bg-red-50"] {
+  background-color: #fee2e2 !important; /* Red 100 */
+  color: #b91c1c !important; /* Red 700 */
+  border: none !important;
+  font-weight: bold !important;
+}
+
+/* Final CSS fixes for subgenre and personality trait options */
+
+/* Make selected subgenre buttons dark with white text */
+.light button[class*="bg-indigo-100"][class*="text-indigo-800"],
+.light button.bg-indigo-100.text-indigo-800 {
+  background-color: #4f46e5 !important; /* Indigo 600 */
+  color: white !important;
+  border-color: #4338ca !important; /* Indigo 700 */
+  font-weight: 500 !important;
+}
+
+/* Ensure unselected subgenre buttons are lighter */
+.light button.bg-gray-100,
+.light button[class*="bg-gray-100"][class*="text-gray-700"] {
+  background-color: #f3f4f6 !important; /* Gray 100 */
+  color: #374151 !important; /* Gray 700 */
+  border-color: #e5e7eb !important; /* Gray 200 */
+}
+
+/* Make selected personality trait buttons dark with white text */
+.light div.mt-4 button[class*="bg-indigo-100"][class*="text-indigo-800"],
+.light div.flex.flex-wrap.gap-2 button[class*="bg-indigo-100"] {
+  background-color: #4f46e5 !important; /* Indigo 600 */
+  color: white !important;
+  border-color: #4338ca !important; /* Indigo 700 */
+  font-weight: 500 !important;
+}
+
+/* Ensure unselected personality trait buttons are lighter */
+.light div.flex.flex-wrap.gap-2 button[class*="bg-gray-100"] {
+  background-color: #f3f4f6 !important; /* Gray 100 */
+  color: #374151 !important; /* Gray 700 */
+  border-color: #e5e7eb !important; /* Gray 200 */
+}
+
+/* Fix selected quest navigation buttons */
+.light button.bg-indigo-100.text-indigo-700.font-medium {
+  background-color: #4f46e5 !important;
+  color: white !important;
+}
+
+/* Ensure very specific contrast for selected vs unselected */
+.light [aria-selected="true"] {
+  background-color: #4f46e5 !important;
+  color: white !important;
+}
+
+.light [aria-selected="false"] {
+  background-color: #f3f4f6 !important;
+  color: #374151 !important;
+}
+
+/* Add these CSS rules to globals.css */
+
+
+
+
+
+
+.model-badge-unselected {
+  color: #4b5563 !important; /* Gray 600 */
+  background-color: #f3f4f6 !important; /* Gray 100 */
+  border: 1px solid #e5e7eb !important; /* Gray 200 */
+  font-weight: normal !important;
+}
+
+/* Dark mode versions */
+.dark .model-badge-selected {
+  color: white !important;
+  background-color: #4f46e5 !important; /* Indigo 600 */
+}
+
+.dark .model-badge-unselected {
+  color: #d1d5db !important; /* Gray 300 */
+  background-color: #1f2937 !important; /* Gray 800 */
+  border: 1px solid #374151 !important; /* Gray 700 */
+}
+
+
+
+.model-badge-unselected {
+  color: #1e3a8a !important; /* Blue 900 - dark blue text */
+  background-color: #dbeafe !important; /* Blue 100 - light blue background */
+  border: 1px solid #bfdbfe !important; /* Blue 200 - slightly darker blue border */
+  font-weight: normal !important;
+}
+
+.light .model-badge-unselected {
+  color: #374151 !important;           /* Gray 700 – neutral/dark gray */
+  background-color: #f3f4f6 !important; /* Gray 100 – very light gray */
+  border: 1px solid #e5e7eb !important; /* Gray 200 – soft border */
+  font-weight: normal !important;
+}
+
+.light model-badge-selected {
+  color: white !important;
+  background-color: #1e40af !important;
+  font-weight: bold !important;
+  border: none !important;
+}
+
+/* Light mode: selected badge gets a pale blue bg, black text */
+html:not(.dark) span.model-badge-selected {
+  background-color: #dbeafe !important; /* Blue-100 */
+  color: #1e293b !important;            /* Gray-800 for crisp blackish text */
+}
+
+
+
