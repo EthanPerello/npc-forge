@@ -60,35 +60,36 @@ function extractUnreleasedChanges(): { changes: string, categories: { [key: stri
 function updateChangelog(version: string, date: string, title: string): void {
   let changelog = fs.readFileSync('CHANGELOG.md', 'utf-8');
 
-  // Extract unreleased section
-  const unreleasedMatch = changelog.match(/## \[Unreleased\]\s*\n([\s\S]*?)(?=\n## \[\d|\n*$)/);
-  const unreleasedBody = unreleasedMatch?.[1]?.trim() || '';
+  // Extract the entire Unreleased section
+  const unreleasedMatch = changelog.match(/## \[Unreleased\]\s*\n([\s\S]*?)(?=\n## \[\d|$)/);
+  if (!unreleasedMatch) {
+    console.error('❌ Failed to find [Unreleased] section in CHANGELOG.md');
+    return;
+  }
 
-  // Clean empty categories (e.g. ### Changed with no items)
-  const cleanedBody = unreleasedBody.replace(/### (\w+)\s*\n(?:- \s*\n?)*/g, '').trim();
-
-  // Create new section
+  const unreleasedContent = unreleasedMatch[1].trim();
   const newVersionHeader = `## [${version}] - ${date}`;
-  const versionEntry = `${newVersionHeader}\n\n${cleanedBody}\n`;
+  const versionBlock = `${newVersionHeader}\n\n${unreleasedContent}\n`;
 
-  // Replace [Unreleased] section and inject new version
+  // Insert the new version section after [Unreleased]
   changelog = changelog.replace(
-    /## \[Unreleased\]\s*\n[\s\S]*?(?=\n## \[\d|\n*$)/,
-    `## [Unreleased]\n\n${versionEntry}`
+    /## \[Unreleased\]\s*\n[\s\S]*?(?=\n## \[\d|$)/,
+    `## [Unreleased]\n\n${versionBlock}`
   );
 
-  // Update comparison links
-  const linkBlockMatch = changelog.match(/\[Unreleased\]: .*\n(?:\[\d+\.\d+\.\d+\]: .*\n)+/);
+  // Update version links at the bottom
+  const linkBlockMatch = changelog.match(/\[Unreleased\]: .*?\n(?:\[\d+\.\d+\.\d+\]: .*?\n)+/);
   if (linkBlockMatch) {
-    const latestVersionMatch = linkBlockMatch[0].match(/\[(\d+\.\d+\.\d+)\]:/g);
-    const lastVersion = latestVersionMatch?.at(-1)?.match(/(\d+\.\d+\.\d+)/)?.[1] || '0.0.0';
+    const latestTagMatch = [...linkBlockMatch[0].matchAll(/\[(\d+\.\d+\.\d+)\]:/g)];
+    const lastVersion = latestTagMatch.at(-1)?.[1] || '0.0.0';
     const newLinks = `[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v${version}...HEAD\n[${version}]: https://github.com/EthanPerello/npc-forge/compare/v${lastVersion}...v${version}\n`;
-    changelog = changelog.replace(/\[Unreleased\]: .*\n(?:\[\d+\.\d+\.\d+\]: .*\n)+/, newLinks);
+    changelog = changelog.replace(linkBlockMatch[0], newLinks);
   }
 
   fs.writeFileSync('CHANGELOG.md', changelog);
   console.log(`✅ CHANGELOG.md updated with version ${version}`);
 }
+
 
 
 async function run() {
