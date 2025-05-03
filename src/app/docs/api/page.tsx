@@ -18,11 +18,11 @@ export default function ApiPage() {
         </p>
         
         <div className="p-4 bg-indigo-50 border-l-4 border-indigo-500 mb-6 dark:bg-indigo-900/30 dark:border-indigo-500">
-          <h3 className="text-lg font-semibold text-indigo-800 flex items-center mb-2 dark:text-indigo-300">
+          <h3 className="text-lg font-semibold text-indigo-900 flex items-center mb-2 dark:text-indigo-300">
             <Server className="h-5 w-5 mr-2" />
             POST /api/generate
           </h3>
-          <p className="text-indigo-700 mb-1 dark:text-indigo-300">
+          <p className="text-indigo-900 mb-1 dark:text-indigo-300 font-medium">
             Generates a character based on provided parameters.
           </p>
         </div>

@@ -44,7 +44,7 @@ export default function RoadmapPage() {
             <h3 className="text-xl font-medium mb-3 text-indigo-700 dark:text-indigo-400">
               Version 0.3.0: Character Library
             </h3>
-            <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full dark:bg-blue-900/30 dark:text-blue-300 mb-4">
+            <span className="inline-block bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-medium dark:bg-blue-900/30 dark:text-blue-300 mb-4">
               High Priority
             </span>
             <p className="text-gray-700 dark:text-gray-300 mb-2"><strong>Goals</strong>: Character management and storage</p>
@@ -68,7 +68,7 @@ export default function RoadmapPage() {
             <h3 className="text-xl font-medium mb-3 text-indigo-700 dark:text-indigo-400">
               Version 0.4.0: "Talk to NPC"
             </h3>
-            <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full dark:bg-blue-900/30 dark:text-blue-300 mb-4">
+            <span className="inline-block bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-medium dark:bg-blue-900/30 dark:text-blue-300 mb-4">
               High Priority
             </span>
             <p className="text-gray-700 dark:text-gray-300 mb-2"><strong>Goals</strong>: Interactive character conversations</p>

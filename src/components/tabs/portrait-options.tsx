@@ -175,7 +175,8 @@ export default function PortraitOptions() {
           />
         </div>
         
-        <div className="mt-4 p-3 bg-blue-50 text-blue-700 rounded-md text-sm dark:bg-blue-900/30 dark:text-blue-300">
+        {/* Updated tip with higher contrast text */}
+        <div className="mt-4 p-3 bg-blue-50 text-blue-900 rounded-md text-sm font-semibold dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
           <p>
             <strong>Tip:</strong> For best results, only specify the options that are important to you. 
             The AI can often create better portraits when given some creative freedom.

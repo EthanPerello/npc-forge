@@ -78,7 +78,7 @@ export default function CharacterExamplesPage() {
               
               <Link
                 href="/docs/examples/elarion.json"
-                className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors border-0"
                 target="_blank"
               >
                 <Download className="h-4 w-4 mr-2" />
@@ -148,7 +148,7 @@ export default function CharacterExamplesPage() {
               
               <Link
                 href="/docs/examples/kira-7.json"
-                className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors border-0"
                 target="_blank"
               >
                 <Download className="h-4 w-4 mr-2" />
@@ -219,7 +219,7 @@ export default function CharacterExamplesPage() {
               
               <Link
                 href="/docs/examples/detective-miles-navarro.json"
-                className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors border-0"
                 target="_blank"
               >
                 <Download className="h-4 w-4 mr-2" />

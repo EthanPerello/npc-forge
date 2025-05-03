@@ -47,10 +47,10 @@ export default function QuestsDisplayTab({ quests }: QuestsDisplayTabProps) {
           {currentQuest.title}
         </h3>
         
-        {/* Quest Type Tag (if available) */}
+        {/* Quest Type Tag with GUARANTEED white text in light mode */}
         {currentQuest.type && (
           <div className="mb-3">
-            <span className="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded dark:bg-indigo-900 dark:text-indigo-200">
+            <span className="inline-block bg-indigo-600 text-white text-xs px-2 py-1 rounded font-medium border border-indigo-700 dark:bg-indigo-900 dark:text-indigo-200">
               {currentQuest.type}
             </span>
           </div>

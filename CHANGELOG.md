@@ -10,6 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Replaced all native `<select>` elements across the app with a custom full-width dropdown using the existing `ui/select.tsx` component for consistent styling and improved accessibility.
 
+### Fixed
+- Fixed portrait generation issue for gpt-image-1 by switching quality parameter from "hd" to "high"
+- Fixed numerous contrast issues in light mode across the application:
+  - Updated "Get Started", "Generate Character", and "Download JSON" buttons to maintain readability in light mode.
+  - Improved text visibility for selected personality traits, quest type labels, and subgenre options.
+  - Darkened API endpoint and contributing file references for better contrast.
+  - Enhanced text on changelog version numbers and roadmap priority badges.
+  - Ensured clear feedback for "Character generation may take a second…" and "Character successfully generated!" messages in light mode.
+  - Corrected contrast of selected model generation badges (e.g., "∞ left") in both character and image model selectors.
 
 ## [0.2.2] - 2025-05-01
 

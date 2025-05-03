@@ -177,7 +177,7 @@ export default function UsageLimitDisplay({
               style={{ width: '0%' }}
             ></div>
           </div>
-          <span className="text-gray-600 dark:text-gray-400">
+          <span className="text-gray-800 font-medium dark:text-gray-400">
             {emoji} Unlimited {limitTypeLabel}
           </span>
         </div>
@@ -192,7 +192,7 @@ export default function UsageLimitDisplay({
             style={{ width: `${usagePercentage}%` }}
           ></div>
         </div>
-        <span className="text-gray-600 dark:text-gray-400">
+        <span className="text-gray-800 font-medium dark:text-gray-400">
           {emoji} {remaining} {limitTypeLabel} remaining
         </span>
       </div>

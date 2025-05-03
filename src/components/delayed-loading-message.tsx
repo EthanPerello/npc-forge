@@ -41,7 +41,7 @@ export default function DelayedLoadingMessage({
   }
 
   return (
-    <div className="mt-4 p-3 bg-yellow-50 text-yellow-700 rounded-md text-sm dark:bg-yellow-900/30 dark:text-yellow-300 animate-pulse">
+    <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-md text-sm font-bold dark:bg-yellow-900/30 dark:text-yellow-300 animate-pulse">
       <p className="flex items-center">
         <svg className="w-4 h-4 mr-2 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
