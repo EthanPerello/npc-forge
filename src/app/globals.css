@@ -1,68 +1,30 @@
-/* Target the specific example text div */
-.light .mb-3.bg-indigo-100.dark\:bg-gray-800 .text-indigo-800.dark\:text-gray-300.text-sm.italic,
-.light div.bg-indigo-100 div.text-indigo-800,
-.light .bg-indigo-100 .text-indigo-800,
-.light .mb-3.bg-indigo-100 div.italic {
-  color: #0f172a !important; /* Very dark text in light mode */
-}/* Make "Welcome to NPC Forge" header always white */
-.welcome-guide h2.text-xl.font-bold,
-.welcome-guide .bg-indigo-600 h2,
-.bg-indigo-600 h2,
-.bg-indigo-700 h2 {
-  color: white !important;
-}/* Make main page background plain white in light mode */
-.light main.bg-gradient-to-br {
-  background: white !important;
-  background-image: none !important;
-}/* Fix "For best results" message on generation options page */
-.light .bg-yellow-50.p-4.rounded-md.border.border-yellow-200,
-.light .bg-yellow-50.p-4.rounded-lg.border.border-yellow-200 {
-  background-color: #fee2e2 !important; /* Light red background */
-  border-color: #fecaca !important; /* Light red border */
-}
+@import "tailwindcss";
 
-.light .bg-yellow-50.p-4.rounded-md.border.border-yellow-200 *,
-.light .bg-yellow-50.p-4.rounded-lg.border.border-yellow-200 * {
-  color: #b91c1c !important; /* Red text */
-}/* Fix numbered steps on character examples page */
-.light .flex.items-start .flex-shrink-0.h-6.w-6.rounded-full.bg-indigo-100,
-.light .flex.items-start .h-6.w-6.rounded-full.bg-indigo-100 {
-  background-color: #e5e7eb !important; /* Light gray background */
-}
-
-.light .flex.items-start .flex-shrink-0.h-6.w-6.rounded-full.bg-indigo-100 *,
-.light .flex.items-start .h-6.w-6.rounded-full.bg-indigo-100 * {
-  color: #0f172a !important; /* Very dark text */
-}/* Fix character description example text in light mode */
-.light .bg-gray-50.p-4.rounded-md.border.border-gray-200 p.text-gray-700.italic,
-.light .p-4.border.border-gray-200.rounded-lg.shadow-sm p.italic,
-.light p.text-gray-700.italic {
-  color: #1e293b !important; /* Dark text color */
-}@import "tailwindcss";
-
+/*********************************************
+ * Theme Variables 
+ *********************************************/
 :root {
   --background: #ffffff;
-  --foreground: #1a1a1a; /* Darker text for better contrast in light mode */
+  --foreground: #1a1a1a;
   --background-card: #ffffff;
   --background-secondary: #f5f7fa;
   --border-light: #d1d5db;
-  --text-muted: #4b5563; /* Dark enough for light mode legibility */
-  --text-description: #374151; /* Even darker for important descriptive text */
-  --text-heading: #111827; /* Very dark for headings */
+  --text-muted: #4b5563;
+  --text-description: #374151;
+  --text-heading: #111827;
 }
 
 .dark {
   --background: #0a0a0a;
-  --foreground: #f3f4f6; /* Slightly less stark than pure white */
+  --foreground: #f3f4f6;
   --background-card: #1f2937;
   --background-secondary: #111827;
   --border-light: #374151;
   --text-muted: #9ca3af;
-  --text-description: #d1d5db; /* Light enough for good dark mode legibility */
-  --text-heading: #f9fafb; /* Very light for headings */
+  --text-description: #d1d5db;
+  --text-heading: #f9fafb;
 }
 
-/* Media query remains as fallback for system preference */
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
     --background: #0a0a0a;
@@ -76,24 +38,29 @@
   }
 }
 
+/*********************************************
+ * Base Styles 
+ *********************************************/
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans, Arial, Helvetica, sans-serif);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
+/* No scrollbar styles */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 
-/* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-/* Animations */
+/*********************************************
+ * Animations 
+ *********************************************/
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
@@ -121,41 +88,49 @@ body {
   animation: pulse-subtle 2s ease-in-out infinite;
 }
 
-/* Custom tooltip styles */
+@keyframes fade-in-up-slow {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up-slow {
+  animation: fade-in-up-slow 1.8s ease-out forwards;
+}
+
+/*********************************************
+ * Tooltips 
+ *********************************************/
 .tooltip {
   position: relative;
   display: inline-block;
 }
 
 .tooltip .tooltip-text {
-  visibility: hidden;
-  width: 200px;
   background-color: rgba(0, 0, 0, 0.8);
   color: #fff;
   text-align: center;
   border-radius: 6px;
   padding: 8px;
-  position: absolute;
-  z-index: 1;
-  bottom: 125%;
-  left: 50%;
-  transform: translateX(-50%);
-  opacity: 0;
   transition: opacity 0.3s;
+  position: absolute;
+  z-index: 10;
+  opacity: 0;
+  visibility: hidden;
 }
 
 .tooltip:hover .tooltip-text {
-  visibility: visible;
   opacity: 1;
+  visibility: visible;
 }
 
-/* Dark mode aware tooltip */
 .dark .tooltip .tooltip-text {
   background-color: rgba(255, 255, 255, 0.8);
   color: #000;
 }
 
-/* Gradient text utilities */
+/*********************************************
+ * Typography 
+ *********************************************/
 .gradient-text {
   background-clip: text;
   -webkit-background-clip: text;
@@ -167,7 +142,9 @@ body {
   background-image: linear-gradient(to right, #6366f1, #60a5fa);
 }
 
-/* Shadow utilities */
+/*********************************************
+ * UI Elements 
+ *********************************************/
 .hover-shadow {
   transition: box-shadow 0.3s ease;
 }
@@ -180,32 +157,18 @@ body {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
 }
 
-/* Full-width section class */
 .full-width-section {
-  width: 100%;
-  max-width: 100%;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
 }
 
-@keyframes fade-in-up-slow {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.animate-fade-in-up-slow {
-  animation: fade-in-up-slow 1.8s ease-out forwards;
-}
-
-/* Theme transition */
-body {
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* Custom theme-aware utility classes */
+/*********************************************
+ * Theme Utility Classes 
+ *********************************************/
 .bg-card {
   background-color: var(--background-card);
 }
@@ -230,25 +193,52 @@ body {
   color: var(--text-heading);
 }
 
-/* Force form elements to use correct theme colors */
+/*********************************************
+ * Form Elements 
+ *********************************************/
 input, select, textarea {
   color: var(--foreground);
+  background-color: var(--background-card);
+  border-color: var(--border-light);
 }
 
 input::placeholder, textarea::placeholder {
   color: var(--text-muted);
 }
 
-/* Improve documentation page text contrast */
-.docs-content h1, .docs-content h2, .docs-content h3 {
+/*********************************************
+ * Documentation Elements 
+ *********************************************/
+.docs-content h1, 
+.docs-content h2, 
+.docs-content h3 {
   color: var(--text-heading);
 }
 
-.docs-content p, .docs-content li {
+.docs-content p, 
+.docs-content li {
   color: var(--text-description);
 }
 
-/* Example boxes */
+.docs-content h2, 
+.docs-content h3 {
+  color: var(--text-heading) !important;
+  font-weight: 600;
+}
+
+.docs-navigation a, 
+#docs-sidebar a, 
+#docs-sidebar span {
+  color: var(--text-heading) !important;
+}
+
+#docs-sidebar .text-muted {
+  color: var(--text-muted) !important;
+}
+
+/*********************************************
+ * Example Boxes 
+ *********************************************/
 .example-box {
   background-color: var(--background-secondary);
   border: 1px solid var(--border-light);
@@ -268,137 +258,93 @@ input::placeholder, textarea::placeholder {
   font-style: italic;
 }
 
-/* Theme toggle button improvements */
+/*********************************************
+ * Model Badge Styles 
+ *********************************************/
+.model-badge-selected {
+  color: white !important;
+  background-color: #4f46e5 !important;
+  font-weight: bold !important;
+  border: none !important;
+}
+
+.model-badge-unselected {
+  color: #374151 !important;
+  background-color: #f3f4f6 !important;
+  border: 1px solid #e5e7eb !important;
+  font-weight: normal !important;
+}
+
+.dark .model-badge-selected {
+  color: white !important;
+  background-color: #4f46e5 !important;
+}
+
+.dark .model-badge-unselected {
+  color: #d1d5db !important;
+  background-color: #1f2937 !important;
+  border: 1px solid #374151 !important;
+}
+
+html:not(.dark) span.model-badge-selected {
+  background-color: #dbeafe !important;
+  color: #1e293b !important;
+}
+
+/*********************************************
+ * Button Overrides 
+ *********************************************/
 button.hover\:bg-gray-200:hover {
-  background-color: #e5e7eb !important; /* Lighter gray for better contrast with icon */
+  background-color: #e5e7eb !important;
 }
 
 .dark button.hover\:bg-gray-800:hover {
   background-color: #1f2937 !important;
 }
 
-/* Improve text contrast in light mode */
-.text-gray-700 {
-  color: var(--text-description);
+/* Ensure buttons maintain proper contrast */
+.welcome-guide button.bg-indigo-600,
+.light .welcome-guide button.bg-indigo-600,
+button.bg-indigo-600,
+button.bg-gradient-to-r,
+.light button.bg-indigo-600,
+.light button.bg-gradient-to-r,
+a.bg-indigo-600,
+.light a.bg-indigo-600,
+.light a.inline-flex.items-center.px-4.py-2.bg-indigo-600,
+.light a.inline-flex.items-center.px-4.py-2.bg-indigo-600 * {
+  color: white !important;
 }
 
-.text-gray-800 {
-  color: var(--text-heading);
+.light button.bg-indigo-100.text-indigo-700.font-medium {
+  background-color: #4f46e5 !important;
+  color: white !important;
 }
 
-/* Ensure form labels have proper contrast */
-label.text-gray-700, label.text-sm {
-  color: var(--text-heading) !important;
+/*********************************************
+ * Header Styles 
+ *********************************************/
+
+/* Welcome Guide headings */
+.welcome-guide h2.text-xl.font-bold,
+.welcome-guide .bg-indigo-600 h2,
+.bg-indigo-600 h2,
+.bg-indigo-700 h2 {
+  color: white !important;
 }
 
-/* Dark mode-aware textarea */
-textarea {
-  color: var(--foreground);
-  background-color: var(--background-card);
-  border-color: var(--border-light);
-}
-
-textarea::placeholder {
-  color: var(--text-muted);
-}
-
-/* Fix genre buttons for better visibility */
-.border-gray-300:not(.border-indigo-500) {
-  color: var(--foreground);
-}
-
-/* Fix template selector texts */
-[class*="cursor-pointer"] h3.font-medium {
-  color: var(--text-heading) !important;
-}
-
-/* Ensure model descriptions are visible */
-.text-xs.text-gray-600 {
-  color: var(--text-description);
-}
-
-/* Docs navigation contrast fix */
-.docs-navigation a {
-  color: var(--text-heading) !important;
-}
-
-/* Fix docs sidebar links */
-#docs-sidebar a, #docs-sidebar span {
-  color: var(--text-heading) !important;
-}
-
-#docs-sidebar .text-muted {
-  color: var(--text-muted) !important;
-}
-
-/* Make docs section headers more visible */
-.docs-content h2, .docs-content h3 {
-  color: var(--text-heading) !important;
-  font-weight: 600;
-}
-
-/* Make expandable section titles visible */
-.expandable-section-title {
-  color: var(--text-heading) !important;
-}
-
-/* Make main title and subtitle text white in both modes */
+/* Page title headers */
 h1.text-4xl.md\:text-5xl.lg\:text-6xl.font-bold,
 h1.text-5xl.sm\:text-6xl.lg\:text-7xl.font-extrabold.tracking-tight,
 p.mt-2.text-lg.sm\:text-xl.lg\:text-2xl.font-medium,
-header h1,
-header p,
 .main-title,
 .main-subtitle {
   color: white !important;
 }
 
-/* ===== CRITICAL FIXES FOR LIGHT MODE BACKGROUNDS ===== */
-
-/* Fix welcome guide in light mode */
-.light .welcome-guide {
-  background-color: white !important;
-}
-
-.light .welcome-guide .text-gray-800 {
-  color: #1e293b !important;
-}
-
-.light .welcome-guide .text-gray-900 {
-  color: #0f172a !important;
-}
-
-/* Fix welcome guide step boxes in light mode */
-.light .welcome-guide .grid.gap-4 .bg-gray-100,
-.light .welcome-guide .grid.gap-4 .dark\:bg-gray-700 {
-  background-color: #f8fafc !important;
-  border-color: #e2e8f0 !important;
-}
-
-.light .welcome-guide .grid.gap-4 .font-medium,
-.light .welcome-guide .grid.gap-4 .text-gray-900, 
-.light .welcome-guide .grid.gap-4 .text-gray-800,
-.light .welcome-guide .grid.gap-4 .text-sm {
-  color: #0f172a !important;
-}
-
-/* Fix "Try This Example" box in welcome guide */
-.light .welcome-guide .bg-indigo-100,
-.light .welcome-guide .dark\:bg-indigo-900\/50 {
-  background-color: #f1f5f9 !important;
-}
-
-.light .welcome-guide h3.text-sm.font-bold.text-indigo-900,
-.light .welcome-guide p.text-sm.font-medium.text-indigo-800 {
-  color: #1e293b !important;
-}
-
-/* Fix "How to Create a Character" heading in welcome guide */
-.light .welcome-guide h3.text-lg.font-semibold.text-indigo-800 {
-  color: #1e293b !important;
-}
-
-/* Fix the main navigation tabs */
+/*********************************************
+ * Tab System Styles 
+ *********************************************/
 .light [role="tablist"] {
   background-color: #f8fafc !important;
 }
@@ -412,180 +358,16 @@ header p,
   color: #4f46e5 !important;
 }
 
-/* Fix the character description example box in light mode */
-.light .mb-3.bg-gray-800, .light .mb-3.bg-gray-700 {
-  background-color: #f0f9ff !important; /* Light blue background */
-  border-color: #bfdbfe !important;
+.light [aria-selected="true"] {
+  background-color: #4f46e5 !important;
+  color: white !important;
 }
 
-.light .mb-3.bg-gray-800 *, .light .mb-3.bg-gray-700 * {
-  color: #1e40af !important; /* Dark blue text */
+.light [aria-selected="false"] {
+  background-color: #f3f4f6 !important;
+  color: #374151 !important;
 }
 
-/* Fix clear options and randomize options buttons in light mode */
-.light button.bg-gray-200 {
-  background-color: #f1f5f9 !important;
-  color: #0f172a !important;
-  border-color: #cbd5e1 !important;
-}
-
-/* Fix portrait customization in light and dark mode */
-.light .portrait-section {
-  border: none !important;
-}
-
-.light .portrait-section > div {
-  background-color: white !important;
-}
-
-.dark .portrait-section {
-  border: none !important;
-}
-
-/* Fix text in light mode for example boxes on doc pages */
-.light .docs-content .bg-gray-800, 
-.light .docs-content .bg-gray-700,
-.light .docs-content .bg-gray-900 {
-  background-color: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
-}
-
-.light .docs-content .bg-gray-800 *, 
-.light .docs-content .bg-gray-700 *,
-.light .docs-content .bg-gray-900 * {
-  color: #1e293b !important;
-}
-
-/* Fix model cards in light mode */
-.light .border-gray-700 {
-  border-color: #e2e8f0 !important;
-}
-
-/* Fix specific color issues on doc pages for light mode */
-.light .character-traits span {
-  background-color: #f1f5f9 !important;
-  color: #1e293b !important;
-  border-color: #cbd5e1 !important;
-}
-
-/* Ensure expandable sections in light mode have proper backgrounds */
-.light .bg-gray-800 {
-  background-color: #f8fafc !important;
-}
-
-.light .bg-gray-700 {
-  background-color: #f8fafc !important;
-}
-
-/* Fix the character form tabs in light mode */
-.light [id^="headlessui-tabs-panel-"] {
-  background-color: white !important;
-}
-
-/* Make any missed dark elements light in light mode */
-.light .bg-gray-900 {
-  background-color: #f8fafc !important;
-}
-
-/* Fix portrait customization area specifically */
-.light #portrait-customization,
-.light #portrait-customization > div {
-  background-color: white !important;
-}
-
-.light #portrait-customization .bg-blue-900\/30 {
-  background-color: #dbeafe !important; /* Light blue background */
-}
-
-.light #portrait-customization .text-blue-300 {
-  color: #1e40af !important; /* Dark blue text */
-}
-
-/* ==== NEW FIXES ADDED FOR LIGHT MODE ISSUES ==== */
-
-/* Fix subgenre buttons in light mode */
-.light button.bg-indigo-100,
-.light button.dark\:bg-indigo-900,
-.light button.bg-gray-100 {
-  background-color: #f1f5f9 !important;
-  color: #0f172a !important;
-  border-color: #e2e8f0 !important;
-}
-
-/* Fix basic traits and character description labels */
-.light label.block.mb-2,
-.light h4.font-semibold {
-  color: #0f172a !important;
-}
-
-/* Fix character description good example box */
-.light .bg-gray-50.p-4.rounded-md.border,
-.light .bg-yellow-50.p-4.rounded-md.border {
-  background-color: #f8fafc !important;
-  border-color: #e2e8f0 !important;
-}
-
-.light .bg-gray-50.p-4.rounded-md.border *,
-.light .bg-yellow-50.p-4.rounded-md.border * {
-  color: #0f172a !important;
-}
-
-/* Fix Advanced Character Options dropdown */
-.light .expandable-section-title,
-.light .p-4.bg-gray-800.dark\:bg-gray-700 {
-  background-color: #f1f5f9 !important;
-  color: #0f172a !important;
-}
-
-.light .expandable-section h3.text-base.font-medium.text-gray-900 {
-  color: #0f172a !important;
-}
-
-/* Fix trait selection buttons in light mode */
-.light .flex.flex-wrap.gap-2 button,
-.light .flex.flex-wrap.gap-3 button {
-  background-color: #f1f5f9 !important;
-  color: #0f172a !important;
-  border-color: #e2e8f0 !important;
-}
-
-/* Fix occupation dropdown in light mode */
-.light [class*="cursor-pointer"].bg-gray-100,
-.light [class*="cursor-pointer"].dark\:bg-gray-700 {
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
-}
-
-.light [class*="cursor-pointer"] span:not(.ring-indigo-500) {
-  color: #0f172a !important;
-}
-
-/* Fix portrait customization dropdowns */
-.light #portrait-customization [class*="cursor-pointer"],
-.light .bg-gray-100.text-gray-800 {
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
-}
-
-/* Fix "Powered by" model text */
-.light .text-xs.text-gray-500,
-.light .mt-1.text-xs.text-gray-500,
-.light .mt-1.text-gray-500,
-.light .text-xs.text-gray-600 {
-  color: #0f172a !important;
-}
-
-/* Fix progress bar background in light mode */
-.light .w-32.bg-gray-200.rounded-full,
-.light .w-full.bg-gray-200.rounded-full {
-  background-color: #e2e8f0 !important;
-}
-
-.light .text-gray-600 {
-  color: #0f172a !important;
-}
-
-/* Fix generated character section tabs */
 .light .character-display [role="tablist"] {
   background-color: #f8fafc !important;
 }
@@ -599,14 +381,124 @@ header p,
   color: #4f46e5 !important;
 }
 
-/* Fix generated character display sections */
+/*********************************************
+ * Light Mode Overrides 
+ *********************************************/
+
+/* Background fixes */
+.light main.bg-gradient-to-br {
+  background: white !important;
+  background-image: none !important;
+}
+
+.light .welcome-guide {
+  background-color: white !important;
+}
+
+/* Fix various contrast issues in light mode */
+.light .mb-3.bg-indigo-100.dark\:bg-gray-800 .text-indigo-800.dark\:text-gray-300.text-sm.italic,
+.light div.bg-indigo-100 div.text-indigo-800,
+.light .bg-indigo-100 .text-indigo-800,
+.light .mb-3.bg-indigo-100 div.italic {
+  color: #0f172a !important; /* Very dark text in light mode */
+}
+
+/* Fix message boxes in light mode */
+.light .bg-yellow-50.p-4.rounded-md.border.border-yellow-200,
+.light .bg-yellow-50.p-4.rounded-lg.border.border-yellow-200 {
+  background-color: #fee2e2 !important; /* Light red background */
+  border-color: #fecaca !important; /* Light red border */
+}
+.light .bg-yellow-50.p-4.rounded-md.border.border-yellow-200 *,
+.light .bg-yellow-50.p-4.rounded-lg.border.border-yellow-200 * {
+  color: #b91c1c !important; /* Red text */
+}
+
+/* Fix numbered steps on character examples page */
+.light .flex.items-start .flex-shrink-0.h-6.w-6.rounded-full.bg-indigo-100,
+.light .flex.items-start .h-6.w-6.rounded-full.bg-indigo-100 {
+  background-color: #e5e7eb !important; /* Light gray background */
+}
+.light .flex.items-start .flex-shrink-0.h-6.w-6.rounded-full.bg-indigo-100 *,
+.light .flex.items-start .h-6.w-6.rounded-full.bg-indigo-100 * {
+  color: #0f172a !important; /* Very dark text */
+}
+
+/* Fix character description example text in light mode */
+.light .bg-gray-50.p-4.rounded-md.border.border-gray-200 p.text-gray-700.italic,
+.light .p-4.border.border-gray-200.rounded-lg.shadow-sm p.italic,
+.light p.text-gray-700.italic {
+  color: #1e293b !important; /* Dark text color */
+}
+
+/* Welcome guide text colors */
+.light .welcome-guide .text-gray-800 {
+  color: #1e293b !important;
+}
+.light .welcome-guide .text-gray-900 {
+  color: #0f172a !important;
+}
+.light .welcome-guide .grid.gap-4 .bg-gray-100,
+.light .welcome-guide .grid.gap-4 .dark\:bg-gray-700 {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+.light .welcome-guide .grid.gap-4 .font-medium,
+.light .welcome-guide .grid.gap-4 .text-gray-900, 
+.light .welcome-guide .grid.gap-4 .text-gray-800,
+.light .welcome-guide .grid.gap-4 .text-sm {
+  color: #0f172a !important;
+}
+
+.light .welcome-guide .bg-indigo-100,
+.light .welcome-guide .dark\:bg-indigo-900\/50 {
+  background-color: #f1f5f9 !important;
+}
+.light .welcome-guide h3.text-sm.font-bold.text-indigo-900,
+.light .welcome-guide p.text-sm.font-medium.text-indigo-800 {
+  color: #1e293b !important;
+}
+.light .welcome-guide h3.text-lg.font-semibold.text-indigo-800 {
+  color: #1e293b !important;
+}
+
+/* Fix progress bar background in light mode */
+.light .w-32.bg-gray-200.rounded-full,
+.light .w-full.bg-gray-200.rounded-full {
+  background-color: #e2e8f0 !important;
+}
+
+/* Card and panel backgrounds */
+.light .mb-3.bg-gray-800, .light .mb-3.bg-gray-700 {
+  background-color: #f0f9ff !important; /* Light blue background */
+  border-color: #bfdbfe !important;
+}
+.light .mb-3.bg-gray-800 *, .light .mb-3.bg-gray-700 * {
+  color: #1e40af !important; /* Dark blue text */
+}
+
+.light button.bg-gray-200 {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+.light .portrait-section {
+  border: none !important;
+}
+.light .portrait-section > div {
+  background-color: white !important;
+}
+.dark .portrait-section {
+  border: none !important;
+}
+
 .light .bg-white.p-4.rounded-lg,
 .light .bg-gray-50.p-4.rounded-lg,
 .light .space-y-6 .bg-white.p-4.rounded-lg {
   background-color: #f8fafc !important;
   border-color: #e2e8f0 !important;
 }
-
 .light .bg-white.p-4.rounded-lg h3,
 .light .bg-white.p-4.rounded-lg p,
 .light .bg-gray-50.p-4.rounded-lg h3,
@@ -616,34 +508,161 @@ header p,
   color: #0f172a !important;
 }
 
-/* Fix JSON viewer in light mode */
-.light .bg-gray-100.rounded-lg p {
-  color: #0f172a !important;
+/* Documentation container backgrounds */
+.light .docs-content .bg-gray-800, 
+.light .docs-content .bg-gray-700,
+.light .docs-content .bg-gray-900 {
+  background-color: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+}
+.light .docs-content .bg-gray-800 *, 
+.light .docs-content .bg-gray-700 *,
+.light .docs-content .bg-gray-900 * {
+  color: #1e293b !important;
+}
+.light .border-gray-700 {
+  border-color: #e2e8f0 !important;
 }
 
-.light .bg-gray-100.rounded-lg .bg-gray-200 {
-  background-color: #e2e8f0 !important;
+/*********************************************
+ * Status Messages 
+ *********************************************/
+
+/* Success message styling */
+.light div.bg-green-50.text-green-800,
+.light div.bg-green-50.text-green-800 p,
+.light div.bg-green-50 * {
+  background-color: #dcfce7 !important; /* Green 100 */
+  color: #166534 !important; /* Green 800 - very dark green */
+  border-color: #bbf7d0 !important; /* Green 200 */
+  font-weight: 600 !important;
+}
+.light div.bg-green-50.text-green-800.p-3.text-center.border-b.border-green-100 {
+  background-color: #dcfce7 !important;
+  color: #166534 !important;
+  border-color: #bbf7d0 !important;
 }
 
-/* Fix main docs page title */
-.light .docs-content h1.text-3xl,
-.light h1.text-3xl.font-bold.mb-6 {
-  color: #0f172a !important;
+/* Warning message styling */
+.light .mt-4.p-3.bg-yellow-50.text-yellow-900.rounded-md.text-sm.font-bold.border.border-yellow-300,
+.light div.mt-4.p-3.bg-yellow-50 {
+  background-color: #fef9c3 !important; /* Yellow 100 */
+  color: #854d0e !important; /* Yellow 800 */
+  border-color: #fef9c3 !important; /* Same as background */
+  font-weight: 600 !important;
 }
 
-/* Fix docs navigation menu */
+/* Error message styling */
+.light .mt-4.p-3.bg-red-50.text-red-700,
+.light .mt-4.p-3.bg-red-50.text-red-700 p,
+.light .mt-4.p-3.bg-red-50,
+.light .mt-4.p-3[class*="bg-red-50"],
+.light .animate-pulse[class*="bg-red-50"] {
+  background-color: #fee2e2 !important; /* Red 100 */
+  color: #b91c1c !important; /* Red 700 */
+  border: none !important;
+  font-weight: bold !important;
+}
+
+/* Ensure loading message has no border */
+.light .mt-4.p-3.bg-amber-50.text-amber-800 {
+  border: none !important;
+}
+
+/*********************************************
+ * Documentation Specific Overrides 
+ *********************************************/
+
+/* Fix navigation colors */
 .light .docs-navigation,
 .light .breadcrumbs {
   color: #0f172a !important;
 }
-
 .light .docs-navigation a,
 .light .breadcrumbs a,
 .light .breadcrumbs span {
   color: #0f172a !important;
 }
 
-/* Fix character examples page */
+/* Heading colors */
+.light .docs-content h1.text-3xl,
+.light h1.text-3xl.font-bold.mb-6 {
+  color: #0f172a !important;
+}
+.light .text-3xl.font-bold.mb-6,
+.light .text-2xl.font-semibold.mb-4,
+.light .text-xl.font-medium.mb-3 {
+  color: #0f172a !important;
+}
+
+/* Fix character traits in examples */
+.light .character-traits span {
+  background-color: #f1f5f9 !important;
+  color: #1e293b !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Fix expandable sections */
+.light .expandable-section-title,
+.light .p-4.bg-gray-800.dark\:bg-gray-700 {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+.light .expandable-section h3.text-base.font-medium.text-gray-900 {
+  color: #0f172a !important;
+}
+
+/* Fix code blocks */
+.light code.bg-gray-100.p-1.rounded.dark\:bg-gray-800 {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+.light .bg-indigo-100.p-2.rounded.border.border-indigo-200 code,
+.light .bg-indigo-100.p-2.rounded code {
+  color: #312e81 !important; /* Indigo 900 - very dark */
+  font-weight: 600 !important;
+}
+
+/* Fix example cards for documentation */
+.light .docs-content .p-4.border.border-gray-200.rounded-lg,
+.light .docs-content .p-4.bg-white.border.border-gray-200.rounded-lg,
+.light .docs-content .grid.gap-6 .p-4.bg-white.border.border-gray-200.rounded-lg,
+.light .docs-content .grid.gap-6 .p-4.border.border-gray-200.rounded-lg {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+.light .docs-content .p-4.border.border-gray-200.rounded-lg *,
+.light .docs-content .p-4.bg-white.border.border-gray-200.rounded-lg *,
+.light .docs-content .grid.gap-6 .p-4.bg-white.border.border-gray-200.rounded-lg *,
+.light .docs-content .grid.gap-6 .p-4.border.border-gray-200.rounded-lg * {
+  color: #0f172a !important;
+}
+
+/* Fix code documentation sections */
+.light .docs-content .bg-gray-800.text-gray-200.p-3.rounded-md,
+.light .docs-content .bg-gray-800.text-gray-200.p-4.rounded-lg {
+  background-color: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+.light .docs-content .bg-gray-800.text-gray-200.p-3.rounded-md *,
+.light .docs-content .bg-gray-800.text-gray-200.p-4.rounded-lg * {
+  color: #334155 !important;
+}
+
+/* Fix grid cards in documentation */
+.light .grid.grid-cols-1.md\:grid-cols-2.gap-6 .p-4.bg-gray-50.rounded-lg.border,
+.light .grid.grid-cols-1.md\:grid-cols-3.gap-6 .p-4.bg-gray-50.rounded-lg.border,
+.light .p-4.bg-gray-50.rounded-lg.border {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+.light .grid.grid-cols-1.md\:grid-cols-2.gap-6 .p-4.bg-gray-50.rounded-lg.border *,
+.light .grid.grid-cols-1.md\:grid-cols-3.gap-6 .p-4.bg-gray-50.rounded-lg.border *,
+.light .p-4.bg-gray-50.rounded-lg.border * {
+  color: #0f172a !important;
+}
+
+/* Fix specific documentation sections */
 .light .character-examples h1,
 .light .character-examples .lead,
 .light .character-examples h2 {
@@ -654,86 +673,58 @@ header p,
   background-color: #f8fafc !important;
   border-color: #e2e8f0 !important;
 }
-
 .light .character-examples .bg-gray-50.p-4.rounded-md.border * {
   color: #0f172a !important;
 }
 
-/* Fix "Tip" sections */
+/* Fix warning & info sections */
 .light .bg-yellow-50.p-4.rounded-md.border {
   background-color: #fef3c7 !important;
   border-color: #fbbf24 !important;
 }
-
 .light .bg-yellow-50.p-4.rounded-md.border p,
 .light .bg-yellow-50.p-4.rounded-md.border strong {
   color: #92400e !important;
 }
 
-/* Fix all documentation pages sections */
-.light .docs-content .p-4.border.border-gray-200.rounded-lg,
-.light .docs-content .p-4.bg-white.border.border-gray-200.rounded-lg,
-.light .docs-content .grid.gap-6 .p-4.bg-white.border.border-gray-200.rounded-lg,
-.light .docs-content .grid.gap-6 .p-4.border.border-gray-200.rounded-lg {
+.light .bg-gray-50.p-4.rounded-md.border,
+.light .bg-yellow-50.p-4.rounded-md.border {
   background-color: #f8fafc !important;
   border-color: #e2e8f0 !important;
 }
-
-.light .docs-content .p-4.border.border-gray-200.rounded-lg *,
-.light .docs-content .p-4.bg-white.border.border-gray-200.rounded-lg *,
-.light .docs-content .grid.gap-6 .p-4.bg-white.border.border-gray-200.rounded-lg *,
-.light .docs-content .grid.gap-6 .p-4.border.border-gray-200.rounded-lg * {
+.light .bg-gray-50.p-4.rounded-md.border *,
+.light .bg-yellow-50.p-4.rounded-md.border * {
   color: #0f172a !important;
 }
 
-/* Fix example code blocks on doc pages */
-.light .docs-content .bg-gray-800.text-gray-200.p-3.rounded-md,
-.light .docs-content .bg-gray-800.text-gray-200.p-4.rounded-lg {
-  background-color: #f1f5f9 !important;
-  border: 1px solid #cbd5e1 !important;
+/* Fix related documentation sections */
+.light .p-4.bg-indigo-50.rounded-lg.border.border-indigo-200 {
+  background-color: #f0f9ff !important;
+  border-color: #bfdbfe !important;
+}
+.light .p-4.bg-indigo-50.rounded-lg.border.border-indigo-200 * {
+  color: #1e40af !important;
 }
 
-.light .docs-content .bg-gray-800.text-gray-200.p-3.rounded-md *,
-.light .docs-content .bg-gray-800.text-gray-200.p-4.rounded-lg * {
-  color: #334155 !important;
+.light .p-4.bg-red-50.rounded-lg.border.border-red-200 {
+  background-color: #fef2f2 !important;
+  border-color: #fecaca !important;
+}
+.light .p-4.bg-red-50.rounded-lg.border.border-red-200 * {
+  color: #b91c1c !important;
 }
 
-/* Make sure all docs page h1-h3 headers are dark in light mode */
-.light .docs-content h1,
-.light .docs-content h2,
-.light .docs-content h3,
-.light h1.text-3xl.font-bold.mb-6.text-gray-900.dark\:text-gray-100,
-.light h2.text-2xl.font-semibold.mb-4.text-indigo-700.dark\:text-indigo-400 {
-  color: #0f172a !important;
+.light .bg-blue-50.p-4.rounded-lg.border.border-blue-100.text-sm.text-blue-700 {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+}
+.light .bg-blue-50.p-4.rounded-lg.border.border-blue-100.text-sm.text-blue-700 * {
+  color: #1e3a8a !important;
 }
 
-/* Make sure all inline code blocks have proper light mode styling */
-.light code.bg-gray-100.p-1.rounded.dark\:bg-gray-800 {
-  background-color: #f1f5f9 !important;
-  color: #0f172a !important;
-}
-
-/* Fix feature boxes on roadmap and other pages */
-.light .grid.grid-cols-1.md\:grid-cols-2.gap-6 .p-4.bg-gray-50.rounded-lg.border,
-.light .grid.grid-cols-1.md\:grid-cols-3.gap-6 .p-4.bg-gray-50.rounded-lg.border,
-.light .p-4.bg-gray-50.rounded-lg.border {
-  background-color: #f8fafc !important;
-  border-color: #e2e8f0 !important;
-}
-
-.light .grid.grid-cols-1.md\:grid-cols-2.gap-6 .p-4.bg-gray-50.rounded-lg.border *,
-.light .grid.grid-cols-1.md\:grid-cols-3.gap-6 .p-4.bg-gray-50.rounded-lg.border *,
-.light .p-4.bg-gray-50.rounded-lg.border * {
-  color: #0f172a !important;
-}
-
-/* Fix headers on all pages */
-.light .text-3xl.font-bold.mb-6,
-.light .text-2xl.font-semibold.mb-4,
-.light .text-xl.font-medium.mb-3 {
-  color: #0f172a !important;
-}
-
+/*********************************************
+ * Dark Mode Background Fixes 
+ *********************************************/
 /* Fix any remaining dark text/background issues */
 .light .bg-gray-800,
 .light .bg-gray-900,
@@ -753,186 +744,25 @@ header p,
   color: #0f172a !important;
 }
 
-/* Fix background of related documentation sections */
-.light .p-4.bg-indigo-50.rounded-lg.border.border-indigo-200 {
-  background-color: #f0f9ff !important;
-  border-color: #bfdbfe !important;
+/*********************************************
+ * Text Color Overrides 
+ *********************************************/
+.light .text-gray-600 {
+  color: #0f172a !important;
 }
 
-.light .p-4.bg-indigo-50.rounded-lg.border.border-indigo-200 * {
-  color: #1e40af !important;
+.light .text-gray-700 {
+  color: var(--text-description);
 }
 
-/* Fix security contact section */
-.light .p-4.bg-red-50.rounded-lg.border.border-red-200 {
-  background-color: #fef2f2 !important;
-  border-color: #fecaca !important;
+.light .text-gray-800 {
+  color: var(--text-heading);
 }
 
-.light .p-4.bg-red-50.rounded-lg.border.border-red-200 * {
-  color: #b91c1c !important;
+.light label.text-gray-700, label.text-sm {
+  color: var(--text-heading) !important;
 }
 
-/* Fix character profiles info box */
-.light .bg-blue-50.p-4.rounded-lg.border.border-blue-100.text-sm.text-blue-700 {
-  background-color: #eff6ff !important;
-  border-color: #bfdbfe !important;
-}
-
-.light .bg-blue-50.p-4.rounded-lg.border.border-blue-100.text-sm.text-blue-700 * {
-  color: #1e3a8a !important;
-}
-
-/* Fix "Get Started" button text in light mode */
-.welcome-guide button.bg-indigo-600,
-.light .welcome-guide button.bg-indigo-600 {
-  color: white !important;
-}
-
-/* Fix "Generate Character" button text in light mode */
-button.bg-indigo-600,
-button.bg-gradient-to-r,
-.light button.bg-indigo-600,
-.light button.bg-gradient-to-r {
-  color: white !important;
-}
-
-/* Fix "Download JSON" button text in light mode */
-a.bg-indigo-600,
-.light a.bg-indigo-600,
-.light a.inline-flex.items-center.px-4.py-2.bg-indigo-600,
-.light a.inline-flex.items-center.px-4.py-2.bg-indigo-600 * {
-  color: white !important;
-}
-
-/* Fix "POST /api/generate" text in API page */
-.light .p-4.bg-indigo-50.border-l-4.border-indigo-500 h3.text-lg.font-semibold.text-indigo-800,
-.light .p-4.bg-indigo-50.border-l-4.border-indigo-500 p.text-indigo-700 {
-  color: #3730a3 !important; /* Darker indigo for better contrast */
-}
-
-/* Fix code/file references in contributing page */
-.light .bg-indigo-50.p-2.rounded.border.border-indigo-100 code,
-.light code.text-indigo-700 {
-  color: #3730a3 !important; /* Darker indigo for better contrast */
-}
-
-/* Fix version numbers in changelog */
-.light span.bg-indigo-100.dark\:bg-indigo-900\/50.text-indigo-800.dark\:text-indigo-300,
-.light .bg-indigo-100.text-indigo-800 {
-  color: #312e81 !important; /* Much darker indigo for better contrast */
-}
-
-/* Fix portrait customization tip text in light mode */
-.light .mt-4.p-3.bg-blue-50.text-blue-700,
-.light .mt-4.p-3.bg-blue-50.text-blue-700 p,
-.light .p-3.bg-blue-50.text-blue-700.rounded-md.text-sm,
-.light .p-3.bg-blue-50.text-blue-700.rounded-md.text-sm p {
-  color: #1e3a8a !important; /* Darker blue for better contrast */
-}
-
-/* Make personality trait buttons more distinct when selected in light mode */
-.light button.bg-indigo-100.text-indigo-800.border.border-indigo-300 {
-  background-color: #a5b4fc !important; /* More vibrant background */
-  color: #312e81 !important; /* Darker text */
-  border-color: #6366f1 !important; /* More visible border */
-  font-weight: 500 !important; /* Make text bolder */
-}
-/* Fix roadmap page "High Priority" badge text */
-.light span.inline-block.bg-blue-100.text-blue-800.text-xs.px-2.py-1.rounded-full,
-.light .inline-block.bg-blue-100.text-blue-800 {
-  color: #1e3a8a !important; /* Much darker blue */
-  font-weight: 500 !important;
-}
-
-/* Fix delayed loading message for better contrast */
-.light .mt-4.p-3.bg-yellow-50.text-yellow-700.rounded-md.text-sm,
-.light .p-3.bg-yellow-50.text-yellow-700,
-.light .bg-yellow-50.text-yellow-700 p {
-  color: #92400e !important; /* Much darker amber/yellow */
-  font-weight: 500 !important;
-}
-
-/* Fix selection in usage limit display */
-.light .bg-indigo-100.text-indigo-800.border.border-indigo-300 span,
-.light .text-indigo-800 {
-  color: #1e3a8a !important; /* Darker indigo for better light mode contrast */
-}
-
-/* Make sure "Download JSON" button text is white */
-.light a.bg-gradient-to-r.from-blue-500.to-blue-700,
-.light button.bg-gradient-to-r.from-blue-500.to-blue-700,
-.light a.bg-gradient-to-r.from-blue-500.to-blue-700 *,
-.light button.bg-gradient-to-r.from-blue-500.to-blue-700 * {
-  color: white !important;
-}
-
-/* Make quest type tag text white in light mode */
-.light span.inline-block.bg-indigo-100.text-indigo-800.text-xs.px-2.py-1.rounded,
-.light .inline-block.bg-indigo-900.text-indigo-200 {
-  background-color: #4f46e5 !important; /* Indigo 600 */
-  color: white !important;
-  border-color: #4338ca !important; /* Indigo 700 */
-}
-
-/* Fix portrait customization tip */
-.light .mt-4.p-3.bg-blue-50.text-blue-700.rounded-md.text-sm,
-.light .mt-4.p-3.bg-blue-50.text-blue-700.rounded-md.text-sm p,
-.light .mt-4.p-3.bg-blue-50.text-blue-700.rounded-md.text-sm strong {
-  color: #1e3a8a !important; /* Very dark blue */
-  font-weight: 500 !important;
-}
-
-/* Fix API page endpoint display */
-.light .p-4.bg-indigo-50.border-l-4.border-indigo-500.mb-6 h3,
-.light .p-4.bg-indigo-50.border-l-4.border-indigo-500.mb-6 p {
-  color: #312e81 !important; /* Indigo 900 - very dark */
-  font-weight: 600 !important;
-}
-
-/* Fix Contributing page file references */
-.light .bg-indigo-100.p-2.rounded.border.border-indigo-200 code,
-.light .bg-indigo-100.p-2.rounded code {
-  color: #312e81 !important; /* Indigo 900 - very dark */
-  font-weight: 600 !important;
-}
-
-/* Fix Changelog page version numbers */
-.light span.bg-indigo-100.dark\:bg-indigo-900\/50.text-indigo-900.dark\:text-indigo-300,
-.light span.bg-indigo-100 {
-  color: #312e81 !important; /* Indigo 900 - very dark */
-  font-weight: 700 !important;
-}
-
-/* Fix all buttons with blue gradients */
-button.bg-gradient-to-r.from-blue-500.to-blue-700,
-button.bg-gradient-to-r.from-blue-600.to-blue-800,
-a.bg-gradient-to-r.from-blue-500.to-blue-700,
-.light button.bg-gradient-to-r.from-blue-500.to-blue-700,
-.light button.bg-gradient-to-r.from-blue-600.to-blue-800,
-.light a.bg-gradient-to-r.from-blue-500.to-blue-700 {
-  color: white !important;
-}
-
-/* Fix model selection "∞ left" text with ultra-high specificity */
-.light span.text-gray-600.dark\:text-gray-400,
-.light span.text-gray-600,
-.light div.text-sm.flex.items-center span,
-.light div.text-sm.flex.items-center span.text-gray-600 {
-  color: #1f2937 !important; /* Gray 800 - very dark gray */
-  font-weight: 500 !important;
-}
-
-/* More specific fix for quest type tag */
-.light span.inline-block.bg-indigo-100.text-indigo-800,
-.light div.mb-3 span.inline-block,
-.light div.mb-3 span.inline-block.bg-indigo-100 {
-  background-color: #4f46e5 !important; /* Indigo 600 */
-  color: white !important;
-  border: 1px solid #4338ca !important; /* Indigo 700 */
-}
-
-/* Ultra specific fix for portrait customization tip */
 .light div.mt-4.p-3.bg-blue-50,
 .light div.mt-4.p-3.bg-blue-50 p,
 .light div.mt-4.p-3.bg-blue-50 strong,
@@ -941,7 +771,6 @@ a.bg-gradient-to-r.from-blue-500.to-blue-700,
   font-weight: 600 !important;
 }
 
-/* Ultra specific fix for delayed loading message */
 .light div.mt-4.p-3.bg-yellow-50,
 .light div.mt-4.p-3.bg-yellow-50 p,
 .light div.mt-4.p-3.bg-yellow-50.text-yellow-900,
@@ -951,16 +780,81 @@ a.bg-gradient-to-r.from-blue-500.to-blue-700,
   border: 1px solid #fbbf24 !important;
 }
 
-/* Fix success message text */
-.light div.bg-green-50.text-green-700,
-.light div.bg-green-50.text-green-700 *,
-.light div.bg-green-50.text-green-700.p-3.text-center {
-  color: #15803d !important; /* Green 700 - dark green */
-  font-weight: 600 !important;
+/*********************************************
+ * Badge & Tag Styles 
+ *********************************************/
+.light span.bg-indigo-100.dark\:bg-indigo-900\/50.text-indigo-900.dark\:text-indigo-300,
+.light span.bg-indigo-100 {
+  color: #312e81 !important; /* Indigo 900 - very dark */
+  font-weight: 700 !important;
 }
-/* Final fixes for the remaining issues */
 
-/* Fix model selector "∞ left" text in selection area */
+.light .mt-4.p-3.bg-blue-50.text-blue-700.rounded-md.text-sm,
+.light .mt-4.p-3.bg-blue-50.text-blue-700.rounded-md.text-sm p,
+.light .mt-4.p-3.bg-blue-50.text-blue-700.rounded-md.text-sm strong {
+  color: #1e3a8a !important; /* Very dark blue */
+  font-weight: 500 !important;
+}
+
+.light span.inline-block.bg-indigo-100.text-indigo-800,
+.light div.mb-3 span.inline-block,
+.light div.mb-3 span.inline-block.bg-indigo-100 {
+  background-color: #4f46e5 !important; /* Indigo 600 */
+  color: white !important;
+  border: 1px solid #4338ca !important; /* Indigo 700 */
+}
+
+.light span.inline-block.bg-blue-100.text-blue-800.text-xs.px-2.py-1.rounded-full,
+.light .inline-block.bg-blue-100.text-blue-800 {
+  color: #1e3a8a !important; /* Much darker blue */
+  font-weight: 500 !important;
+}
+
+.light span.text-gray-600.dark\:text-gray-400,
+.light span.text-gray-600,
+.light div.text-sm.flex.items-center span,
+.light div.text-sm.flex.items-center span.text-gray-600 {
+  color: #1f2937 !important; /* Gray 800 - very dark gray */
+  font-weight: 500 !important;
+}
+
+.light span.inline-block.bg-indigo-100.text-indigo-800.text-xs.px-2.py-1.rounded,
+.light .inline-block.bg-indigo-900.text-indigo-200 {
+  background-color: #4f46e5 !important; /* Indigo 600 */
+  color: white !important;
+  border-color: #4338ca !important; /* Indigo 700 */
+}
+
+/*********************************************
+ * Button Styles 
+ *********************************************/
+.light button.bg-indigo-100.text-indigo-800.border.border-indigo-300 {
+  background-color: #a5b4fc !important; /* More vibrant background */
+  color: #312e81 !important; /* Darker text */
+  border-color: #6366f1 !important; /* More visible border */
+  font-weight: 500 !important; /* Make text bolder */
+}
+
+.light .flex.flex-wrap.gap-2 button,
+.light .flex.flex-wrap.gap-3 button {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light div.flex.flex-wrap.gap-2 button[class*="bg-indigo-100"] {
+  background-color: #4f46e5 !important; /* Indigo 600 */
+  color: white !important;
+  border-color: #4338ca !important; /* Indigo 700 */
+  font-weight: 500 !important;
+}
+
+.light div.flex.flex-wrap.gap-2 button[class*="bg-gray-100"] {
+  background-color: #f3f4f6 !important; /* Gray 100 */
+  color: #374151 !important; /* Gray 700 */
+  border-color: #e5e7eb !important; /* Gray 200 */
+}
+
 .light button.px-3.py-1.rounded-md.text-xs.font-medium,
 .light button[class*="text-xs font-medium"],
 .light button.bg-green-100.text-green-800,
@@ -971,64 +865,6 @@ a.bg-gradient-to-r.from-blue-500.to-blue-700,
   border: 1px solid #4338ca !important; /* Indigo 700 */
 }
 
-/* Fix success message color in light mode */
-.light .bg-green-50.text-green-800,
-.light div.bg-green-50.text-green-800,
-.light div.bg-green-50.text-green-800 * {
-  background-color: #dcfce7 !important; /* Light green background */
-  color: #166534 !important; /* Dark green text */
-  border-color: #bbf7d0 !important; /* Light green border */
-  font-weight: 600 !important;
-}
-
-/* Fix the yellow box around delayed loading message */
-.light .mt-4.p-3.bg-yellow-50.text-yellow-900.rounded-md.text-sm.font-bold.border.border-yellow-300,
-.light div.mt-4.p-3.bg-yellow-50 {
-  background-color: #fef9c3 !important; /* Yellow 100 */
-  color: #854d0e !important; /* Yellow 800 */
-  border-color: #fef9c3 !important; /* Same as background - eliminate visible border */
-  font-weight: 600 !important;
-}
-
-/* Add these final fixes to globals.css */
-
-/* Fix success message text */
-.light div.bg-green-50.text-green-800,
-.light div.bg-green-50.text-green-800 p,
-.light div.bg-green-50 * {
-  background-color: #dcfce7 !important; /* Green 100 */
-  color: #166534 !important; /* Green 800 - very dark green */
-  border-color: #bbf7d0 !important; /* Green 200 */
-  font-weight: 600 !important;
-}
-
-/* Very specific selector for the success message */
-.light div.bg-green-50.text-green-800.p-3.text-center.border-b.border-green-100 {
-  background-color: #dcfce7 !important;
-  color: #166534 !important;
-  border-color: #bbf7d0 !important;
-}
-
-/* Ensure there's no border in the loading message */
-.light .mt-4.p-3.bg-amber-50.text-amber-800 {
-  border: none !important;
-}
-
-/* Make delayed loading message red in light mode */
-.light .mt-4.p-3.bg-red-50.text-red-700,
-.light .mt-4.p-3.bg-red-50.text-red-700 p,
-.light .mt-4.p-3.bg-red-50,
-.light .mt-4.p-3[class*="bg-red-50"],
-.light .animate-pulse[class*="bg-red-50"] {
-  background-color: #fee2e2 !important; /* Red 100 */
-  color: #b91c1c !important; /* Red 700 */
-  border: none !important;
-  font-weight: bold !important;
-}
-
-/* Final CSS fixes for subgenre and personality trait options */
-
-/* Make selected subgenre buttons dark with white text */
 .light button[class*="bg-indigo-100"][class*="text-indigo-800"],
 .light button.bg-indigo-100.text-indigo-800 {
   background-color: #4f46e5 !important; /* Indigo 600 */
@@ -1037,7 +873,6 @@ a.bg-gradient-to-r.from-blue-500.to-blue-700,
   font-weight: 500 !important;
 }
 
-/* Ensure unselected subgenre buttons are lighter */
 .light button.bg-gray-100,
 .light button[class*="bg-gray-100"][class*="text-gray-700"] {
   background-color: #f3f4f6 !important; /* Gray 100 */
@@ -1045,93 +880,85 @@ a.bg-gradient-to-r.from-blue-500.to-blue-700,
   border-color: #e5e7eb !important; /* Gray 200 */
 }
 
-/* Make selected personality trait buttons dark with white text */
-.light div.mt-4 button[class*="bg-indigo-100"][class*="text-indigo-800"],
-.light div.flex.flex-wrap.gap-2 button[class*="bg-indigo-100"] {
-  background-color: #4f46e5 !important; /* Indigo 600 */
-  color: white !important;
-  border-color: #4338ca !important; /* Indigo 700 */
-  font-weight: 500 !important;
+/*********************************************
+ * Special Section Styles
+ *********************************************/
+.light .p-4.bg-indigo-50.border-l-4.border-indigo-500 h3.text-lg.font-semibold.text-indigo-800,
+.light .p-4.bg-indigo-50.border-l-4.border-indigo-500 p.text-indigo-700 {
+  color: #3730a3 !important; /* Darker indigo for better contrast */
 }
 
-/* Ensure unselected personality trait buttons are lighter */
-.light div.flex.flex-wrap.gap-2 button[class*="bg-gray-100"] {
-  background-color: #f3f4f6 !important; /* Gray 100 */
-  color: #374151 !important; /* Gray 700 */
-  border-color: #e5e7eb !important; /* Gray 200 */
+.light .p-4.bg-indigo-50.border-l-4.border-indigo-500.mb-6 h3,
+.light .p-4.bg-indigo-50.border-l-4.border-indigo-500.mb-6 p {
+  color: #312e81 !important; /* Indigo 900 - very dark */
+  font-weight: 600 !important;
 }
 
-/* Fix selected quest navigation buttons */
-.light button.bg-indigo-100.text-indigo-700.font-medium {
-  background-color: #4f46e5 !important;
-  color: white !important;
+/* Fix special UI elements */
+.light .text-xs.text-gray-500,
+.light .mt-1.text-xs.text-gray-500,
+.light .mt-1.text-gray-500,
+.light .text-xs.text-gray-600 {
+  color: #0f172a !important;
 }
 
-/* Ensure very specific contrast for selected vs unselected */
-.light [aria-selected="true"] {
-  background-color: #4f46e5 !important;
-  color: white !important;
+.light div.bg-green-50.text-green-700,
+.light div.bg-green-50.text-green-700 *,
+.light div.bg-green-50.text-green-700.p-3.text-center {
+  color: #15803d !important; /* Green 700 - dark green */
+  font-weight: 600 !important;
 }
 
-.light [aria-selected="false"] {
-  background-color: #f3f4f6 !important;
-  color: #374151 !important;
+.light [id^="headlessui-tabs-panel-"] {
+  background-color: white !important;
 }
 
-/* Add these CSS rules to globals.css */
-
-
-
-
-
-
-.model-badge-unselected {
-  color: #4b5563 !important; /* Gray 600 */
-  background-color: #f3f4f6 !important; /* Gray 100 */
-  border: 1px solid #e5e7eb !important; /* Gray 200 */
-  font-weight: normal !important;
+.light #portrait-customization,
+.light #portrait-customization > div {
+  background-color: white !important;
 }
 
-/* Dark mode versions */
-.dark .model-badge-selected {
-  color: white !important;
-  background-color: #4f46e5 !important; /* Indigo 600 */
+.light #portrait-customization .bg-blue-900\/30 {
+  background-color: #dbeafe !important; /* Light blue background */
 }
 
-.dark .model-badge-unselected {
-  color: #d1d5db !important; /* Gray 300 */
-  background-color: #1f2937 !important; /* Gray 800 */
-  border: 1px solid #374151 !important; /* Gray 700 */
+.light #portrait-customization .text-blue-300 {
+  color: #1e40af !important; /* Dark blue text */
 }
 
-
-
-.model-badge-unselected {
-  color: #1e3a8a !important; /* Blue 900 - dark blue text */
-  background-color: #dbeafe !important; /* Blue 100 - light blue background */
-  border: 1px solid #bfdbfe !important; /* Blue 200 - slightly darker blue border */
-  font-weight: normal !important;
+.light #portrait-customization [class*="cursor-pointer"],
+.light .bg-gray-100.text-gray-800 {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
 }
 
-.light .model-badge-unselected {
-  color: #374151 !important;           /* Gray 700 – neutral/dark gray */
-  background-color: #f3f4f6 !important; /* Gray 100 – very light gray */
-  border: 1px solid #e5e7eb !important; /* Gray 200 – soft border */
-  font-weight: normal !important;
+/* Fix cursor pointer elements */
+.light [class*="cursor-pointer"].bg-gray-100,
+.light [class*="cursor-pointer"].dark\:bg-gray-700 {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
 }
 
-.light model-badge-selected {
-  color: white !important;
-  background-color: #1e40af !important;
-  font-weight: bold !important;
-  border: none !important;
+.light [class*="cursor-pointer"] span:not(.ring-indigo-500) {
+  color: #0f172a !important;
 }
 
-/* Light mode: selected badge gets a pale blue bg, black text */
-html:not(.dark) span.model-badge-selected {
-  background-color: #dbeafe !important; /* Blue-100 */
-  color: #1e293b !important;            /* Gray-800 for crisp blackish text */
+.light [class*="cursor-pointer"] h3.font-medium {
+  color: var(--text-heading) !important;
 }
 
+/* Ensure the right background for bg-white elements */
+.light .bg-white.p-4.rounded-lg,
+.light .bg-gray-50.p-4.rounded-lg,
+.light .space-y-6 .bg-white.p-4.rounded-lg {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
 
+.light .bg-gray-100.rounded-lg p {
+  color: #0f172a !important;
+}
 
+.light .bg-gray-100.rounded-lg .bg-gray-200 {
+  background-color: #e2e8f0 !important;
+}
