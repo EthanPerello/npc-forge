@@ -7,11 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-- Replaced all native `<select>` elements across the app with a custom full-width dropdown using the existing `ui/select.tsx` component for consistent styling and improved accessibility.
+## [0.2.3] - 2025-05-03
 
-### Fixed
-- Fixed portrait generation issue for gpt-image-1 by switching quality parameter from "hd" to "high"
+Replaced all native `<select>` elements across the app with a custom full-width dropdown using the existing `ui/select.tsx` component for consistent styling and improved accessibility.
+
+Fixed portrait generation issue for gpt-image-1 by switching quality parameter from "hd" to "high"
 - Fixed numerous contrast issues in light mode across the application:
   - Updated "Get Started", "Generate Character", and "Download JSON" buttons to maintain readability in light mode.
   - Improved text visibility for selected personality traits, quest type labels, and subgenre options.
@@ -216,14 +216,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Export to JSON feature.
 - Fully responsive UI for desktop and mobile.
 
-[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.2.2...HEAD  
-[0.2.2]: https://github.com/EthanPerello/npc-forge/compare/v0.2.1...v0.2.2  
-[0.2.1]: https://github.com/EthanPerello/npc-forge/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/EthanPerello/npc-forge/compare/v0.1.4...v0.2.0
-[0.1.4]: https://github.com/EthanPerello/npc-forge/compare/v0.1.3...v0.1.4
-[0.1.3]: https://github.com/EthanPerello/npc-forge/compare/v0.1.2...v0.1.3
-[0.1.2]: https://github.com/EthanPerello/npc-forge/compare/v0.1.1...v0.1.2
-[0.1.1]: https://github.com/EthanPerello/npc-forge/compare/v0.1.0...v0.1.1
-[0.1.0]: https://github.com/EthanPerello/npc-forge/releases/tag/v0.1.0
+[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.2.3...HEAD
+[0.2.3]: https://github.com/EthanPerello/npc-forge/compare/v0.1.0...v0.2.3
 ## [v0.2.2] - 2025-05-02
 - Theme & API Fixes
