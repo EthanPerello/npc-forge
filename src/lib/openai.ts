@@ -179,7 +179,7 @@ export async function generatePortrait(character: Character): Promise<string> {
     
     // Only add quality parameter for models that support it
     if (imageModel === 'gpt-image-1') {
-      generateOptions.quality = "hd";
+      generateOptions.quality = "high";
     } else if (imageModel === 'dall-e-3') {
       generateOptions.quality = "standard";
     }
