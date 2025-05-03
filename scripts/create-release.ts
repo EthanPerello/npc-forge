@@ -43,12 +43,36 @@ function extractUnreleasedChanges(): { changes: string, categories: { [key: stri
     // Process each category
     for (const match of categoryMatches) {
       const category = match[1];
-      const items = match[2].split('\n')
-        .filter(line => line.trim().startsWith('-'))
-        .map(line => line.trim());
+      // Preserve the entire content including nested bullets and indentation
+      // Split by lines that start with -, not just any line
+      const categoryContent = match[2].trim();
+      const itemBlocks: string[] = [];
       
-      if (items.length > 0) {
-        categories[category] = items;
+      // Split the content by top-level bullet points
+      let currentItem = '';
+      const lines = categoryContent.split('\n');
+      
+      for (const line of lines) {
+        if (line.trim().startsWith('-')) {
+          // If we already have content and find a new bullet, save the previous item
+          if (currentItem) {
+            itemBlocks.push(currentItem);
+            currentItem = '';
+          }
+          currentItem = line;
+        } else if (line.trim() && currentItem) {
+          // Add to current item if it's not empty (preserves indentation)
+          currentItem += '\n' + line;
+        }
+      }
+      
+      // Add the last item if it exists
+      if (currentItem) {
+        itemBlocks.push(currentItem);
+      }
+      
+      if (itemBlocks.length > 0) {
+        categories[category] = itemBlocks;
       }
     }
   }
@@ -90,8 +114,6 @@ function updateChangelog(version: string, date: string, title: string): void {
   console.log(`✅ CHANGELOG.md updated with version ${version}`);
 }
 
-
-
 async function run() {
   const version = process.argv[2] || await prompt('🔢 Enter version (e.g., 0.2.1): ');
   const title = process.argv[3] || await prompt('📝 Enter title (e.g., UI Polish and Fixes): ');
@@ -104,20 +126,29 @@ async function run() {
   // Extract unreleased changes
   const { changes, categories } = extractUnreleasedChanges();
   
-  // Build release note content
+  // Build release note content in exact format matching previous releases
   let releaseNoteContent = `# NPC Forge ${tag} – ${title}\n\n**Release Date:** ${today}\n\n${summary}\n\n`;
   
-  // Add categories from changelog
+  // Add categories from changelog, preserving structure and formatting
   if (Object.keys(categories).length > 0) {
-    for (const [category, items] of Object.entries(categories)) {
-      releaseNoteContent += `## ${category}\n${items.join('\n')}\n\n`;
+    // Get array of category names to determine the last one
+    const categoryNames = Object.keys(categories);
+    
+    for (let i = 0; i < categoryNames.length; i++) {
+      const category = categoryNames[i];
+      const items = categories[category];
+      
+      releaseNoteContent += `## ${category}\n${items.join('\n')}\n`;
+      
+      // Add extra newline between categories (but not after the last one)
+      if (i < categoryNames.length - 1) {
+        releaseNoteContent += "\n";
+      }
     }
   } else {
-    // Add placeholder sections if no changes were found
-    releaseNoteContent += `## Added\n- _TBD_\n\n## Changed\n- _TBD_\n\n## Fixed\n- _TBD_\n\n`;
+    // Add placeholder sections if no changes were found, matching format of previous releases
+    releaseNoteContent += `## Added\n- _TBD_\n\n## Changed\n- _TBD_\n\n## Fixed\n- _TBD_`;
   }
-  
-  releaseNoteContent += `---\n\n## Removed\nNone.\n`;
 
   // Write release note
   fs.writeFileSync(releaseNotePath, releaseNoteContent);
