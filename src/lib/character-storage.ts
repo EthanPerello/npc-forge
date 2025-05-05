@@ -1,4 +1,5 @@
 import { Character, CharacterFormData } from './types';
+import { exampleCharacters } from './example-characters';
 
 const STORAGE_KEY = 'npc-forge-characters';
 
@@ -95,7 +96,7 @@ export function saveCharacter(character: Character, formData?: CharacterFormData
   return newStoredCharacter;
 }
 
-// Delete a character from storage
+// Delete a character from storage - now allows deleting examples
 export function deleteCharacter(id: string): boolean {
   const stored = getStoredCharacters();
   const updated = stored.filter(char => char.id !== id);
@@ -108,15 +109,12 @@ export function deleteCharacter(id: string): boolean {
   return true;
 }
 
-// Update an existing character
+// Update an existing character - now allows updating examples
 export function updateCharacter(id: string, updatedCharacter: Character, updatedFormData?: CharacterFormData): boolean {
   const stored = getStoredCharacters();
   const index = stored.findIndex(char => char.id === id);
   
   if (index === -1) return false;
-  
-  // Only update if the character isn't an example
-  if (stored[index].isExample) return false;
   
   // Update the character while preserving metadata
   stored[index] = {
@@ -140,17 +138,16 @@ function generateCharacterId(character: Character): string {
   return `${character.name.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}`;
 }
 
-// Initialize the library with example characters
+// Initialize the library with example characters immediately
 export function initializeLibrary(): void {
   if (typeof window === 'undefined') return;
   
-  // Import example characters here
-  import('./example-characters').then(({ exampleCharacters }) => {
-    // Only add examples if storage is empty
-    const stored = getStoredCharacters();
-    if (stored.length > 0) return;
-    
-    // Add example characters
+  // Get stored characters
+  const stored = getStoredCharacters();
+  
+  // Check if we already have characters
+  if (stored.length === 0) {
+    // Add example characters immediately
     try {
       exampleCharacters.forEach(char => {
         saveCharacter(char as Character, undefined, true);
@@ -159,7 +156,5 @@ export function initializeLibrary(): void {
     } catch (error) {
       console.error('Failed to initialize example characters', error);
     }
-  }).catch(error => {
-    console.error('Failed to import example characters', error);
-  });
+  }
 }

@@ -24,6 +24,11 @@ const itemCategoryOptions: ItemCategoryOption[] = [
 // Rarity distribution options
 const rarityDistributionOptions: RarityDistributionOption[] = [
   { 
+    value: 'any', 
+    label: 'Any Rarity',
+    description: 'Let the AI choose an appropriate distribution of item rarities'
+  },
+  { 
     value: 'balanced', 
     label: 'Balanced',
     description: 'A mix of common and uncommon items, with a small chance of rare items'
@@ -66,7 +71,7 @@ export default function ItemsTab() {
     updateFormData({
       item_options: {
         number_of_items: 3,
-        rarity_distribution: 'balanced',
+        rarity_distribution: 'any',
         item_categories: []
       }
     });
@@ -157,7 +162,7 @@ export default function ItemsTab() {
       </div>
       
       {/* Rarity Description */}
-      {formData.item_options?.rarity_distribution && (
+      {formData.item_options?.rarity_distribution && formData.item_options.rarity_distribution !== 'any' && (
         <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-sm dark:bg-gray-800 dark:border-gray-700">
           <p className="text-gray-700 dark:text-gray-300">
             {rarityDistributionOptions.find(opt => opt.value === formData.item_options?.rarity_distribution)?.description}

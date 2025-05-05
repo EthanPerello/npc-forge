@@ -35,20 +35,20 @@ interface CharacterContextType {
 // Default form values using undefined instead of empty strings for enum types
 const defaultFormData: CharacterFormData = {
   description: '',
-  include_quests: true,
-  include_dialogue: true,
-  include_items: true,
+  include_quests: false,  // Changed from true to false
+  include_dialogue: false,  // Changed from true to false
+  include_items: false,  // Changed from true to false
   genre: undefined,
-  sub_genre: undefined, // Added sub-genre field
-  gender: undefined, // Changed from empty string
-  age_group: undefined, // Changed from empty string
-  moral_alignment: undefined, // Changed from empty string
-  relationship_to_player: undefined, // Changed from empty string
-  model: DEFAULT_MODEL, // Default model for text generation
+  sub_genre: undefined,
+  gender: undefined,
+  age_group: undefined,
+  moral_alignment: undefined,
+  relationship_to_player: undefined,
+  model: DEFAULT_MODEL,
   advanced_options: {
     species: undefined,
     occupation: undefined,
-    personality_traits: [], // Initialize as empty array
+    personality_traits: [],
     social_class: undefined,
     height: undefined,
     build: undefined,
@@ -71,11 +71,11 @@ const defaultFormData: CharacterFormData = {
     item_categories: [],
   },
   portrait_options: {
-    art_style: '', // String fields can be empty
+    art_style: '',
     mood: '',
     framing: '',
     background: '',
-    image_model: DEFAULT_IMAGE_MODEL, // Default model for image generation
+    image_model: DEFAULT_IMAGE_MODEL,
   },
 };
 
