@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - May 5, 2025
+
 ### Added
 - Sticky footer with Generate Character, Clear Options, and Randomize buttons
 - Auto-fill message when description is populated based on genre selection (persists until changed)
@@ -265,6 +267,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Export to JSON feature
 - Fully responsive UI for desktop and mobile
 
-[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.3.0...HEAD
-[0.3.0]: https://github.com/EthanPerello/npc-forge/compare/v0.1.1...v0.3.0
+[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/EthanPerello/npc-forge/compare/v0.3.0...v0.3.1
 [0.1.0]: https://github.com/EthanPerello/npc-forge/releases/tag/v0.1.0
