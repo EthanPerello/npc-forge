@@ -1,68 +1,49 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useCharacter } from '@/contexts/character-context';
 import TabInterface, { Tab } from '@/components/ui/tab-interface';
-import Button from '@/components/ui/button';
-import PortraitDisplay from '@/components/portrait-display';
-import JsonViewer from '@/components/json-viewer';
-import UsageLimitDisplay from '@/components/usage-limit-display';
-import { getCharacterTraitsArray } from '@/lib/utils';
-import { Download, Code, User, BookOpen, MessageSquare, Package, Award } from 'lucide-react';
-
-// Tab components for character display
-import CharacterProfileTab from '@/components/tabs/display/profile-tab';
+import ProfileTab from '@/components/tabs/display/profile-tab';
 import QuestsDisplayTab from '@/components/tabs/display/quests-display-tab';
 import DialogueDisplayTab from '@/components/tabs/display/dialogue-display-tab';
 import ItemsDisplayTab from '@/components/tabs/display/items-display-tab';
+import PortraitDisplay from '@/components/portrait-display';
+import Button from '@/components/ui/button';
+import { Download, Save, User, MessageSquare, Package, BookOpen } from 'lucide-react';
+import { saveCharacter } from '@/lib/character-storage';
 
 export default function CharacterDisplay() {
-  const { 
-    character, 
-    downloadCharacterJSON, 
-    formData
-  } = useCharacter();
-  
+  const { character, formData, downloadCharacterJSON, error } = useCharacter();
   const [activeTab, setActiveTab] = useState('profile');
-  const [showJson, setShowJson] = useState(false);
-  const [refreshCounter, setRefreshCounter] = useState(0);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState('');
   
   // Reset to profile tab when character changes
   useEffect(() => {
     if (character) {
       setActiveTab('profile');
-      // Force refresh of usage counts whenever a character is generated
-      setRefreshCounter(prev => prev + 1);
-      // Show success message
-      setShowSuccessMessage(true);
-      // Hide success message after 3 seconds
-      const timer = setTimeout(() => setShowSuccessMessage(false), 3000);
-      return () => clearTimeout(timer);
     }
   }, [character]);
-  
-  // Callback for refreshing the count
-  const refreshUsageCount = useCallback(() => {
-    setRefreshCounter(prev => prev + 1);
-  }, []);
   
   if (!character) {
     return null;
   }
   
-  // Define the tabs, with conditional tabs based on character data
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+  };
+  
+  // Define tabs based on what content is available
   const tabs: Tab[] = [
     {
       id: 'profile',
       label: 'Profile',
       icon: <User className="h-4 w-4 mr-1" />,
-      content: <CharacterProfileTab character={character} />
+      content: <ProfileTab character={character} />
     }
   ];
   
-  // Add quests tab if character has quests and they were included in generation
-  if (character.quests?.length && formData.include_quests) {
+  if (character.quests && character.quests.length > 0) {
     tabs.push({
       id: 'quests',
       label: 'Quests',
@@ -71,8 +52,7 @@ export default function CharacterDisplay() {
     });
   }
   
-  // Add dialogue tab if character has dialogue and they were included in generation
-  if (character.dialogue_lines?.length && formData.include_dialogue) {
+  if (character.dialogue_lines && character.dialogue_lines.length > 0) {
     tabs.push({
       id: 'dialogue',
       label: 'Dialogue',
@@ -81,8 +61,7 @@ export default function CharacterDisplay() {
     });
   }
   
-  // Add items tab if character has items and they were included in generation
-  if (character.items?.length && formData.include_items) {
+  if (character.items && character.items.length > 0) {
     tabs.push({
       id: 'items',
       label: 'Items',
@@ -91,106 +70,82 @@ export default function CharacterDisplay() {
     });
   }
   
-  // Extract traits for display
-  const traits = getCharacterTraitsArray(character);
+  // Save character to library
+  const handleSaveToLibrary = () => {
+    try {
+      // Reset states
+      setSaveSuccess(false);
+      setSaveError('');
+      
+      // Save character with form data
+      saveCharacter(character, formData);
+      
+      // Show success message
+      setSaveSuccess(true);
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSaveSuccess(false);
+      }, 3000);
+    } catch (error) {
+      setSaveError('Failed to save character to library');
+      console.error('Error saving character:', error);
+    }
+  };
   
   return (
-    <div className="w-full bg-card rounded-xl shadow-lg overflow-hidden border border-theme mt-8 transition-all duration-300">
-      {/* Success Message */}
-      {showSuccessMessage && (
-        <div className="bg-green-50 text-green-800 p-3 text-center border-b border-green-100 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800/50 flex items-center justify-center font-semibold">
-          <Award className="h-5 w-5 mr-2 text-green-600 dark:text-green-400" />
-          Character successfully generated!
-        </div>
-      )}
-      
+    <div className="w-full max-w-5xl mx-auto bg-card rounded-xl shadow-lg overflow-hidden mt-8 border border-theme">
       <div className="p-6">
-        <h2 className="text-3xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800 mb-6 dark:from-blue-400 dark:to-blue-600">
-          {character.name}
-        </h2>
-        
-        <div className="md:flex gap-6">
-          {/* Portrait Section with improved styling */}
-          <div className="md:w-1/3 mb-6 md:mb-0">
-            <div className="bg-secondary p-3 rounded-xl shadow-md">
-              <PortraitDisplay 
-                imageUrl={character.image_url} 
-                name={character.name} 
-              />
-              
-              {/* Traits Display with visual enhancement */}
-              <div className="mt-4">
-                <h3 className="text-lg font-semibold text-blue-800 mb-2 flex items-center dark:text-blue-300">
-                  <Award className="h-5 w-5 mr-1 text-blue-600 dark:text-blue-400" />
-                  Traits
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {traits.map((trait, index) => (
-                    <span 
-                      key={index} 
-                      className="bg-card px-2 py-1 rounded-md text-sm border border-theme shadow-sm"
-                    >
-                      {trait}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Portrait section */}
+          <div className="md:w-1/3">
+            <PortraitDisplay imageUrl={character.image_url} name={character.name} />
           </div>
           
-          {/* Content Section */}
+          {/* Character info section */}
           <div className="md:w-2/3">
-            {/* Tab Interface */}
+            <div className="mb-6">
+              <h2 className="text-3xl font-bold">{character.name}</h2>
+              
+              {/* Action buttons */}
+              <div className="flex flex-wrap gap-2 mt-4">
+                <Button
+                  variant="primary"
+                  onClick={handleSaveToLibrary}
+                  leftIcon={<Save className="h-4 w-4" />}
+                >
+                  Save to Library
+                </Button>
+                
+                <Button
+                  variant="secondary"
+                  onClick={downloadCharacterJSON}
+                  leftIcon={<Download className="h-4 w-4" />}
+                >
+                  Download JSON
+                </Button>
+              </div>
+              
+              {/* Save feedback messages */}
+              {saveSuccess && (
+                <div className="mt-2 p-2 bg-green-50 text-green-700 rounded border border-green-200 text-sm dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">
+                  Character successfully saved to library!
+                </div>
+              )}
+              
+              {saveError && (
+                <div className="mt-2 p-2 bg-red-50 text-red-700 rounded border border-red-200 text-sm dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
+                  {saveError}
+                </div>
+              )}
+            </div>
+            
+            {/* Tabs interface */}
             <TabInterface 
               tabs={tabs} 
               defaultTabId="profile" 
-              onChange={setActiveTab}
-              className="mb-6"
+              onChange={handleTabChange}
             />
-            
-            {/* Action Buttons with improved design */}
-            <div className="flex flex-wrap gap-3 mt-6">
-              <Button
-                onClick={downloadCharacterJSON}
-                leftIcon={<Download className="h-5 w-5" />}
-                variant="primary"
-                className="bg-gradient-to-r from-blue-500 to-blue-700 border-0 hover:from-blue-600 hover:to-blue-800 text-white"
-              >
-                Download JSON
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={() => setShowJson(!showJson)}
-                leftIcon={<Code className="h-5 w-5" />}
-                className="border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-900/30"
-              >
-                {showJson ? 'Hide' : 'Show'} JSON Data
-              </Button>
-            </div>
-            
-            {/* JSON Viewer */}
-            {showJson && (
-              <div className="mt-4">
-                <JsonViewer 
-                  data={character} 
-                  title="Character Data"
-                  downloadable={true}
-                  downloadFilename={`${character.name.replace(/\s+/g, '_').toLowerCase()}.json`}
-                  collapsible={true}
-                />
-              </div>
-            )}
-            
-            {/* Usage Limit Display with enhanced styling */}
-            <div className="mt-6">
-              <UsageLimitDisplay 
-                variant="detailed" 
-                refreshKey={refreshCounter} 
-                onRefresh={refreshUsageCount}
-                className="bg-secondary"
-              />
-            </div>
           </div>
         </div>
       </div>

@@ -962,3 +962,19 @@ p.mt-2.text-lg.sm\:text-xl.lg\:text-2xl.font-medium,
 .light .bg-gray-100.rounded-lg .bg-gray-200 {
   background-color: #e2e8f0 !important;
 }
+
+/*********************************************
+ * Library Page Styles
+ *********************************************/
+/* Ensure genre/subgenre indicators have white text in light mode */
+.light .bg-indigo-100.text-white,
+.light .bg-purple-100.text-white {
+  background-color: #4f46e5 !important; /* Indigo 600 */
+  color: white !important;
+  font-weight: normal !important; /* Override bold font weight */
+}
+
+/* Fix eye icon for View JSON */
+.light button.text-gray-900 {
+  color: #0f172a !important;
+}

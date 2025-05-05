@@ -1,0 +1,439 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { getStoredCharacters, deleteCharacter, initializeLibrary, StoredCharacter } from '@/lib/character-storage';
+import { Character } from '@/lib/types';
+import CharacterCard from '@/components/character-card';
+import Button from '@/components/ui/button';
+import { Library, Search, Upload, Filter, X, Download, Edit, Trash2, Eye } from 'lucide-react';
+import { downloadJson } from '@/lib/utils';
+
+export default function CharacterLibraryPage() {
+  const [characters, setCharacters] = useState<StoredCharacter[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedGenre, setSelectedGenre] = useState<string>('');
+  const [isJsonViewerOpen, setIsJsonViewerOpen] = useState(false);
+  const [selectedCharacter, setSelectedCharacter] = useState<StoredCharacter | null>(null);
+  const [activeTab, setActiveTab] = useState<'details' | 'json'>('details');
+  
+  // Initialize library and load characters
+  useEffect(() => {
+    initializeLibrary();
+    loadCharacters();
+  }, []);
+  
+  const loadCharacters = () => {
+    const stored = getStoredCharacters();
+    setCharacters(stored);
+  };
+  
+  // Filter characters based on search and genre
+  const filteredCharacters = characters.filter(char => {
+    const matchesSearch = searchQuery === '' || 
+      char.character.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (char.character.selected_traits.genre && 
+       char.character.selected_traits.genre.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesGenre = selectedGenre === '' || 
+      char.character.selected_traits.genre === selectedGenre;
+    
+    return matchesSearch && matchesGenre;
+  });
+  
+  // Handle character deletion
+  const handleDeleteCharacter = (id: string) => {
+    if (window.confirm('Are you sure you want to delete this character?')) {
+      if (deleteCharacter(id)) {
+        loadCharacters();
+      }
+    }
+  };
+  
+  // Handle character download
+  const handleDownloadCharacter = (character: Character) => {
+    downloadJson(character, `${character.name.replace(/\s+/g, '_').toLowerCase()}.json`);
+  };
+  
+  // Handle JSON file upload
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        const characterData = JSON.parse(content) as Character;
+        
+        // Validate basic character structure
+        if (!characterData.name || !characterData.appearance || !characterData.personality) {
+          throw new Error('Invalid character file format');
+        }
+        
+        // Import the character storage function
+        import('@/lib/character-storage').then(({ saveCharacter }) => {
+          saveCharacter(characterData);
+          loadCharacters();
+          alert(`Character ${characterData.name} has been added to your library!`);
+        });
+      } catch (error) {
+        alert('Error importing character: Invalid JSON format');
+        console.error('Error importing character:', error);
+      }
+    };
+    reader.readAsText(file);
+    
+    // Reset the input
+    event.target.value = '';
+  };
+  
+  // Get unique genres for filter dropdown
+  const genres = Array.from(new Set(characters.map(char => 
+    char.character.selected_traits.genre || 'unknown'
+  )));
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8 flex flex-col md:flex-row justify-between items-center">
+        <h1 className="text-3xl font-bold flex items-center mb-4 md:mb-0">
+          <Library className="h-8 w-8 mr-2 text-indigo-600 dark:text-indigo-400" />
+          Character Library
+        </h1>
+        
+        <div className="flex flex-wrap gap-2">
+          {/* Upload JSON button */}
+          <label className="flex items-center bg-indigo-100 text-indigo-700 px-4 py-2 rounded-md cursor-pointer hover:bg-indigo-200 dark:bg-indigo-900 dark:text-indigo-300 dark:hover:bg-indigo-800">
+            <Upload className="h-4 w-4 mr-2" />
+            Import Character
+            <input 
+              type="file" 
+              accept=".json" 
+              className="hidden"
+              onChange={handleFileUpload}
+            />
+          </label>
+        </div>
+      </div>
+      
+      {/* Search and filter bar */}
+      <div className="mb-6 flex flex-col md:flex-row gap-4">
+        <div className="relative flex-grow">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            placeholder="Search characters..."
+            className="w-full pl-10 p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button
+              className="absolute inset-y-0 right-0 flex items-center pr-3"
+              onClick={() => setSearchQuery('')}
+            >
+              <X className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+            </button>
+          )}
+        </div>
+        
+        <div className="relative min-w-[200px]">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <Filter className="h-5 w-5 text-gray-400" />
+          </div>
+          <select
+            className="w-full pl-10 p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary appearance-none"
+            value={selectedGenre}
+            onChange={(e) => setSelectedGenre(e.target.value)}
+          >
+            <option value="">All Genres</option>
+            {genres.map((genre) => (
+              <option key={genre} value={genre}>
+                {genre.charAt(0).toUpperCase() + genre.slice(1)}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+      
+      {/* Character count */}
+      <p className="mb-4 text-muted">
+        {filteredCharacters.length} {filteredCharacters.length === 1 ? 'character' : 'characters'} found
+      </p>
+      
+      {/* Character grid */}
+      {filteredCharacters.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredCharacters.map((storedChar) => (
+            <div 
+              key={storedChar.id} 
+              className="bg-card rounded-lg shadow-md overflow-hidden border border-theme relative transition-transform hover:shadow-lg hover:-translate-y-1 cursor-pointer"
+              onClick={() => {
+                setSelectedCharacter(storedChar);
+                setIsJsonViewerOpen(true);
+              }}
+            >
+              {/* Character preview */}
+              <div className="p-4">
+                <h3 className="text-xl font-bold mb-2 truncate">{storedChar.character.name}</h3>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {storedChar.character.selected_traits.genre && (
+                    <span className="px-2 py-1 bg-indigo-100 text-white dark:text-indigo-200 text-xs rounded-full dark:bg-indigo-900">
+                      {storedChar.character.selected_traits.genre.charAt(0).toUpperCase() + 
+                       storedChar.character.selected_traits.genre.slice(1)}
+                    </span>
+                  )}
+                  {storedChar.character.selected_traits.sub_genre && (
+                    <span className="px-2 py-1 bg-purple-100 text-white dark:text-purple-200 text-xs rounded-full dark:bg-purple-900">
+                      {storedChar.character.selected_traits.sub_genre
+                        .split('_')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ')}
+                    </span>
+                  )}
+                  {storedChar.isExample && (
+                    <span className="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded-full dark:bg-amber-900 dark:text-amber-200">
+                      Example
+                    </span>
+                  )}
+                </div>
+                
+                {/* Character image */}
+                {storedChar.character.image_url && (
+                  <div className="relative w-full h-48 mb-3 bg-gray-100 dark:bg-gray-800 rounded overflow-hidden">
+                    <img 
+                      src={storedChar.character.image_url} 
+                      alt={storedChar.character.name}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                )}
+                
+                {/* Character description - truncated */}
+                <p className="text-sm mb-4 text-muted line-clamp-3">
+                  {storedChar.character.appearance}
+                </p>
+                
+                {/* Action buttons */}
+                <div className="flex justify-between" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex space-x-2">
+                    <button 
+                      onClick={() => handleDownloadCharacter(storedChar.character)}
+                      className="p-2 text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
+                      title="Download JSON"
+                    >
+                      <Download className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedCharacter(storedChar);
+                        setIsJsonViewerOpen(true);
+                      }}
+                      className="p-2 text-gray-900 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                      title="View JSON"
+                    >
+                      <Eye className="h-5 w-5" />
+                    </button>
+                  </div>
+                  
+                  <div className="flex space-x-2">
+                    {!storedChar.isExample && (
+                      <>
+                        <button
+                          onClick={() => {
+                            window.location.href = `/library/edit/${storedChar.id}`;
+                          }}
+                          className="p-2 text-gray-600 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400"
+                          title="Edit Character"
+                        >
+                          <Edit className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCharacter(storedChar.id)}
+                          className="p-2 text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
+                          title="Delete Character"
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12 bg-card rounded-lg border border-theme">
+          <Library className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+          <h3 className="text-xl font-medium mb-2">No characters found</h3>
+          <p className="text-muted mb-4">
+            {searchQuery || selectedGenre 
+              ? "Try adjusting your search or filters" 
+              : "Your character library is empty. Generate or import characters to get started."}
+          </p>
+          <Button
+            variant="primary"
+            onClick={() => window.location.href = '/'}
+          >
+            Create a Character
+          </Button>
+        </div>
+      )}
+      
+      {/* Character Viewer Modal */}
+      {isJsonViewerOpen && selectedCharacter && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card rounded-lg shadow-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div className="p-4 border-b border-theme flex justify-between items-center">
+              <h3 className="text-lg font-medium">
+                {selectedCharacter.character.name}
+              </h3>
+              <button 
+                onClick={() => setIsJsonViewerOpen(false)}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="p-4 overflow-auto max-h-[calc(90vh-4rem)]">
+              {/* Tabs */}
+              <div className="mb-4 border-b border-theme">
+                <ul className="flex flex-wrap -mb-px text-sm font-medium text-center">
+                  <li className="mr-2">
+                    <button 
+                      onClick={() => setActiveTab('details')}
+                      className={`inline-block p-4 border-b-2 rounded-t-lg ${
+                        activeTab === 'details' 
+                          ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
+                          : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
+                      }`}>
+                      Character Details
+                    </button>
+                  </li>
+                  <li className="mr-2">
+                    <button 
+                      onClick={() => setActiveTab('json')}
+                      className={`inline-block p-4 border-b-2 rounded-t-lg ${
+                        activeTab === 'json' 
+                          ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
+                          : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
+                      }`}>
+                      View JSON
+                    </button>
+                  </li>
+                </ul>
+              </div>
+              
+              {activeTab === 'details' ? (
+                <div className="space-y-6">
+                  {/* Character image */}
+                  {selectedCharacter.character.image_url && (
+                    <div className="flex justify-center">
+                      <div className="w-48 h-48 relative">
+                        <img 
+                          src={selectedCharacter.character.image_url} 
+                          alt={selectedCharacter.character.name}
+                          className="object-cover w-full h-full rounded-lg"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Appearance */}
+                  <div>
+                    <h4 className="text-lg font-semibold mb-2">Appearance</h4>
+                    <p className="text-sm">{selectedCharacter.character.appearance}</p>
+                  </div>
+                  
+                  {/* Personality */}
+                  <div>
+                    <h4 className="text-lg font-semibold mb-2">Personality</h4>
+                    <p className="text-sm">{selectedCharacter.character.personality}</p>
+                  </div>
+                  
+                  {/* Backstory */}
+                  <div>
+                    <h4 className="text-lg font-semibold mb-2">Backstory Hook</h4>
+                    <p className="text-sm">{selectedCharacter.character.backstory_hook}</p>
+                  </div>
+                  
+                  {/* Special Ability */}
+                  {selectedCharacter.character.special_ability && (
+                    <div>
+                      <h4 className="text-lg font-semibold mb-2">Special Ability</h4>
+                      <p className="text-sm">{selectedCharacter.character.special_ability}</p>
+                    </div>
+                  )}
+                  
+                  {/* Dialogue Lines */}
+                  {selectedCharacter.character.dialogue_lines && selectedCharacter.character.dialogue_lines.length > 0 && (
+                    <div>
+                      <h4 className="text-lg font-semibold mb-2">Dialogue Lines</h4>
+                      <div className="space-y-2">
+                        {selectedCharacter.character.dialogue_lines.map((line, index) => (
+                          <div key={index} className="p-2 bg-secondary rounded text-sm italic">"{line}"</div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Items */}
+                  {selectedCharacter.character.items && selectedCharacter.character.items.length > 0 && (
+                    <div>
+                      <h4 className="text-lg font-semibold mb-2">Items</h4>
+                      <ul className="list-disc list-inside text-sm">
+                        {selectedCharacter.character.items.map((item, index) => (
+                          <li key={index}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {/* Quests */}
+                  {selectedCharacter.character.quests && selectedCharacter.character.quests.length > 0 && (
+                    <div>
+                      <h4 className="text-lg font-semibold mb-2">Quests</h4>
+                      <div className="space-y-4">
+                        {selectedCharacter.character.quests.map((quest, index) => (
+                          <div key={index} className="p-3 bg-secondary rounded-lg border border-theme">
+                            <h5 className="font-medium mb-1">{quest.title}</h5>
+                            <p className="text-sm mb-2">{quest.description}</p>
+                            <div className="text-sm">
+                              <span className="font-medium">Reward:</span> {quest.reward}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <pre className="text-xs whitespace-pre-wrap bg-gray-100 p-4 rounded dark:bg-gray-800 dark:text-gray-300">
+                  {JSON.stringify(selectedCharacter.character, null, 2)}
+                </pre>
+              )}
+            </div>
+            <div className="p-4 border-t border-theme flex justify-end">
+              <Button
+                variant="secondary"
+                className="mr-2"
+                onClick={() => setIsJsonViewerOpen(false)}
+              >
+                Close
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() => handleDownloadCharacter(selectedCharacter.character)}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download JSON
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

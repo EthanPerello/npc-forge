@@ -7,11 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Character Library system:
+  - New dedicated page for viewing, managing, and filtering saved characters
+  - Interactive character cards with detailed view on click
+  - Character editing functionality for user-created characters
+  - Ability to delete characters from the library
+  - Example characters preloaded in the library
+- Save character functionality from character display screen
+- JSON import/export capabilities:
+  - Download characters as JSON files
+  - Upload JSON files to add characters to the library
+- Search and filter functionality in the Character Library:
+  - Text search across character names and properties
+  - Genre-based filtering
+- Storage system using localStorage for persistent character data
+- Updated sidebar navigation with Character Library link
+- Integrated Vercel Analytics for automatic page view tracking
+
 ### Changed
 - Refactored `globals.css` by consolidating and cleaning up redundant or conflicting style rules. No visual changes expected.
-
-### Added
-- Integrated Vercel Analytics for automatic page view tracking
+- Fixed various styling issues in light mode
 
 
 ## [0.2.3] - 2025-05-02
