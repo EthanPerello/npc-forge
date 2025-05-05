@@ -67,7 +67,7 @@ const defaultFormData: CharacterFormData = {
   },
   item_options: {
     number_of_items: 3,
-    rarity_distribution: 'balanced',
+    rarity_distribution: 'any',
     item_categories: [],
   },
   portrait_options: {
