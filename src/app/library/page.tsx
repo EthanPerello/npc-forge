@@ -7,6 +7,7 @@ import CharacterCard from '@/components/character-card';
 import Button from '@/components/ui/button';
 import { Library, Search, Upload, Filter, X, Download, Edit, Trash2, Eye } from 'lucide-react';
 import { downloadJson } from '@/lib/utils';
+import { getCharacterTraitsArray } from '@/lib/utils';
 
 export default function CharacterLibraryPage() {
   const [characters, setCharacters] = useState<StoredCharacter[]>([]);
@@ -45,6 +46,10 @@ export default function CharacterLibraryPage() {
     if (window.confirm('Are you sure you want to delete this character?')) {
       if (deleteCharacter(id)) {
         loadCharacters();
+        if (selectedCharacter?.id === id) {
+          setIsJsonViewerOpen(false);
+          setSelectedCharacter(null);
+        }
       }
     }
   };
@@ -172,6 +177,7 @@ export default function CharacterLibraryPage() {
               onClick={() => {
                 setSelectedCharacter(storedChar);
                 setIsJsonViewerOpen(true);
+                setActiveTab('details');
               }}
             >
               {/* Character preview */}
@@ -179,13 +185,13 @@ export default function CharacterLibraryPage() {
                 <h3 className="text-xl font-bold mb-2 truncate">{storedChar.character.name}</h3>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {storedChar.character.selected_traits.genre && (
-                    <span className="px-2 py-1 bg-indigo-100 text-white dark:text-indigo-200 text-xs rounded-full dark:bg-indigo-900">
+                    <span className="px-2 py-1 bg-indigo-600 text-white text-xs rounded-full">
                       {storedChar.character.selected_traits.genre.charAt(0).toUpperCase() + 
                        storedChar.character.selected_traits.genre.slice(1)}
                     </span>
                   )}
                   {storedChar.character.selected_traits.sub_genre && (
-                    <span className="px-2 py-1 bg-purple-100 text-white dark:text-purple-200 text-xs rounded-full dark:bg-purple-900">
+                    <span className="px-2 py-1 bg-purple-600 text-white text-xs rounded-full">
                       {storedChar.character.selected_traits.sub_genre
                         .split('_')
                         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -193,7 +199,7 @@ export default function CharacterLibraryPage() {
                     </span>
                   )}
                   {storedChar.isExample && (
-                    <span className="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded-full dark:bg-amber-900 dark:text-amber-200">
+                    <span className="px-2 py-1 bg-amber-600 text-white text-xs rounded-full">
                       Example
                     </span>
                   )}
@@ -219,45 +225,38 @@ export default function CharacterLibraryPage() {
                 <div className="flex justify-between" onClick={(e) => e.stopPropagation()}>
                   <div className="flex space-x-2">
                     <button 
-                      onClick={() => handleDownloadCharacter(storedChar.character)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDownloadCharacter(storedChar.character);
+                      }}
                       className="p-2 text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
                       title="Download JSON"
                     >
                       <Download className="h-5 w-5" />
                     </button>
-                    <button
-                      onClick={() => {
-                        setSelectedCharacter(storedChar);
-                        setIsJsonViewerOpen(true);
-                      }}
-                      className="p-2 text-gray-900 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
-                      title="View JSON"
-                    >
-                      <Eye className="h-5 w-5" />
-                    </button>
                   </div>
                   
                   <div className="flex space-x-2">
-                    {!storedChar.isExample && (
-                      <>
-                        <button
-                          onClick={() => {
-                            window.location.href = `/library/edit/${storedChar.id}`;
-                          }}
-                          className="p-2 text-gray-600 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400"
-                          title="Edit Character"
-                        >
-                          <Edit className="h-5 w-5" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteCharacter(storedChar.id)}
-                          className="p-2 text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
-                          title="Delete Character"
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </button>
-                      </>
-                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.location.href = `/library/edit/${storedChar.id}`;
+                      }}
+                      className="p-2 text-gray-600 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400"
+                      title="Edit Character"
+                    >
+                      <Edit className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteCharacter(storedChar.id);
+                      }}
+                      className="p-2 text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
+                      title="Delete Character"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -297,7 +296,7 @@ export default function CharacterLibraryPage() {
                 <X className="h-6 w-6" />
               </button>
             </div>
-            <div className="p-4 overflow-auto max-h-[calc(90vh-4rem)]">
+            <div className="p-4 overflow-auto max-h-[calc(90vh-10rem)]">
               {/* Tabs */}
               <div className="mb-4 border-b border-theme">
                 <ul className="flex flex-wrap -mb-px text-sm font-medium text-center">
@@ -340,6 +339,18 @@ export default function CharacterLibraryPage() {
                       </div>
                     </div>
                   )}
+                  
+                  {/* Character traits */}
+                  <div>
+                    <h4 className="text-lg font-semibold mb-2">Character Traits</h4>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {getCharacterTraitsArray(selectedCharacter.character).map((trait, index) => (
+                        <span key={index} className="character-trait-tag">
+                          {trait}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                   
                   {/* Appearance */}
                   <div>
@@ -410,18 +421,35 @@ export default function CharacterLibraryPage() {
                   )}
                 </div>
               ) : (
-                <pre className="text-xs whitespace-pre-wrap bg-gray-100 p-4 rounded dark:bg-gray-800 dark:text-gray-300">
+                <pre className="text-xs whitespace-pre-wrap bg-gray-100 p-4 rounded dark:bg-gray-800 dark:text-gray-300 text-gray-800">
                   {JSON.stringify(selectedCharacter.character, null, 2)}
                 </pre>
               )}
             </div>
             <div className="p-4 border-t border-theme flex justify-end">
               <Button
+                variant="danger"
+                className="mr-2"
+                onClick={() => {
+                  if (window.confirm(`Are you sure you want to delete ${selectedCharacter.character.name}? This action cannot be undone.`)) {
+                    if (deleteCharacter(selectedCharacter.id)) {
+                      setIsJsonViewerOpen(false);
+                      setSelectedCharacter(null);
+                      loadCharacters();
+                    }
+                  }
+                }}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Character
+              </Button>
+              <Button
                 variant="secondary"
                 className="mr-2"
-                onClick={() => setIsJsonViewerOpen(false)}
+                onClick={() => window.location.href = `/library/edit/${selectedCharacter.id}`}
               >
-                Close
+                <Edit className="h-4 w-4 mr-2" />
+                Edit Character
               </Button>
               <Button
                 variant="primary"

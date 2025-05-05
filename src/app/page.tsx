@@ -1,12 +1,110 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CharacterProvider } from '@/contexts/character-context';
+import { CharacterProvider, useCharacter } from '@/contexts/character-context';
 import MainFormTabs from '@/components/main-form-tabs';
 import CharacterDisplay from '@/components/character-display';
 import UsageLimitsNotice from '@/components/usage-limits-notice';
 import WelcomeGuide from '@/components/welcome-guide';
-import { BookOpen } from 'lucide-react';
+import Button from '@/components/ui/button';
+import { Sparkles, RotateCcw, AlertCircle } from 'lucide-react';
+
+// Main content area with generate button
+function MainContent() {
+  const { generateCharacter, isLoading, resetFormData, formData, error } = useCharacter();
+  
+  const handleRandomize = () => {
+    // This will trigger the randomize function in CharacterTab
+    document.getElementById('randomize-button')?.click();
+  };
+
+  return (
+    <div className="mb-20">
+      {/* Generate Button - Keep in the main UI as well as the sticky footer */}
+      <div className="flex justify-center my-6">
+        <Button
+          variant="primary"
+          onClick={generateCharacter}
+          disabled={!formData.description || isLoading}
+          isLoading={isLoading}
+          leftIcon={<Sparkles className="h-5 w-5" />}
+          size="lg"
+        >
+          {isLoading ? 'Generating...' : 'Generate Character'}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// Global loading message component that appears above the footer
+function FloatingLoadingMessage() {
+  const { isLoading } = useCharacter();
+  
+  if (!isLoading) return null;
+  
+  return (
+    <div className="fixed bottom-24 left-0 right-0 z-50 flex justify-center">
+      <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-md text-sm font-bold dark:bg-yellow-900/30 dark:text-yellow-300 animate-pulse shadow-lg border border-red-200 dark:border-yellow-800">
+        <p className="flex items-center">
+          <svg className="w-4 h-4 mr-2 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Character generation may take a second... Creating your unique NPC with AI.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// Create a new component for the sticky footer
+function StickyFooter() {
+  const { generateCharacter, isLoading, resetFormData, formData, error } = useCharacter();
+  
+  const handleRandomize = () => {
+    // This will trigger the randomize function in CharacterTab
+    document.getElementById('randomize-button')?.click();
+  };
+  
+  return (
+    <div className="sticky-footer">
+      <div className="container mx-auto max-w-6xl flex items-center justify-between">
+        <div className="flex space-x-3">
+          <Button
+            variant="secondary"
+            onClick={resetFormData}
+            leftIcon={<RotateCcw className="h-4 w-4" />}
+            disabled={isLoading}
+            size="sm"
+          >
+            Clear Options
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={handleRandomize}
+            leftIcon={<AlertCircle className="h-4 w-4" />}
+            disabled={isLoading}
+            size="sm"
+          >
+            Randomize
+          </Button>
+        </div>
+        
+        <Button
+          variant="primary"
+          onClick={generateCharacter}
+          disabled={!formData.description || isLoading}
+          isLoading={isLoading}
+          leftIcon={<Sparkles className="h-5 w-5" />}
+          size="lg"
+        >
+          {isLoading ? 'Generating...' : 'Generate Character'}
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   // State for whether the welcome guide is visible
@@ -33,7 +131,7 @@ export default function Home() {
 
   return (
     <CharacterProvider>
-      <main className="min-h-screen py-8 px-4 bg-gradient-to-br from-indigo-50 via-indigo-50/30 to-blue-100 dark:from-gray-900 dark:via-indigo-950/30 dark:to-blue-950/20">
+      <main className="min-h-screen py-8 px-4 pb-24 bg-gradient-to-br from-indigo-50 via-indigo-50/30 to-blue-100 dark:from-gray-900 dark:via-indigo-950/30 dark:to-blue-950/20">
         <div className="container mx-auto max-w-full">
         <header className="relative w-full h-[200px] sm:h-[220px] lg:h-[240px] mb-12 overflow-hidden rounded-2xl shadow-lg">
           {/* Background glow */}
@@ -75,6 +173,9 @@ export default function Home() {
             <MainFormTabs />
           </section>
           
+          {/* Generate Button */}
+          <MainContent />
+          
           {/* Character Display - Always show */}
           <section>
             <CharacterDisplay />
@@ -107,12 +208,18 @@ export default function Home() {
                 </a>
               </div>
               <p className="mt-4 text-xs text-gray-600 dark:text-gray-400 bg-white/50 rounded-full px-3 py-1 inline-block dark:bg-gray-800/50">
-                Limited to 15 character generations per month per device.
+                Usage varies by model tier selected - Standard tier is unlimited
               </p>
             </div>
           </footer>
         </div>
       </main>
+      
+      {/* Sticky Footer for main actions */}
+      <StickyFooter />
+      
+      {/* Floating loading message that appears above the footer */}
+      <FloatingLoadingMessage />
     </CharacterProvider>
   );
 }

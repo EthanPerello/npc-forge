@@ -1,190 +1,158 @@
 'use client';
 
 import { useState } from 'react';
-import TabInterface, { Tab } from '@/components/ui/tab-interface';
 import { useCharacter } from '@/contexts/character-context';
-import Button from '@/components/ui/button';
-import CharacterTab from '@/components/tabs/character-tab';
-import QuestsTab from '@/components/tabs/quests-tab';
-import DialogueTab from '@/components/tabs/dialogue-tab';
-import ItemsTab from '@/components/tabs/items-tab';
-import UsageLimitDisplay from '@/components/usage-limit-display';
-import DelayedLoadingMessage from '@/components/delayed-loading-message';
-import { User, MessageSquare, Package, BookOpen, Zap } from 'lucide-react';
+import CharacterTab from './tabs/character-tab';
+import QuestsTab from './tabs/quests-tab';
+import DialogueTab from './tabs/dialogue-tab';
+import ItemsTab from './tabs/items-tab';
+import Button from './ui/button';
+import { Sparkles, Check } from 'lucide-react';
 
 export default function MainFormTabs() {
-  const { 
-    formData, 
-    updateFormData, 
-    isLoading, 
-    generateCharacter, 
-    error 
-  } = useCharacter();
-  
   const [activeTab, setActiveTab] = useState('character');
+  const { formData, updateFormData, generateCharacter, isLoading, error } = useCharacter();
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   
-  // Toggle handlers for feature inclusion
-  const handleToggleQuests = () => {
-    updateFormData({ include_quests: !formData.include_quests });
+  // Add a hidden button for the randomize function to be triggered from the footer
+  const handleRandomize = () => {
+    // Find and call the randomize button in CharacterTab
+    document.getElementById('randomize-button')?.click();
   };
-  
-  const handleToggleDialogue = () => {
-    updateFormData({ include_dialogue: !formData.include_dialogue });
+
+  // Handle checkbox changes for quest, dialogue, and item inclusion
+  const handleIncludeChange = (type: 'quests' | 'dialogue' | 'items', checked: boolean) => {
+    updateFormData({ [`include_${type}`]: checked });
   };
-  
-  const handleToggleItems = () => {
-    updateFormData({ include_items: !formData.include_items });
-  };
-  
+
   // Handle tab change
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
   };
-  
-  // Define tabs with proper disabled states based on toggle values
-  const tabs: Tab[] = [
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.description) return;
+    
+    await generateCharacter();
+    
+    // Show success message for 3 seconds
+    setShowSuccessMessage(true);
+    setTimeout(() => {
+      setShowSuccessMessage(false);
+    }, 3000);
+  };
+
+  const tabs = [
     {
       id: 'character',
       label: 'Character',
-      icon: <User className="h-4 w-4 mr-1" />,
       content: <CharacterTab />
     },
     {
       id: 'quests',
       label: 'Quests',
-      icon: <BookOpen className="h-4 w-4 mr-1" />,
       content: <QuestsTab />,
       disabled: !formData.include_quests
     },
     {
       id: 'dialogue',
       label: 'Dialogue',
-      icon: <MessageSquare className="h-4 w-4 mr-1" />,
       content: <DialogueTab />,
       disabled: !formData.include_dialogue
     },
     {
       id: 'items',
       label: 'Items',
-      icon: <Package className="h-4 w-4 mr-1" />,
       content: <ItemsTab />,
       disabled: !formData.include_items
     }
   ];
-  
+
   return (
-    <div className="w-full bg-card rounded-xl shadow-md overflow-hidden p-6 border border-theme">
-      <h2 className="text-2xl font-bold mb-4 flex items-center justify-center">
-        <User className="h-6 w-6 mr-2 text-indigo-600 dark:text-indigo-400" />
-        Create Your NPC
-      </h2>
-      
-      {/* Feature toggles with improved styling */}
-      <div className="mb-6 bg-secondary p-4 rounded-lg border border-theme">
-        <p className="text-sm text-muted mb-3">
-          Select what to include in your character:
-        </p>
-        <div className="flex flex-wrap gap-3 justify-center">
-          <div className="flex items-center bg-card px-3 py-2 rounded-lg border border-theme">
-            <input
-              type="checkbox"
-              id="include-quests"
-              checked={formData.include_quests}
-              onChange={handleToggleQuests}
-              className="rounded text-indigo-600 focus:ring-indigo-500 bg-secondary border-theme"
-            />
-            <label htmlFor="include-quests" className="text-sm ml-2 flex items-center">
-              <BookOpen className="h-4 w-4 mr-1 text-indigo-500" />
-              Quests
-            </label>
+    <div className="bg-white shadow-md rounded-lg overflow-hidden dark:bg-gray-800">
+      {/* Tab Header */}
+      <div className="bg-gray-100 dark:bg-gray-700 p-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="flex space-x-2 overflow-x-auto">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => !tab.disabled && handleTabChange(tab.id)}
+                className={`py-2 px-4 rounded-md transition-colors ${
+                  activeTab === tab.id 
+                    ? 'bg-indigo-600 text-white dark:bg-indigo-700' 
+                    : tab.disabled
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-600 dark:text-gray-500'
+                      : 'bg-white text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
           
-          <div className="flex items-center bg-card px-3 py-2 rounded-lg border border-theme">
-            <input
-              type="checkbox"
-              id="include-dialogue"
-              checked={formData.include_dialogue}
-              onChange={handleToggleDialogue}
-              className="rounded text-indigo-600 focus:ring-indigo-500 bg-secondary border-theme"
-            />
-            <label htmlFor="include-dialogue" className="text-sm ml-2 flex items-center">
-              <MessageSquare className="h-4 w-4 mr-1 text-indigo-500" />
-              Dialogue
+          <div className="flex flex-wrap gap-3">
+            <label className="flex items-center space-x-2 text-sm cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.include_quests}
+                onChange={(e) => handleIncludeChange('quests', e.target.checked)}
+                className="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4"
+              />
+              <span className="text-gray-700 dark:text-gray-300">Include Quests</span>
             </label>
-          </div>
-          
-          <div className="flex items-center bg-card px-3 py-2 rounded-lg border border-theme">
-            <input
-              type="checkbox"
-              id="include-items"
-              checked={formData.include_items}
-              onChange={handleToggleItems}
-              className="rounded text-indigo-600 focus:ring-indigo-500 bg-secondary border-theme"
-            />
-            <label htmlFor="include-items" className="text-sm ml-2 flex items-center">
-              <Package className="h-4 w-4 mr-1 text-indigo-500" />
-              Items
+            
+            <label className="flex items-center space-x-2 text-sm cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.include_dialogue}
+                onChange={(e) => handleIncludeChange('dialogue', e.target.checked)}
+                className="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4"
+              />
+              <span className="text-gray-700 dark:text-gray-300">Include Dialogue</span>
+            </label>
+            
+            <label className="flex items-center space-x-2 text-sm cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.include_items}
+                onChange={(e) => handleIncludeChange('items', e.target.checked)}
+                className="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4"
+              />
+              <span className="text-gray-700 dark:text-gray-300">Include Items</span>
             </label>
           </div>
         </div>
       </div>
       
-      {/* Tab Interface with enhanced styling */}
-      <TabInterface 
-        tabs={tabs} 
-        defaultTabId="character" 
-        onChange={handleTabChange}
-        className="mb-6"
-      />
-      
-      {/* Error Display with improved styling */}
-      {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex items-start dark:bg-red-900/30 dark:border-red-800 dark:text-red-400">
-          <svg className="h-5 w-5 mr-2 flex-shrink-0 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-          </svg>
-          <span>{error}</span>
-        </div>
-      )}
-      
-      {/* Delayed loading message */}
-      {isLoading && (
-        <DelayedLoadingMessage 
-          isLoading={isLoading} 
-          message="Character generation may take a second... Creating your unique NPC with AI."
+      {/* Tab Content */}
+      <div className="p-6">
+        {tabs.find(tab => tab.id === activeTab)?.content}
+        
+        {/* Hidden button for randomizing from the footer */}
+        <button 
+          id="randomize-button"
+          type="button"
+          onClick={handleRandomize}
+          className="hidden"
         />
+      </div>
+      
+      {/* Error and Success Messages */}
+      {error && (
+        <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-md text-sm font-bold dark:bg-red-900/30 dark:text-red-300">
+          {error}
+        </div>
       )}
       
-      {/* Generate Button and Usage Display with enhanced styling */}
-      <div className="mt-8 flex flex-col items-center">
-        <Button
-          variant="primary"
-          size="lg"
-          isLoading={isLoading}
-          onClick={generateCharacter}
-          disabled={!formData.description.trim() || isLoading}
-          className="min-w-40 bg-gradient-to-r from-indigo-500 to-indigo-700 border-0 hover:from-indigo-600 hover:to-indigo-800"
-          leftIcon={<Zap className="h-5 w-5" />}
-        >
-          Generate Character
-        </Button>
-        
-        {/* Description to make it clear what happens next */}
-        {!isLoading && (
-          <p className="text-sm text-muted mt-2">
-            Character will appear below after generation
-          </p>
-        )}
-        
-        {/* Usage limit display with improved visibility */}
-        <div className="w-full flex justify-center mt-4">
-          <UsageLimitDisplay 
-            variant="compact" 
-            showWhenFull={true} 
-            className="bg-card px-3 py-1 rounded-full shadow-sm border border-theme" 
-          />
+      {showSuccessMessage && (
+        <div className="mt-4 p-3 bg-green-50 text-green-700 rounded-md text-sm font-bold flex items-center dark:bg-green-900/30 dark:text-green-300">
+          <Check className="h-5 w-5 mr-2" />
+          Character successfully generated!
         </div>
-      </div>
+      )}
     </div>
   );
 }

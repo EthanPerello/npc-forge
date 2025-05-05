@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Sticky footer with Generate Character, Clear Options, and Randomize buttons
+- Auto-fill message when description is populated based on genre selection (persists until changed)
+- Generate Character button now appears both on main page and in sticky footer
+- Example quest format in the Quests tab similar to other tabs
+- Loading message as floating notification that appears above the sticky footer
+- Delete character button in library detail view
+- Ability to add, edit, and remove custom traits in character editor
+
+### Changed
+- Items tab rarity distribution now defaults to "Any" instead of "Balanced"
+- Example characters can now be edited and deleted from library
+- Description field automatically updates when genre changes (if not manually edited)
+- Updated usage text at bottom of main page to accurately reflect tiered model system
+- Removed example description box from the character description field
+
+### Fixed
+- Example characters now appear in library on first visit without requiring refresh
+- Different background colors for genre vs sub-genre indicators in library
+- Fixed JSON viewer text color in light mode
+- Character traits now display properly in edit page with all options available
+- Improved character edit page with better organization of fields
+- Individual containers for quests in edit page for better visual separation
+
 ## [0.3.0] - 2025-05-04
 
 ### Added

@@ -123,6 +123,18 @@ export default function QuestsTab() {
           </p>
         </div>
       )}
+
+      {/* Example Quest Format */}
+      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        <h3 className="text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">Example Quest Format:</h3>
+        <div className="space-y-3 text-gray-600 dark:text-gray-400 text-sm">
+          <h4 className="font-semibold">The Stolen Artifact</h4>
+          <p>A valuable artifact has been stolen from the local museum. The thief is believed to be hiding in the abandoned district. Investigate the area and recover the artifact before it falls into the wrong hands.</p>
+          <div>
+            <span className="font-medium">Reward:</span> A rare magical pendant that grants enhanced perception in dark environments.
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

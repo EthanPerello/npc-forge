@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { GENRE_TEMPLATES, getTemplateExample } from '@/lib/templates';
 import { getSubGenres } from '@/lib/templates';
 import { useCharacter } from '@/contexts/character-context';
@@ -10,7 +10,6 @@ import PortraitOptions from '@/components/tabs/portrait-options';
 import ExpandableSection from '@/components/ui/expandable-section';
 import Select from '@/components/ui/select';
 import SearchableSelect from '@/components/ui/searchable-select';
-import Checkbox from '@/components/ui/checkbox';
 import { getModelByTier } from '@/lib/models';
 import { 
   TemplateOption, 
@@ -251,6 +250,29 @@ const formElementClass = "bg-gray-100 text-gray-800 border border-gray-300 round
 export default function CharacterTab() {
   const { formData, updateFormData } = useCharacter();
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [isDescriptionDefault, setIsDescriptionDefault] = useState(true);
+  const [showAutoFillMessage, setShowAutoFillMessage] = useState(false);
+  const initialDescription = useRef("");
+  
+  // Update when description changes
+  useEffect(() => {
+    if (formData.description && initialDescription.current === '') {
+      initialDescription.current = formData.description;
+    }
+  }, [formData.description]);
+
+  // Handle description field changes
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    updateFormData({ description: newValue });
+
+    // If user has changed from the default, mark as not default
+    if (newValue !== initialDescription.current) {
+      setIsDescriptionDefault(false);
+    } else {
+      setIsDescriptionDefault(true);
+    }
+  };
   
   // Handle template change
   const handleTemplateChange = (template: TemplateOption | undefined, subGenre?: SubGenreOption) => {
@@ -261,12 +283,18 @@ export default function CharacterTab() {
         sub_genre: subGenre ? subGenre.id : undefined
       });
       
-      // If the description field is empty, populate it with an example
-      if (!formData.description || formData.description.trim() === '') {
+      // If the description field is empty or hasn't been modified, populate it with an example
+      if (!formData.description || formData.description.trim() === '' || isDescriptionDefault) {
         const example = subGenre && subGenre.example 
           ? subGenre.example 
           : getTemplateExample(template.id);
+        
         updateFormData({ description: example });
+        initialDescription.current = example;
+        setIsDescriptionDefault(true);
+        setShowAutoFillMessage(true);
+        
+        // Message should not disappear automatically
       }
     } else {
       updateFormData({ 
@@ -489,6 +517,13 @@ export default function CharacterTab() {
         occupation: ''
       }
     });
+    
+    // Update the initial description reference and mark as default
+    initialDescription.current = exampleText;
+    setIsDescriptionDefault(true);
+    
+    // Show the auto-fill message
+    setShowAutoFillMessage(true);
   };
   
   // Clear all options and revert to defaults
@@ -512,6 +547,10 @@ export default function CharacterTab() {
         homeland: undefined
       }
     });
+    
+    // Reset the initial description
+    initialDescription.current = '';
+    setIsDescriptionDefault(true);
   };
   
   // Helper function to get a random option from an array
@@ -566,36 +605,40 @@ export default function CharacterTab() {
       </div>
       
       {/* Character Description - FIXED FOR LIGHT MODE */}
-<div>
-  <label htmlFor="description" className="block text-base font-medium mb-2 text-gray-900 dark:text-gray-200">
-    Character Description <span className="text-red-500">*</span>
-  </label>
-  
-  {/* Example of Good Description - High Contrast Box */}
-  <div className="mb-3 bg-indigo-100 dark:bg-gray-800 p-4 rounded-lg border border-indigo-200 dark:border-gray-700">
-    <div className="text-indigo-900 dark:text-gray-200 text-sm mb-2 font-semibold">Example of a good description:</div>
-    <div className="text-indigo-800 dark:text-gray-300 text-sm italic">
-      A scarred elven ranger who protects a sacred forest, harboring a secret connection to ancient magic that causes plants to grow in her footsteps. She wears leather armor adorned with living vines and carries a bow made from a branch of the oldest tree in the forest.
-    </div>
-  </div>
-  
-  {/* Helpful instruction text with better contrast */}
-  <div className="mb-3">
-    <p className="text-gray-800 dark:text-gray-300 text-sm">
-      The free-text description field allows you to provide specific details about your character. More detailed descriptions typically result in more tailored characters.
-    </p>
-  </div>
-  
-  <textarea
-    id="description"
-    rows={6}
-    value={formData.description || ''}
-    onChange={(e) => updateFormData({ description: e.target.value })}
-    placeholder="Describe your character or concept... (e.g., A wise old wizard with a mysterious past)"
-    className="w-full p-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-500 dark:placeholder-gray-400"
-    required
-  />
-</div>
+      <div>
+        <label htmlFor="description" className="block text-base font-medium mb-2 text-gray-900 dark:text-gray-200">
+          Character Description <span className="text-red-500">*</span>
+        </label>
+        
+        {/* Auto-fill message */}
+        {showAutoFillMessage && (
+          <div className="autofill-message">
+            <div className="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Description auto-filled based on selected genre. Feel free to edit it to customize your character!</span>
+            </div>
+          </div>
+        )}
+        
+        {/* Helpful instruction text with better contrast */}
+        <div className="mb-3">
+          <p className="text-gray-800 dark:text-gray-300 text-sm">
+            The free-text description field allows you to provide specific details about your character. More detailed descriptions typically result in more tailored characters.
+          </p>
+        </div>
+        
+        <textarea
+          id="description"
+          rows={6}
+          value={formData.description || ''}
+          onChange={handleDescriptionChange}
+          placeholder="Describe your character or concept... (e.g., A wise old wizard with a mysterious past)"
+          className="w-full p-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-500 dark:placeholder-gray-400"
+          required
+        />
+      </div>
       
       {/* Basic Character Traits */}
       <div>
@@ -773,6 +816,7 @@ export default function CharacterTab() {
       {/* Action Buttons with better contrast */}
       <div className="flex space-x-4">
         <button
+          id="clear-options-button"
           type="button"
           onClick={handleClearOptions}
           className="py-2 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 border border-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
@@ -781,6 +825,7 @@ export default function CharacterTab() {
         </button>
         
         <button
+          id="randomize-button"
           type="button"
           onClick={handleRandomize}
           className="py-2 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 border border-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
