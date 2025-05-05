@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Refactored `globals.css` by consolidating and cleaning up redundant or conflicting style rules. No visual changes expected.
 
+### Added
+- Integrated Vercel Analytics for automatic page view tracking
+
+
 ## [0.2.3] - 2025-05-02
 
 ### Changed
