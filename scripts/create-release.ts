@@ -11,6 +11,20 @@ function prompt(query: string): Promise<string> {
   }));
 }
 
+// Function to format date as "Month Day, Year"
+function formatDate(date: Date): string {
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  
+  const month = monthNames[date.getMonth()];
+  const day = date.getDate();
+  const year = date.getFullYear();
+  
+  return `${month} ${day}, ${year}`;
+}
+
 // Helper to extract unreleased changes from changelog
 function extractUnreleasedChanges(): { changes: string, categories: { [key: string]: string[] } } {
   const changelog = fs.readFileSync('CHANGELOG.md', 'utf-8');
@@ -119,14 +133,16 @@ async function run() {
   const summary = await prompt('📄 Enter summary (Markdown, one paragraph): ');
 
   const tag = `v${version}`;
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date();
+  const formattedDate = formatDate(today);
+  const isoDate = today.toISOString().split('T')[0]; // For links and filenames
   const releaseNotePath = `release-notes/${tag}.md`;
 
   // Extract unreleased changes
   const { changes, categories } = extractUnreleasedChanges();
   
   // Build release note content in exact format matching previous releases
-  let releaseNoteContent = `# NPC Forge ${tag} – ${title}\n\n**Release Date:** ${today}\n\n${summary}\n\n`;
+  let releaseNoteContent = `# NPC Forge ${tag} – ${title}\n\n**Release Date:** ${formattedDate}\n\n${summary}\n\n`;
   
   // Add categories from changelog, preserving structure and formatting
   if (Object.keys(categories).length > 0) {
@@ -159,7 +175,7 @@ async function run() {
   console.log('\nPlease verify this content appears correctly and includes all sections.\n');
 
   // Update changelog by moving unreleased changes to the new version
-  updateChangelog(version, today, title);
+  updateChangelog(version, formattedDate, title);
   console.log(`✅ CHANGELOG.md updated`);
 
   // Git commit, tag & push
@@ -214,13 +230,13 @@ async function run() {
       // It's okay if the release doesn't exist yet
     }
     
-    // Create new release
-    execSync(`gh release create ${tag} -F "${releaseNotePath}" -t "NPC Forge ${tag} – ${title}"`, { stdio: 'inherit' });
+    // Create new release with a simpler title but full content
+    execSync(`gh release create ${tag} -F "${releaseNotePath}" -t "NPC Forge ${tag}"`, { stdio: 'inherit' });
     console.log('🎉 GitHub release published!');
   } catch (error) {
     console.error('❌ Failed to create GitHub release:', error);
     console.log('You can manually create a release using:');
-    console.log(`gh release create ${tag} -F "${releaseNotePath}" -t "NPC Forge ${tag} – ${title}"`);
+    console.log(`gh release create ${tag} -F "${releaseNotePath}" -t "NPC Forge ${tag}"`);
   }
 }
 
