@@ -1,6 +1,6 @@
 import { execSync } from 'child_process';
-import fs from 'fs';
-import readline from 'readline';
+import * as fs from 'fs';
+import * as readline from 'readline';
 
 // Helper for input prompts
 function prompt(query: string): Promise<string> {
@@ -44,7 +44,6 @@ function extractUnreleasedChanges(): { changes: string, categories: { [key: stri
     for (const match of categoryMatches) {
       const category = match[1];
       // Preserve the entire content including nested bullets and indentation
-      // Split by lines that start with -, not just any line
       const categoryContent = match[2].trim();
       const itemBlocks: string[] = [];
       
@@ -115,8 +114,8 @@ function updateChangelog(version: string, date: string, title: string): void {
 }
 
 async function run() {
-  const version = process.argv[2] || await prompt('🔢 Enter version (e.g., 0.2.1): ');
-  const title = process.argv[3] || await prompt('📝 Enter title (e.g., UI Polish and Fixes): ');
+  const version = process.argv[2] || await prompt('🔢 Enter version (e.g., 0.3.0): ');
+  const title = process.argv[3] || await prompt('📝 Enter title (e.g., Character Library System): ');
   const summary = await prompt('📄 Enter summary (Markdown, one paragraph): ');
 
   const tag = `v${version}`;
@@ -154,6 +153,11 @@ async function run() {
   fs.writeFileSync(releaseNotePath, releaseNoteContent);
   console.log(`✅ Release note created at: ${releaseNotePath}`);
 
+  // Log release note content for verification
+  console.log('\n📝 RELEASE NOTE CONTENT:\n');
+  console.log(releaseNoteContent);
+  console.log('\nPlease verify this content appears correctly and includes all sections.\n');
+
   // Update changelog by moving unreleased changes to the new version
   updateChangelog(version, today, title);
   console.log(`✅ CHANGELOG.md updated`);
@@ -163,9 +167,6 @@ async function run() {
     // Explicitly add the changelog and release notes file
     execSync(`git add CHANGELOG.md "${releaseNotePath}"`);
     console.log(`✅ Added CHANGELOG.md and ${releaseNotePath} to git staging`);
-    
-    // Add any other changes that might be part of the release
-    execSync(`git add .`);
     
     // Commit the changes
     execSync(`git commit -m "chore: release ${tag}"`);
@@ -177,6 +178,11 @@ async function run() {
   }
 
   try {
+    // Remove tag if it exists
+    execSync(`git tag -d ${tag} 2>/dev/null || true`);
+    console.log(`✅ Removed existing tag ${tag} (if any)`);
+    
+    // Create new tag
     execSync(`git tag ${tag}`);
     console.log(`✅ Tag ${tag} created`);
   } catch (error) {
@@ -188,6 +194,8 @@ async function run() {
     execSync(`git push origin main`);
     console.log(`✅ Changes pushed to main branch`);
     
+    // Delete remote tag if it exists and push the new tag
+    execSync(`git push origin :${tag} 2>/dev/null || true`);
     execSync(`git push origin ${tag}`);
     console.log(`✅ Tag ${tag} pushed to origin`);
   } catch (error) {
@@ -198,12 +206,21 @@ async function run() {
 
   // GitHub Release
   try {
-    execSync(`gh release create ${tag} -F ${releaseNotePath} -t "NPC Forge ${tag} – ${title}"`, { stdio: 'inherit' });
+    // Delete existing release if it exists
+    try {
+      execSync(`gh release delete ${tag} --yes 2>/dev/null`);
+      console.log(`✅ Deleted existing GitHub release ${tag}`);
+    } catch (error) {
+      // It's okay if the release doesn't exist yet
+    }
+    
+    // Create new release
+    execSync(`gh release create ${tag} -F "${releaseNotePath}" -t "NPC Forge ${tag} – ${title}"`, { stdio: 'inherit' });
     console.log('🎉 GitHub release published!');
   } catch (error) {
     console.error('❌ Failed to create GitHub release:', error);
     console.log('You can manually create a release using:');
-    console.log(`gh release create ${tag} -F ${releaseNotePath} -t "NPC Forge ${tag} – ${title}"`);
+    console.log(`gh release create ${tag} -F "${releaseNotePath}" -t "NPC Forge ${tag} – ${title}"`);
   }
 }
 
