@@ -82,7 +82,7 @@ export default function CharacterForm({ onSubmit, isLoading }: CharacterFormProp
             { value: '', label: 'Select a genre (optional)' },
             ...GENRE_TEMPLATES.map(template => ({
               value: template.id,
-              label: template.label
+              label: template.label === 'Unknown' ? 'Historical' : template.label
             }))
           ]}
           value={genre || ''}

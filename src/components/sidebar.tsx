@@ -19,10 +19,11 @@ import {
   Rocket,
   Award,
   Scale,
-  Sparkles,
   Menu,
   X,
-  History
+  History,
+  Sparkles,
+  Library
 } from 'lucide-react';
 import { ReactNode } from 'react';
 import { isValidElement } from 'react';
@@ -38,13 +39,18 @@ interface NavItemType {
 // Navigation structure for the sidebar
 const navigationItems: NavItemType[] = [
   { 
-    title: 'Character Generation', 
+    title: 'Character Generator', 
     path: '/',
     icon: <Sparkles className="h-5 w-5" />
   },
   {
+    title: 'Character Library',
+    path: '/library',
+    icon: <Library className="h-5 w-5" />
+  },
+  {
     title: 'Documentation',
-    path: '/docs',  // Added a path to navigate to docs home
+    path: '/docs',
     icon: <BookOpen className="h-5 w-5" />,
     items: [
       { title: 'How to Use', path: '/docs/how-to-use', icon: <File className="h-4 w-4" /> },
@@ -64,7 +70,7 @@ const navigationItems: NavItemType[] = [
           { title: 'Testing', path: '/docs/testing', icon: <Code className="h-3 w-3" /> },
           { title: 'Deployment', path: '/docs/deployment', icon: <Rocket className="h-3 w-3" /> },
           { title: 'Roadmap', path: '/docs/roadmap', icon: <Rocket className="h-3 w-3" /> },
-          { title: 'Changelog', path: '/docs/changelog', icon: <History className="h-3 w-3" /> }, // Added changelog
+          { title: 'Changelog', path: '/docs/changelog', icon: <History className="h-3 w-3" /> },
           { title: 'Credits', path: '/docs/credits', icon: <Award className="h-3 w-3" /> },
           { title: 'License', path: '/docs/license', icon: <Scale className="h-3 w-3" /> },
         ]
@@ -95,7 +101,7 @@ interface NavItemProps {
 const NavItem = ({ item, depth = 0, isOpen = false, toggleOpen, isFullSidebar, toggleSidebar }: NavItemProps) => {
   const pathname = usePathname();
   const router = useRouter();
-  const isActive = item.path === pathname;
+  const isActive = item.path === pathname || (pathname?.startsWith(item.path!) && item.path !== '/' && pathname !== '/');
   const hasChildren = item.items && item.items.length > 0;
   
   // Don't render anything if sidebar is collapsed and depth > 0
@@ -232,6 +238,7 @@ const NavItemWithState = ({ item, depth = 0, isFullSidebar, toggleSidebar }: Nav
   // Automatically expand if the current path matches this item or its children
   const isInPath = (item: NavItemType): boolean => {
     if (item.path === pathname) return true;
+    if (item.path !== '/' && pathname?.startsWith(item.path!)) return true;
     if (item.items) {
       return item.items.some(child => isInPath(child));
     }
@@ -252,7 +259,7 @@ const NavItemWithState = ({ item, depth = 0, isFullSidebar, toggleSidebar }: Nav
   );
 };
 
-export default function DocsSidebar() {
+export default function Sidebar() {
   // Start collapsed by default
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -275,7 +282,7 @@ export default function DocsSidebar() {
   // Close mobile sidebar when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const sidebar = document.getElementById('docs-sidebar');
+      const sidebar = document.getElementById('main-sidebar');
       const mobileButton = document.getElementById('mobile-sidebar-toggle');
       const toggleButton = document.getElementById('sidebar-toggle-button');
       
@@ -334,7 +341,7 @@ export default function DocsSidebar() {
       
       {/* Sidebar Container */}
       <div 
-        id="docs-sidebar"
+        id="main-sidebar"
         className={`
           fixed top-0 left-0 z-40 h-screen pt-16
           transition-all duration-300 ease-in-out
@@ -352,7 +359,7 @@ export default function DocsSidebar() {
                 NPC Forge
               </h2>
               <p className="text-sm text-muted">
-                Documentation and Guides
+                AI Character Creator
               </p>
             </div>
           )}

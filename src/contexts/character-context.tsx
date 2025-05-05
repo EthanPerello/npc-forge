@@ -18,6 +18,7 @@ import {
 } from '@/lib/types';
 import { DEFAULT_MODEL } from '@/lib/models';
 import { DEFAULT_IMAGE_MODEL } from '@/lib/image-models';
+import { saveCharacter, getStoredCharacters, deleteCharacter, updateCharacter } from '@/lib/character-storage';
 
 interface CharacterContextType {
   character: Character | null;
@@ -28,6 +29,7 @@ interface CharacterContextType {
   resetFormData: () => void;
   generateCharacter: () => Promise<void>;
   downloadCharacterJSON: () => void;
+  saveToLibrary: () => void;
 }
 
 // Default form values using undefined instead of empty strings for enum types
@@ -205,6 +207,20 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     document.body.removeChild(link);
     URL.revokeObjectURL(href);
   }, [character]);
+  
+  // Save to library
+  const saveToLibrary = useCallback(() => {
+    if (!character) return;
+    
+    try {
+      // Save character with form data
+      saveCharacter(character, formData);
+      return true;
+    } catch (error) {
+      console.error('Error saving character to library:', error);
+      return false;
+    }
+  }, [character, formData]);
 
   // Create the context value
   const contextValue = useMemo(() => ({
@@ -216,6 +232,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     resetFormData,
     generateCharacter,
     downloadCharacterJSON,
+    saveToLibrary,
   }), [
     character, 
     formData, 
@@ -224,7 +241,8 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     updateFormData, 
     resetFormData, 
     generateCharacter,
-    downloadCharacterJSON
+    downloadCharacterJSON,
+    saveToLibrary
   ]);
 
   return (
