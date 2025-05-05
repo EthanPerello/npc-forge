@@ -42,7 +42,7 @@ function extractUnreleasedChanges(): { changes: string, categories: { [key: stri
   
   // Parse categories (Added, Changed, Fixed, etc.)
   const categories: { [key: string]: string[] } = {};
-  const categoryMatches = [...changes.matchAll(/### (\w+)\s*\n([\s\S]*?)(?=\n### |\n## |\n$)/g)];
+  const categoryMatches = [...changes.matchAll(/^### ([^\n]+)\n([\s\S]*?)(?=^### |\n## |\n$)/gm)];
   
   if (categoryMatches.length === 0) {
     // If no categories are found, try to extract bullet points directly
