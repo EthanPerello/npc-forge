@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-05-05
+
 ### Added
 - Character Library system:
   - New dedicated page for viewing, managing, and filtering saved characters
@@ -28,7 +30,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Refactored `globals.css` by consolidating and cleaning up redundant or conflicting style rules. No visual changes expected.
 - Fixed various styling issues in light mode
-
 
 ## [0.2.3] - 2025-05-02
 
@@ -240,13 +241,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Export to JSON feature
 - Fully responsive UI for desktop and mobile
 
-[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.2.3...HEAD
-[0.2.3]: https://github.com/EthanPerello/npc-forge/compare/v0.2.2...v0.2.3
-[0.2.2]: https://github.com/EthanPerello/npc-forge/compare/v0.2.1...v0.2.2
-[0.2.1]: https://github.com/EthanPerello/npc-forge/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/EthanPerello/npc-forge/compare/v0.1.4...v0.2.0
-[0.1.4]: https://github.com/EthanPerello/npc-forge/compare/v0.1.3...v0.1.4
-[0.1.3]: https://github.com/EthanPerello/npc-forge/compare/v0.1.2...v0.1.3
-[0.1.2]: https://github.com/EthanPerello/npc-forge/compare/v0.1.1...v0.1.2
-[0.1.1]: https://github.com/EthanPerello/npc-forge/compare/v0.1.0...v0.1.1
+[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/EthanPerello/npc-forge/compare/v0.1.1...v0.3.0
 [0.1.0]: https://github.com/EthanPerello/npc-forge/releases/tag/v0.1.0
