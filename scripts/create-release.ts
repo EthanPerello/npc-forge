@@ -93,6 +93,25 @@ function extractUnreleasedChanges(): { changes: string, categories: { [key: stri
   return { changes, categories };
 }
 
+// Update package.json with the new version
+function updatePackageJson(version: string): void {
+  const packageJsonPath = 'package.json';
+  
+  if (!fs.existsSync(packageJsonPath)) {
+    console.warn(`⚠️ ${packageJsonPath} not found, skipping version update`);
+    return;
+  }
+  
+  try {
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+    packageJson.version = version;
+    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
+    console.log(`✅ ${packageJsonPath} updated with version ${version}`);
+  } catch (error) {
+    console.error(`❌ Failed to update ${packageJsonPath}:`, error);
+  }
+}
+
 // Update changelog by moving unreleased changes to a new version
 function updateChangelog(version: string, date: string, title: string): void {
   let changelog = fs.readFileSync('CHANGELOG.md', 'utf-8');
@@ -178,11 +197,14 @@ async function run() {
   updateChangelog(version, formattedDate, title);
   console.log(`✅ CHANGELOG.md updated`);
 
+  // Update package.json with the new version
+  updatePackageJson(version);
+
   // Git commit, tag & push
   try {
-    // Explicitly add the changelog and release notes file
-    execSync(`git add CHANGELOG.md "${releaseNotePath}"`);
-    console.log(`✅ Added CHANGELOG.md and ${releaseNotePath} to git staging`);
+    // Explicitly add the changelog, package.json, and release notes file
+    execSync(`git add CHANGELOG.md package.json "${releaseNotePath}"`);
+    console.log(`✅ Added CHANGELOG.md, package.json, and ${releaseNotePath} to git staging`);
     
     // Commit the changes
     execSync(`git commit -m "chore: release ${tag}"`);
@@ -190,7 +212,7 @@ async function run() {
   } catch (error) {
     console.warn('⚠️ Git commit failed:', error);
     console.log('Try committing manually:');
-    console.log(`git add CHANGELOG.md "${releaseNotePath}" && git commit -m "chore: release ${tag}"`);
+    console.log(`git add CHANGELOG.md package.json "${releaseNotePath}" && git commit -m "chore: release ${tag}"`);
   }
 
   try {
