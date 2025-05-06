@@ -7,9 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Ability to add and remove quests, dialogue lines, and items in the character editor
+- Regeneration buttons for newly added elements (quests, dialogue, items)
+- Regeneration controls for individual sections of a quest (e.g., title, reward, description)
+- Option to regenerate character portraits from the editor
+
 ### Changed
-- Improved mobile UI with optimized sticky footer layout
-- Enhanced character library responsiveness on small screens
+- Removed the "Special Ability" field from character profiles
+- Improved mobile layout of character library cards and footer actions
+- Refactored sticky footer into a responsive standalone component
 
 ## [0.3.1] - May 5, 2025
 
