@@ -98,16 +98,16 @@ export default function CharacterLibraryPage() {
   )));
   
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8 flex flex-col md:flex-row justify-between items-center">
-        <h1 className="text-3xl font-bold flex items-center mb-4 md:mb-0">
-          <Library className="h-8 w-8 mr-2 text-indigo-600 dark:text-indigo-400" />
+    <div className="container mx-auto px-4 py-6 md:py-8">
+      <div className="mb-6 md:mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold flex items-center">
+          <Library className="h-6 w-6 md:h-8 md:w-8 mr-2 text-indigo-600 dark:text-indigo-400" />
           Character Library
         </h1>
         
-        <div className="flex flex-wrap gap-2">
+        <div className="w-full md:w-auto">
           {/* Upload JSON button */}
-          <label className="flex items-center bg-indigo-100 text-indigo-700 px-4 py-2 rounded-md cursor-pointer hover:bg-indigo-200 dark:bg-indigo-900 dark:text-indigo-300 dark:hover:bg-indigo-800">
+          <label className="flex items-center justify-center w-full md:w-auto bg-indigo-100 text-indigo-700 px-4 py-2 rounded-md cursor-pointer hover:bg-indigo-200 dark:bg-indigo-900 dark:text-indigo-300 dark:hover:bg-indigo-800">
             <Upload className="h-4 w-4 mr-2" />
             Import Character
             <input 
@@ -120,8 +120,8 @@ export default function CharacterLibraryPage() {
         </div>
       </div>
       
-      {/* Search and filter bar */}
-      <div className="mb-6 flex flex-col md:flex-row gap-4">
+      {/* Search and filter bar - Stack on mobile, side by side on desktop */}
+      <div className="mb-6 flex flex-col md:flex-row gap-3">
         <div className="relative flex-grow">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <Search className="h-5 w-5 text-gray-400" />
@@ -143,7 +143,7 @@ export default function CharacterLibraryPage() {
           )}
         </div>
         
-        <div className="relative min-w-[200px]">
+        <div className="relative w-full md:min-w-[200px] md:w-auto">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <Filter className="h-5 w-5 text-gray-400" />
           </div>
@@ -167,9 +167,9 @@ export default function CharacterLibraryPage() {
         {filteredCharacters.length} {filteredCharacters.length === 1 ? 'character' : 'characters'} found
       </p>
       
-      {/* Character grid */}
+      {/* Character grid - 1 column on mobile, 2 on tablet, 3 on desktop */}
       {filteredCharacters.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {filteredCharacters.map((storedChar) => (
             <div 
               key={storedChar.id} 
@@ -207,7 +207,7 @@ export default function CharacterLibraryPage() {
                 
                 {/* Character image */}
                 {storedChar.character.image_url && (
-                  <div className="relative w-full h-48 mb-3 bg-gray-100 dark:bg-gray-800 rounded overflow-hidden">
+                  <div className="relative w-full h-40 sm:h-48 mb-3 bg-gray-100 dark:bg-gray-800 rounded overflow-hidden">
                     <img 
                       src={storedChar.character.image_url} 
                       alt={storedChar.character.name}
@@ -221,41 +221,44 @@ export default function CharacterLibraryPage() {
                   {storedChar.character.appearance}
                 </p>
                 
-                {/* Action buttons */}
+                {/* Action buttons - Larger touch targets for mobile */}
                 <div className="flex justify-between" onClick={(e) => e.stopPropagation()}>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-1 md:space-x-2">
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDownloadCharacter(storedChar.character);
                       }}
-                      className="p-2 text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
+                      className="p-2 md:p-2 text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 touch-manipulation"
                       title="Download JSON"
+                      aria-label="Download JSON"
                     >
-                      <Download className="h-5 w-5" />
+                      <Download className="h-5 w-5 md:h-5 md:w-5" />
                     </button>
                   </div>
                   
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-1 md:space-x-2">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         window.location.href = `/library/edit/${storedChar.id}`;
                       }}
-                      className="p-2 text-gray-600 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400"
+                      className="p-2 md:p-2 text-gray-600 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400 touch-manipulation"
                       title="Edit Character"
+                      aria-label="Edit Character"
                     >
-                      <Edit className="h-5 w-5" />
+                      <Edit className="h-5 w-5 md:h-5 md:w-5" />
                     </button>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDeleteCharacter(storedChar.id);
                       }}
-                      className="p-2 text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
+                      className="p-2 md:p-2 text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 touch-manipulation"
                       title="Delete Character"
+                      aria-label="Delete Character"
                     >
-                      <Trash2 className="h-5 w-5" />
+                      <Trash2 className="h-5 w-5 md:h-5 md:w-5" />
                     </button>
                   </div>
                 </div>
@@ -281,56 +284,63 @@ export default function CharacterLibraryPage() {
         </div>
       )}
       
-      {/* Character Viewer Modal */}
+      {/* Character Viewer Modal - Full-screen on mobile */}
       {isJsonViewerOpen && selectedCharacter && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-card rounded-lg shadow-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            <div className="p-4 border-b border-theme flex justify-between items-center">
-              <h3 className="text-lg font-medium">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-1 sm:p-4">
+          <div className="bg-card rounded-lg shadow-lg w-full max-w-4xl h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="p-3 sm:p-4 border-b border-theme flex justify-between items-center">
+              <h3 className="text-lg font-medium truncate pr-2">
                 {selectedCharacter.character.name}
               </h3>
               <button 
                 onClick={() => setIsJsonViewerOpen(false)}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-1"
+                aria-label="Close"
               >
                 <X className="h-6 w-6" />
               </button>
             </div>
-            <div className="p-4 overflow-auto max-h-[calc(90vh-10rem)]">
-              {/* Tabs */}
-              <div className="mb-4 border-b border-theme">
-                <ul className="flex flex-wrap -mb-px text-sm font-medium text-center">
-                  <li className="mr-2">
-                    <button 
-                      onClick={() => setActiveTab('details')}
-                      className={`inline-block p-4 border-b-2 rounded-t-lg ${
-                        activeTab === 'details' 
-                          ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
-                          : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
-                      }`}>
-                      Character Details
-                    </button>
-                  </li>
-                  <li className="mr-2">
-                    <button 
-                      onClick={() => setActiveTab('json')}
-                      className={`inline-block p-4 border-b-2 rounded-t-lg ${
-                        activeTab === 'json' 
-                          ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
-                          : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
-                      }`}>
-                      View JSON
-                    </button>
-                  </li>
-                </ul>
-              </div>
-              
+            
+            {/* Tabs */}
+            <div className="border-b border-theme">
+              <ul className="flex flex-wrap text-sm font-medium text-center">
+                <li className="mr-2">
+                  <button 
+                    onClick={() => setActiveTab('details')}
+                    className={`inline-block p-3 sm:p-4 border-b-2 rounded-t-lg ${
+                      activeTab === 'details' 
+                        ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
+                        : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
+                    }`}
+                    aria-label="View Character Details"
+                  >
+                    Character Details
+                  </button>
+                </li>
+                <li className="mr-2">
+                  <button 
+                    onClick={() => setActiveTab('json')}
+                    className={`inline-block p-3 sm:p-4 border-b-2 rounded-t-lg ${
+                      activeTab === 'json' 
+                        ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
+                        : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
+                    }`}
+                    aria-label="View JSON"
+                  >
+                    View JSON
+                  </button>
+                </li>
+              </ul>
+            </div>
+            
+            {/* Content area with scrolling */}
+            <div className="flex-1 overflow-auto p-4">
               {activeTab === 'details' ? (
                 <div className="space-y-6">
                   {/* Character image */}
                   {selectedCharacter.character.image_url && (
                     <div className="flex justify-center">
-                      <div className="w-48 h-48 relative">
+                      <div className="w-32 h-32 sm:w-48 sm:h-48 relative">
                         <img 
                           src={selectedCharacter.character.image_url} 
                           alt={selectedCharacter.character.name}
@@ -421,15 +431,17 @@ export default function CharacterLibraryPage() {
                   )}
                 </div>
               ) : (
-                <pre className="text-xs whitespace-pre-wrap bg-gray-100 p-4 rounded dark:bg-gray-800 dark:text-gray-300 text-gray-800">
+                <pre className="text-xs whitespace-pre-wrap bg-gray-100 p-4 rounded dark:bg-gray-800 dark:text-gray-300 text-gray-800 overflow-auto h-full">
                   {JSON.stringify(selectedCharacter.character, null, 2)}
                 </pre>
               )}
             </div>
-            <div className="p-4 border-t border-theme flex justify-end">
+            
+            {/* Bottom action buttons - Full width on mobile */}
+            <div className="p-4 border-t border-theme flex flex-col sm:flex-row gap-2 sm:justify-end">
               <Button
                 variant="danger"
-                className="mr-2"
+                className="w-full sm:w-auto"
                 onClick={() => {
                   if (window.confirm(`Are you sure you want to delete ${selectedCharacter.character.name}? This action cannot be undone.`)) {
                     if (deleteCharacter(selectedCharacter.id)) {
@@ -445,7 +457,7 @@ export default function CharacterLibraryPage() {
               </Button>
               <Button
                 variant="secondary"
-                className="mr-2"
+                className="w-full sm:w-auto"
                 onClick={() => window.location.href = `/library/edit/${selectedCharacter.id}`}
               >
                 <Edit className="h-4 w-4 mr-2" />
@@ -453,6 +465,7 @@ export default function CharacterLibraryPage() {
               </Button>
               <Button
                 variant="primary"
+                className="w-full sm:w-auto"
                 onClick={() => handleDownloadCharacter(selectedCharacter.character)}
               >
                 <Download className="h-4 w-4 mr-2" />
