@@ -3,19 +3,22 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Image as ImageIcon, AlertCircle, RefreshCw, User } from 'lucide-react';
+import Button from '@/components/ui/button';
 
 interface PortraitDisplayProps {
   imageUrl?: string;
   name: string;
   isLoading?: boolean;
   onRetry?: () => void;
+  onRegenerate?: () => void;
 }
 
 export default function PortraitDisplay({ 
   imageUrl, 
   name, 
   isLoading = false,
-  onRetry
+  onRetry,
+  onRegenerate
 }: PortraitDisplayProps) {
   const [error, setError] = useState<boolean>(false);
   const [loaded, setLoaded] = useState<boolean>(false);
@@ -113,6 +116,21 @@ export default function PortraitDisplay({
               <p className="text-white text-sm font-medium truncate">{name}</p>
             </div>
           </div>
+          
+          {/* Regenerate button overlay */}
+          {onRegenerate && (
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20">
+              <Button
+                variant="secondary"
+                onClick={onRegenerate}
+                size="sm"
+                leftIcon={<RefreshCw className="h-3 w-3" />}
+                className="bg-white bg-opacity-75 hover:bg-opacity-100 dark:bg-gray-800 dark:bg-opacity-75 dark:hover:bg-opacity-100 shadow-md"
+              >
+                Regenerate
+              </Button>
+            </div>
+          )}
         </>
       )}
     </div>
