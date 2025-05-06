@@ -380,14 +380,6 @@ export default function CharacterLibraryPage() {
                     <p className="text-sm">{selectedCharacter.character.backstory_hook}</p>
                   </div>
                   
-                  {/* Special Ability */}
-                  {selectedCharacter.character.special_ability && (
-                    <div>
-                      <h4 className="text-lg font-semibold mb-2">Special Ability</h4>
-                      <p className="text-sm">{selectedCharacter.character.special_ability}</p>
-                    </div>
-                  )}
-                  
                   {/* Dialogue Lines */}
                   {selectedCharacter.character.dialogue_lines && selectedCharacter.character.dialogue_lines.length > 0 && (
                     <div>

@@ -111,8 +111,7 @@ Return ONLY valid JSON with the following structure:
   },
   "appearance": "Detailed physical description as a paragraph",
   "personality": "Detailed personality description as a paragraph",
-  "backstory_hook": "A 1-2 sentence hook about the character's past or motivation",
-  "special_ability": "A unique ability or power the character possesses"`;
+  "backstory_hook": "A 1-2 sentence hook about the character's past or motivation"`;
   
   // Add conditional components
   if (data.include_items) {

@@ -89,11 +89,6 @@ export default function CharacterCard({ character, onDownload }: CharacterCardPr
                 </div>
               </div>
               
-              <div>
-                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Special Ability</h3>
-                <p className="text-gray-600 dark:text-gray-400">{character.special_ability}</p>
-              </div>
-              
               {character.items && character.items.length > 0 && (
                 <div>
                   <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Inventory</h3>

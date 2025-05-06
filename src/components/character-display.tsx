@@ -13,10 +13,11 @@ import { Download, Save, User, MessageSquare, Package, BookOpen } from 'lucide-r
 import { saveCharacter } from '@/lib/character-storage';
 
 export default function CharacterDisplay() {
-  const { character, formData, downloadCharacterJSON, error } = useCharacter();
+  const { character, formData, downloadCharacterJSON, error, isLoading } = useCharacter();
   const [activeTab, setActiveTab] = useState('profile');
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState('');
+  const [isRegeneratingPortrait, setIsRegeneratingPortrait] = useState(false);
   
   // Reset to profile tab when character changes
   useEffect(() => {
@@ -92,6 +93,16 @@ export default function CharacterDisplay() {
       console.error('Error saving character:', error);
     }
   };
+
+  // Handle portrait regeneration (placeholder for now)
+  const handleRegeneratePortrait = () => {
+    alert('Portrait regeneration will be implemented in a future update.');
+    // For now, just show the loading state briefly for UI feedback
+    setIsRegeneratingPortrait(true);
+    setTimeout(() => {
+      setIsRegeneratingPortrait(false);
+    }, 1500);
+  };
   
   return (
     <div className="w-full max-w-5xl mx-auto bg-card rounded-xl shadow-lg overflow-hidden mt-8 border border-theme">
@@ -99,7 +110,12 @@ export default function CharacterDisplay() {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Portrait section */}
           <div className="md:w-1/3">
-            <PortraitDisplay imageUrl={character.image_url} name={character.name} />
+            <PortraitDisplay 
+              imageUrl={character.image_url} 
+              name={character.name} 
+              isLoading={isRegeneratingPortrait}
+              onRegenerate={handleRegeneratePortrait}
+            />
           </div>
           
           {/* Character info section */}

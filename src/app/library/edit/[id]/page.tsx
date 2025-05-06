@@ -7,7 +7,7 @@ import { Character, Quest } from '@/lib/types';
 import Button from '@/components/ui/button';
 import Select from '@/components/ui/select';
 import SearchableSelect from '@/components/ui/searchable-select';
-import { Save, ArrowLeft, Sparkles } from 'lucide-react';
+import { Save, ArrowLeft, Sparkles, PlusCircle, Trash2, RefreshCw, Image as ImageIcon } from 'lucide-react';
 
 // Import the same options used in the CharacterTab
 import { GENRE_TEMPLATES, getSubGenres } from '@/lib/templates';
@@ -251,6 +251,71 @@ export default function CharacterEditorPage() {
     // This will be implemented with OpenAI integration later
     alert(`Regenerating ${field} is not implemented yet.`);
   };
+
+  // Add a new quest
+  const handleAddQuest = () => {
+    if (!character) return;
+    
+    const newQuest: Quest = {
+      title: "New Quest",
+      description: "Quest description goes here...",
+      reward: "Quest reward goes here...",
+      type: "any"
+    };
+    
+    const updatedQuests = character.quests ? [...character.quests, newQuest] : [newQuest];
+    handleArrayInputChange('quests', updatedQuests);
+  };
+  
+  // Remove a quest
+  const handleRemoveQuest = (index: number) => {
+    if (!character || !character.quests) return;
+    
+    const updatedQuests = [...character.quests];
+    updatedQuests.splice(index, 1);
+    handleArrayInputChange('quests', updatedQuests);
+  };
+  
+  // Add a new item
+  const handleAddItem = () => {
+    if (!character) return;
+    
+    const newItem = "New item description";
+    const updatedItems = character.items ? [...character.items, newItem] : [newItem];
+    handleArrayInputChange('items', updatedItems);
+  };
+  
+  // Remove an item
+  const handleRemoveItem = (index: number) => {
+    if (!character || !character.items) return;
+    
+    const updatedItems = [...character.items];
+    updatedItems.splice(index, 1);
+    handleArrayInputChange('items', updatedItems);
+  };
+  
+  // Add new dialogue
+  const handleAddDialogue = () => {
+    if (!character) return;
+    
+    const newDialogue = "New dialogue line...";
+    const updatedDialogue = character.dialogue_lines ? [...character.dialogue_lines, newDialogue] : [newDialogue];
+    handleArrayInputChange('dialogue_lines', updatedDialogue);
+  };
+  
+  // Remove dialogue
+  const handleRemoveDialogue = (index: number) => {
+    if (!character || !character.dialogue_lines) return;
+    
+    const updatedDialogue = [...character.dialogue_lines];
+    updatedDialogue.splice(index, 1);
+    handleArrayInputChange('dialogue_lines', updatedDialogue);
+  };
+  
+  // Regenerate portrait (placeholder)
+  const handleRegeneratePortrait = () => {
+    alert("Portrait regeneration will be implemented in a future update.");
+  };
   
   if (isLoading) {
     return <div className="container mx-auto px-4 py-8 text-center">Loading character data...</div>;
@@ -413,28 +478,30 @@ export default function CharacterEditorPage() {
               </button>
             </div>
           </div>
-          
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              Special Ability
-            </label>
-            <div className="flex">
-              <input
-                type="text"
-                value={character.special_ability || ''}
-                onChange={(e) => handleInputChange('special_ability', e.target.value)}
-                className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
-              />
-              <button
-                type="button"
-                onClick={() => handleRegenerateField('special_ability')}
-                className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
-                title="Regenerate with AI"
-              >
-                <Sparkles className="h-5 w-5" />
-              </button>
+
+          {/* Portrait section */}
+          {character.image_url && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Portrait</label>
+              <div className="flex items-center">
+                <div className="relative w-32 h-32 border border-theme rounded-md overflow-hidden bg-secondary">
+                  <img 
+                    src={character.image_url} 
+                    alt={`Portrait of ${character.name}`} 
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+                <Button
+                  variant="secondary"
+                  onClick={handleRegeneratePortrait}
+                  className="ml-4"
+                  leftIcon={<RefreshCw className="h-4 w-4" />}
+                >
+                  Regenerate Portrait
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
         
         {/* Character Traits */}
@@ -533,7 +600,7 @@ export default function CharacterEditorPage() {
         <div className="space-y-3">
             {/* List of existing AI-added traits */}
             {Object.entries(character.added_traits).map(([key, value], index) => (
-            <div key={index} className="flex items-center gap-3 pb-3 border-b border-gray-200 dark:border-gray-700 last:border-0">
+            <div key={index} className="flex items-center gap-3 pb-3 border-b border-gray-200 dark:border-gray-700 last:border-0 last:mb-0 last:pb-0">
                 <div className="w-1/3">
                 <input
                     type="text"
@@ -576,9 +643,7 @@ export default function CharacterEditorPage() {
                 className="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                 title="Remove trait"
                 >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
+                <Trash2 className="h-5 w-5" />
                 </button>
             </div>
             ))}
@@ -600,9 +665,7 @@ export default function CharacterEditorPage() {
                 }}
                 className="px-4 py-2 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded-md dark:bg-indigo-900 dark:text-indigo-300 dark:hover:bg-indigo-800 flex items-center"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-                </svg>
+                <PlusCircle className="h-5 w-5 mr-2" />
                 Add Custom Trait
             </button>
             </div>
@@ -610,104 +673,238 @@ export default function CharacterEditorPage() {
         </div>
         
         {/* Items */}
-        {character.items && character.items.length > 0 && (
-          <div className="bg-card p-6 rounded-lg border border-theme">
-            <h2 className="text-xl font-bold mb-4">Items</h2>
-            
-            {character.items.map((item, index) => (
-              <div key={index} className="mb-2 flex">
-                <input
-                  type="text"
-                  value={item}
-                  onChange={(e) => {
-                    const newItems = [...character.items!];
-                    newItems[index] = e.target.value;
-                    handleArrayInputChange('items', newItems);
-                  }}
-                  className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
-                />
-                <button
-                  type="button"
-                  onClick={() => handleRegenerateField(`item_${index}`)}
-                  className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
-                  title="Regenerate with AI"
-                >
-                  <Sparkles className="h-5 w-5" />
-                </button>
-              </div>
-            ))}
+        <div className="bg-card p-6 rounded-lg border border-theme">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">Items</h2>
+            <Button 
+              variant="secondary" 
+              onClick={handleAddItem}
+              leftIcon={<PlusCircle className="h-4 w-4" />}
+            >
+              Add Item
+            </Button>
           </div>
-        )}
-        
-        {/* Quests */}
-        {character.quests && character.quests.length > 0 && (
-          <div className="bg-card p-6 rounded-lg border border-theme">
-            <h2 className="text-xl font-bold mb-4">Quests</h2>
-            
-            {character.quests.map((quest, index) => (
-              <div key={index} className="mb-6 pb-6 border-b border-theme last:border-0 last:mb-0 last:pb-0 bg-secondary p-4 rounded-lg">
-                <div className="mb-2">
-                  <label className="block text-sm font-medium mb-1">
-                    Quest Title
-                  </label>
+          
+          {character.items && character.items.length > 0 ? (
+            <div className="space-y-3">
+              {character.items.map((item, index) => (
+                <div key={index} className="mb-2 flex">
                   <input
                     type="text"
-                    value={quest.title}
+                    value={item}
                     onChange={(e) => {
-                      const newQuests = [...character.quests!];
-                      newQuests[index] = {...newQuests[index], title: e.target.value};
-                      handleArrayInputChange('quests', newQuests);
+                      const newItems = [...character.items!];
+                      newItems[index] = e.target.value;
+                      handleArrayInputChange('items', newItems);
                     }}
-                    className="w-full p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
+                    className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
                   />
-                </div>
-                
-                <div className="mb-2">
-                  <label className="block text-sm font-medium mb-1">
-                    Quest Description
-                  </label>
-                  <textarea
-                    value={quest.description}
-                    onChange={(e) => {
-                      const newQuests = [...character.quests!];
-                      newQuests[index] = {...newQuests[index], description: e.target.value};
-                      handleArrayInputChange('quests', newQuests);
-                    }}
-                    rows={3}
-                    className="w-full p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
-                  />
-                </div>
-                
-                <div className="mb-2 flex">
-                  <div className="flex-grow">
-                    <label className="block text-sm font-medium mb-1">
-                      Quest Reward
-                    </label>
-                    <input
-                      type="text"
-                      value={quest.reward}
-                      onChange={(e) => {
-                        const newQuests = [...character.quests!];
-                        newQuests[index] = {...newQuests[index], reward: e.target.value};
-                        handleArrayInputChange('quests', newQuests);
-                      }}
-                      className="w-full p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
-                    />
-                  </div>
-                  
                   <button
                     type="button"
-                    onClick={() => handleRegenerateField(`quest_${index}`)}
-                    className="ml-2 self-end p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
-                    title="Regenerate Quest with AI"
+                    onClick={() => handleRegenerateField(`item_${index}`)}
+                    className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
+                    title="Regenerate with AI"
                   >
                     <Sparkles className="h-5 w-5" />
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveItem(index)}
+                    className="ml-2 p-2 text-red-600 hover:text-red-800 bg-red-50 rounded-md dark:bg-red-900/20 dark:text-red-400 dark:hover:text-red-300"
+                    title="Remove Item"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-secondary rounded-lg border border-dashed border-theme">
+              <p className="text-muted">No items available. Add an item to get started.</p>
+            </div>
+          )}
+        </div>
+        
+        {/* Dialogue Lines */}
+        <div className="bg-card p-6 rounded-lg border border-theme">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">Dialogue Lines</h2>
+            <Button 
+              variant="secondary" 
+              onClick={handleAddDialogue}
+              leftIcon={<PlusCircle className="h-4 w-4" />}
+            >
+              Add Dialogue
+            </Button>
           </div>
-        )}
+          
+          {character.dialogue_lines && character.dialogue_lines.length > 0 ? (
+            <div className="space-y-3">
+              {character.dialogue_lines.map((line, index) => (
+                <div key={index} className="mb-2 flex">
+                  <input
+                    type="text"
+                    value={line}
+                    onChange={(e) => {
+                      const newLines = [...character.dialogue_lines!];
+                      newLines[index] = e.target.value;
+                      handleArrayInputChange('dialogue_lines', newLines);
+                    }}
+                    className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRegenerateField(`dialogue_${index}`)}
+                    className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
+                    title="Regenerate with AI"
+                  >
+                    <Sparkles className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveDialogue(index)}
+                    className="ml-2 p-2 text-red-600 hover:text-red-800 bg-red-50 rounded-md dark:bg-red-900/20 dark:text-red-400 dark:hover:text-red-300"
+                    title="Remove Dialogue"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-secondary rounded-lg border border-dashed border-theme">
+              <p className="text-muted">No dialogue available. Add dialogue to get started.</p>
+            </div>
+          )}
+        </div>
+        
+        {/* Quests */}
+        <div className="bg-card p-6 rounded-lg border border-theme">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">Quests</h2>
+            <Button 
+              variant="secondary" 
+              onClick={handleAddQuest}
+              leftIcon={<PlusCircle className="h-4 w-4" />}
+            >
+              Add Quest
+            </Button>
+          </div>
+          
+          {character.quests && character.quests.length > 0 ? (
+            <div className="space-y-6">
+              {character.quests.map((quest, index) => (
+                <div key={index} className="mb-6 pb-6 border-b border-theme last:border-0 last:mb-0 last:pb-0 bg-secondary p-4 rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-lg font-semibold">Quest #{index + 1}</h3>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveQuest(index)}
+                      className="p-2 text-red-600 hover:text-red-800 bg-red-50 rounded-md dark:bg-red-900/20 dark:text-red-400 dark:hover:text-red-300"
+                      title="Remove Quest"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                    </button>
+                  </div>
+                
+                  <div className="mb-2">
+                    <label className="block text-sm font-medium mb-1">
+                      Quest Title
+                    </label>
+                    <div className="flex">
+                      <input
+                        type="text"
+                        value={quest.title}
+                        onChange={(e) => {
+                          const newQuests = [...character.quests!];
+                          newQuests[index] = {...newQuests[index], title: e.target.value};
+                          handleArrayInputChange('quests', newQuests);
+                        }}
+                        className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRegenerateField(`quest_${index}_title`)}
+                        className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
+                        title="Regenerate Title"
+                      >
+                        <Sparkles className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-2">
+                    <label className="block text-sm font-medium mb-1">
+                      Quest Description
+                    </label>
+                    <div className="flex">
+                      <textarea
+                        value={quest.description}
+                        onChange={(e) => {
+                          const newQuests = [...character.quests!];
+                          newQuests[index] = {...newQuests[index], description: e.target.value};
+                          handleArrayInputChange('quests', newQuests);
+                        }}
+                        rows={3}
+                        className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRegenerateField(`quest_${index}_description`)}
+                        className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
+                        title="Regenerate Description"
+                      >
+                        <Sparkles className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-2">
+                    <label className="block text-sm font-medium mb-1">
+                      Quest Reward
+                    </label>
+                    <div className="flex">
+                      <input
+                        type="text"
+                        value={quest.reward}
+                        onChange={(e) => {
+                          const newQuests = [...character.quests!];
+                          newQuests[index] = {...newQuests[index], reward: e.target.value};
+                          handleArrayInputChange('quests', newQuests);
+                        }}
+                        className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRegenerateField(`quest_${index}_reward`)}
+                        className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
+                        title="Regenerate Reward"
+                      >
+                        <Sparkles className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-2">
+                    <button
+                      type="button"
+                      onClick={() => handleRegenerateField(`quest_${index}_whole`)}
+                      className="w-full p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300 flex items-center justify-center"
+                      title="Regenerate Entire Quest"
+                    >
+                      <Sparkles className="h-5 w-5 mr-2" />
+                      Regenerate Entire Quest
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-secondary rounded-lg border border-dashed border-theme">
+              <p className="text-muted">No quests available. Add a quest to get started.</p>
+            </div>
+          )}
+        </div>
         
         {/* Form controls */}
         <div className="flex justify-end">

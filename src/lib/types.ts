@@ -48,7 +48,6 @@ export interface Character {
   appearance: string; // Now a freeform paragraph
   personality: string; // Now a freeform paragraph
   backstory_hook: string; // 1-2 sentence hook
-  special_ability?: string;
   items?: string[];
   dialogue_lines?: string[];
   quests?: Quest[];
