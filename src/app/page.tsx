@@ -6,17 +6,13 @@ import MainFormTabs from '@/components/main-form-tabs';
 import CharacterDisplay from '@/components/character-display';
 import UsageLimitsNotice from '@/components/usage-limits-notice';
 import WelcomeGuide from '@/components/welcome-guide';
+import StickyFooter from '@/components/sticky-footer';
 import Button from '@/components/ui/button';
-import { Sparkles, RotateCcw, AlertCircle } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 // Main content area with generate button
 function MainContent() {
-  const { generateCharacter, isLoading, resetFormData, formData, error } = useCharacter();
-  
-  const handleRandomize = () => {
-    // This will trigger the randomize function in CharacterTab
-    document.getElementById('randomize-button')?.click();
-  };
+  const { generateCharacter, isLoading, formData } = useCharacter();
 
   return (
     <div className="mb-20">
@@ -44,7 +40,7 @@ function FloatingLoadingMessage() {
   if (!isLoading) return null;
   
   return (
-    <div className="fixed bottom-24 left-0 right-0 z-50 flex justify-center">
+    <div className="fixed bottom-24 md:bottom-24 left-0 right-0 z-50 flex justify-center px-4">
       <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-md text-sm font-bold dark:bg-yellow-900/30 dark:text-yellow-300 animate-pulse shadow-lg border border-red-200 dark:border-yellow-800">
         <p className="flex items-center">
           <svg className="w-4 h-4 mr-2 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -53,54 +49,6 @@ function FloatingLoadingMessage() {
           </svg>
           Character generation may take a second... Creating your unique NPC with AI.
         </p>
-      </div>
-    </div>
-  );
-}
-
-// Create a new component for the sticky footer
-function StickyFooter() {
-  const { generateCharacter, isLoading, resetFormData, formData, error } = useCharacter();
-  
-  const handleRandomize = () => {
-    // This will trigger the randomize function in CharacterTab
-    document.getElementById('randomize-button')?.click();
-  };
-  
-  return (
-    <div className="sticky-footer">
-      <div className="container mx-auto max-w-6xl flex items-center justify-between">
-        <div className="flex space-x-3">
-          <Button
-            variant="secondary"
-            onClick={resetFormData}
-            leftIcon={<RotateCcw className="h-4 w-4" />}
-            disabled={isLoading}
-            size="sm"
-          >
-            Clear Options
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={handleRandomize}
-            leftIcon={<AlertCircle className="h-4 w-4" />}
-            disabled={isLoading}
-            size="sm"
-          >
-            Randomize
-          </Button>
-        </div>
-        
-        <Button
-          variant="primary"
-          onClick={generateCharacter}
-          disabled={!formData.description || isLoading}
-          isLoading={isLoading}
-          leftIcon={<Sparkles className="h-5 w-5" />}
-          size="lg"
-        >
-          {isLoading ? 'Generating...' : 'Generate Character'}
-        </Button>
       </div>
     </div>
   );
@@ -131,31 +79,31 @@ export default function Home() {
 
   return (
     <CharacterProvider>
-      <main className="min-h-screen py-8 px-4 pb-24 bg-gradient-to-br from-indigo-50 via-indigo-50/30 to-blue-100 dark:from-gray-900 dark:via-indigo-950/30 dark:to-blue-950/20">
+      <main className="min-h-screen py-8 px-4 pb-32 md:pb-24 bg-gradient-to-br from-indigo-50 via-indigo-50/30 to-blue-100 dark:from-gray-900 dark:via-indigo-950/30 dark:to-blue-950/20">
         <div className="container mx-auto max-w-full">
-        <header className="relative w-full h-[200px] sm:h-[220px] lg:h-[240px] mb-12 overflow-hidden rounded-2xl shadow-lg">
-          {/* Background glow */}
-          <div className="absolute inset-0 bg-gradient-to-b from-indigo-900/80 via-indigo-800/40 to-transparent blur-2xl" />
+          <header className="relative w-full h-[200px] sm:h-[220px] lg:h-[240px] mb-12 overflow-hidden rounded-2xl shadow-lg">
+            {/* Background glow */}
+            <div className="absolute inset-0 bg-gradient-to-b from-indigo-900/80 via-indigo-800/40 to-transparent blur-2xl" />
 
-          {/* Fanned Cards Image */}
-          <img
-            src="/images/fanned-cards.png"
-            alt="Fanned NPC character cards"
-            className="absolute inset-0 w-full h-full object-cover object-[center_20%] opacity-0 animate-fade-in-up-slow drop-shadow-2xl"
-          />
+            {/* Fanned Cards Image */}
+            <img
+              src="/images/fanned-cards.png"
+              alt="Fanned NPC character cards"
+              className="absolute inset-0 w-full h-full object-cover object-[center_20%] opacity-0 animate-fade-in-up-slow drop-shadow-2xl"
+            />
 
-          {/* Title */}
-          {/* Gradient behind text */}
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-indigo-900/80 via-indigo-800/30 to-transparent z-10 pointer-events-none rounded-b-2xl" />
-          <div className="relative z-20 flex flex-col justify-center items-center h-full text-center px-4">
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]">
-              NPC Forge
-            </h1>
-            <p className="mt-2 text-lg sm:text-xl lg:text-2xl font-medium text-white drop-shadow-sm">
-              AI-powered character generator for games
-            </p>
-          </div>
-        </header>
+            {/* Title */}
+            {/* Gradient behind text */}
+            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-indigo-900/80 via-indigo-800/30 to-transparent z-10 pointer-events-none rounded-b-2xl" />
+            <div className="relative z-20 flex flex-col justify-center items-center h-full text-center px-4">
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]">
+                NPC Forge
+              </h1>
+              <p className="mt-2 text-lg sm:text-xl lg:text-2xl font-medium text-white drop-shadow-sm">
+                AI-powered character generator for games
+              </p>
+            </div>
+          </header>
 
           {/* Welcome Guide - Only show if state is true */}
           {showWelcomeGuide && (

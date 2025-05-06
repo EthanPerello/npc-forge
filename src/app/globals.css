@@ -1063,10 +1063,18 @@ p.mt-2.text-lg.sm\:text-xl.lg\:text-2xl.font-medium,
   left: 0;
   right: 0;
   background-color: white;
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   border-top: 1px solid #e5e7eb;
   z-index: 50;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+}
+
+/* Add safe area inset for iOS devices */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .sticky-footer {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  }
 }
 
 .light .sticky-footer {
@@ -1076,6 +1084,37 @@ p.mt-2.text-lg.sm\:text-xl.lg\:text-2xl.font-medium,
 .dark .sticky-footer {
   background-color: #111827;
   border-color: #374151;
+}
+
+/* Add bottom padding to main content to prevent it from being hidden behind the sticky footer */
+.pb-footer {
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 768px) {
+  .pb-footer {
+    padding-bottom: 4rem;
+  }
+}
+
+/* Ensure buttons have larger touch targets on mobile */
+@media (max-width: 640px) {
+  button[class*="p-2"], 
+  button[class*="px-2"], 
+  button[class*="py-2"] {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Make sure the floating loading message doesn't overlap with the footer */
+@media (max-width: 640px) {
+  .fixed.bottom-24 {
+    bottom: 8rem;
+  }
 }
 
 /* Auto-fill message styling */
