@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Improved mobile UI with optimized sticky footer layout
+- Enhanced character library responsiveness on small screens
+- Added larger touch targets for improved mobile usability
+
 ## [0.3.1] - May 5, 2025
 
 ### Added
