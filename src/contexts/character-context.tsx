@@ -34,9 +34,9 @@ interface CharacterContextType {
 // Default form values using undefined instead of empty strings for enum types
 const defaultFormData: CharacterFormData = {
   description: '',
-  include_quests: true,  
-  include_dialogue: true,  
-  include_items: true,  
+  include_quests: false,  // Changed to false as requested
+  include_dialogue: false,  // Changed to false as requested
+  include_items: false,  // Changed to false as requested
   genre: undefined,
   sub_genre: undefined,
   gender: undefined,
@@ -197,12 +197,12 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     downloadJson(character, `${character.name.replace(/\s+/g, '_').toLowerCase()}.json`);
   }, [character]);
   
-  // Save to library - updated to async to handle image processing
+  // Save to library - updated to handle IndexedDB
   const saveToLibrary = useCallback(async () => {
     if (!character) return false;
     
     try {
-      // Save character with form data
+      // Save character with form data to IndexedDB
       await saveCharacter(character, formData);
       return true;
     } catch (error) {

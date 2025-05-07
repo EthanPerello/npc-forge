@@ -8,15 +8,10 @@ import UsageLimitsNotice from '@/components/usage-limits-notice';
 import WelcomeGuide from '@/components/welcome-guide';
 import StickyFooter from '@/components/sticky-footer';
 
-// Main content area - removed Generate Button since it's in the form
+// Main content area
 function MainContent() {
   const { isLoading } = useCharacter();
-
-  return (
-    <div className="mb-20">
-      {/* Generate Button removed - already in the form and sticky footer */}
-    </div>
-  );
+  return <div className="mb-20"></div>;
 }
 
 // Global loading message component that appears above the footer
@@ -43,29 +38,51 @@ function FloatingLoadingMessage() {
 export default function Home() {
   // State for whether the welcome guide is visible
   const [showWelcomeGuide, setShowWelcomeGuide] = useState(true);
+  const [hasScrolled, setHasScrolled] = useState(false);
   
-  // Force reset the localStorage flag in dev mode on first page load
+  // Check if welcome guide has been dismissed before
   useEffect(() => {
+    // In dev mode, always show the guide
     if (process.env.NODE_ENV === 'development') {
-      localStorage.removeItem('npc-forge-guide-dismissed');
+      setShowWelcomeGuide(true);
+      return;
     }
+    
+    // In production, check localStorage
+    const guideDismissed = localStorage.getItem('npc-forge-guide-dismissed');
+    if (guideDismissed === 'true') {
+      setShowWelcomeGuide(false);
+    } else {
+      setShowWelcomeGuide(true);
+    }
+  }, []);
+
+  // Track scrolling to show/hide back to top button
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      setHasScrolled(scrollTop > 300);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Handle the welcome guide dismissal
   const handleWelcomeDismiss = () => {
     setShowWelcomeGuide(false);
+    localStorage.setItem('npc-forge-guide-dismissed', 'true');
   };
 
   // Handle the get started button
   const handleGetStarted = () => {
     setShowWelcomeGuide(false);
-    // We can do any additional actions here if needed
-    // For example, scroll to the form or focus on an input field
+    localStorage.setItem('npc-forge-guide-dismissed', 'true');
   };
 
   return (
     <CharacterProvider>
-      <main className="min-h-screen py-8 px-4 pb-32 md:pb-24 bg-gradient-to-br from-indigo-50 via-indigo-50/30 to-blue-100 dark:from-gray-900 dark:via-indigo-950/30 dark:to-blue-950/20">
+      <main className="min-h-screen py-8 px-4 pb-32 md:pb-24 bg-gradient-to-br from-indigo-50 via-indigo-50/30 to-blue-100 dark:from-gray-900 dark:via-indigo-950/30 dark:to-blue-950/20 pb-footer">
         <div className="container mx-auto max-w-full">
           <header className="relative w-full h-[200px] sm:h-[220px] lg:h-[240px] mb-12 overflow-hidden rounded-2xl shadow-lg">
             {/* Background glow */}
@@ -115,7 +132,7 @@ export default function Home() {
             <CharacterDisplay />
           </section>
           
-          {/* Footer with enhanced styling */}
+          {/* Footer with improved styling - Removed usage banner */}
           <footer className="mt-16 text-center border-t border-indigo-100 pt-8 dark:border-indigo-900/50">
             <div className="mx-auto">
               <p className="text-gray-700 dark:text-gray-300">
@@ -141,16 +158,13 @@ export default function Home() {
                   GitHub Repository
                 </a>
               </div>
-              <p className="mt-4 text-xs text-gray-600 dark:text-gray-400 bg-white/50 rounded-full px-3 py-1 inline-block dark:bg-gray-800/50">
-                Usage varies by model tier selected - Standard tier is unlimited
-              </p>
             </div>
           </footer>
         </div>
       </main>
       
       {/* Sticky Footer for main actions */}
-      <StickyFooter />
+      <StickyFooter pageType="creator" showBackToTop={hasScrolled} />
       
       {/* Floating loading message that appears above the footer */}
       <FloatingLoadingMessage />

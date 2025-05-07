@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Model selectors for text and image regeneration on the character edit page
+- Ability to upload and regenerate portraits from the edit screen
+- Button to download portrait image from the character display
+- Delete button on character cards in the library for quick removal
+
+### Changed
+- Portrait controls on the edit page are now positioned below the image
+- Updated Welcome Guide with improved steps and visuals
+- Removed "Usage varies by model tier..." banner from the main screen
+- Fixed layout and styling of the "Enhanced" portrait model option
+
 ## [0.3.2] - May 7, 2025
 
 ### Added
