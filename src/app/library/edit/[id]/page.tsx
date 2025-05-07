@@ -2,12 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { getStoredCharacters, updateCharacter, deleteCharacter, loadCharacterWithImage } from '@/lib/character-storage';
-import { Character, Quest } from '@/lib/types';
+import { getCharacterById, updateCharacter, deleteCharacter, loadCharacterWithImage } from '@/lib/character-storage';
+import { Character, Quest, OpenAIModel, ImageModel } from '@/lib/types';
 import Button from '@/components/ui/button';
 import Select from '@/components/ui/select';
-import SearchableSelect from '@/components/ui/searchable-select';
-import { Save, ArrowLeft, Sparkles, PlusCircle, Trash2, RefreshCw, Image as ImageIcon, AlertTriangle } from 'lucide-react';
+import ImageUpload from '@/components/image-upload';
+import PortraitDisplay from '@/components/portrait-display';
+import { Save, ArrowLeft, Sparkles, PlusCircle, Trash2, RefreshCw } from 'lucide-react';
+import ModelSelector from '@/components/model-selector';
+import ImageModelSelector from '@/components/image-model-selector';
+import { DEFAULT_MODEL } from '@/lib/models';
+import { DEFAULT_IMAGE_MODEL } from '@/lib/image-models';
 
 // Import the same options used in the CharacterTab
 import { GENRE_TEMPLATES, getSubGenres } from '@/lib/templates';
@@ -130,6 +135,10 @@ export default function CharacterEditorPage() {
   const [currentGenre, setCurrentGenre] = useState<string>('');
   const [subGenres, setSubGenres] = useState<{value: string, label: string}[]>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showImageUpload, setShowImageUpload] = useState(false);
+  const [isRegeneratingPortrait, setIsRegeneratingPortrait] = useState(false);
+  const [selectedTextModel, setSelectedTextModel] = useState<OpenAIModel>(DEFAULT_MODEL);
+  const [selectedImageModel, setSelectedImageModel] = useState<ImageModel>(DEFAULT_IMAGE_MODEL);
   
   // Load character data - updated to use loadCharacterWithImage
   useEffect(() => {
@@ -138,12 +147,11 @@ export default function CharacterEditorPage() {
     async function loadCharacter() {
       setIsLoading(true);
       try {
-        // First check if the character exists in storage
-        const storedCharacters = getStoredCharacters();
-        const storedCharacter = storedCharacters.find(char => char.id === characterId);
+        // Load the character with image from IndexedDB
+        const storedCharacter = await getCharacterById(characterId);
         
         if (storedCharacter) {
-          // Load the character with image from IndexedDB
+          // Load the full character with image data
           const fullCharacter = await loadCharacterWithImage(characterId);
           
           if (fullCharacter) {
@@ -159,6 +167,11 @@ export default function CharacterEditorPage() {
                 ...genreSubGenres.map(sg => ({ value: sg.id, label: sg.label }))
               ]);
             }
+            
+            // Set the model settings if they exist in the character data
+            if (fullCharacter.portrait_options?.image_model) {
+              setSelectedImageModel(fullCharacter.portrait_options.image_model);
+            }
           } else {
             // Fallback to the stored character without image if needed
             setCharacter(storedCharacter.character);
@@ -172,6 +185,16 @@ export default function CharacterEditorPage() {
                 { value: '', label: 'Not specified' },
                 ...genreSubGenres.map(sg => ({ value: sg.id, label: sg.label }))
               ]);
+            }
+            
+            // Set the model settings if they exist in the character data
+            if (storedCharacter.character.portrait_options?.image_model) {
+              setSelectedImageModel(storedCharacter.character.portrait_options.image_model);
+            }
+            
+            // If the character has form data with a model, use that
+            if (storedCharacter.formData?.model) {
+              setSelectedTextModel(storedCharacter.formData.model);
             }
           }
         } else {
@@ -233,7 +256,7 @@ export default function CharacterEditorPage() {
     setShowDeleteConfirm(false);
   };
   
-  // Handle form submission - updated to async to handle Promise
+  // Handle form submission - updated to async to handle Promise and include model info
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -243,8 +266,27 @@ export default function CharacterEditorPage() {
     setIsSaving(true);
     
     try {
+      // Update the character's portrait options with the selected image model
+      const updatedCharacter = {
+        ...character,
+        portrait_options: {
+          ...(character.portrait_options || {}),
+          image_model: selectedImageModel
+        }
+      };
+      
+      // Create form data with the selected text model
+      const formData = {
+        model: selectedTextModel,
+        // Add other required form data fields with default values
+        description: `${character.name} - ${character.appearance?.substring(0, 50)}...`,
+        include_quests: true,
+        include_dialogue: true,
+        include_items: true,
+      };
+      
       // Update to await the Promise returned by updateCharacter
-      const success = await updateCharacter(characterId, character);
+      const success = await updateCharacter(characterId, updatedCharacter, formData);
       
       if (success) {
         navigateToLibrary();
@@ -276,6 +318,46 @@ export default function CharacterEditorPage() {
       ...character,
       [field]: value
     });
+  };
+  
+  // Handle portrait regeneration
+  const handleRegeneratePortrait = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setIsRegeneratingPortrait(true);
+    
+    // In a real implementation, this would call the API with the selectedImageModel
+    setTimeout(() => {
+      setIsRegeneratingPortrait(false);
+      alert(`Portrait regeneration will use the ${selectedImageModel} model in a future update.`);
+    }, 1500);
+  };
+  
+  // Handle toggle for image upload
+  const handleToggleImageUpload = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowImageUpload(!showImageUpload);
+  };
+  
+  // Handle image change from upload component
+  const handleImageChange = (imageData: string | null) => {
+    if (!character) return;
+    
+    if (imageData) {
+      setCharacter({
+        ...character,
+        image_data: imageData
+      });
+    } else {
+      // If image is removed, make a copy of character without image_data
+      const { image_data, ...rest } = character;
+      setCharacter(rest as Character);
+    }
+    
+    // Close image upload after change
+    setShowImageUpload(false);
   };
   
   // Handle array input changes
@@ -334,13 +416,13 @@ export default function CharacterEditorPage() {
     });
   };
   
-  // Function to regenerate field with AI (placeholder for now)
+  // Function to regenerate field with AI (now uses selectedTextModel)
   const handleRegenerateField = (field: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
     // This will be implemented with OpenAI integration later
-    alert(`Regenerating ${field} is not implemented yet.`);
+    alert(`Regenerating ${field} will use the ${selectedTextModel} model in a future update.`);
   };
 
   // Add a new quest with explicit event handling
@@ -421,13 +503,6 @@ export default function CharacterEditorPage() {
     handleArrayInputChange('dialogue_lines', updatedDialogue);
   };
   
-  // Regenerate portrait (placeholder)
-  const handleRegeneratePortrait = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    alert("Portrait regeneration will be implemented in a future update.");
-  };
-  
   // Toggle personality trait
   const handleTogglePersonalityTrait = (trait: string) => (e: React.MouseEvent) => {
     e.preventDefault();
@@ -473,7 +548,7 @@ export default function CharacterEditorPage() {
   }
   
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 pb-32">
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center">
           <Button
@@ -645,40 +720,76 @@ export default function CharacterEditorPage() {
             </div>
           </div>
 
-          {/* Portrait section - Updated to use both image_url and image_data */}
-          {(character.image_data || character.image_url) && (
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Portrait</label>
-              <div className="flex items-center">
-                <div className="relative w-32 h-32 border border-theme rounded-md overflow-hidden bg-secondary">
-                  <img 
-                    src={character.image_data || character.image_url} 
-                    alt={`Portrait of ${character.name}`} 
-                    className="object-cover w-full h-full"
-                    onError={(e) => {
-                      // If image_data fails, try image_url as fallback
-                      if (character.image_data && character.image_url && e.currentTarget.src !== character.image_url) {
-                        e.currentTarget.src = character.image_url;
-                      } else {
-                        // If both fail, show a placeholder or error state
-                        e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Ccircle cx="12" cy="8" r="5"/%3E%3Cpath d="M20 21a8 8 0 0 0-16 0"/%3E%3C/svg%3E';
-                        e.currentTarget.alt = 'Portrait unavailable';
-                      }
-                    }}
+          {/* Added: Text Model Selector */}
+          <div className="mb-6 mt-6 p-4 bg-secondary rounded-lg border border-theme">
+            <h3 className="text-lg font-semibold mb-4">Text Generation Model</h3>
+            <p className="text-sm text-muted mb-4">
+              Select which model to use for regenerating any text content in this character.
+            </p>
+            <ModelSelector 
+              value={selectedTextModel}
+              onChange={setSelectedTextModel}
+            />
+          </div>
+        </div>
+        
+        {/* Portrait section - Updated with toggle between display and upload and added Image Model Selector */}
+        <div className="bg-card p-6 rounded-lg border border-theme">
+          <h2 className="text-xl font-bold mb-4">Portrait</h2>
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="md:w-1/2">
+              {showImageUpload ? (
+                <div>
+                  <ImageUpload
+                    initialImage={character.image_data || character.image_url}
+                    onImageChange={handleImageChange}
+                    className="mt-2"
+                  />
+                  <Button
+                    variant="secondary"
+                    onClick={handleToggleImageUpload}
+                    className="mt-2"
+                    type="button"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <div>
+                  <PortraitDisplay 
+                    imageUrl={character.image_url} 
+                    imageData={character.image_data}
+                    characterId={characterId}
+                    name={character.name}
+                    size="medium"
+                    isLoading={isRegeneratingPortrait}
+                    onRegenerate={handleRegeneratePortrait}
+                    onUpload={handleToggleImageUpload}
+                    showRegenerateButton={true}
+                    showUploadButton={true}
                   />
                 </div>
-                <Button
-                  variant="secondary"
-                  onClick={handleRegeneratePortrait}
-                  className="ml-4"
-                  leftIcon={<RefreshCw className="h-4 w-4" />}
-                  type="button"
-                >
-                  Regenerate Portrait
-                </Button>
+              )}
+              
+              <p className="text-xs text-muted mt-2">
+                Upload a custom portrait or regenerate using AI. The portrait will be saved with the character.
+              </p>
+            </div>
+            
+            {/* Added: Image Model Selector */}
+            <div className="md:w-1/2">
+              <div className="bg-secondary p-4 rounded-lg border border-theme h-full">
+                <h3 className="text-lg font-semibold mb-4">Portrait Generation Model</h3>
+                <p className="text-sm text-muted mb-4">
+                  Select which model to use when regenerating this character's portrait.
+                </p>
+                <ImageModelSelector 
+                  value={selectedImageModel}
+                  onChange={setSelectedImageModel}
+                />
               </div>
             </div>
-          )}
+          </div>
         </div>
         
         {/* Character Traits */}
