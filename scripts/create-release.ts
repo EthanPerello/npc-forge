@@ -43,12 +43,57 @@ function extractUnreleasedChanges(): { changes: string, categories: { [key: stri
   // Parse categories (Added, Changed, Fixed, etc.)
   const categories: { [key: string]: string[] } = {};
   
-  // Use a regular expression with exec() instead of matchAll
+  // First, manually check for the specific category headers we want to ensure we capture them
+  const expectedCategories = ["Added", "Changed", "Fixed"];
+  for (const category of expectedCategories) {
+    const categoryPattern = new RegExp(`### ${category}\\s*\\n([\\s\\S]*?)(?=###|$)`, 'g');
+    const match = categoryPattern.exec(changes);
+    
+    if (match && match[1]) {
+      const content = match[1].trim();
+      if (content) {
+        // Extract bullet points while preserving nested structure
+        const items: string[] = [];
+        let currentItem = '';
+        const lines = content.split('\n');
+        
+        for (const line of lines) {
+          if (line.trim().startsWith('-')) {
+            if (currentItem) {
+              items.push(currentItem);
+              currentItem = '';
+            }
+            currentItem = line;
+          } else if (line.trim() && currentItem) {
+            currentItem += '\n' + line;
+          }
+        }
+        
+        // Add final item if exists
+        if (currentItem) {
+          items.push(currentItem);
+        }
+        
+        if (items.length > 0) {
+          categories[category] = items;
+        }
+      }
+    }
+  }
+  
+  // Then use the general regex approach to catch any other categories
   const categoryRegex = /^### ([^\n]+)\n([\s\S]*?)(?=^### |\n## |\n$)/gm;
   let categoryMatch;
+  let lastIndex = 0;
   
   while ((categoryMatch = categoryRegex.exec(changes)) !== null) {
     const category = categoryMatch[1];
+    
+    // Skip if we already processed this category in the expected list
+    if (expectedCategories.includes(category)) {
+      continue;
+    }
+    
     // Preserve the entire content including nested bullets and indentation
     const categoryContent = categoryMatch[2].trim();
     const itemBlocks: string[] = [];
@@ -79,6 +124,9 @@ function extractUnreleasedChanges(): { changes: string, categories: { [key: stri
     if (itemBlocks.length > 0) {
       categories[category] = itemBlocks;
     }
+    
+    // Make sure we're advancing properly
+    lastIndex = categoryMatch.index + categoryMatch[0].length;
   }
   
   // If no categories were found using the regex, try to extract bullet points directly
@@ -211,26 +259,28 @@ async function run() {
   // Build release note content in exact format matching previous releases
   let releaseNoteContent = `# NPC Forge ${tag} – ${title}\n\n**Release Date:** ${formattedDate}\n\n${summary}\n\n`;
   
-  // Add categories from changelog, preserving structure and formatting
-  if (Object.keys(categories).length > 0) {
-    // Get array of category names to determine the last one
-    const categoryNames = Object.keys(categories);
-    
-    for (let i = 0; i < categoryNames.length; i++) {
-      const category = categoryNames[i];
-      const items = categories[category];
-      
-      releaseNoteContent += `## ${category}\n${items.join('\n')}\n`;
-      
-      // Add extra newline between categories (but not after the last one)
-      if (i < categoryNames.length - 1) {
-        releaseNoteContent += "\n";
-      }
+  // Ensure we always include the standard categories in the right order for the release notes
+  const standardCategories = ["Added", "Changed", "Fixed"];
+  
+  // First add the standard categories in the correct order
+  for (const category of standardCategories) {
+    if (categories[category] && categories[category].length > 0) {
+      releaseNoteContent += `## ${category}\n${categories[category].join('\n')}\n\n`;
+    } else {
+      // Add placeholder if this standard category doesn't have items
+      releaseNoteContent += `## ${category}\n- _No changes in this category_\n\n`;
     }
-  } else {
-    // Add placeholder sections if no changes were found, matching format of previous releases
-    releaseNoteContent += `## Added\n- _TBD_\n\n## Changed\n- _TBD_\n\n## Fixed\n- _TBD_`;
   }
+  
+  // Then add any other categories that might exist
+  const otherCategories = Object.keys(categories).filter(cat => !standardCategories.includes(cat));
+  
+  for (const category of otherCategories) {
+    releaseNoteContent += `## ${category}\n${categories[category].join('\n')}\n\n`;
+  }
+  
+  // Remove trailing newlines
+  releaseNoteContent = releaseNoteContent.trim();
 
   // Write release note
   fs.writeFileSync(releaseNotePath, releaseNoteContent);
