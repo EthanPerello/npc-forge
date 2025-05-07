@@ -42,51 +42,53 @@ function extractUnreleasedChanges(): { changes: string, categories: { [key: stri
   
   // Parse categories (Added, Changed, Fixed, etc.)
   const categories: { [key: string]: string[] } = {};
-  const categoryMatches = [...changes.matchAll(/^### ([^\n]+)\n([\s\S]*?)(?=^### |\n## |\n$)/gm)];
   
-  if (categoryMatches.length === 0) {
-    // If no categories are found, try to extract bullet points directly
+  // Use a regular expression with exec() instead of matchAll
+  const categoryRegex = /^### ([^\n]+)\n([\s\S]*?)(?=^### |\n## |\n$)/gm;
+  let categoryMatch;
+  
+  while ((categoryMatch = categoryRegex.exec(changes)) !== null) {
+    const category = categoryMatch[1];
+    // Preserve the entire content including nested bullets and indentation
+    const categoryContent = categoryMatch[2].trim();
+    const itemBlocks: string[] = [];
+    
+    // Split the content by top-level bullet points
+    let currentItem = '';
+    const lines = categoryContent.split('\n');
+    
+    for (const line of lines) {
+      if (line.trim().startsWith('-')) {
+        // If we already have content and find a new bullet, save the previous item
+        if (currentItem) {
+          itemBlocks.push(currentItem);
+          currentItem = '';
+        }
+        currentItem = line;
+      } else if (line.trim() && currentItem) {
+        // Add to current item if it's not empty (preserves indentation)
+        currentItem += '\n' + line;
+      }
+    }
+    
+    // Add the last item if it exists
+    if (currentItem) {
+      itemBlocks.push(currentItem);
+    }
+    
+    if (itemBlocks.length > 0) {
+      categories[category] = itemBlocks;
+    }
+  }
+  
+  // If no categories were found using the regex, try to extract bullet points directly
+  if (Object.keys(categories).length === 0) {
     const items = changes.split('\n')
       .filter(line => line.trim().startsWith('-'))
       .map(line => line.trim());
     
     if (items.length > 0) {
       categories['General'] = items;
-    }
-  } else {
-    // Process each category
-    for (const match of categoryMatches) {
-      const category = match[1];
-      // Preserve the entire content including nested bullets and indentation
-      const categoryContent = match[2].trim();
-      const itemBlocks: string[] = [];
-      
-      // Split the content by top-level bullet points
-      let currentItem = '';
-      const lines = categoryContent.split('\n');
-      
-      for (const line of lines) {
-        if (line.trim().startsWith('-')) {
-          // If we already have content and find a new bullet, save the previous item
-          if (currentItem) {
-            itemBlocks.push(currentItem);
-            currentItem = '';
-          }
-          currentItem = line;
-        } else if (line.trim() && currentItem) {
-          // Add to current item if it's not empty (preserves indentation)
-          currentItem += '\n' + line;
-        }
-      }
-      
-      // Add the last item if it exists
-      if (currentItem) {
-        itemBlocks.push(currentItem);
-      }
-      
-      if (itemBlocks.length > 0) {
-        categories[category] = itemBlocks;
-      }
     }
   }
   
@@ -159,8 +161,16 @@ function updateChangelog(version: string, date: string, title: string): void {
   // Update version links at the bottom
   const linkBlockMatch = changelog.match(/\[Unreleased\]: .*?\n(?:\[\d+\.\d+\.\d+\]: .*?\n)+/);
   if (linkBlockMatch) {
-    const latestTagMatch = [...linkBlockMatch[0].matchAll(/\[(\d+\.\d+\.\d+)\]:/g)];
-    const lastVersion = latestTagMatch.at(-1)?.[1] || '0.0.0';
+    // Use regex.exec() in a loop instead of matchAll with spread operator
+    const versionRegex = /\[(\d+\.\d+\.\d+)\]:/g;
+    let lastVersion = '0.0.0';
+    let versionMatch;
+    
+    // Find the last version mentioned
+    while ((versionMatch = versionRegex.exec(linkBlockMatch[0])) !== null) {
+      lastVersion = versionMatch[1];
+    }
+    
     const newLinks = `[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v${version}...HEAD\n[${version}]: https://github.com/EthanPerello/npc-forge/compare/v${lastVersion}...v${version}\n`;
     changelog = changelog.replace(linkBlockMatch[0], newLinks);
   }
@@ -181,9 +191,6 @@ async function run() {
   
   // Use the specified day or default to today
   const releaseDay = dayInput ? parseInt(dayInput, 10) : defaultDay;
-  if (isNaN(releaseDay) || releaseDay < 1 || releaseDay > 31) {
-    console.warn(`⚠️ Invalid day provided. Using default day (${defaultDay}).`);
-  }
   
   // Create a new date with the specified day
   const releaseDate = new Date(today);
