@@ -112,6 +112,29 @@ function updatePackageJson(version: string): void {
   }
 }
 
+// Update package-lock.json with the new version
+function updatePackageLockJson(version: string): void {
+  const packageLockPath = 'package-lock.json';
+  
+  if (!fs.existsSync(packageLockPath)) {
+    console.warn(`⚠️ ${packageLockPath} not found, skipping version update`);
+    return;
+  }
+  
+  try {
+    const packageLock = JSON.parse(fs.readFileSync(packageLockPath, 'utf-8'));
+    packageLock.version = version;
+    // Also update the name entry in packages section if it exists
+    if (packageLock.packages && packageLock.packages['']) {
+      packageLock.packages[''].version = version;
+    }
+    fs.writeFileSync(packageLockPath, JSON.stringify(packageLock, null, 2) + '\n');
+    console.log(`✅ ${packageLockPath} updated with version ${version}`);
+  } catch (error) {
+    console.error(`❌ Failed to update ${packageLockPath}:`, error);
+  }
+}
+
 // Update changelog by moving unreleased changes to a new version
 function updateChangelog(version: string, date: string, title: string): void {
   let changelog = fs.readFileSync('CHANGELOG.md', 'utf-8');
@@ -150,11 +173,29 @@ async function run() {
   const version = process.argv[2] || await prompt('🔢 Enter version (e.g., 0.3.0): ');
   const title = process.argv[3] || await prompt('📝 Enter title (e.g., Character Library System): ');
   const summary = await prompt('📄 Enter summary (Markdown, one paragraph): ');
-
-  const tag = `v${version}`;
+  
+  // Prompt for release day
   const today = new Date();
-  const formattedDate = formatDate(today);
-  const isoDate = today.toISOString().split('T')[0]; // For links and filenames
+  const defaultDay = today.getDate();
+  const dayInput = await prompt(`📅 Enter release day (1-31) [default: ${defaultDay}]: `);
+  
+  // Use the specified day or default to today
+  const releaseDay = dayInput ? parseInt(dayInput, 10) : defaultDay;
+  if (isNaN(releaseDay) || releaseDay < 1 || releaseDay > 31) {
+    console.warn(`⚠️ Invalid day provided. Using default day (${defaultDay}).`);
+  }
+  
+  // Create a new date with the specified day
+  const releaseDate = new Date(today);
+  if (!isNaN(releaseDay) && releaseDay >= 1 && releaseDay <= 31) {
+    releaseDate.setDate(releaseDay);
+  } else {
+    console.warn(`⚠️ Using current day (${defaultDay}) for the release date.`);
+  }
+  
+  const tag = `v${version}`;
+  const formattedDate = formatDate(releaseDate);
+  const isoDate = releaseDate.toISOString().split('T')[0]; // For links and filenames
   const releaseNotePath = `release-notes/${tag}.md`;
 
   // Extract unreleased changes
@@ -199,12 +240,15 @@ async function run() {
 
   // Update package.json with the new version
   updatePackageJson(version);
+  
+  // Update package-lock.json with the new version
+  updatePackageLockJson(version);
 
   // Git commit, tag & push
   try {
-    // Explicitly add the changelog, package.json, and release notes file
-    execSync(`git add CHANGELOG.md package.json "${releaseNotePath}"`);
-    console.log(`✅ Added CHANGELOG.md, package.json, and ${releaseNotePath} to git staging`);
+    // Explicitly add the changelog, package.json, package-lock.json, and release notes file
+    execSync(`git add CHANGELOG.md package.json package-lock.json "${releaseNotePath}"`);
+    console.log(`✅ Added CHANGELOG.md, package.json, package-lock.json, and ${releaseNotePath} to git staging`);
     
     // Commit the changes
     execSync(`git commit -m "chore: release ${tag}"`);
@@ -212,7 +256,7 @@ async function run() {
   } catch (error) {
     console.warn('⚠️ Git commit failed:', error);
     console.log('Try committing manually:');
-    console.log(`git add CHANGELOG.md package.json "${releaseNotePath}" && git commit -m "chore: release ${tag}"`);
+    console.log(`git add CHANGELOG.md package.json package-lock.json "${releaseNotePath}" && git commit -m "chore: release ${tag}"`);
   }
 
   try {
