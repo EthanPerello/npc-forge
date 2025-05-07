@@ -51,7 +51,8 @@ export interface Character {
   items?: string[];
   dialogue_lines?: string[];
   quests?: Quest[];
-  image_url?: string;
+  image_url?: string;         // OpenAI URL (temporary)
+  image_data?: string;        // Base64 encoded image data (persistent)
   portrait_options?: PortraitOptions;
 }
 

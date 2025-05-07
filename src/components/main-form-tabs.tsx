@@ -30,9 +30,12 @@ export default function MainFormTabs() {
     setActiveTab(tabId);
   };
 
-  // Handle form submission
+  // Handle form submission - make sure we don't accidentally trigger browser form submission
   const handleSubmit = async (e: React.FormEvent) => {
+    // Prevent default form submission behavior which might cause page refreshes
     e.preventDefault();
+    e.stopPropagation();
+    
     if (!formData.description) return;
     
     await generateCharacter();
@@ -79,7 +82,12 @@ export default function MainFormTabs() {
             {tabs.map(tab => (
               <button
                 key={tab.id}
-                onClick={() => !tab.disabled && handleTabChange(tab.id)}
+                type="button" 
+                /* Explicitly specify button type to prevent form submission */
+                onClick={(e) => {
+                  e.preventDefault(); // Prevent possible form submission
+                  if (!tab.disabled) handleTabChange(tab.id);
+                }}
                 className={`py-2 px-4 rounded-md transition-colors ${
                   activeTab === tab.id 
                     ? 'bg-indigo-600 text-white dark:bg-indigo-700' 
@@ -127,9 +135,24 @@ export default function MainFormTabs() {
         </div>
       </div>
       
-      {/* Tab Content */}
-      <div className="p-6">
+      {/* Wrap form around the tab content to contain all our form elements */}
+      <form onSubmit={handleSubmit} className="p-6">
         {tabs.find(tab => tab.id === activeTab)?.content}
+        
+        {/* Generate button inside the form to make it the default submit action */}
+        <div className="mt-6 flex justify-center">
+          <Button
+            variant="primary"
+            type="submit"
+            onClick={handleSubmit}
+            disabled={!formData.description || isLoading}
+            isLoading={isLoading}
+            leftIcon={<Sparkles className="h-5 w-5" />}
+            size="lg"
+          >
+            {isLoading ? 'Generating...' : 'Generate Character'}
+          </Button>
+        </div>
         
         {/* Hidden button for randomizing from the footer */}
         <button 
@@ -138,7 +161,7 @@ export default function MainFormTabs() {
           onClick={handleRandomize}
           className="hidden"
         />
-      </div>
+      </form>
       
       {/* Error and Success Messages */}
       {error && (

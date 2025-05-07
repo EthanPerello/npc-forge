@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { getStoredCharacters, updateCharacter } from '@/lib/character-storage';
+import { getStoredCharacters, updateCharacter, deleteCharacter, loadCharacterWithImage } from '@/lib/character-storage';
 import { Character, Quest } from '@/lib/types';
 import Button from '@/components/ui/button';
 import Select from '@/components/ui/select';
 import SearchableSelect from '@/components/ui/searchable-select';
-import { Save, ArrowLeft, Sparkles, PlusCircle, Trash2, RefreshCw, Image as ImageIcon } from 'lucide-react';
+import { Save, ArrowLeft, Sparkles, PlusCircle, Trash2, RefreshCw, Image as ImageIcon, AlertTriangle } from 'lucide-react';
 
 // Import the same options used in the CharacterTab
 import { GENRE_TEMPLATES, getSubGenres } from '@/lib/templates';
@@ -125,50 +125,129 @@ export default function CharacterEditorPage() {
   const [character, setCharacter] = useState<Character | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentGenre, setCurrentGenre] = useState<string>('');
   const [subGenres, setSubGenres] = useState<{value: string, label: string}[]>([]);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
-  // Load character data
+  // Load character data - updated to use loadCharacterWithImage
   useEffect(() => {
     if (!characterId) return;
     
-    const storedCharacters = getStoredCharacters();
-    const storedCharacter = storedCharacters.find(char => char.id === characterId);
-    
-    if (storedCharacter) {
-      setCharacter(storedCharacter.character);
-      
-      // Set current genre for subgenres
-      if (storedCharacter.character.selected_traits.genre) {
-        setCurrentGenre(storedCharacter.character.selected_traits.genre);
-        // Load sub-genres for the current genre
-        const genreSubGenres = getSubGenres(storedCharacter.character.selected_traits.genre);
-        setSubGenres([
-          { value: '', label: 'Not specified' },
-          ...genreSubGenres.map(sg => ({ value: sg.id, label: sg.label }))
-        ]);
+    async function loadCharacter() {
+      setIsLoading(true);
+      try {
+        // First check if the character exists in storage
+        const storedCharacters = getStoredCharacters();
+        const storedCharacter = storedCharacters.find(char => char.id === characterId);
+        
+        if (storedCharacter) {
+          // Load the character with image from IndexedDB
+          const fullCharacter = await loadCharacterWithImage(characterId);
+          
+          if (fullCharacter) {
+            setCharacter(fullCharacter);
+            
+            // Set current genre for subgenres
+            if (fullCharacter.selected_traits.genre) {
+              setCurrentGenre(fullCharacter.selected_traits.genre);
+              // Load sub-genres for the current genre
+              const genreSubGenres = getSubGenres(fullCharacter.selected_traits.genre);
+              setSubGenres([
+                { value: '', label: 'Not specified' },
+                ...genreSubGenres.map(sg => ({ value: sg.id, label: sg.label }))
+              ]);
+            }
+          } else {
+            // Fallback to the stored character without image if needed
+            setCharacter(storedCharacter.character);
+            
+            // Set current genre for subgenres
+            if (storedCharacter.character.selected_traits.genre) {
+              setCurrentGenre(storedCharacter.character.selected_traits.genre);
+              // Load sub-genres for the current genre
+              const genreSubGenres = getSubGenres(storedCharacter.character.selected_traits.genre);
+              setSubGenres([
+                { value: '', label: 'Not specified' },
+                ...genreSubGenres.map(sg => ({ value: sg.id, label: sg.label }))
+              ]);
+            }
+          }
+        } else {
+          setError('Character not found');
+        }
+      } catch (err) {
+        console.error('Error loading character:', err);
+        setError('Failed to load character');
+      } finally {
+        setIsLoading(false);
       }
-    } else {
-      setError('Character not found');
     }
     
-    setIsLoading(false);
+    loadCharacter();
   }, [characterId]);
   
-  // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  // Navigate back to library after a short delay
+  const navigateToLibrary = () => {
+    // Use a timeout to allow any state updates to complete first
+    setTimeout(() => {
+      router.push('/library');
+    }, 50);
+  };
+  
+  // Handle character deletion
+  const handleDeleteCharacter = async (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    
+    if (!characterId) return;
+    
+    if (!showDeleteConfirm) {
+      setShowDeleteConfirm(true);
+      return;
+    }
+    
+    setIsDeleting(true);
+    
+    try {
+      const success = await deleteCharacter(characterId);
+      
+      if (success) {
+        navigateToLibrary();
+      } else {
+        setError('Failed to delete character');
+      }
+    } catch (err) {
+      setError('An error occurred while deleting');
+      console.error('Error deleting character:', err);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+  
+  // Cancel delete confirmation
+  const handleCancelDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowDeleteConfirm(false);
+  };
+  
+  // Handle form submission - updated to async to handle Promise
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     
     if (!character) return;
     
     setIsSaving(true);
     
     try {
-      const success = updateCharacter(characterId, character);
+      // Update to await the Promise returned by updateCharacter
+      const success = await updateCharacter(characterId, character);
       
       if (success) {
-        router.push('/library');
+        navigateToLibrary();
       } else {
         setError('Failed to update character');
       }
@@ -178,6 +257,15 @@ export default function CharacterEditorPage() {
     } finally {
       setIsSaving(false);
     }
+  };
+  
+  // Generic function to prevent form submission from buttons
+  const handleButtonClick = (callback: (e: React.MouseEvent) => void) => {
+    return (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      callback(e);
+    };
   };
   
   // Handle text input changes for simple string fields
@@ -233,7 +321,7 @@ export default function CharacterEditorPage() {
     }
   };
   
-  // Handle personality traits selection
+  // Handle personality traits selection - removed limit
   const handlePersonalityTraitsChange = (traits: string[]) => {
     if (!character) return;
     
@@ -247,13 +335,19 @@ export default function CharacterEditorPage() {
   };
   
   // Function to regenerate field with AI (placeholder for now)
-  const handleRegenerateField = (field: string) => {
+  const handleRegenerateField = (field: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     // This will be implemented with OpenAI integration later
     alert(`Regenerating ${field} is not implemented yet.`);
   };
 
-  // Add a new quest
-  const handleAddQuest = () => {
+  // Add a new quest with explicit event handling
+  const handleAddQuest = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (!character) return;
     
     const newQuest: Quest = {
@@ -267,8 +361,11 @@ export default function CharacterEditorPage() {
     handleArrayInputChange('quests', updatedQuests);
   };
   
-  // Remove a quest
-  const handleRemoveQuest = (index: number) => {
+  // Remove a quest with explicit event handling  
+  const handleRemoveQuest = (index: number) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (!character || !character.quests) return;
     
     const updatedQuests = [...character.quests];
@@ -277,7 +374,10 @@ export default function CharacterEditorPage() {
   };
   
   // Add a new item
-  const handleAddItem = () => {
+  const handleAddItem = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (!character) return;
     
     const newItem = "New item description";
@@ -286,7 +386,10 @@ export default function CharacterEditorPage() {
   };
   
   // Remove an item
-  const handleRemoveItem = (index: number) => {
+  const handleRemoveItem = (index: number) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (!character || !character.items) return;
     
     const updatedItems = [...character.items];
@@ -295,7 +398,10 @@ export default function CharacterEditorPage() {
   };
   
   // Add new dialogue
-  const handleAddDialogue = () => {
+  const handleAddDialogue = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (!character) return;
     
     const newDialogue = "New dialogue line...";
@@ -304,7 +410,10 @@ export default function CharacterEditorPage() {
   };
   
   // Remove dialogue
-  const handleRemoveDialogue = (index: number) => {
+  const handleRemoveDialogue = (index: number) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (!character || !character.dialogue_lines) return;
     
     const updatedDialogue = [...character.dialogue_lines];
@@ -313,8 +422,28 @@ export default function CharacterEditorPage() {
   };
   
   // Regenerate portrait (placeholder)
-  const handleRegeneratePortrait = () => {
+  const handleRegeneratePortrait = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     alert("Portrait regeneration will be implemented in a future update.");
+  };
+  
+  // Toggle personality trait
+  const handleTogglePersonalityTrait = (trait: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!character) return;
+    
+    const currentTraits = character.selected_traits.personality_traits || [];
+    
+    if (currentTraits.includes(trait)) {
+      // Remove trait
+      handlePersonalityTraitsChange(currentTraits.filter(t => t !== trait));
+    } else {
+      // Add trait - no limit anymore
+      handlePersonalityTraitsChange([...currentTraits, trait]);
+    }
   };
   
   if (isLoading) {
@@ -329,7 +458,8 @@ export default function CharacterEditorPage() {
         </div>
         <Button
           variant="secondary"
-          onClick={() => router.push('/library')}
+          onClick={handleButtonClick(() => router.push('/library'))}
+          type="button"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Library
@@ -344,16 +474,52 @@ export default function CharacterEditorPage() {
   
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-6 flex items-center">
-        <Button
-          variant="secondary"
-          onClick={() => router.push('/library')}
-          className="mr-4"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button>
-        <h1 className="text-2xl font-bold">Edit Character: {character.name}</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center">
+          <Button
+            variant="secondary"
+            onClick={handleButtonClick(() => router.push('/library'))}
+            className="mr-4"
+            type="button"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <h1 className="text-2xl font-bold">Edit Character: {character.name}</h1>
+        </div>
+        
+        {/* Delete Character Button */}
+        {showDeleteConfirm ? (
+          <div className="flex items-center">
+            <span className="mr-2 text-sm text-red-600 dark:text-red-400">Confirm delete?</span>
+            <Button
+              variant="secondary"
+              onClick={handleCancelDelete}
+              className="mr-2"
+              type="button"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={handleDeleteCharacter}
+              isLoading={isDeleting}
+              type="button"
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              Delete
+            </Button>
+          </div>
+        ) : (
+          <Button
+            variant="danger"
+            onClick={handleDeleteCharacter}
+            type="button"
+          >
+            <Trash2 className="h-4 w-4 mr-1" />
+            Delete Character
+          </Button>
+        )}
       </div>
       
       {error && (
@@ -382,7 +548,7 @@ export default function CharacterEditorPage() {
               />
               <button
                 type="button"
-                onClick={() => handleRegenerateField('name')}
+                onClick={(e) => handleRegenerateField('name', e)}
                 className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
                 title="Regenerate with AI"
               >
@@ -426,7 +592,7 @@ export default function CharacterEditorPage() {
               />
               <button
                 type="button"
-                onClick={() => handleRegenerateField('appearance')}
+                onClick={(e) => handleRegenerateField('appearance', e)}
                 className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
                 title="Regenerate with AI"
               >
@@ -448,7 +614,7 @@ export default function CharacterEditorPage() {
               />
               <button
                 type="button"
-                onClick={() => handleRegenerateField('personality')}
+                onClick={(e) => handleRegenerateField('personality', e)}
                 className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
                 title="Regenerate with AI"
               >
@@ -470,7 +636,7 @@ export default function CharacterEditorPage() {
               />
               <button
                 type="button"
-                onClick={() => handleRegenerateField('backstory_hook')}
+                onClick={(e) => handleRegenerateField('backstory_hook', e)}
                 className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
                 title="Regenerate with AI"
               >
@@ -479,16 +645,26 @@ export default function CharacterEditorPage() {
             </div>
           </div>
 
-          {/* Portrait section */}
-          {character.image_url && (
+          {/* Portrait section - Updated to use both image_url and image_data */}
+          {(character.image_data || character.image_url) && (
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1">Portrait</label>
               <div className="flex items-center">
                 <div className="relative w-32 h-32 border border-theme rounded-md overflow-hidden bg-secondary">
                   <img 
-                    src={character.image_url} 
+                    src={character.image_data || character.image_url} 
                     alt={`Portrait of ${character.name}`} 
                     className="object-cover w-full h-full"
+                    onError={(e) => {
+                      // If image_data fails, try image_url as fallback
+                      if (character.image_data && character.image_url && e.currentTarget.src !== character.image_url) {
+                        e.currentTarget.src = character.image_url;
+                      } else {
+                        // If both fail, show a placeholder or error state
+                        e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Ccircle cx="12" cy="8" r="5"/%3E%3Cpath d="M20 21a8 8 0 0 0-16 0"/%3E%3C/svg%3E';
+                        e.currentTarget.alt = 'Portrait unavailable';
+                      }
+                    }}
                   />
                 </div>
                 <Button
@@ -496,6 +672,7 @@ export default function CharacterEditorPage() {
                   onClick={handleRegeneratePortrait}
                   className="ml-4"
                   leftIcon={<RefreshCw className="h-4 w-4" />}
+                  type="button"
                 >
                   Regenerate Portrait
                 </Button>
@@ -559,24 +736,15 @@ export default function CharacterEditorPage() {
             />
           </div>
           
-          {/* Personality Traits */}
+          {/* Personality Traits - No more limit */}
           <div className="mt-4">
-            <label className="block text-sm font-medium mb-2">Personality Traits (select up to 3)</label>
+            <label className="block text-sm font-medium mb-2">Personality Traits</label>
             <div className="flex flex-wrap gap-2">
               {personalityTraitOptions.map((trait) => (
                 <button
                   key={trait.value}
                   type="button"
-                  onClick={() => {
-                    const currentTraits = character.selected_traits.personality_traits || [];
-                    if (currentTraits.includes(trait.value)) {
-                      // Remove trait
-                      handlePersonalityTraitsChange(currentTraits.filter(t => t !== trait.value));
-                    } else if (currentTraits.length < 3) {
-                      // Add trait if under limit
-                      handlePersonalityTraitsChange([...currentTraits, trait.value]);
-                    }
-                  }}
+                  onClick={handleTogglePersonalityTrait(trait.value)}
                   className={`px-2 py-1 text-xs rounded-full transition-colors ${
                     character.selected_traits.personality_traits?.includes(trait.value)
                       ? 'bg-indigo-100 text-indigo-800 border border-indigo-300 dark:bg-indigo-900 dark:text-indigo-200 dark:border-indigo-700 font-medium shadow-sm'
@@ -592,84 +760,88 @@ export default function CharacterEditorPage() {
         
         {/* Added Traits */}
         <div className="bg-card p-6 rounded-lg border border-theme">
-        <h2 className="text-xl font-bold mb-4">Additional Traits</h2>
-        <p className="text-sm text-muted mb-4">
+          <h2 className="text-xl font-bold mb-4">Additional Traits</h2>
+          <p className="text-sm text-muted mb-4">
             These are additional traits that were generated by AI or that you can add yourself. You can edit, add, or remove traits as needed.
-        </p>
-        
-        <div className="space-y-3">
+          </p>
+          
+          <div className="space-y-3">
             {/* List of existing AI-added traits */}
             {Object.entries(character.added_traits).map(([key, value], index) => (
-            <div key={index} className="flex items-center gap-3 pb-3 border-b border-gray-200 dark:border-gray-700 last:border-0 last:mb-0 last:pb-0">
+              <div key={index} className="flex items-center gap-3 pb-3 border-b border-gray-200 dark:border-gray-700 last:border-0 last:mb-0 last:pb-0">
                 <div className="w-1/3">
-                <input
+                  <input
                     type="text"
                     value={key}
                     onChange={(e) => {
-                    // Create a new object without the old key but with the new key
-                    const newTraits = { ...character.added_traits };
-                    const oldValue = newTraits[key];
-                    delete newTraits[key];
-                    newTraits[e.target.value] = oldValue;
-                    
-                    setCharacter({
+                      // Create a new object without the old key but with the new key
+                      const newTraits = { ...character.added_traits };
+                      const oldValue = newTraits[key];
+                      delete newTraits[key];
+                      newTraits[e.target.value] = oldValue;
+                      
+                      setCharacter({
                         ...character,
                         added_traits: newTraits
-                    });
+                      });
                     }}
                     placeholder="Trait name"
                     className="w-full p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
-                />
+                  />
                 </div>
                 <div className="flex-1">
-                <input
+                  <input
                     type="text"
                     value={value}
                     onChange={(e) => handleNestedChange('added_traits', key, e.target.value)}
                     placeholder="Trait value"
                     className="w-full p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
-                />
+                  />
                 </div>
                 <button
-                type="button"
-                onClick={() => {
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     const newTraits = { ...character.added_traits };
                     delete newTraits[key];
                     setCharacter({
-                    ...character,
-                    added_traits: newTraits
+                      ...character,
+                      added_traits: newTraits
                     });
-                }}
-                className="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                title="Remove trait"
+                  }}
+                  className="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                  title="Remove trait"
                 >
-                <Trash2 className="h-5 w-5" />
+                  <Trash2 className="h-5 w-5" />
                 </button>
-            </div>
+              </div>
             ))}
             
             {/* Add new trait button */}
             <div className="mt-4">
-            <button
+              <button
                 type="button"
-                onClick={() => {
-                // Create a unique key for the new trait
-                const newTraitKey = `custom_trait_${Object.keys(character.added_traits).length + 1}`;
-                setCharacter({
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  // Create a unique key for the new trait
+                  const newTraitKey = `custom_trait_${Object.keys(character.added_traits).length + 1}`;
+                  setCharacter({
                     ...character,
                     added_traits: {
-                    ...character.added_traits,
-                    [newTraitKey]: "New trait value"
+                      ...character.added_traits,
+                      [newTraitKey]: "New trait value"
                     }
-                });
+                  });
                 }}
                 className="px-4 py-2 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded-md dark:bg-indigo-900 dark:text-indigo-300 dark:hover:bg-indigo-800 flex items-center"
-            >
+              >
                 <PlusCircle className="h-5 w-5 mr-2" />
                 Add Custom Trait
-            </button>
+              </button>
             </div>
-        </div>
+          </div>
         </div>
         
         {/* Items */}
@@ -680,6 +852,7 @@ export default function CharacterEditorPage() {
               variant="secondary" 
               onClick={handleAddItem}
               leftIcon={<PlusCircle className="h-4 w-4" />}
+              type="button"
             >
               Add Item
             </Button>
@@ -701,7 +874,7 @@ export default function CharacterEditorPage() {
                   />
                   <button
                     type="button"
-                    onClick={() => handleRegenerateField(`item_${index}`)}
+                    onClick={(e) => handleRegenerateField(`item_${index}`, e)}
                     className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
                     title="Regenerate with AI"
                   >
@@ -709,7 +882,7 @@ export default function CharacterEditorPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleRemoveItem(index)}
+                    onClick={handleRemoveItem(index)}
                     className="ml-2 p-2 text-red-600 hover:text-red-800 bg-red-50 rounded-md dark:bg-red-900/20 dark:text-red-400 dark:hover:text-red-300"
                     title="Remove Item"
                   >
@@ -733,6 +906,7 @@ export default function CharacterEditorPage() {
               variant="secondary" 
               onClick={handleAddDialogue}
               leftIcon={<PlusCircle className="h-4 w-4" />}
+              type="button"
             >
               Add Dialogue
             </Button>
@@ -754,7 +928,7 @@ export default function CharacterEditorPage() {
                   />
                   <button
                     type="button"
-                    onClick={() => handleRegenerateField(`dialogue_${index}`)}
+                    onClick={(e) => handleRegenerateField(`dialogue_${index}`, e)}
                     className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
                     title="Regenerate with AI"
                   >
@@ -762,7 +936,7 @@ export default function CharacterEditorPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleRemoveDialogue(index)}
+                    onClick={handleRemoveDialogue(index)}
                     className="ml-2 p-2 text-red-600 hover:text-red-800 bg-red-50 rounded-md dark:bg-red-900/20 dark:text-red-400 dark:hover:text-red-300"
                     title="Remove Dialogue"
                   >
@@ -786,6 +960,7 @@ export default function CharacterEditorPage() {
               variant="secondary" 
               onClick={handleAddQuest}
               leftIcon={<PlusCircle className="h-4 w-4" />}
+              type="button"
             >
               Add Quest
             </Button>
@@ -799,7 +974,7 @@ export default function CharacterEditorPage() {
                     <h3 className="text-lg font-semibold">Quest #{index + 1}</h3>
                     <button
                       type="button"
-                      onClick={() => handleRemoveQuest(index)}
+                      onClick={handleRemoveQuest(index)}
                       className="p-2 text-red-600 hover:text-red-800 bg-red-50 rounded-md dark:bg-red-900/20 dark:text-red-400 dark:hover:text-red-300"
                       title="Remove Quest"
                     >
@@ -824,7 +999,7 @@ export default function CharacterEditorPage() {
                       />
                       <button
                         type="button"
-                        onClick={() => handleRegenerateField(`quest_${index}_title`)}
+                        onClick={(e) => handleRegenerateField(`quest_${index}_title`, e)}
                         className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
                         title="Regenerate Title"
                       >
@@ -850,7 +1025,7 @@ export default function CharacterEditorPage() {
                       />
                       <button
                         type="button"
-                        onClick={() => handleRegenerateField(`quest_${index}_description`)}
+                        onClick={(e) => handleRegenerateField(`quest_${index}_description`, e)}
                         className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
                         title="Regenerate Description"
                       >
@@ -876,7 +1051,7 @@ export default function CharacterEditorPage() {
                       />
                       <button
                         type="button"
-                        onClick={() => handleRegenerateField(`quest_${index}_reward`)}
+                        onClick={(e) => handleRegenerateField(`quest_${index}_reward`, e)}
                         className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
                         title="Regenerate Reward"
                       >
@@ -888,7 +1063,7 @@ export default function CharacterEditorPage() {
                   <div className="mt-2">
                     <button
                       type="button"
-                      onClick={() => handleRegenerateField(`quest_${index}_whole`)}
+                      onClick={(e) => handleRegenerateField(`quest_${index}_whole`, e)}
                       className="w-full p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300 flex items-center justify-center"
                       title="Regenerate Entire Quest"
                     >
@@ -910,8 +1085,9 @@ export default function CharacterEditorPage() {
         <div className="flex justify-end">
           <Button
             variant="secondary"
-            onClick={() => router.push('/library')}
+            onClick={handleButtonClick(() => router.push('/library'))}
             className="mr-2"
+            type="button"
           >
             Cancel
           </Button>

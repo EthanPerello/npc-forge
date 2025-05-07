@@ -7,28 +7,14 @@ import CharacterDisplay from '@/components/character-display';
 import UsageLimitsNotice from '@/components/usage-limits-notice';
 import WelcomeGuide from '@/components/welcome-guide';
 import StickyFooter from '@/components/sticky-footer';
-import Button from '@/components/ui/button';
-import { Sparkles } from 'lucide-react';
 
-// Main content area with generate button
+// Main content area - removed Generate Button since it's in the form
 function MainContent() {
-  const { generateCharacter, isLoading, formData } = useCharacter();
+  const { isLoading } = useCharacter();
 
   return (
     <div className="mb-20">
-      {/* Generate Button - Keep in the main UI as well as the sticky footer */}
-      <div className="flex justify-center my-6">
-        <Button
-          variant="primary"
-          onClick={generateCharacter}
-          disabled={!formData.description || isLoading}
-          isLoading={isLoading}
-          leftIcon={<Sparkles className="h-5 w-5" />}
-          size="lg"
-        >
-          {isLoading ? 'Generating...' : 'Generate Character'}
-        </Button>
-      </div>
+      {/* Generate Button removed - already in the form and sticky footer */}
     </div>
   );
 }
@@ -121,7 +107,7 @@ export default function Home() {
             <MainFormTabs />
           </section>
           
-          {/* Generate Button */}
+          {/* MainContent - now just handles spacing */}
           <MainContent />
           
           {/* Character Display - Always show */}
