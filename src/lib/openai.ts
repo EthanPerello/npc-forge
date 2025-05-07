@@ -169,12 +169,13 @@ export async function generatePortrait(character: Character): Promise<string> {
     console.log(`Generating character portrait with ${imageModel}`);
     console.log("Portrait prompt:", imagePrompt); // Debug the actual prompt being sent
     
-    // Base configuration for all models
+    // Base configuration for all models - NOTE: request base64 directly!
     const generateOptions: any = {
       model: imageModel,
       prompt: imagePrompt,
       n: 1,
-      size: "1024x1024"
+      size: "1024x1024",
+      response_format: "b64_json" // This is the key change - get base64 directly
     };
     
     // Only add quality parameter for models that support it
@@ -185,9 +186,27 @@ export async function generatePortrait(character: Character): Promise<string> {
     }
     // DALL-E-2 doesn't support the quality parameter, so we omit it
     
+    // Call the API to generate the image
     const response = await openai.images.generate(generateOptions);
 
-    return response.data[0].url || '';
+    // Now we get the base64 data directly
+    const b64Image = response.data[0].b64_json;
+    
+    if (!b64Image) {
+      throw new Error("No base64 image data returned from OpenAI");
+    }
+    
+    // Determine the correct MIME type
+    let mimeType = "image/png"; // Default for most OpenAI images
+    
+    // Create the complete data URL and store it directly in the character
+    const dataUrl = `data:${mimeType};base64,${b64Image}`;
+    
+    // Store both URL and data for compatibility
+    character.image_data = dataUrl;
+    
+    // Return the data URL directly
+    return dataUrl;
   } catch (error) {
     console.error("Error generating portrait:", error);
     

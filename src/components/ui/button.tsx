@@ -22,6 +22,8 @@ export default function Button({
   rightIcon,
   className = '',
   disabled,
+  type = 'button', // Set default type to 'button' to prevent accidental form submissions
+  onClick,
   ...props
 }: ButtonProps) {
   // Define styles based on variant
@@ -40,6 +42,20 @@ export default function Button({
     lg: 'px-6 py-2.5 text-lg',
   };
 
+  // Enhanced onClick handler to ensure we don't get accidental form submissions
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // If it's not explicitly a submit button, prevent form submission
+    if (type !== 'submit') {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    // Call the original onClick handler if provided
+    if (onClick) {
+      onClick(e);
+    }
+  };
+
   // Combine all styles
   const buttonStyles = `
     rounded-md font-medium transition-colors duration-200 
@@ -55,6 +71,8 @@ export default function Button({
     <button
       className={buttonStyles}
       disabled={disabled || isLoading}
+      type={type}
+      onClick={handleClick}
       {...props}
     >
       {isLoading ? (

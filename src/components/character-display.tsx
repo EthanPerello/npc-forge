@@ -10,13 +10,14 @@ import ItemsDisplayTab from '@/components/tabs/display/items-display-tab';
 import PortraitDisplay from '@/components/portrait-display';
 import Button from '@/components/ui/button';
 import { Download, Save, User, MessageSquare, Package, BookOpen } from 'lucide-react';
-import { saveCharacter } from '@/lib/character-storage';
+import { getCharacterTraitsArray } from '@/lib/utils';
 
 export default function CharacterDisplay() {
-  const { character, formData, downloadCharacterJSON, error, isLoading } = useCharacter();
+  const { character, formData, downloadCharacterJSON, error, isLoading, saveToLibrary } = useCharacter();
   const [activeTab, setActiveTab] = useState('profile');
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
   const [isRegeneratingPortrait, setIsRegeneratingPortrait] = useState(false);
   
   // Reset to profile tab when character changes
@@ -72,30 +73,46 @@ export default function CharacterDisplay() {
   }
   
   // Save character to library
-  const handleSaveToLibrary = () => {
+  const handleSaveToLibrary = async (e: React.MouseEvent) => {
+    // Prevent default to avoid form submission
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setIsSaving(true);
+    
     try {
       // Reset states
       setSaveSuccess(false);
       setSaveError('');
       
       // Save character with form data
-      saveCharacter(character, formData);
+      const success = await saveToLibrary();
       
-      // Show success message
-      setSaveSuccess(true);
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setSaveSuccess(false);
-      }, 3000);
+      if (success) {
+        // Show success message
+        setSaveSuccess(true);
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          setSaveSuccess(false);
+        }, 3000);
+      } else {
+        setSaveError('Failed to save character to library');
+      }
     } catch (error) {
       setSaveError('Failed to save character to library');
       console.error('Error saving character:', error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  // Handle portrait regeneration (placeholder for now)
-  const handleRegeneratePortrait = () => {
+  // Handle portrait regeneration
+  const handleRegeneratePortrait = (e: React.MouseEvent) => {
+    // Prevent default to avoid form submission
+    e.preventDefault();
+    e.stopPropagation();
+    
     alert('Portrait regeneration will be implemented in a future update.');
     // For now, just show the loading state briefly for UI feedback
     setIsRegeneratingPortrait(true);
@@ -103,6 +120,16 @@ export default function CharacterDisplay() {
       setIsRegeneratingPortrait(false);
     }, 1500);
   };
+  
+  // Handle download button click
+  const handleDownload = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    downloadCharacterJSON();
+  };
+  
+  // Get character traits for display
+  const traits = getCharacterTraitsArray(character);
   
   return (
     <div className="w-full max-w-5xl mx-auto bg-card rounded-xl shadow-lg overflow-hidden mt-8 border border-theme">
@@ -112,10 +139,26 @@ export default function CharacterDisplay() {
           <div className="md:w-1/3">
             <PortraitDisplay 
               imageUrl={character.image_url} 
+              imageData={character.image_data}
               name={character.name} 
               isLoading={isRegeneratingPortrait}
               onRegenerate={handleRegeneratePortrait}
             />
+            
+            {/* Character traits display */}
+            <div className="mt-4">
+              <h3 className="text-sm font-semibold mb-2">Character Traits</h3>
+              <div className="flex flex-wrap gap-2">
+                {traits.map((trait, index) => (
+                  <span 
+                    key={index} 
+                    className="character-trait-tag text-xs px-2 py-1 rounded-full"
+                  >
+                    {trait}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
           
           {/* Character info section */}
@@ -129,14 +172,18 @@ export default function CharacterDisplay() {
                   variant="primary"
                   onClick={handleSaveToLibrary}
                   leftIcon={<Save className="h-4 w-4" />}
+                  isLoading={isSaving}
+                  disabled={isSaving}
+                  type="button" // Explicitly set type to prevent form submission
                 >
                   Save to Library
                 </Button>
                 
                 <Button
                   variant="secondary"
-                  onClick={downloadCharacterJSON}
+                  onClick={handleDownload}
                   leftIcon={<Download className="h-4 w-4" />}
+                  type="button" // Explicitly set type to prevent form submission
                 >
                   Download JSON
                 </Button>

@@ -1,26 +1,37 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getStoredCharacters, deleteCharacter, initializeLibrary, StoredCharacter } from '@/lib/character-storage';
+import { useRouter } from 'next/navigation';
+import { getStoredCharacters, deleteCharacter, initializeLibrary, StoredCharacter, loadCharacterWithImage } from '@/lib/character-storage';
 import { Character } from '@/lib/types';
 import CharacterCard from '@/components/character-card';
 import Button from '@/components/ui/button';
-import { Library, Search, Upload, Filter, X, Download, Edit, Trash2, Eye } from 'lucide-react';
+import { Library, Search, Upload, Filter, X, Download, Edit, Trash2, Eye, User } from 'lucide-react';
 import { downloadJson } from '@/lib/utils';
 import { getCharacterTraitsArray } from '@/lib/utils';
 
 export default function CharacterLibraryPage() {
+  const router = useRouter();
   const [characters, setCharacters] = useState<StoredCharacter[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenre, setSelectedGenre] = useState<string>('');
   const [isJsonViewerOpen, setIsJsonViewerOpen] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState<StoredCharacter | null>(null);
+  const [fullCharacter, setFullCharacter] = useState<Character | null>(null);
   const [activeTab, setActiveTab] = useState<'details' | 'json'>('details');
+  const [isNavigating, setIsNavigating] = useState(false); // Added to track navigation state
+  const [isLoading, setIsLoading] = useState(true);
   
   // Initialize library and load characters
   useEffect(() => {
-    initializeLibrary();
-    loadCharacters();
+    async function init() {
+      setIsLoading(true);
+      await initializeLibrary();
+      loadCharacters();
+      setIsLoading(false);
+    }
+    
+    init();
   }, []);
   
   const loadCharacters = () => {
@@ -41,22 +52,64 @@ export default function CharacterLibraryPage() {
     return matchesSearch && matchesGenre;
   });
   
+  // When a character is selected, load the full character with image from IndexedDB
+  useEffect(() => {
+    async function loadFullCharacter() {
+      if (selectedCharacter) {
+        try {
+          const character = await loadCharacterWithImage(selectedCharacter.id);
+          if (character) {
+            setFullCharacter(character);
+          } else {
+            // If no character with image could be loaded, use the stored character
+            setFullCharacter(selectedCharacter.character);
+          }
+        } catch (error) {
+          console.error('Error loading character with image:', error);
+          // Fallback to stored character
+          setFullCharacter(selectedCharacter.character);
+        }
+      } else {
+        setFullCharacter(null);
+      }
+    }
+    
+    loadFullCharacter();
+  }, [selectedCharacter]);
+  
   // Handle character deletion
   const handleDeleteCharacter = (id: string) => {
     if (window.confirm('Are you sure you want to delete this character?')) {
-      if (deleteCharacter(id)) {
-        loadCharacters();
-        if (selectedCharacter?.id === id) {
-          setIsJsonViewerOpen(false);
-          setSelectedCharacter(null);
+      deleteCharacter(id).then(success => {
+        if (success) {
+          loadCharacters();
+          if (selectedCharacter?.id === id) {
+            setIsJsonViewerOpen(false);
+            setSelectedCharacter(null);
+            setFullCharacter(null);
+          }
         }
-      }
+      }).catch(error => {
+        console.error('Error deleting character:', error);
+      });
     }
   };
   
   // Handle character download
   const handleDownloadCharacter = (character: Character) => {
     downloadJson(character, `${character.name.replace(/\s+/g, '_').toLowerCase()}.json`);
+  };
+  
+  // Handle character edit with improved navigation
+  const handleEditCharacter = (id: string) => {
+    if (isNavigating) return; // Prevent double-clicks
+    
+    setIsNavigating(true);
+    
+    // Use a small timeout to ensure state is updated before navigation
+    setTimeout(() => {
+      router.push(`/library/edit/${id}`);
+    }, 100);
   };
   
   // Handle JSON file upload
@@ -75,11 +128,13 @@ export default function CharacterLibraryPage() {
           throw new Error('Invalid character file format');
         }
         
-        // Import the character storage function
-        import('@/lib/character-storage').then(({ saveCharacter }) => {
-          saveCharacter(characterData);
+        // Import the character
+        saveCharacter(characterData).then(() => {
           loadCharacters();
           alert(`Character ${characterData.name} has been added to your library!`);
+        }).catch(error => {
+          alert(`Error importing character: ${error.message}`);
+          console.error('Error importing character:', error);
         });
       } catch (error) {
         alert('Error importing character: Invalid JSON format');
@@ -92,13 +147,29 @@ export default function CharacterLibraryPage() {
     event.target.value = '';
   };
   
+  // Save a character to the library
+  const saveCharacter = async (character: Character) => {
+    // Import dynamically to avoid SSR issues
+    const { saveCharacter } = await import('@/lib/character-storage');
+    await saveCharacter(character);
+  };
+  
   // Get unique genres for filter dropdown
   const genres = Array.from(new Set(characters.map(char => 
     char.character.selected_traits.genre || 'unknown'
   )));
   
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8 flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
+  
   return (
     <div className="container mx-auto px-4 py-6 md:py-8">
+      {/* Header and search UI remains the same */}
       <div className="mb-6 md:mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h1 className="text-2xl md:text-3xl font-bold flex items-center">
           <Library className="h-6 w-6 md:h-8 md:w-8 mr-2 text-indigo-600 dark:text-indigo-400" />
@@ -167,7 +238,7 @@ export default function CharacterLibraryPage() {
         {filteredCharacters.length} {filteredCharacters.length === 1 ? 'character' : 'characters'} found
       </p>
       
-      {/* Character grid - 1 column on mobile, 2 on tablet, 3 on desktop */}
+      {/* Character grid - Updated to use hasStoredImage flag */}
       {filteredCharacters.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {filteredCharacters.map((storedChar) => (
@@ -205,16 +276,43 @@ export default function CharacterLibraryPage() {
                   )}
                 </div>
                 
-                {/* Character image */}
-                {storedChar.character.image_url && (
-                  <div className="relative w-full h-40 sm:h-48 mb-3 bg-gray-100 dark:bg-gray-800 rounded overflow-hidden">
-                    <img 
-                      src={storedChar.character.image_url} 
-                      alt={storedChar.character.name}
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
-                )}
+                {/* Character image with IndexedDB loading indicator */}
+                <div className="relative w-full h-40 sm:h-48 mb-3 bg-gray-100 dark:bg-gray-800 rounded overflow-hidden">
+                  {/* The image will be loaded from IndexedDB when the detailed view is opened */}
+                  {!storedChar.hasStoredImage && !storedChar.character.image_url ? (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-gray-500 dark:text-gray-400">
+                        <User className="h-12 w-12 opacity-30" />
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      {storedChar.character.image_url && (
+                        <img 
+                          src={storedChar.character.image_url}
+                          alt={storedChar.character.name}
+                          className="object-cover w-full h-full"
+                          onError={(e) => {
+                            // Show placeholder on error
+                            e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Ccircle cx="12" cy="8" r="5"/%3E%3Cpath d="M20 21a8 8 0 0 0-16 0"/%3E%3C/svg%3E';
+                            e.currentTarget.alt = 'Portrait unavailable';
+                            e.currentTarget.style.padding = '20%';
+                            e.currentTarget.style.opacity = '0.5';
+                          }}
+                        />
+                      )}
+                      {!storedChar.character.image_url && storedChar.hasStoredImage && (
+                        <div className="flex items-center justify-center h-full">
+                          <p className="text-sm text-center text-muted px-2">
+                            Image stored in IndexedDB
+                            <br />
+                            <span className="text-xs">(Click to view)</span>
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
                 
                 {/* Character description - truncated */}
                 <p className="text-sm mb-4 text-muted line-clamp-3">
@@ -227,11 +325,23 @@ export default function CharacterLibraryPage() {
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDownloadCharacter(storedChar.character);
+                        // Load the full character with image before downloading
+                        loadCharacterWithImage(storedChar.id).then(fullChar => {
+                          if (fullChar) {
+                            handleDownloadCharacter(fullChar);
+                          } else {
+                            handleDownloadCharacter(storedChar.character);
+                          }
+                        }).catch(error => {
+                          console.error('Error loading character for download:', error);
+                          // Fallback to the stored character without image
+                          handleDownloadCharacter(storedChar.character);
+                        });
                       }}
                       className="p-2 md:p-2 text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 touch-manipulation"
                       title="Download JSON"
                       aria-label="Download JSON"
+                      type="button"
                     >
                       <Download className="h-5 w-5 md:h-5 md:w-5" />
                     </button>
@@ -241,11 +351,13 @@ export default function CharacterLibraryPage() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        window.location.href = `/library/edit/${storedChar.id}`;
+                        handleEditCharacter(storedChar.id);
                       }}
                       className="p-2 md:p-2 text-gray-600 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400 touch-manipulation"
                       title="Edit Character"
                       aria-label="Edit Character"
+                      type="button"
+                      disabled={isNavigating}
                     >
                       <Edit className="h-5 w-5 md:h-5 md:w-5" />
                     </button>
@@ -257,6 +369,7 @@ export default function CharacterLibraryPage() {
                       className="p-2 md:p-2 text-gray-600 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 touch-manipulation"
                       title="Delete Character"
                       aria-label="Delete Character"
+                      type="button"
                     >
                       <Trash2 className="h-5 w-5 md:h-5 md:w-5" />
                     </button>
@@ -277,14 +390,15 @@ export default function CharacterLibraryPage() {
           </p>
           <Button
             variant="primary"
-            onClick={() => window.location.href = '/'}
+            onClick={() => router.push('/')}
+            type="button"
           >
             Create a Character
           </Button>
         </div>
       )}
       
-      {/* Character Viewer Modal - Full-screen on mobile */}
+      {/* Character Viewer Modal - Updated to use fullCharacter */}
       {isJsonViewerOpen && selectedCharacter && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-1 sm:p-4">
           <div className="bg-card rounded-lg shadow-lg w-full max-w-4xl h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
@@ -293,9 +407,14 @@ export default function CharacterLibraryPage() {
                 {selectedCharacter.character.name}
               </h3>
               <button 
-                onClick={() => setIsJsonViewerOpen(false)}
+                onClick={() => {
+                  setIsJsonViewerOpen(false);
+                  setSelectedCharacter(null);
+                  setFullCharacter(null);
+                }}
                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-1"
                 aria-label="Close"
+                type="button"
               >
                 <X className="h-6 w-6" />
               </button>
@@ -313,6 +432,7 @@ export default function CharacterLibraryPage() {
                         : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
                     }`}
                     aria-label="View Character Details"
+                    type="button"
                   >
                     Character Details
                   </button>
@@ -326,6 +446,7 @@ export default function CharacterLibraryPage() {
                         : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
                     }`}
                     aria-label="View JSON"
+                    type="button"
                   >
                     View JSON
                   </button>
@@ -333,24 +454,32 @@ export default function CharacterLibraryPage() {
               </ul>
             </div>
             
-            {/* Content area with scrolling */}
+            {/* Content area with scrolling - Updated to use fullCharacter */}
             <div className="flex-1 overflow-auto p-4">
               {activeTab === 'details' ? (
                 <div className="space-y-6">
-                  {/* Character image */}
-                  {selectedCharacter.character.image_url && (
+                  {/* Character image - use fullCharacter if available */}
+                  {(fullCharacter?.image_data || selectedCharacter.character.image_url) && (
                     <div className="flex justify-center">
                       <div className="w-32 h-32 sm:w-48 sm:h-48 relative">
                         <img 
-                          src={selectedCharacter.character.image_url} 
+                          src={fullCharacter?.image_data || selectedCharacter.character.image_url}
                           alt={selectedCharacter.character.name}
                           className="object-cover w-full h-full rounded-lg"
+                          onError={(e) => {
+                            // Show placeholder on error
+                            e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Ccircle cx="12" cy="8" r="5"/%3E%3Cpath d="M20 21a8 8 0 0 0-16 0"/%3E%3C/svg%3E';
+                            e.currentTarget.alt = 'Portrait unavailable';
+                            e.currentTarget.style.padding = '20%';
+                            e.currentTarget.style.opacity = '0.5';
+                          }}
                         />
                       </div>
                     </div>
                   )}
                   
-                  {/* Character traits */}
+                  {/* Rest of the character display remains the same */}
+                  {/* Character traits display */}
                   <div>
                     <h4 className="text-lg font-semibold mb-2">Character Traits</h4>
                     <div className="flex flex-wrap gap-2 mb-3">
@@ -424,25 +553,32 @@ export default function CharacterLibraryPage() {
                 </div>
               ) : (
                 <pre className="text-xs whitespace-pre-wrap bg-gray-100 p-4 rounded dark:bg-gray-800 dark:text-gray-300 text-gray-800 overflow-auto h-full">
-                  {JSON.stringify(selectedCharacter.character, null, 2)}
+                  {/* Use fullCharacter for JSON view if available */}
+                  {JSON.stringify(fullCharacter || selectedCharacter.character, null, 2)}
                 </pre>
               )}
             </div>
             
-            {/* Bottom action buttons - Full width on mobile */}
+            {/* Bottom action buttons */}
             <div className="p-4 border-t border-theme flex flex-col sm:flex-row gap-2 sm:justify-end">
               <Button
                 variant="danger"
                 className="w-full sm:w-auto"
                 onClick={() => {
                   if (window.confirm(`Are you sure you want to delete ${selectedCharacter.character.name}? This action cannot be undone.`)) {
-                    if (deleteCharacter(selectedCharacter.id)) {
-                      setIsJsonViewerOpen(false);
-                      setSelectedCharacter(null);
-                      loadCharacters();
-                    }
+                    deleteCharacter(selectedCharacter.id).then(success => {
+                      if (success) {
+                        setIsJsonViewerOpen(false);
+                        setSelectedCharacter(null);
+                        setFullCharacter(null);
+                        loadCharacters();
+                      }
+                    }).catch(error => {
+                      console.error('Error deleting character:', error);
+                    });
                   }
                 }}
+                type="button"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete Character
@@ -450,7 +586,14 @@ export default function CharacterLibraryPage() {
               <Button
                 variant="secondary"
                 className="w-full sm:w-auto"
-                onClick={() => window.location.href = `/library/edit/${selectedCharacter.id}`}
+                onClick={() => {
+                  setIsNavigating(true);
+                  setTimeout(() => {
+                    router.push(`/library/edit/${selectedCharacter.id}`);
+                  }, 100);
+                }}
+                disabled={isNavigating}
+                type="button"
               >
                 <Edit className="h-4 w-4 mr-2" />
                 Edit Character
@@ -458,7 +601,15 @@ export default function CharacterLibraryPage() {
               <Button
                 variant="primary"
                 className="w-full sm:w-auto"
-                onClick={() => handleDownloadCharacter(selectedCharacter.character)}
+                onClick={() => {
+                  // Download the full character if available
+                  if (fullCharacter) {
+                    handleDownloadCharacter(fullCharacter);
+                  } else {
+                    handleDownloadCharacter(selectedCharacter.character);
+                  }
+                }}
+                type="button"
               >
                 <Download className="h-4 w-4 mr-2" />
                 Download JSON

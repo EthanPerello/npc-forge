@@ -232,18 +232,6 @@ interface OptionValue {
   label: string;
 }
 
-// Custom interface for our components
-interface CustomSelectProps {
-  id?: string;
-  value: any;
-  onChange: (value: any) => void;
-  options?: any[];
-  placeholder?: string;
-  isMulti?: boolean;
-  isCreatable?: boolean;
-  className?: string;
-}
-
 // CSS class to match the other form elements styling
 const formElementClass = "bg-gray-100 text-gray-800 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600";
 
@@ -263,6 +251,7 @@ export default function CharacterTab() {
 
   // Handle description field changes
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
     const newValue = e.target.value;
     updateFormData({ description: newValue });
 
@@ -293,8 +282,6 @@ export default function CharacterTab() {
         initialDescription.current = example;
         setIsDescriptionDefault(true);
         setShowAutoFillMessage(true);
-        
-        // Message should not disappear automatically
       }
     } else {
       updateFormData({ 
@@ -306,6 +293,7 @@ export default function CharacterTab() {
   
   // Handle basic character fields
   const handleGenderChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    e.preventDefault();
     const value = e.target.value;
     if (value === '') {
       updateFormData({ gender: undefined });
@@ -315,6 +303,7 @@ export default function CharacterTab() {
   };
   
   const handleAgeGroupChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    e.preventDefault();
     const value = e.target.value;
     if (value === '') {
       updateFormData({ age_group: undefined });
@@ -324,6 +313,7 @@ export default function CharacterTab() {
   };
   
   const handleAlignmentChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    e.preventDefault();
     const value = e.target.value;
     if (value === '') {
       updateFormData({ moral_alignment: undefined });
@@ -333,6 +323,7 @@ export default function CharacterTab() {
   };
   
   const handleRelationshipChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    e.preventDefault();
     const value = e.target.value;
     if (value === '') {
       updateFormData({ relationship_to_player: undefined });
@@ -343,6 +334,7 @@ export default function CharacterTab() {
   
   // Handle advanced options
   const handleSpeciesChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    e.preventDefault();
     updateFormData({
       advanced_options: {
         ...formData.advanced_options,
@@ -373,6 +365,7 @@ export default function CharacterTab() {
   };
   
   const handleSocialClassChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    e.preventDefault();
     updateFormData({
       advanced_options: {
         ...formData.advanced_options,
@@ -382,6 +375,7 @@ export default function CharacterTab() {
   };
   
   const handleHeightChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    e.preventDefault();
     updateFormData({
       advanced_options: {
         ...formData.advanced_options,
@@ -391,6 +385,7 @@ export default function CharacterTab() {
   };
   
   const handleBuildChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    e.preventDefault();
     updateFormData({
       advanced_options: {
         ...formData.advanced_options,
@@ -400,6 +395,7 @@ export default function CharacterTab() {
   };
   
   const handleDistinctiveFeaturesChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
     updateFormData({
       advanced_options: {
         ...formData.advanced_options,
@@ -409,6 +405,7 @@ export default function CharacterTab() {
   };
   
   const handleHomelandChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
     updateFormData({
       advanced_options: {
         ...formData.advanced_options,
@@ -417,7 +414,7 @@ export default function CharacterTab() {
     });
   };
   
-  // Helper function to toggle personality traits (limit to 3)
+  // Helper function to toggle personality traits - NO LIMIT
   const togglePersonalityTrait = (trait: string) => {
     // Initialize the array if it doesn't exist
     const currentTraits = formData.advanced_options?.personality_traits || [];
@@ -428,15 +425,8 @@ export default function CharacterTab() {
       // Remove the trait if already selected
       updatedTraits = currentTraits.filter(t => t !== trait);
     } else {
-      // Add the trait if not at limit
-      if (currentTraits.length < 3) {
-        updatedTraits = [...currentTraits, trait];
-      } else {
-        // At limit, don't add more
-        updatedTraits = currentTraits;
-        // Optional: Show a toast or notification about the limit
-        return;
-      }
+      // Add the trait - no limit imposed
+      updatedTraits = [...currentTraits, trait];
     }
     
     updateFormData({
@@ -452,7 +442,9 @@ export default function CharacterTab() {
   };
   
   // Function to handle the randomize button click - IMPROVED VERSION
-  const handleRandomize = () => {
+  const handleRandomize = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
     // Get random values for the basic fields
     const randomGenderOption = getRandomOption(genderOptions.filter(option => option.value !== ''));
     const randomAgeOption = getRandomOption(ageGroupOptions.filter(option => option.value !== ''));
@@ -524,10 +516,13 @@ export default function CharacterTab() {
     
     // Show the auto-fill message
     setShowAutoFillMessage(true);
+    
+    console.log("Randomized character with genre:", randomGenre, "and description:", exampleText);
   };
   
   // Clear all options and revert to defaults
-  const handleClearOptions = () => {
+  const handleClearOptions = (e: React.MouseEvent) => {
+    e.preventDefault();
     updateFormData({
       description: '',  // Also clear the description
       genre: undefined,
@@ -551,6 +546,9 @@ export default function CharacterTab() {
     // Reset the initial description
     initialDescription.current = '';
     setIsDescriptionDefault(true);
+    
+    // Hide the auto-fill message since we're clearing everything
+    setShowAutoFillMessage(false);
   };
   
   // Helper function to get a random option from an array
@@ -682,7 +680,10 @@ export default function CharacterTab() {
       <div>
         <button
           type="button"
-          onClick={() => setShowAdvanced(!showAdvanced)}
+          onClick={(e) => {
+            e.preventDefault();
+            setShowAdvanced(!showAdvanced);
+          }}
           className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium flex items-center"
         >
           {showAdvanced ? 'Hide Advanced Options' : 'Show Advanced Options'}
@@ -788,17 +789,20 @@ export default function CharacterTab() {
             </div>
           </div>
           
-          {/* Personality Traits - Now in its own row at the bottom */}
+          {/* Personality Traits - No Limit */}
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-1">
-              Personality Traits (select up to 3)
+              Personality Traits
             </label>
             <div className="flex flex-wrap gap-2">
               {personalityTraitOptions.map((trait) => (
                 <button
                   key={trait.value}
                   type="button"
-                  onClick={() => togglePersonalityTrait(trait.value)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    togglePersonalityTrait(trait.value);
+                  }}
                   className={`px-2 py-1 text-xs rounded-full transition-colors ${
                     formData.advanced_options?.personality_traits?.includes(trait.value)
                       ? 'bg-indigo-100 text-indigo-800 border border-indigo-300 dark:bg-indigo-900 dark:text-indigo-200 dark:border-indigo-700 font-medium shadow-sm'

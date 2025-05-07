@@ -11,14 +11,13 @@ import {
 import { 
   Character, 
   CharacterFormData, 
-  Quest, 
   OpenAIModel,
-  PortraitOptions,
   ImageModel
 } from '@/lib/types';
 import { DEFAULT_MODEL } from '@/lib/models';
 import { DEFAULT_IMAGE_MODEL } from '@/lib/image-models';
-import { saveCharacter, getStoredCharacters, deleteCharacter, updateCharacter } from '@/lib/character-storage';
+import { saveCharacter } from '@/lib/character-storage';
+import { downloadJson } from '@/lib/utils';
 
 interface CharacterContextType {
   character: Character | null;
@@ -29,15 +28,15 @@ interface CharacterContextType {
   resetFormData: () => void;
   generateCharacter: () => Promise<void>;
   downloadCharacterJSON: () => void;
-  saveToLibrary: () => void;
+  saveToLibrary: () => Promise<boolean>;
 }
 
 // Default form values using undefined instead of empty strings for enum types
 const defaultFormData: CharacterFormData = {
   description: '',
-  include_quests: false,  // Changed from true to false
-  include_dialogue: false,  // Changed from true to false
-  include_items: false,  // Changed from true to false
+  include_quests: true,  
+  include_dialogue: true,  
+  include_items: true,  
   genre: undefined,
   sub_genre: undefined,
   gender: undefined,
@@ -82,7 +81,7 @@ const defaultFormData: CharacterFormData = {
 // Create the context
 const CharacterContext = createContext<CharacterContextType | undefined>(undefined);
 
-// Context provider component
+// Context provider component - Export this!
 export function CharacterProvider({ children }: { children: ReactNode }) {
   const [character, setCharacter] = useState<Character | null>(null);
   const [formData, setFormData] = useState<CharacterFormData>(defaultFormData);
@@ -194,27 +193,17 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
   const downloadCharacterJSON = useCallback(() => {
     if (!character) return;
 
-    const jsonString = JSON.stringify(character, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    const href = URL.createObjectURL(blob);
-    
-    const link = document.createElement('a');
-    link.href = href;
-    link.download = `${character.name.replace(/\s+/g, '_').toLowerCase()}.json`;
-    document.body.appendChild(link);
-    link.click();
-    
-    document.body.removeChild(link);
-    URL.revokeObjectURL(href);
+    // Use the utility function to download the JSON
+    downloadJson(character, `${character.name.replace(/\s+/g, '_').toLowerCase()}.json`);
   }, [character]);
   
-  // Save to library
-  const saveToLibrary = useCallback(() => {
-    if (!character) return;
+  // Save to library - updated to async to handle image processing
+  const saveToLibrary = useCallback(async () => {
+    if (!character) return false;
     
     try {
       // Save character with form data
-      saveCharacter(character, formData);
+      await saveCharacter(character, formData);
       return true;
     } catch (error) {
       console.error('Error saving character to library:', error);
@@ -252,7 +241,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Custom hook to use the character context
+// Custom hook to use the character context - Export this!
 export function useCharacter() {
   const context = useContext(CharacterContext);
   if (context === undefined) {

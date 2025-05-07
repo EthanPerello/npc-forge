@@ -222,3 +222,98 @@ export function sanitizeUserInput(input: string): string {
     // Trim leading/trailing whitespace
     return sanitized.trim();
 }
+/**
+ * Compresses a base64 image to a smaller size while maintaining reasonable quality
+ * @param base64Image - The base64 image data URL to compress
+ * @param maxWidth - Maximum width in pixels (maintains aspect ratio)
+ * @param quality - JPEG quality (0-1)
+ * @returns Promise with the compressed image as a data URL
+ */
+export async function compressImage(
+  base64Image: string,
+  maxWidth = 512, // Halve the image size from 1024
+  quality = 0.6  // Medium-low quality is usually sufficient for character portraits
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    // Create an image to load the base64 data
+    const img = new Image();
+    
+    // Set up load and error handlers
+    img.onload = () => {
+      try {
+        // Calculate new dimensions while preserving aspect ratio
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > maxWidth) {
+          const ratio = maxWidth / width;
+          width = maxWidth;
+          height = Math.round(height * ratio);
+        }
+        
+        // Create a canvas to draw the resized image
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Get the 2D context and draw the image
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Could not get canvas context'));
+          return;
+        }
+        
+        // Draw the image with a white background to handle transparency
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convert to JPEG format with specified quality
+        // JPEG has much better compression than PNG for photos
+        const compressedImage = canvas.toDataURL('image/jpeg', quality);
+        
+        // Log compression results
+        const originalSize = getBase64Size(base64Image);
+        const compressedSize = getBase64Size(compressedImage);
+        console.log(`Image compressed from ${originalSize.toFixed(2)}MB to ${compressedSize.toFixed(2)}MB (${Math.round((compressedSize/originalSize)*100)}% of original)`);
+        
+        resolve(compressedImage);
+      } catch (error) {
+        console.error('Error compressing image:', error);
+        reject(error);
+      }
+    };
+    
+    img.onerror = () => {
+      reject(new Error('Failed to load image for compression'));
+    };
+    
+    // Start loading the image
+    img.src = base64Image;
+  });
+}
+
+/**
+ * Estimates the size of a base64 string in megabytes
+ */
+export function getBase64Size(base64: string): number {
+  // Remove the data URL prefix to get just the base64 data
+  const base64Data = base64.split(',')[1];
+  if (!base64Data) return 0;
+  
+  // Base64 represents 6 bits per character, while 1 byte is 8 bits
+  // So 4 base64 characters represent 3 bytes (24 bits / 8 = 3)
+  const sizeInBytes = (base64Data.length * 3) / 4;
+  
+  // Convert to megabytes
+  return sizeInBytes / (1024 * 1024);
+}
+
+/**
+ * Checks if a data URL contains valid image data
+ */
+export function isValidImageData(dataUrl: string): boolean {
+  return !!dataUrl && 
+    (dataUrl.startsWith('data:image/') || dataUrl.startsWith('data:application/octet-stream')) && 
+    dataUrl.includes('base64');
+}
