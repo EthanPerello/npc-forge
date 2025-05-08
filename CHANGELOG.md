@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.3] - 2025-05-08
+
 ### Added
 - Model selectors for text and image regeneration on the edit character page
 - Upload and regenerate portrait buttons in the editor, always visible regardless of image state
@@ -312,6 +314,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Export to JSON feature
 - Fully responsive UI for desktop and mobile
 
-[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.3.2...HEAD
-[0.3.2]: https://github.com/EthanPerello/npc-forge/compare/v0.3.1...v0.3.2
+[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.3.2...v0.3.3
 [0.1.0]: https://github.com/EthanPerello/npc-forge/releases/tag/v0.1.0
