@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.3.2] - May 7, 2025
+## [0.3.2] - 2025-05-06
 
 ### Added
 - Ability to add and remove quests, dialogue lines, and items in the character editor
@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed 3-trait limit for personality traits in both the editor and advanced options dropdown
 - Updated character editor and creation form to allow unlimited trait selection
 
-## [0.3.1] - May 5, 2025
+## [0.3.1] - 2025-05-05
 
 ### Added
 - Sticky footer with Generate Character, Clear Options, and Randomize buttons
