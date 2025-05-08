@@ -8,16 +8,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Model selectors for text and image regeneration on the character edit page
-- Ability to upload and regenerate portraits from the edit screen
-- Button to download portrait image from the character display
-- Delete button on character cards in the library for quick removal
+- Model selectors for text and image regeneration on the edit character page
+- Upload and regenerate portrait buttons in the editor, always visible regardless of image state
+- Download portrait button on the main character display
+- Delete button added directly to character cards in the library list (no need to open modal)
+- Full character data (not just images) now stored in IndexedDB, replacing localStorage
+- Resilient IndexedDB storage with object store validation and database recovery logic
+- New "Reset Database" option added when IndexedDB errors are detected
+- Welcome Guide redesigned with updated visuals, icons, and steps for new users
 
 ### Changed
-- Portrait controls on the edit page are now positioned below the image
-- Updated Welcome Guide with improved steps and visuals
-- Removed "Usage varies by model tier..." banner from the main screen
-- Fixed layout and styling of the "Enhanced" portrait model option
+- Portrait controls in the editor moved below the image for better UX and layout
+- Portrait now persists after saving a character to the library (no more disappearing image)
+- Example characters now appear immediately on first load (no refresh needed)
+- Filter dropdowns in the character library now use consistent UI components (e.g. `Select`, `SearchableSelect`)
+- Modal layout spacing improved to prevent sticky footer overlap on mobile and desktop
+- "Enhanced" label in the portrait model selector now aligned correctly with the card
+- Removed redundant "Import Character" button from the top of the library page
+- Removed "Usage varies by model tier..." footer banner from the main screen
+
+### Fixed
+- Character portraits now appear correctly in library detail view when a character is clicked
+- Prevented duplicate example characters from appearing in the library
+- Fixed React hook ordering violation in the CharacterLibraryPage component
+- Resolved localStorage quota errors by completing the IndexedDB migration for all character data
 
 ## [0.3.2] - 2025-05-06
 
