@@ -37,129 +37,35 @@ function extractUnreleasedChanges(): { changes: string, categories: { [key: stri
     return { changes: '', categories: {} };
   }
   
-  // Extract the changes
-  const changes = unreleasedMatch[1].trim();
-  
-  // Parse categories (Added, Changed, Fixed, etc.)
+  const content = unreleasedMatch[1].trim();
+  const lines = content.split('\n');
   const categories: { [key: string]: string[] } = {};
+  let currentCategory = 'Uncategorized';
   
-  // First, manually check for the specific category headers we want to ensure we capture them
-  const expectedCategories = ["Added", "Changed", "Fixed"];
-  for (const category of expectedCategories) {
-    const categoryPattern = new RegExp(`### ${category}\\s*\\n([\\s\\S]*?)(?=###|$)`, 'g');
-    const match = categoryPattern.exec(changes);
-    
-    if (match && match[1]) {
-      const content = match[1].trim();
-      if (content) {
-        // Extract bullet points while preserving nested structure
-        const items: string[] = [];
-        let currentItem = '';
-        const lines = content.split('\n');
-        
-        for (const line of lines) {
-          if (line.trim().startsWith('-')) {
-            if (currentItem) {
-              items.push(currentItem);
-              currentItem = '';
-            }
-            currentItem = line;
-          } else if (line.trim() && currentItem) {
-            currentItem += '\n' + line;
-          }
-        }
-        
-        // Add final item if exists
-        if (currentItem) {
-          items.push(currentItem);
-        }
-        
-        if (items.length > 0) {
-          categories[category] = items;
-        }
+  for (const line of lines) {
+    const categoryMatch = line.match(/^###\s+(.*)/);
+    if (categoryMatch) {
+      currentCategory = categoryMatch[1];
+      categories[currentCategory] = [];
+    } else if (line.startsWith('- ')) {
+      if (!categories[currentCategory]) {
+        categories[currentCategory] = [];
       }
+      categories[currentCategory].push(line);
     }
   }
   
-  // Then use the general regex approach to catch any other categories
-  const categoryRegex = /^### ([^\n]+)\n([\s\S]*?)(?=^### |\n## |\n$)/gm;
-  let categoryMatch;
-  let lastIndex = 0;
-  
-  while ((categoryMatch = categoryRegex.exec(changes)) !== null) {
-    const category = categoryMatch[1];
-    
-    // Skip if we already processed this category in the expected list
-    if (expectedCategories.includes(category)) {
-      continue;
-    }
-    
-    // Preserve the entire content including nested bullets and indentation
-    const categoryContent = categoryMatch[2].trim();
-    const itemBlocks: string[] = [];
-    
-    // Split the content by top-level bullet points
-    let currentItem = '';
-    const lines = categoryContent.split('\n');
-    
-    for (const line of lines) {
-      if (line.trim().startsWith('-')) {
-        // If we already have content and find a new bullet, save the previous item
-        if (currentItem) {
-          itemBlocks.push(currentItem);
-          currentItem = '';
-        }
-        currentItem = line;
-      } else if (line.trim() && currentItem) {
-        // Add to current item if it's not empty (preserves indentation)
-        currentItem += '\n' + line;
-      }
-    }
-    
-    // Add the last item if it exists
-    if (currentItem) {
-      itemBlocks.push(currentItem);
-    }
-    
-    if (itemBlocks.length > 0) {
-      categories[category] = itemBlocks;
-    }
-    
-    // Make sure we're advancing properly
-    lastIndex = categoryMatch.index + categoryMatch[0].length;
-  }
-  
-  // If no categories were found using the regex, try to extract bullet points directly
-  if (Object.keys(categories).length === 0) {
-    const items = changes.split('\n')
-      .filter(line => line.trim().startsWith('-'))
-      .map(line => line.trim());
-    
-    if (items.length > 0) {
-      categories['General'] = items;
-    }
-  }
-  
-  return { changes, categories };
+  return { changes: content, categories };
 }
 
 // Update package.json with the new version
 function updatePackageJson(version: string): void {
   const packageJsonPath = 'package.json';
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+  packageJson.version = version;
   
-  if (!fs.existsSync(packageJsonPath)) {
-    console.warn(`⚠️ ${packageJsonPath} not found, skipping version update`);
-    return;
-  }
-  
-  try {
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-    packageJson.version = version;
-    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
-    console.log(`✅ ${packageJsonPath} updated with version ${version}`);
-  } catch (error) {
-    console.error(`❌ Failed to update ${packageJsonPath}:`, error);
-  }
+  fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
+  console.log(`✅ ${packageJsonPath} updated with version ${version}`);
 }
 
 // Update package-lock.json with the new version
@@ -219,7 +125,7 @@ function updateChangelog(version: string, date: string, title: string): void {
       lastVersion = versionMatch[1];
     }
     
-    const newLinks = `[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v${version}...HEAD\n[${version}]: https://github.com/EthanPerello/npc-forge/compare/v${lastVersion}...v${version}\n`;
+    const newLinks = `[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v${lastVersion}...v${version}\n`;
     changelog = changelog.replace(linkBlockMatch[0], newLinks);
   }
 
@@ -228,16 +134,14 @@ function updateChangelog(version: string, date: string, title: string): void {
 }
 
 async function run() {
-  const version = process.argv[2] || await prompt('🔢 Enter version (e.g., 0.3.0): ');
-  const title = process.argv[3] || await prompt('📝 Enter title (e.g., Character Library System): ');
-  const summary = await prompt('📄 Enter summary (Markdown, one paragraph): ');
+  const version = await prompt('Enter the new version (e.g., 1.2.3): ');
+  const title = await prompt('Enter the release title: ');
+  const summary = await prompt('Enter a short summary of this release: ');
+  const dayInput = await prompt('Enter release day of this month (1–31, leave blank for today): ');
   
-  // Prompt for release day
+  // Determine the release date
   const today = new Date();
   const defaultDay = today.getDate();
-  const dayInput = await prompt(`📅 Enter release day (1-31) [default: ${defaultDay}]: `);
-  
-  // Use the specified day or default to today
   const releaseDay = dayInput ? parseInt(dayInput, 10) : defaultDay;
   
   // Create a new date with the specified day
@@ -258,7 +162,7 @@ async function run() {
   
   // Build release note content in exact format matching previous releases
   let releaseNoteContent = `# NPC Forge ${tag} – ${title}\n\n**Release Date:** ${formattedDate}\n\n${summary}\n\n`;
-  
+
   // Ensure we always include the standard categories in the right order for the release notes
   const standardCategories = ["Added", "Changed", "Fixed"];
   
@@ -274,33 +178,32 @@ async function run() {
   
   // Then add any other categories that might exist
   const otherCategories = Object.keys(categories).filter(cat => !standardCategories.includes(cat));
-  
   for (const category of otherCategories) {
     releaseNoteContent += `## ${category}\n${categories[category].join('\n')}\n\n`;
   }
   
   // Remove trailing newlines
   releaseNoteContent = releaseNoteContent.trim();
-
+  
   // Write release note
   fs.writeFileSync(releaseNotePath, releaseNoteContent);
   console.log(`✅ Release note created at: ${releaseNotePath}`);
-
+  
   // Log release note content for verification
   console.log('\n📝 RELEASE NOTE CONTENT:\n');
   console.log(releaseNoteContent);
   console.log('\nPlease verify this content appears correctly and includes all sections.\n');
-
+  
   // Update changelog by moving unreleased changes to the new version
-  updateChangelog(version, formattedDate, title);
+  updateChangelog(version, isoDate, title);
   console.log(`✅ CHANGELOG.md updated`);
-
+  
   // Update package.json with the new version
   updatePackageJson(version);
   
   // Update package-lock.json with the new version
   updatePackageLockJson(version);
-
+  
   // Git commit, tag & push
   try {
     // Explicitly add the changelog, package.json, package-lock.json, and release notes file
@@ -316,20 +219,8 @@ async function run() {
     console.log(`git add CHANGELOG.md package.json package-lock.json "${releaseNotePath}" && git commit -m "chore: release ${tag}"`);
   }
 
+  // Push to repository
   try {
-    // Remove tag if it exists
-    execSync(`git tag -d ${tag} 2>/dev/null || true`);
-    console.log(`✅ Removed existing tag ${tag} (if any)`);
-    
-    // Create new tag
-    execSync(`git tag ${tag}`);
-    console.log(`✅ Tag ${tag} created`);
-  } catch (error) {
-    console.warn(`⚠️ Tag ${tag} creation failed:`, error);
-  }
-
-  try {
-    // Push both the main branch and the tags to ensure everything is updated
     execSync(`git push origin main`);
     console.log(`✅ Changes pushed to main branch`);
     
@@ -348,10 +239,7 @@ async function run() {
     // Delete existing release if it exists
     try {
       execSync(`gh release delete ${tag} --yes 2>/dev/null`);
-      console.log(`✅ Deleted existing GitHub release ${tag}`);
-    } catch (error) {
-      // It's okay if the release doesn't exist yet
-    }
+    } catch {}
     
     // Create new release with a simpler title but full content
     execSync(`gh release create ${tag} -F "${releaseNotePath}" -t "NPC Forge ${tag}"`, { stdio: 'inherit' });
