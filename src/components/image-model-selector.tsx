@@ -46,16 +46,18 @@ export default function ImageModelSelector({ value, onChange }: ImageModelSelect
               <h3 className="font-medium">
                 {config.emoji} {config.label}
               </h3>
-              {/* Use different classes to avoid the global CSS override */}
-              {selectedModel === config.id ? (
-                <span className="model-badge-selected text-xs px-2 py-1 rounded-full font-medium bg-blue-700 text-white">
-                  {remaining[config.id] === "Unlimited" ? "∞" : `${remaining[config.id]}`} left
-                </span>
-              ) : (
-                <span className="model-badge-unselected text-xs px-2 py-1 rounded-full font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
-                  {remaining[config.id] === "Unlimited" ? "∞" : `${remaining[config.id]}`} left
-                </span>
-              )}
+              {/* Fixed badge positioning across all cards */}
+              <div className="flex items-center">
+                {selectedModel === config.id ? (
+                  <span className="model-badge-selected text-xs px-2 py-1 rounded-full font-medium bg-blue-700 text-white">
+                    {remaining[config.id] === "Unlimited" ? "∞" : `${remaining[config.id]}`} left
+                  </span>
+                ) : (
+                  <span className="model-badge-unselected text-xs px-2 py-1 rounded-full font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                    {remaining[config.id] === "Unlimited" ? "∞" : `${remaining[config.id]}`} left
+                  </span>
+                )}
+              </div>
             </div>
             <p className="text-xs text-gray-600 dark:text-gray-400">
               {config.description}
