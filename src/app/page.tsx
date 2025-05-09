@@ -82,7 +82,7 @@ export default function Home() {
 
   return (
     <CharacterProvider>
-      <main className="min-h-screen py-8 px-4 pb-32 md:pb-24 bg-gradient-to-br from-indigo-50 via-indigo-50/30 to-blue-100 dark:from-gray-900 dark:via-indigo-950/30 dark:to-blue-950/20 pb-footer">
+      <main className="min-h-screen py-8 px-4 bg-gradient-to-br from-indigo-50 via-indigo-50/30 to-blue-100 dark:from-gray-900 dark:via-indigo-950/30 dark:to-blue-950/20">
         <div className="container mx-auto max-w-full">
           <header className="relative w-full h-[200px] sm:h-[220px] lg:h-[240px] mb-12 overflow-hidden rounded-2xl shadow-lg">
             {/* Background glow */}
@@ -145,7 +145,8 @@ export default function Home() {
                   Ethan Perello
                 </a>
               </p>
-              <div className="flex justify-center space-x-6 mt-3">
+              <div className="flex justify-center space-x-6 mt-3 mb-32">
+                {/* Added pb-32 class for extra padding at the bottom */}
                 <a 
                   href="https://github.com/EthanPerello/npc-forge" 
                   target="_blank" 

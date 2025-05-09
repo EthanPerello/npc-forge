@@ -259,50 +259,8 @@ input::placeholder, textarea::placeholder {
 }
 
 /*********************************************
- * Model Badge Styles 
+ * Ensure buttons maintain proper contrast
  *********************************************/
-.model-badge-selected {
-  color: white !important;
-  background-color: #4f46e5 !important;
-  font-weight: bold !important;
-  border: none !important;
-}
-
-.model-badge-unselected {
-  color: #374151 !important;
-  background-color: #f3f4f6 !important;
-  border: 1px solid #e5e7eb !important;
-  font-weight: normal !important;
-}
-
-.dark .model-badge-selected {
-  color: white !important;
-  background-color: #4f46e5 !important;
-}
-
-.dark .model-badge-unselected {
-  color: #d1d5db !important;
-  background-color: #1f2937 !important;
-  border: 1px solid #374151 !important;
-}
-
-html:not(.dark) span.model-badge-selected {
-  background-color: #dbeafe !important;
-  color: #1e293b !important;
-}
-
-/*********************************************
- * Button Overrides 
- *********************************************/
-button.hover\:bg-gray-200:hover {
-  background-color: #e5e7eb !important;
-}
-
-.dark button.hover\:bg-gray-800:hover {
-  background-color: #1f2937 !important;
-}
-
-/* Ensure buttons maintain proper contrast */
 .welcome-guide button.bg-indigo-600,
 .light .welcome-guide button.bg-indigo-600,
 button.bg-indigo-600,
@@ -316,15 +274,29 @@ a.bg-indigo-600,
   color: white !important;
 }
 
-.light button.bg-indigo-100.text-indigo-700.font-medium {
-  background-color: #4f46e5 !important;
+/* FIX: Ensure danger buttons always have white text in all themes */
+button.bg-red-600,
+button.bg-red-700,
+.light button.bg-red-600,
+.light button.bg-red-700,
+.dark button.bg-red-600,
+.dark button.bg-red-700 {
+  color: white !important;
+}
+
+/* FIX: Ensure danger button icons are white too */
+button.bg-red-600 svg,
+button.bg-red-700 svg,
+.light button.bg-red-600 svg,
+.light button.bg-red-700 svg,
+.dark button.bg-red-600 svg,
+.dark button.bg-red-700 svg {
   color: white !important;
 }
 
 /*********************************************
  * Header Styles 
  *********************************************/
-
 /* Welcome Guide headings */
 .welcome-guide h2.text-xl.font-bold,
 .welcome-guide .bg-indigo-600 h2,
@@ -384,7 +356,6 @@ p.mt-2.text-lg.sm\:text-xl.lg\:text-2xl.font-medium,
 /*********************************************
  * Light Mode Overrides 
  *********************************************/
-
 /* Background fixes */
 .light main.bg-gradient-to-br {
   background: white !important;
@@ -477,12 +448,6 @@ p.mt-2.text-lg.sm\:text-xl.lg\:text-2xl.font-medium,
   color: #1e40af !important; /* Dark blue text */
 }
 
-.light button.bg-gray-200 {
-  background-color: #f1f5f9 !important;
-  color: #0f172a !important;
-  border-color: #cbd5e1 !important;
-}
-
 .light .portrait-section {
   border: none !important;
 }
@@ -527,7 +492,6 @@ p.mt-2.text-lg.sm\:text-xl.lg\:text-2xl.font-medium,
 /*********************************************
  * Status Messages 
  *********************************************/
-
 /* Success message styling */
 .light div.bg-green-50.text-green-800,
 .light div.bg-green-50.text-green-800 p,
@@ -572,7 +536,6 @@ p.mt-2.text-lg.sm\:text-xl.lg\:text-2xl.font-medium,
 /*********************************************
  * Documentation Specific Overrides 
  *********************************************/
-
 /* Fix navigation colors */
 .light .docs-navigation,
 .light .breadcrumbs {
@@ -826,215 +789,8 @@ p.mt-2.text-lg.sm\:text-xl.lg\:text-2xl.font-medium,
 }
 
 /*********************************************
- * Button Styles 
+ * Fix character traits display 
  *********************************************/
-.light button.bg-indigo-100.text-indigo-800.border.border-indigo-300 {
-  background-color: #a5b4fc !important; /* More vibrant background */
-  color: #312e81 !important; /* Darker text */
-  border-color: #6366f1 !important; /* More visible border */
-  font-weight: 500 !important; /* Make text bolder */
-}
-
-.light .flex.flex-wrap.gap-2 button,
-.light .flex.flex-wrap.gap-3 button {
-  background-color: #f1f5f9 !important;
-  color: #0f172a !important;
-  border-color: #e2e8f0 !important;
-}
-
-.light div.flex.flex-wrap.gap-2 button[class*="bg-indigo-100"] {
-  background-color: #4f46e5 !important; /* Indigo 600 */
-  color: white !important;
-  border-color: #4338ca !important; /* Indigo 700 */
-  font-weight: 500 !important;
-}
-
-.light div.flex.flex-wrap.gap-2 button[class*="bg-gray-100"] {
-  background-color: #f3f4f6 !important; /* Gray 100 */
-  color: #374151 !important; /* Gray 700 */
-  border-color: #e5e7eb !important; /* Gray 200 */
-}
-
-.light button.px-3.py-1.rounded-md.text-xs.font-medium,
-.light button[class*="text-xs font-medium"],
-.light button.bg-green-100.text-green-800,
-.light button.bg-blue-100.text-blue-800,
-.light button.bg-indigo-100.text-indigo-800 {
-  background-color: #4f46e5 !important; /* Indigo 600 */
-  color: white !important;
-  border: 1px solid #4338ca !important; /* Indigo 700 */
-}
-
-.light button[class*="bg-indigo-100"][class*="text-indigo-800"],
-.light button.bg-indigo-100.text-indigo-800 {
-  background-color: #4f46e5 !important; /* Indigo 600 */
-  color: white !important;
-  border-color: #4338ca !important; /* Indigo 700 */
-  font-weight: 500 !important;
-}
-
-.light button.bg-gray-100,
-.light button[class*="bg-gray-100"][class*="text-gray-700"] {
-  background-color: #f3f4f6 !important; /* Gray 100 */
-  color: #374151 !important; /* Gray 700 */
-  border-color: #e5e7eb !important; /* Gray 200 */
-}
-
-/*********************************************
- * Special Section Styles
- *********************************************/
-.light .p-4.bg-indigo-50.border-l-4.border-indigo-500 h3.text-lg.font-semibold.text-indigo-800,
-.light .p-4.bg-indigo-50.border-l-4.border-indigo-500 p.text-indigo-700 {
-  color: #3730a3 !important; /* Darker indigo for better contrast */
-}
-
-.light .p-4.bg-indigo-50.border-l-4.border-indigo-500.mb-6 h3,
-.light .p-4.bg-indigo-50.border-l-4.border-indigo-500.mb-6 p {
-  color: #312e81 !important; /* Indigo 900 - very dark */
-  font-weight: 600 !important;
-}
-
-/* Fix special UI elements */
-.light .text-xs.text-gray-500,
-.light .mt-1.text-xs.text-gray-500,
-.light .mt-1.text-gray-500,
-.light .text-xs.text-gray-600 {
-  color: #0f172a !important;
-}
-
-.light div.bg-green-50.text-green-700,
-.light div.bg-green-50.text-green-700 *,
-.light div.bg-green-50.text-green-700.p-3.text-center {
-  color: #15803d !important; /* Green 700 - dark green */
-  font-weight: 600 !important;
-}
-
-.light [id^="headlessui-tabs-panel-"] {
-  background-color: white !important;
-}
-
-.light #portrait-customization,
-.light #portrait-customization > div {
-  background-color: white !important;
-}
-
-.light #portrait-customization .bg-blue-900\/30 {
-  background-color: #dbeafe !important; /* Light blue background */
-}
-
-.light #portrait-customization .text-blue-300 {
-  color: #1e40af !important; /* Dark blue text */
-}
-
-.light #portrait-customization [class*="cursor-pointer"],
-.light .bg-gray-100.text-gray-800 {
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
-}
-
-/* Fix cursor pointer elements */
-.light [class*="cursor-pointer"].bg-gray-100,
-.light [class*="cursor-pointer"].dark\:bg-gray-700 {
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
-}
-
-.light [class*="cursor-pointer"] span:not(.ring-indigo-500) {
-  color: #0f172a !important;
-}
-
-.light [class*="cursor-pointer"] h3.font-medium {
-  color: var(--text-heading) !important;
-}
-
-/* Ensure the right background for bg-white elements */
-.light .bg-white.p-4.rounded-lg,
-.light .bg-gray-50.p-4.rounded-lg,
-.light .space-y-6 .bg-white.p-4.rounded-lg {
-  background-color: #f8fafc !important;
-  border-color: #e2e8f0 !important;
-}
-
-.light .bg-gray-100.rounded-lg p {
-  color: #0f172a !important;
-}
-
-.light .bg-gray-100.rounded-lg .bg-gray-200 {
-  background-color: #e2e8f0 !important;
-}
-
-/*********************************************
- * Library Page Styles
- *********************************************/
-/* Ensure genre/subgenre indicators have white text in light mode */
-.light .bg-indigo-100.text-white,
-.light .bg-purple-100.text-white {
-  background-color: #4f46e5 !important; /* Indigo 600 */
-  color: white !important;
-  font-weight: normal !important; /* Override bold font weight */
-}
-
-/* Fix eye icon for View JSON */
-.light button.text-gray-900 {
-  color: #0f172a !important;
-}
-
-/* Fix character card badges */
-.light span.px-2.py-1.bg-indigo-100.text-white,
-.light span.px-2.py-1.bg-purple-100.text-white,
-.light span.px-2.py-1.bg-amber-100.text-amber-800 {
-  color: white !important;
-  font-weight: 500 !important;
-}
-
-.light span.px-2.py-1.bg-indigo-100.text-white {
-  background-color: #4f46e5 !important; /* Indigo 600 for genre */
-}
-
-.light span.px-2.py-1.bg-purple-100.text-white {
-  background-color: #7e22ce !important; /* Purple 700 for sub-genre */
-}
-
-.light span.px-2.py-1.bg-amber-100.text-amber-800 {
-  background-color: #d97706 !important; /* Amber 600 for example tag */
-  color: white !important;
-}
-
-/* Fix JSON viewer text color in light mode */
-.light pre.text-xs.text-gray-800,
-.light pre.text-xs.text-gray-200,
-.light pre.text-xs.whitespace-pre-wrap.bg-gray-100 {
-  color: #1e293b !important; /* Slate 800 */
-}
-
-/* Fix character card detail view */
-.light .bg-card.rounded-lg h3.text-xl.font-bold.mb-2.truncate,
-.light .bg-card.rounded-lg p.text-sm.mb-4.text-muted,
-.light .bg-card.rounded-lg div.flex.justify-between button {
-  color: #1e293b !important;
-}
-
-/* Style consistency for tabs */
-.section-container {
-  padding: 1rem;
-  background-color: var(--background-card);
-  border-radius: 0.5rem;
-  border: 1px solid var(--border-light);
-}
-
-.section-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-}
-
-.section-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-/* Fix character traits display */
 .character-trait-tag {
   display: inline-block;
   padding-left: 0.5rem;
@@ -1068,6 +824,11 @@ p.mt-2.text-lg.sm\:text-xl.lg\:text-2xl.font-medium,
   z-index: 50;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease;
+}
+
+/* Hide sticky footer when character modal is open */
+body:has(.fixed.inset-0.bg-black.bg-opacity-50.flex.items-center.justify-center.z-50) .sticky-footer {
+  display: none !important;
 }
 
 /* Add safe area inset for iOS devices */
@@ -1136,4 +897,111 @@ p.mt-2.text-lg.sm\:text-xl.lg\:text-2xl.font-medium,
   background-color: rgba(30, 58, 138, 0.2);
   color: #93c5fd;
   border: 1px solid rgba(59, 130, 246, 0.5);
+}
+
+/*********************************************
+ * Fixed Button Overrides - Addressing icon color issues
+ *********************************************/
+/* Primary, danger and success buttons should have white icons */
+.bg-indigo-600 svg,
+.bg-red-600 svg,
+.bg-green-600 svg,
+.bg-indigo-700 svg, 
+.bg-red-700 svg,
+.bg-green-700 svg {
+  color: white !important;
+}
+
+/* Fix model badge styles */
+.bg-indigo-600.text-white, 
+.text-xs.px-2.py-1.rounded-full.font-medium.bg-indigo-600 {
+  background-color: #4f46e5 !important;
+  color: white !important;
+}
+
+/* Fix padding in modal buttons */
+.modal-footer-buttons {
+  padding: 1rem !important;
+  margin-bottom: 0 !important;  /* Fix: Remove bottom margin */
+}
+
+/* FIX: Ensure modal doesn't have extra spacing at bottom */
+.fixed.inset-0.bg-black.bg-opacity-50.flex.items-center.justify-center .bg-card {
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* FIX: Modal container to have no bottom padding beyond the footer */
+.fixed.inset-0.bg-black.bg-opacity-50.flex.items-center.justify-center .bg-card .modal-footer-buttons {
+  margin-bottom: 0 !important;
+  padding-bottom: 1rem !important;
+}
+
+/* Portrait specific fixes */
+.portrait-container {
+  /* Ensure portrait container maintains consistent size */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.portrait-container img {
+  object-fit: contain !important;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* FIX: Completely revamped image model selector layout and badge alignment */
+div[class*="grid grid-cols-1 gap-3 md:grid-cols-3"] > div {
+  position: relative;
+}
+
+/* Ensure proper alignment of all elements in the model selector */
+div[class*="grid grid-cols-1 gap-3 md:grid-cols-3"] > div > div.flex.flex-wrap.items-center.justify-between {
+  align-items: center !important;
+  display: flex !important;
+  width: 100% !important;
+  flex-wrap: nowrap !important;
+}
+
+/* Push badge to the right */
+div[class*="grid grid-cols-1 gap-3 md:grid-cols-3"] > div > div.flex.flex-wrap.items-center.justify-between > div.flex-shrink-0 {
+  margin-left: auto !important;
+}
+
+/* Fix badge styling globally */
+span.text-xs.px-2.py-1.rounded-full.font-medium {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 1.5rem !important;
+  white-space: nowrap !important;
+}
+
+/* Ensure model label doesn't wrap and maintains proper width */
+div[class*="grid grid-cols-1 gap-3 md:grid-cols-3"] > div > div > div.flex.items-center > h3 {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 100px !important;
+}
+
+/* Fix Modal Padding Issues */
+div.fixed.inset-0.bg-black.bg-opacity-50.flex.items-center.justify-center.z-50 > div.bg-card {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+div.fixed.inset-0.bg-black.bg-opacity-50.flex.items-center.justify-center.z-50 > div.bg-card > div:last-child {
+  margin-top: auto !important;
+  padding-bottom: 0 !important;
+}
+
+/* Fix Button Contrast for Delete */
+button[variant="danger"], 
+button.bg-red-600, 
+button.bg-red-700,
+button.bg-red-600 *, 
+button.bg-red-700 * {
+  color: white !important;
 }

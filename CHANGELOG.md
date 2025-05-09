@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Portrait persistence issues:
+  - Fixed portrait disappearing after saving to library or viewing a character
+  - Improved image handling across display, storage, and context components
+- UI consistency improvements:
+  - Fixed icon/text color consistency in buttons across light/dark themes
+  - Fixed delete button text color in light mode to ensure white text on red background
+  - Fixed misaligned icon and badge in image model selector
+  - Fixed unnecessary padding below modal buttons in character viewer
+  - Added consistent coloring for button icons to match text in all themes
+- Character card enhancements:
+  - All action buttons (edit, download JSON, download portrait, delete) are now visible directly on each card
+  - Portrait download button moved to top-left corner for better layout
+- Layout fixes:
+  - Added extra padding to ensure the GitHub link and footer content are not cut off
+  - Fixed sticky footer showing behind character modals
+  - Improved model selection card layouts and alignment
+
 ## [0.3.3] - 2025-05-08
 
 ### Added

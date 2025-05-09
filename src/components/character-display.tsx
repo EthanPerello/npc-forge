@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useCharacter } from '@/contexts/character-context';
 import TabInterface, { Tab } from '@/components/ui/tab-interface';
 import ProfileTab from '@/components/tabs/display/profile-tab';
@@ -13,6 +13,9 @@ import { Download, Save, User, MessageSquare, Package, BookOpen, Image } from 'l
 import { getCharacterTraitsArray } from '@/lib/utils';
 import { Character } from '@/lib/types';
 
+// Use sessionStorage for temporary image caching during the session
+const IMAGE_CACHE_KEY = 'npc-forge-temp-image-cache';
+
 export default function CharacterDisplay() {
   const { character, formData, downloadCharacterJSON, error, isLoading, saveToLibrary } = useCharacter();
   const [activeTab, setActiveTab] = useState('profile');
@@ -21,14 +24,76 @@ export default function CharacterDisplay() {
   const [isSaving, setIsSaving] = useState(false);
   const [displayCharacter, setDisplayCharacter] = useState<Character | null>(null);
   
+  // Keep references to image data to prevent it from disappearing
+  const imageDataRef = useRef<string | null>(null);
+  const characterKeyRef = useRef<string | null>(null);
+  
+  // Initialize cached images from sessionStorage
+  const [cachedImages, setCachedImages] = useState<Record<string, string>>(() => {
+    // Try to load cached images from sessionStorage
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = sessionStorage.getItem(IMAGE_CACHE_KEY);
+        return cached ? JSON.parse(cached) : {};
+      } catch (e) {
+        console.warn("Failed to load cached images from sessionStorage:", e);
+        return {};
+      }
+    }
+    return {};
+  });
+  
+  // Save cached images to sessionStorage when they change
+  useEffect(() => {
+    if (typeof window !== 'undefined' && Object.keys(cachedImages).length > 0) {
+      try {
+        sessionStorage.setItem(IMAGE_CACHE_KEY, JSON.stringify(cachedImages));
+      } catch (e) {
+        console.warn("Failed to save cached images to sessionStorage:", e);
+      }
+    }
+  }, [cachedImages]);
+  
   // Update display character when the main character changes
   useEffect(() => {
     if (character) {
-      // Create a deep copy to preserve the character (especially with image data)
-      setDisplayCharacter(JSON.parse(JSON.stringify(character)));
+      // Create a deep copy to preserve the character
+      const characterCopy = { ...JSON.parse(JSON.stringify(character)) };
+      
+      // Generate a unique key for this character
+      const characterKey = characterCopy.name 
+        ? `${characterCopy.name.toLowerCase().replace(/\s+/g, '-')}`
+        : `unnamed-${Date.now()}`;
+      
+      characterKeyRef.current = characterKey;
+      
+      // Check sources for image data in this priority order:
+      // 1. Character's own image_data
+      // 2. Previously cached image for this character key
+      // 3. Current imageDataRef value
+      
+      if (characterCopy.image_data) {
+        // If character has image data, update our cache and ref
+        imageDataRef.current = characterCopy.image_data;
+        setCachedImages(prev => ({
+          ...prev,
+          [characterKey]: characterCopy.image_data as string
+        }));
+      } 
+      else if (cachedImages[characterKey]) {
+        // If we have cached image for this character, use it
+        characterCopy.image_data = cachedImages[characterKey];
+        imageDataRef.current = cachedImages[characterKey];
+      }
+      else if (imageDataRef.current) {
+        // If we have a current image in the ref, use it as fallback
+        characterCopy.image_data = imageDataRef.current;
+      }
+      
+      setDisplayCharacter(characterCopy);
       setActiveTab('profile');
     }
-  }, [character]);
+  }, [character, cachedImages]);
 
   // If we don't have a character to display, return null
   if (!displayCharacter) {
@@ -76,32 +141,46 @@ export default function CharacterDisplay() {
     });
   }
   
-  // Save character to library
+  // Save character to library with improved image handling
   const handleSaveToLibrary = async (e: React.MouseEvent) => {
     // Prevent default to avoid form submission
     e.preventDefault();
     e.stopPropagation();
     
     setIsSaving(true);
+    setSaveSuccess(false);
+    setSaveError('');
     
     try {
-      // Reset states
-      setSaveSuccess(false);
-      setSaveError('');
-      
-      // Save character with form data
-      const success = await saveToLibrary();
-      
-      if (success) {
-        // Show success message
-        setSaveSuccess(true);
+      // Ensure we have the image data stored in the character
+      if (displayCharacter) {
+        // Create a deep copy to avoid mutations
+        const characterToSave = { ...displayCharacter };
         
-        // Clear success message after 3 seconds
-        setTimeout(() => {
-          setSaveSuccess(false);
-        }, 3000);
-      } else {
-        setSaveError('Failed to save character to library');
+        // Ensure the image data is included - check all possible sources
+        if (!characterToSave.image_data) {
+          // Try to get image from our ref or cache
+          if (imageDataRef.current) {
+            characterToSave.image_data = imageDataRef.current;
+          } else if (characterKeyRef.current && cachedImages[characterKeyRef.current]) {
+            characterToSave.image_data = cachedImages[characterKeyRef.current];
+          }
+        }
+        
+        // Save character with form data
+        const success = await saveToLibrary(characterToSave);
+        
+        if (success) {
+          // Show success message
+          setSaveSuccess(true);
+          
+          // Clear success message after 3 seconds
+          setTimeout(() => {
+            setSaveSuccess(false);
+          }, 3000);
+        } else {
+          setSaveError('Failed to save character to library');
+        }
       }
     } catch (error) {
       setSaveError('Failed to save character to library');
@@ -123,8 +202,12 @@ export default function CharacterDisplay() {
     e.preventDefault();
     e.stopPropagation();
     
-    // Get the image data
-    const imageData = displayCharacter.image_data || displayCharacter.image_url;
+    // Get the image data from all possible sources
+    let imageData = displayCharacter.image_data || 
+                   (characterKeyRef.current ? cachedImages[characterKeyRef.current] : null) ||
+                   imageDataRef.current ||
+                   displayCharacter.image_url;
+                   
     if (!imageData) {
       alert('No image available to download');
       return;
@@ -151,8 +234,11 @@ export default function CharacterDisplay() {
             <div className="mx-auto md:mx-0 w-full max-w-[300px]">
               <PortraitDisplay 
                 imageUrl={displayCharacter.image_url} 
-                imageData={displayCharacter.image_data}
-                characterId={displayCharacter.name ? `${displayCharacter.name.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}` : undefined}
+                imageData={displayCharacter.image_data || 
+                          (characterKeyRef.current ? cachedImages[characterKeyRef.current] : undefined) || 
+                          imageDataRef.current || 
+                          undefined}
+                characterId={displayCharacter.name ? `${displayCharacter.name.replace(/\s+/g, '-')}-${Date.now()}` : undefined}
                 name={displayCharacter.name} 
                 size="medium"
                 className="mx-auto"

@@ -67,6 +67,11 @@ export default function Button({
     ${className}
   `;
 
+  // Define icon color class - updated to ensure white color for danger variant
+  const iconColorClass = variant === 'primary' || variant === 'danger' || variant === 'success' 
+    ? 'text-white' 
+    : '';
+
   return (
     <button
       className={buttonStyles}
@@ -85,9 +90,17 @@ export default function Button({
         </div>
       ) : (
         <div className="flex items-center justify-center">
-          {leftIcon && <span className="mr-2">{leftIcon}</span>}
+          {leftIcon && (
+            <span className={`mr-2 ${iconColorClass}`}>
+              {leftIcon}
+            </span>
+          )}
           {children}
-          {rightIcon && <span className="ml-2">{rightIcon}</span>}
+          {rightIcon && (
+            <span className={`ml-2 ${iconColorClass}`}>
+              {rightIcon}
+            </span>
+          )}
         </div>
       )}
     </button>

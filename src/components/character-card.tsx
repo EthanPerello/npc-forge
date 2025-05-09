@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Character } from '@/lib/types';
 import { getCharacterTraitsArray } from '@/lib/utils';
 import { getImage } from '@/lib/character-storage';
-import { User, Download, Edit, Trash2 } from 'lucide-react';
+import { User, Download, Edit, Trash2, Image } from 'lucide-react';
 import Button from '@/components/ui/button';
 
 interface CharacterCardProps {
@@ -13,10 +13,19 @@ interface CharacterCardProps {
   onDownload: (e: React.MouseEvent) => void;
   onEdit?: (e: React.MouseEvent) => void;
   onDelete?: (e: React.MouseEvent) => void;
+  onDownloadImage?: (e: React.MouseEvent) => void;
   onClick?: () => void;
 }
 
-export default function CharacterCard({ character, id, onDownload, onEdit, onDelete, onClick }: CharacterCardProps) {
+export default function CharacterCard({ 
+  character, 
+  id, 
+  onDownload, 
+  onEdit, 
+  onDelete, 
+  onDownloadImage,
+  onClick 
+}: CharacterCardProps) {
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -104,7 +113,8 @@ export default function CharacterCard({ character, id, onDownload, onEdit, onDel
           </div>
         )}
         
-        {/* Add a delete button in the top right */}
+        {/* Action buttons in corners */}
+        {/* Delete button in the top right */}
         {onDelete && (
           <button 
             onClick={onDelete}
@@ -113,6 +123,18 @@ export default function CharacterCard({ character, id, onDownload, onEdit, onDel
             type="button"
           >
             <Trash2 className="h-4 w-4" />
+          </button>
+        )}
+        
+        {/* Download image button in the top left */}
+        {onDownloadImage && (
+          <button 
+            onClick={onDownloadImage}
+            className="absolute top-2 left-2 p-1.5 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 dark:bg-blue-900/40 dark:text-blue-400 dark:hover:bg-blue-800/60 z-10"
+            title="Download Portrait"
+            type="button"
+          >
+            <Image className="h-4 w-4" />
           </button>
         )}
       </div>
@@ -126,15 +148,13 @@ export default function CharacterCard({ character, id, onDownload, onEdit, onDel
           {traits.slice(0, 3).map((trait, index) => (
             <span 
               key={index} 
-              className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs truncate
-                        dark:bg-gray-700 dark:text-gray-300 max-w-[100px]"
+              className="character-trait-tag px-2 py-1 rounded-full text-xs truncate max-w-[100px]"
             >
               {trait}
             </span>
           ))}
           {traits.length > 3 && (
-            <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs
-                          dark:bg-gray-700 dark:text-gray-300">
+            <span className="character-trait-tag px-2 py-1 rounded-full text-xs">
               +{traits.length - 3}
             </span>
           )}
@@ -146,14 +166,13 @@ export default function CharacterCard({ character, id, onDownload, onEdit, onDel
         </p>
         
         {/* Action buttons */}
-        <div className="mt-3 flex gap-2">
+        <div className="mt-3 grid grid-cols-2 gap-2">
           {onEdit && (
             <Button
               variant="secondary"
               onClick={onEdit}
               type="button"
               size="sm"
-              className="flex-1"
               leftIcon={<Edit size={16} />}
             >
               Edit
@@ -165,7 +184,6 @@ export default function CharacterCard({ character, id, onDownload, onEdit, onDel
             onClick={onDownload}
             type="button"
             size="sm"
-            className="flex-1"
             leftIcon={<Download size={16} />}
           >
             Download
