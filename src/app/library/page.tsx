@@ -622,7 +622,6 @@ export default function CharacterLibraryPage() {
       {/* Sticky Footer */}
       <StickyFooter 
         pageType="library"
-        showBackToTop={hasScrolled}
         libraryFilterCount={activeFilterCount}
         onClearFilters={resetFilters}
         showImport={true}
