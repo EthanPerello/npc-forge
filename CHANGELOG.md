@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed sticky footer showing behind character modals
   - Improved model selection card layouts and alignment
 
-## [0.3.3] - 2025-05-08
+## [0.3.3] - 2025-05-07
 
 ### Added
 - Model selectors for text and image regeneration on the edit character page
@@ -46,8 +46,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Filter dropdowns in the character library now use consistent UI components (e.g. `Select`, `SearchableSelect`)
 - Modal layout spacing improved to prevent sticky footer overlap on mobile and desktop
 - "Enhanced" label in the portrait model selector now aligned correctly with the card
-- Removed redundant "Import Character" button from the top of the library page
-- Removed "Usage varies by model tier..." footer banner from the main screen
+
+### Removed
+- Redundant "Import Character" button from the top of the library page
+- "Usage varies by model tier..." footer banner from the main screen
 
 ### Fixed
 - Character portraits now appear correctly in library detail view when a character is clicked
@@ -68,11 +70,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Integrated IndexedDB into character card, display, edit page, and context provider
 
 ### Changed
-- Removed the "Special Ability" field from character profiles
 - Improved mobile layout of character library cards and footer actions
 - Refactored sticky footer into a responsive standalone component
-- Removed 3-trait limit for personality traits in both the editor and advanced options dropdown
 - Updated character editor and creation form to allow unlimited trait selection
+- Removed 3-trait limit for personality traits in both the editor and advanced options dropdown
+
+### Removed
+- "Special Ability" field from character profiles
 
 ## [0.3.1] - 2025-05-05
 
@@ -90,7 +94,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Example characters can now be edited and deleted from library
 - Description field automatically updates when genre changes (if not manually edited)
 - Updated usage text at bottom of main page to accurately reflect tiered model system
-- Removed example description box from the character description field
+
+### Removed
+- Example description box from the character description field
 
 ### Fixed
 - Example characters now appear in library on first visit without requiring refresh
@@ -121,123 +127,98 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Integrated Vercel Analytics for automatic page view tracking
 
 ### Changed
-- Refactored `globals.css` by consolidating and cleaning up redundant or conflicting style rules. No visual changes expected.
-- Fixed various styling issues in light mode
+- Refactored `globals.css` by consolidating and cleaning up redundant style rules
+
+### Fixed
+- Various styling issues in light mode
 
 ## [0.2.3] - 2025-05-02
 
 ### Changed
-- Replaced all native `<select>` elements across the app with a custom full-width dropdown using the existing `ui/select.tsx` component for consistent styling and improved accessibility.
+- Replaced all native `<select>` elements across the app with a custom full-width dropdown using the existing `ui/select.tsx` component for consistent styling and improved accessibility
 
 ### Fixed
-- Fixed portrait generation issue for gpt-image-1 by switching quality parameter from "hd" to "high"
-- Fixed numerous contrast issues in light mode across the application:
-  - Updated "Get Started", "Generate Character", and "Download JSON" buttons to maintain readability in light mode
-  - Improved text visibility for selected personality traits, quest type labels, and subgenre options
-  - Darkened API endpoint and contributing file references for better contrast
-  - Enhanced text on changelog version numbers and roadmap priority badges
-  - Ensured clear feedback for "Character generation may take a second…" and "Character successfully generated!" messages in light mode
-  - Corrected contrast of selected model generation badges (e.g., "∞ left") in both character and image model selectors
+- Portrait generation issue for gpt-image-1 by switching quality parameter from "hd" to "high"
+- Numerous contrast issues in light mode across the application:
+  - Buttons such as "Get Started", "Generate Character", and "Download JSON" now maintain readability
+  - Selected personality traits, quest type labels, and subgenre options have improved text visibility
+  - API endpoint and contributing file references have darker text for better contrast
+  - Changelog version numbers and roadmap priority badges have enhanced clarity
+  - User feedback messages like "Character generation may take a second..." now display properly
+  - Selected model generation badges (e.g., "∞ left") have corrected contrast in all selectors
 
 ## [0.2.2] - 2025-05-01
 
 ### Added
 - New CSS utility classes: `text-description`, `bg-secondary`, `border-theme`, and additional variants for consistent theme support
-- Example-specific selectors in `globals.css` to improve the readability of dynamic example content in light mode
+- Example-specific selectors in `globals.css` to improve dynamic content readability in light mode
 
 ### Changed
-- Refactored theme styling system to use standardized CSS variables and utility classes (`bg-card`, `text-muted`, `border-theme`, etc.) for consistent appearance across light and dark modes
-- Simplified randomization logic in `character-form.tsx` to eliminate fragile state timing patterns
-- Updated global styles to improve visibility for UI elements like subgenre text, welcome guide examples, and tabbed panels in light mode
+- Refactored theme styling system to use standardized CSS variables and utility classes
+- Simplified randomization logic in `character-form.tsx` to eliminate state timing patterns
+- Updated global styles to improve visibility for UI elements in light mode
 
 ### Fixed
-- Fixed portrait generation errors by omitting unsupported parameters for DALL·E-2 and conditionally applying model-specific options
-- Corrected the randomize button behavior to ensure the character description updates reliably alongside the selected genre
-- Improved text contrast and accessibility in light mode across multiple components, including form labels, documentation content, and example text
+- Portrait generation errors when using unsupported parameters for DALL·E-2
+- Randomize button behavior to ensure character description updates with selected genre
+- Text contrast and accessibility in light mode across multiple components
 
 ## [0.2.1] - 2025-04-29
 
 ### Added
-- Delayed feedback message system:
-  - Displays after 3 seconds of character generation to manage user expectations
-- Model selector for text generation:
-  - Supports `gpt-4o-mini`, `gpt-4.1-mini`, and `gpt-4o` with usage tiers and monthly limits
-- Image model selector for portraits:
-  - Supports `dall-e-2`, `dall-e-3`, and `gpt-image-1` with matching tier system
-- Visual model selection UI:
-  - Tiered design with emoji indicators (🟢🟡🔴), model names, and descriptions
-- Per-model usage limits:
-  - Tracked in localStorage, with automatic resets per month
-  - Unlimited usage for the cheapest tier
-- Development bypass for all usage limits for testing purposes
-- Implemented complete dark mode toggle system:
-  - Created ThemeContext for managing light, dark, and system themes
-  - Added a ThemeToggle button for switching themes
-  - Integrated theme switching with Tailwind CSS using the .dark class
-  - Persisted user theme preference with localStorage
-  - Applied smooth theme transitions across the app
+- Delayed feedback message system that displays after 3 seconds of character generation
+- Model selector for text generation with tiered options:
+  - Supports `gpt-4o-mini`, `gpt-4.1-mini`, and `gpt-4o` 
+  - Includes usage tiers and monthly limits
+- Image model selector for portraits with tiered options:
+  - Supports `dall-e-2`, `dall-e-3`, and `gpt-image-1`
+  - Matches tier system of text models
+- Visual model selection UI with emoji indicators (🟢🟡🔴), model names, and descriptions
+- Per-model usage limits tracked in localStorage with automatic monthly resets
+- Unlimited usage option for the cheapest tier models
+- Development bypass for all usage limits to facilitate testing
+- Complete dark mode toggle system with:
+  - ThemeContext for state management across the app
+  - ThemeToggle button for switching between themes
+  - Tailwind CSS integration using the .dark class
+  - Theme preference persistence via localStorage
+  - Smooth transitions between theme states
 
 ### Changed
 - Refactored context and form components to support model selection
 - Simplified tier display while retaining full model name transparency
 - Updated usage-limit utilities for both image and text models
-- Standardized documentation styling across all pages:
-  - Consistent header formatting and section structure
-  - Unified card layouts, colors, and spacing
-  - Standardized text colors, link styles, and content formatting
-  - Added consistent "Related Documentation" sections
-  - Fixed responsive layout issues on mobile devices
+- Standardized documentation styling with consistent headers, layouts, and formatting
 - Corrected Next.js version reference from 15 to 14 throughout documentation
 - Fixed date inconsistencies in release information
-- Updated ClientLayout to include ThemeProvider and reposition toggle button
-- Updated RootLayout to handle dynamic theme colors and suppress hydration warnings
-- Enhanced globals.css for dark mode transitions and theme-aware UI components
-- Usage limit display and notification components now compare the user's selected text and image models
-- Displays whichever selected model has fewer remaining generations (e.g., "7 Portrait Premium generations remaining")
+- Updated layouts to support theme context and toggle button placement
+- Enhanced globals.css for better theme transition support
+- Improved usage limit display to show the most constrained selected model
 
 ## [0.2.0] - 2025-04-22
 
 ### Added
 - Fully integrated documentation system with sidebar and breadcrumb navigation
-- New documentation pages in the app:
-  - `/docs/how-to-use` – usage walkthrough for new users
-  - `/docs/character-examples` – downloadable JSON examples
-  - `/docs/generation-options` – full overview of generation settings
-  - `/docs/features` – all major and optional features explained
-  - `/docs/faq` – frequently asked questions
-  - `/docs/dev-setup` – instructions for local setup
-  - `/docs/architecture` – system and component structure
-  - `/docs/api` – endpoint descriptions and formats
-  - `/docs/security` – data handling and localStorage notes
-  - `/docs/contributing` – style and structure guidelines
-  - `/docs/testing` – setup and test structure
-  - `/docs/deployment` – build and deploy to Vercel
-  - `/docs/roadmap` – upcoming milestones
-  - `/docs/changelog` – version history
-  - `/docs/credits` – acknowledgments
-  - `/docs/license` – license details
-- Corresponding GitHub Markdown files added:
-  - `how-to-use.md`, `features.md`, `character-examples.md`, `api.md`, `architecture.md`, `security.md`, `contributing.md`, `testing.md`, `deployment.md`, `roadmap.md`, `changelog.md`, `credits.md`, `license.md`
-- Navigation enhancements:
-  - Collapsible sidebar with auto-expanding sections
-  - Breadcrumb navigation (`DocsNavigation`) synced with route
-  - Mobile toggle with backdrop
-  - Sticky, scrollable layout with bottom collapse button on desktop
-- Success message added after character generation (auto-dismisses after 3 seconds)
+- New documentation pages covering all aspects of the application:
+  - Usage guides, character examples, and generation options
+  - Features overview, FAQs, and developer setup instructions
+  - Architecture documentation, API references, and security notes
+  - Contributing guidelines, testing procedures, and deployment instructions
+  - Roadmap, changelog, credits, and license information
+- Corresponding GitHub Markdown files for all documentation pages
+- Enhanced navigation features including collapsible sidebar and breadcrumb trails
+- Success message that appears after character generation (auto-dismisses after 3 seconds)
 
 ### Changed
 - Character tab interface now auto-resets to the "Profile" tab after generation
-- Refactored `/docs` folder for separation between page and markdown content
-- Consolidated and renamed image and asset folders under the documentation system
-- Redesigned homepage header: replaced static title text with layered hero layout
-- Added full-width character collage image (fanned-cards.png) with responsive styling
-- Adjusted header height and layout for better visual balance
-- Improved title text with larger typography, custom drop shadow, and enhanced positioning
-- Applied custom fade-in-up-slow animation for smoother entry effect
+- Refactored documentation folder structure and file organization
+- Consolidated image assets for better organization
+- Redesigned homepage header with layered hero layout and collage image
+- Improved typography and animations throughout the interface
 
 ### Fixed
-- Welcome guide toggle now functions reliably in dev and production environments
-- `useEffect` behavior in `CharacterDisplay` now correctly resets and displays new characters
+- Welcome guide toggle now functions reliably in all environments
+- Character display now correctly resets and updates with new character data
 
 ## [0.1.4] - 2025-04-21
 
@@ -334,5 +315,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Export to JSON feature
 - Fully responsive UI for desktop and mobile
 
-[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.3.2...v0.3.3
+[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.3.4...HEAD
+[0.3.4]: https://github.com/EthanPerello/npc-forge/compare/v0.3.3...v0.3.4
+[0.3.3]: https://github.com/EthanPerello/npc-forge/compare/v0.3.2...v0.3.3
+[0.3.2]: https://github.com/EthanPerello/npc-forge/compare/v0.3.1...v0.3.2
+[0.3.1]: https://github.com/EthanPerello/npc-forge/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/EthanPerello/npc-forge/compare/v0.2.3...v0.3.0
+[0.2.3]: https://github.com/EthanPerello/npc-forge/compare/v0.2.2...v0.2.3
+[0.2.2]: https://github.com/EthanPerello/npc-forge/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/EthanPerello/npc-forge/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/EthanPerello/npc-forge/compare/v0.1.4...v0.2.0
+[0.1.4]: https://github.com/EthanPerello/npc-forge/compare/v0.1.3...v0.1.4
+[0.1.3]: https://github.com/EthanPerello/npc-forge/compare/v0.1.2...v0.1.3
+[0.1.2]: https://github.com/EthanPerello/npc-forge/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/EthanPerello/npc-forge/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/EthanPerello/npc-forge/releases/tag/v0.1.0
