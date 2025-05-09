@@ -25,6 +25,11 @@ function formatDate(date: Date): string {
   return `${month} ${day}, ${year}`;
 }
 
+// Format date as YYYY-MM-DD for changelog
+function formatISODate(date: Date): string {
+  return date.toISOString().split('T')[0]; // YYYY-MM-DD
+}
+
 // Helper to extract unreleased changes from changelog
 function extractUnreleasedChanges(): { changes: string, categories: { [key: string]: string[] } } {
   const changelog = fs.readFileSync('CHANGELOG.md', 'utf-8');
@@ -41,18 +46,55 @@ function extractUnreleasedChanges(): { changes: string, categories: { [key: stri
   const lines = content.split('\n');
   const categories: { [key: string]: string[] } = {};
   let currentCategory = 'Uncategorized';
+  let currentLine = '';
+  let indentLevel = 0;
   
   for (const line of lines) {
+    // Check if it's a category header
     const categoryMatch = line.match(/^###\s+(.*)/);
     if (categoryMatch) {
       currentCategory = categoryMatch[1];
-      categories[currentCategory] = [];
-    } else if (line.startsWith('- ')) {
       if (!categories[currentCategory]) {
         categories[currentCategory] = [];
       }
-      categories[currentCategory].push(line);
+      continue;
     }
+    
+    // Handle list items
+    if (line.match(/^-\s+/)) {
+      // This is a top-level list item
+      if (currentLine) {
+        // If we have a pending line, save it first
+        categories[currentCategory].push(currentLine);
+      }
+      currentLine = line;
+      indentLevel = 0;
+    } else if (line.match(/^\s+-\s+/)) {
+      // This is a nested list item
+      // If it's a new indent level, add the parent line first
+      if (indentLevel === 0 && currentLine) {
+        categories[currentCategory].push(currentLine);
+        currentLine = '';
+      }
+      // Add this nested item with proper indentation preserved
+      categories[currentCategory].push(line);
+      indentLevel = line.match(/^\s+/)?.[0].length || 2;
+    } else if (line.trim() === '') {
+      // Empty line - if we have a pending line, save it
+      if (currentLine) {
+        categories[currentCategory].push(currentLine);
+        currentLine = '';
+      }
+      indentLevel = 0;
+    } else if (indentLevel > 0 || currentLine) {
+      // Line is part of a previous list item, merge them
+      currentLine += '\n' + line;
+    }
+  }
+  
+  // Add any pending line
+  if (currentLine) {
+    categories[currentCategory].push(currentLine);
   }
   
   return { changes: content, categories };
@@ -91,7 +133,7 @@ function updatePackageLockJson(version: string): void {
 }
 
 // Update changelog by moving unreleased changes to a new version
-function updateChangelog(version: string, date: string): void {
+function updateChangelog(version: string, dateStr: string): void {
   let changelog = fs.readFileSync('CHANGELOG.md', 'utf-8');
 
   const unreleasedMatch = changelog.match(/## \[Unreleased\]\s*\n([\s\S]*?)(?=\n## \[\d|$)/);
@@ -101,7 +143,7 @@ function updateChangelog(version: string, date: string): void {
   }
 
   const unreleasedContent = unreleasedMatch[1].trim();
-  const newVersionHeader = `## [${version}] - ${date}`;
+  const newVersionHeader = `## [${version}] - ${dateStr}`;
   const versionBlock = `${newVersionHeader}\n\n${unreleasedContent}\n`;
 
   changelog = changelog.replace(
@@ -109,48 +151,107 @@ function updateChangelog(version: string, date: string): void {
     `## [Unreleased]\n\n${versionBlock}`
   );
 
-  const linkBlockMatch = changelog.match(/\[Unreleased\]: .*?\n(?:\[\d+\.\d+\.\d+\]: .*?\n)+/);
-  if (linkBlockMatch) {
-    const versionRegex = /\[(\d+\.\d+\.\d+)\]:/g;
-    let lastVersion = '0.0.0';
-    let versionMatch;
-    while ((versionMatch = versionRegex.exec(linkBlockMatch[0])) !== null) {
-      lastVersion = versionMatch[1];
+  // Update the comparison links at the bottom of the file
+  const latestVersion = version;
+  const compareUrl = (v1: string, v2: string) => 
+    `[${v1}]: https://github.com/EthanPerello/npc-forge/compare/v${v2}...v${latestVersion}`;
+  
+  // Find the previous version to create proper comparison links
+  const versionRegex = /## \[(\d+\.\d+\.\d+)\]/g;
+  let versions: string[] = [];
+  let match;
+  
+  while ((match = versionRegex.exec(changelog)) !== null) {
+    if (match[1] !== version) {
+      versions.push(match[1]);
     }
-    const newLinks = `[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v${lastVersion}...v${version}\n`;
-    changelog = changelog.replace(linkBlockMatch[0], newLinks);
   }
+  
+  // Sort versions in descending order
+  versions.sort((a, b) => {
+    const aParts = a.split('.').map(Number);
+    const bParts = b.split('.').map(Number);
+    
+    for (let i = 0; i < 3; i++) {
+      if (aParts[i] !== bParts[i]) {
+        return bParts[i] - aParts[i];
+      }
+    }
+    
+    return 0;
+  });
+  
+  const previousVersion = versions[0] || '0.0.0';
+  
+  // Update the link section at the bottom
+  const linkSection = `[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v${latestVersion}...HEAD\n${compareUrl(latestVersion, previousVersion)}`;
+  
+  // Replace the first link line (unreleased)
+  changelog = changelog.replace(
+    /\[Unreleased\]: .*$/m,
+    linkSection
+  );
 
   fs.writeFileSync('CHANGELOG.md', changelog);
-  console.log(`✅ CHANGELOG.md updated with version ${version}`);
+  console.log(`✅ CHANGELOG.md updated with version ${version} and date ${dateStr}`);
 }
 
 async function run() {
   const version = await prompt('Enter the new version (e.g., 1.2.3): ');
   const title = await prompt('Enter the release title: ');
   const summary = await prompt('Enter a short summary of this release: ');
-  const dayInput = await prompt('Enter release day of this month (1–31, leave blank for today): ');
+  
+  // More detailed date input
+  const dayInput = await prompt('Enter release day (1–31, leave blank for today): ');
+  const monthInput = await prompt('Enter release month (1-12, leave blank for current month): ');
+  const yearInput = await prompt('Enter release year (YYYY, leave blank for current year): ');
 
   const today = new Date();
-  const defaultDay = today.getDate();
-  const releaseDay = dayInput ? parseInt(dayInput, 10) : defaultDay;
   const releaseDate = new Date(today);
 
-  if (!isNaN(releaseDay) && releaseDay >= 1 && releaseDay <= 31) {
-    releaseDate.setDate(releaseDay);
-  } else {
-    console.warn(`⚠️ Using current day (${defaultDay}) for the release date.`);
+  // Set year if provided
+  if (yearInput && !isNaN(parseInt(yearInput))) {
+    releaseDate.setFullYear(parseInt(yearInput));
+  }
+  
+  // Set month if provided (0-based index in JS Date)
+  if (monthInput && !isNaN(parseInt(monthInput))) {
+    const month = parseInt(monthInput) - 1; // Convert to 0-indexed
+    if (month >= 0 && month < 12) {
+      releaseDate.setMonth(month);
+    } else {
+      console.warn('⚠️ Invalid month, using current month.');
+    }
+  }
+  
+  // Set day if provided
+  if (dayInput && !isNaN(parseInt(dayInput))) {
+    const day = parseInt(dayInput);
+    // Check if the day is valid for the selected month
+    const maxDaysInMonth = new Date(
+      releaseDate.getFullYear(), 
+      releaseDate.getMonth() + 1, 
+      0
+    ).getDate();
+    
+    if (day >= 1 && day <= maxDaysInMonth) {
+      releaseDate.setDate(day);
+    } else {
+      console.warn(`⚠️ Invalid day for selected month (max: ${maxDaysInMonth}), using current day.`);
+    }
   }
 
   const tag = `v${version}`;
   const formattedDate = formatDate(releaseDate);
-  const isoDate = releaseDate.toISOString().split('T')[0];
+  const isoDate = formatISODate(releaseDate);
   const releaseNotePath = `release-notes/${tag}.md`;
+
+  console.log(`📅 Using release date: ${formattedDate} (${isoDate} in changelog)`);
 
   const { categories } = extractUnreleasedChanges();
 
   let releaseNoteContent = `# NPC Forge ${tag} – ${title}\n\n**Release Date:** ${formattedDate}\n\n${summary}\n\n`;
-  const standardCategories = ["Added", "Changed", "Fixed"];
+  const standardCategories = ["Added", "Changed", "Fixed", "Removed", "Security"];
 
   for (const category of standardCategories) {
     if (categories[category] && categories[category].length > 0) {
@@ -160,9 +261,14 @@ async function run() {
     }
   }
 
-  const otherCategories = Object.keys(categories).filter(cat => !standardCategories.includes(cat));
+  const otherCategories = Object.keys(categories).filter(cat => !standardCategories.includes(cat) && cat !== 'Uncategorized');
   for (const category of otherCategories) {
     releaseNoteContent += `## ${category}\n${categories[category].join('\n')}\n\n`;
+  }
+
+  // Add any uncategorized items at the end
+  if (categories['Uncategorized'] && categories['Uncategorized'].length > 0) {
+    releaseNoteContent += `## Other\n${categories['Uncategorized'].join('\n')}\n\n`;
   }
 
   releaseNoteContent = releaseNoteContent.trim();
@@ -171,7 +277,7 @@ async function run() {
   console.log('📝 RELEASE NOTE CONTENT:\n');
   console.log(releaseNoteContent + '\nPlease verify this content appears correctly and includes all sections.\n');
 
-  // Update CHANGELOG, package files
+  // Update CHANGELOG, package files - now using the ISO date format for changelog
   updateChangelog(version, isoDate);
   updatePackageJson(version);
   updatePackageLockJson(version);
