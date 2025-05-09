@@ -28,15 +28,15 @@ interface CharacterContextType {
   resetFormData: () => void;
   generateCharacter: () => Promise<void>;
   downloadCharacterJSON: () => void;
-  saveToLibrary: () => Promise<boolean>;
+  saveToLibrary: (customCharacter?: Character) => Promise<boolean>;
 }
 
 // Default form values using undefined instead of empty strings for enum types
 const defaultFormData: CharacterFormData = {
   description: '',
-  include_quests: false,  // Changed to false as requested
-  include_dialogue: false,  // Changed to false as requested
-  include_items: false,  // Changed to false as requested
+  include_quests: false,
+  include_dialogue: false,
+  include_items: false,
   genre: undefined,
   sub_genre: undefined,
   gender: undefined,
@@ -81,20 +81,32 @@ const defaultFormData: CharacterFormData = {
 // Create the context
 const CharacterContext = createContext<CharacterContextType | undefined>(undefined);
 
-// Context provider component - Export this!
+// Context provider component
 export function CharacterProvider({ children }: { children: ReactNode }) {
   const [character, setCharacter] = useState<Character | null>(null);
   const [formData, setFormData] = useState<CharacterFormData>(defaultFormData);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Update form data
+  // Update form data - fixed to prevent infinite loop
   const updateFormData = useCallback((data: Partial<CharacterFormData>) => {
     setFormData(prev => {
       // Create a new state object
-      const newState = { ...prev, ...data };
+      const newState = { ...prev };
       
-      // Handle nested objects specially to preserve existing values
+      // Directly assign top-level properties
+      Object.keys(data).forEach(key => {
+        if (key !== 'advanced_options' && 
+            key !== 'quest_options' && 
+            key !== 'dialogue_options' && 
+            key !== 'item_options' && 
+            key !== 'portrait_options') {
+          // @ts-ignore
+          newState[key] = data[key];
+        }
+      });
+      
+      // Handle nested objects without creating object literals in the handler
       if (data.advanced_options) {
         newState.advanced_options = {
           ...prev.advanced_options,
@@ -197,14 +209,21 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     downloadJson(character, `${character.name.replace(/\s+/g, '_').toLowerCase()}.json`);
   }, [character]);
   
-  // Save to library - updated to handle IndexedDB
-  const saveToLibrary = useCallback(async () => {
-    if (!character) return false;
+  // Save to library - updated to handle custom character and ensure it returns a boolean
+  const saveToLibrary = useCallback(async (customCharacter?: Character): Promise<boolean> => {
+    // Use the provided character if available, otherwise use state
+    const characterToSave = customCharacter || character;
+    
+    if (!characterToSave) {
+      console.error('No character to save');
+      return false;
+    }
     
     try {
-      // Save character with form data to IndexedDB
-      await saveCharacter(character, formData);
-      return true;
+      // Save character with form data to IndexedDB - ensure boolean return
+      const result = await saveCharacter(characterToSave, formData);
+      // Simply check if the result is truthy, avoiding explicit type comparison
+      return !!result;
     } catch (error) {
       console.error('Error saving character to library:', error);
       return false;
@@ -241,7 +260,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Custom hook to use the character context - Export this!
+// Custom hook to use the character context
 export function useCharacter() {
   const context = useContext(CharacterContext);
   if (context === undefined) {

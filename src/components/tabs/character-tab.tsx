@@ -423,8 +423,7 @@ export default function CharacterTab() {
     let updatedTraits;
     if (currentTraits.includes(trait)) {
       // Remove the trait if already selected
-      updatedTraits = currentTraits.filter(t => t !== trait);
-    } else {
+      updatedTraits = currentTraits.filter((t: string) => t !== trait);    } else {
       // Add the trait - no limit imposed
       updatedTraits = [...currentTraits, trait];
     }

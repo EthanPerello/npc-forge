@@ -42,18 +42,20 @@ export default function ImageModelSelector({ value, onChange }: ImageModelSelect
                 : 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600'}
             `}
           >
-            <div className="flex justify-between items-center mb-1">
-              <h3 className="font-medium">
-                {config.emoji} {config.label}
-              </h3>
-              {/* Fixed badge positioning across all cards */}
+            <div className="flex flex-wrap items-center justify-between mb-1 gap-2">
               <div className="flex items-center">
+                <span className="mr-2 flex-shrink-0">{config.emoji}</span>
+                <h3 className="font-medium">{config.label}</h3>
+              </div>
+              
+              {/* Completely restructured badge styling with flex-end alignment */}
+              <div className="flex-shrink-0">
                 {selectedModel === config.id ? (
-                  <span className="model-badge-selected text-xs px-2 py-1 rounded-full font-medium bg-blue-700 text-white">
+                  <span className="text-xs px-2 py-1 rounded-full font-medium bg-indigo-600 text-white inline-flex items-center whitespace-nowrap">
                     {remaining[config.id] === "Unlimited" ? "∞" : `${remaining[config.id]}`} left
                   </span>
                 ) : (
-                  <span className="model-badge-unselected text-xs px-2 py-1 rounded-full font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                  <span className="text-xs px-2 py-1 rounded-full font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 inline-flex items-center whitespace-nowrap">
                     {remaining[config.id] === "Unlimited" ? "∞" : `${remaining[config.id]}`} left
                   </span>
                 )}

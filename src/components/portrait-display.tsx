@@ -123,7 +123,7 @@ export default function PortraitDisplay({
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center portrait-container">
       {/* Portrait Container */}
       <div 
         className={`relative ${getSizeClasses()} ${className} rounded-lg overflow-hidden transition-all duration-300 group mb-4`}
