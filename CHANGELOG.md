@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.5] - 2025-05-09
+
 ### Added
 - Character regeneration capabilities in the edit page:
   - Ability to regenerate individual character attributes (name, appearance, personality, backstory)
@@ -334,7 +336,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Export to JSON feature
 - Fully responsive UI for desktop and mobile
 
-[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.3.4...HEAD
+[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.3.5...HEAD
+[0.3.5]: https://github.com/EthanPerello/npc-forge/compare/v0.3.4...v0.3.5
 [0.3.4]: https://github.com/EthanPerello/npc-forge/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/EthanPerello/npc-forge/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/EthanPerello/npc-forge/compare/v0.3.1...v0.3.2
