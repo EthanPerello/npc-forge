@@ -136,12 +136,24 @@ export async function getStoredCharacters(): Promise<StoredCharacter[]> {
 }
 
 /**
- * Save an image to IndexedDB
+ * Save an image to IndexedDB with better error handling and logging
  * @param characterId - ID of the character the image belongs to
  * @param imageData - Base64 string of the image data
  * @returns Promise that resolves when the image is saved
  */
 export async function saveImage(characterId: string, imageData: string): Promise<void> {
+  if (!characterId) {
+    console.error("Cannot save image: Missing character ID");
+    throw new Error("Character ID is required to save image");
+  }
+  
+  if (!imageData) {
+    console.error("Cannot save image: Missing image data");
+    throw new Error("Image data is required");
+  }
+  
+  console.log(`Saving image for character ${characterId} (data length: ${imageData.length})`);
+  
   try {
     const db = await initDB();
     
@@ -162,7 +174,7 @@ export async function saveImage(characterId: string, imageData: string): Promise
         const request = store.put(imageData, characterId);
         
         request.onsuccess = () => {
-          console.log(`Image for character ${characterId} saved to IndexedDB`);
+          console.log(`Image for character ${characterId} saved to IndexedDB successfully`);
           resolve();
         };
         

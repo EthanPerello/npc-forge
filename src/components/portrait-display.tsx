@@ -38,6 +38,10 @@ export default function PortraitDisplay({
   const [loaded, setLoaded] = useState<boolean>(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [isZoomed, setIsZoomed] = useState<boolean>(false);
+  
+  // Create a unique key that changes when image sources change
+  // This forces the image to reload when sources change
+  const imageKey = `${characterId || ''}-${imageData ? imageData.substring(0, 30) : ''}-${imageUrl || ''}`;
 
   // Load image from various sources, with IndexedDB as a priority
   useEffect(() => {
@@ -71,7 +75,10 @@ export default function PortraitDisplay({
     };
 
     loadImage();
-  }, [imageUrl, imageData, characterId, isLoading]);
+    
+    // Add a log to track when this effect runs
+    console.log(`PortraitDisplay effect running with key: ${imageKey}`);
+  }, [imageUrl, imageData, characterId, imageKey]); 
 
   const handleImageError = () => {
     console.error('Image failed to load');
@@ -193,6 +200,7 @@ export default function PortraitDisplay({
             {/* Image container with object-fit to ensure the entire image is visible */}
             <div className="relative w-full h-full">
               <img 
+                key={imageKey} // Add key to force re-render on image change
                 src={imageSrc} 
                 alt={`Portrait of ${name}`}
                 className={`
@@ -245,11 +253,16 @@ export default function PortraitDisplay({
               variant="secondary"
               onClick={handleRegenerate}
               size="sm"
-              leftIcon={<RefreshCw className="h-4 w-4" />}
+              leftIcon={isLoading ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600 dark:border-indigo-700 dark:border-t-indigo-300"></div>
+              ) : (
+                <RefreshCw className="h-4 w-4" />
+              )}
               className="shadow-sm"
               type="button"
+              disabled={isLoading}
             >
-              Regenerate
+              {isLoading ? "Regenerating..." : "Regenerate"}
             </Button>
           )}
           
@@ -261,6 +274,7 @@ export default function PortraitDisplay({
               leftIcon={<Upload className="h-4 w-4" />}
               className="shadow-sm"
               type="button"
+              disabled={isLoading}
             >
               Upload
             </Button>

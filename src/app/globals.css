@@ -927,7 +927,7 @@ body:has(.fixed.inset-0.bg-black.bg-opacity-50.flex.items-center.justify-center.
 
 /* FIX: Ensure modal doesn't have extra spacing at bottom */
 .fixed.inset-0.bg-black.bg-opacity-50.flex.items-center.justify-center .bg-card {
-  padding-bottom: 0 !important;
+  padding-bottom: 1rem !important;
   margin-bottom: 0 !important;
 }
 

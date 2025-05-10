@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { getCharacterById, updateCharacter, deleteCharacter, loadCharacterWithImage } from '@/lib/character-storage';
+import { getCharacterById, updateCharacter, deleteCharacter, loadCharacterWithImage, saveImage } from '@/lib/character-storage';
 import { Character, Quest, OpenAIModel, ImageModel } from '@/lib/types';
 import Button from '@/components/ui/button';
 import Select from '@/components/ui/select';
@@ -13,6 +13,9 @@ import ModelSelector from '@/components/model-selector';
 import ImageModelSelector from '@/components/image-model-selector';
 import { DEFAULT_MODEL } from '@/lib/models';
 import { DEFAULT_IMAGE_MODEL } from '@/lib/image-models';
+
+// Import components from the edit-page directory
+import { FeedbackMessage, RegenerateButton, FormSection } from '@/components/edit-page/shared';
 
 // Import the same options used in the CharacterTab
 import { GENRE_TEMPLATES, getSubGenres } from '@/lib/templates';
@@ -127,34 +130,46 @@ export default function CharacterEditorPage() {
   const router = useRouter();
   const characterId = params.id as string;
   
+  // Character state
   const [character, setCharacter] = useState<Character | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // UI state
   const [currentGenre, setCurrentGenre] = useState<string>('');
   const [subGenres, setSubGenres] = useState<{value: string, label: string}[]>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showImageUpload, setShowImageUpload] = useState(false);
+  
+  // Regeneration state
   const [isRegeneratingPortrait, setIsRegeneratingPortrait] = useState(false);
+  const [fieldLoadingStates, setFieldLoadingStates] = useState<Record<string, boolean>>({});
+  const [feedbackMessage, setFeedbackMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
+  
+  // Model selections
   const [selectedTextModel, setSelectedTextModel] = useState<OpenAIModel>(DEFAULT_MODEL);
   const [selectedImageModel, setSelectedImageModel] = useState<ImageModel>(DEFAULT_IMAGE_MODEL);
   
-  // Load character data - updated to use loadCharacterWithImage
+  // Load character data
   useEffect(() => {
     if (!characterId) return;
     
     async function loadCharacter() {
       setIsLoading(true);
       try {
+        console.log(`Loading character with ID: ${characterId}`);
         // Load the character with image from IndexedDB
         const storedCharacter = await getCharacterById(characterId);
         
         if (storedCharacter) {
+          console.log(`Character found: ${storedCharacter.character.name}`);
           // Load the full character with image data
           const fullCharacter = await loadCharacterWithImage(characterId);
           
           if (fullCharacter) {
+            console.log("Loaded character with image data");
             setCharacter(fullCharacter);
             
             // Set current genre for subgenres
@@ -174,12 +189,12 @@ export default function CharacterEditorPage() {
             }
           } else {
             // Fallback to the stored character without image if needed
+            console.log("Using stored character without image data");
             setCharacter(storedCharacter.character);
             
             // Set current genre for subgenres
             if (storedCharacter.character.selected_traits.genre) {
               setCurrentGenre(storedCharacter.character.selected_traits.genre);
-              // Load sub-genres for the current genre
               const genreSubGenres = getSubGenres(storedCharacter.character.selected_traits.genre);
               setSubGenres([
                 { value: '', label: 'Not specified' },
@@ -198,6 +213,7 @@ export default function CharacterEditorPage() {
             }
           }
         } else {
+          console.error(`Character not found with ID: ${characterId}`);
           setError('Character not found');
         }
       } catch (err) {
@@ -256,7 +272,7 @@ export default function CharacterEditorPage() {
     setShowDeleteConfirm(false);
   };
   
-  // Handle form submission - updated to async to handle Promise and include model info
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -285,11 +301,21 @@ export default function CharacterEditorPage() {
         include_items: true,
       };
       
-      // Update to await the Promise returned by updateCharacter
+      console.log("Saving character updates...");
       const success = await updateCharacter(characterId, updatedCharacter, formData);
       
       if (success) {
-        navigateToLibrary();
+        console.log("Character saved successfully");
+        setFeedbackMessage({
+          type: 'success',
+          text: 'Changes saved successfully!'
+        });
+        
+        // Clear message after 3 seconds and navigate
+        setTimeout(() => {
+          setFeedbackMessage(null);
+          navigateToLibrary();
+        }, 1500);
       } else {
         setError('Failed to update character');
       }
@@ -319,45 +345,265 @@ export default function CharacterEditorPage() {
       [field]: value
     });
   };
-  
-  // Handle portrait regeneration
-  const handleRegeneratePortrait = (e: React.MouseEvent) => {
+
+ // Handle portrait regeneration with better error handling and logging
+  const handleRegeneratePortrait = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
-    setIsRegeneratingPortrait(true);
-    
-    // In a real implementation, this would call the API with the selectedImageModel
-    setTimeout(() => {
-      setIsRegeneratingPortrait(false);
-      alert(`Portrait regeneration will use the ${selectedImageModel} model in a future update.`);
-    }, 1500);
-  };
-  
-  // Handle toggle for image upload
-  const handleToggleImageUpload = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setShowImageUpload(!showImageUpload);
-  };
-  
-  // Handle image change from upload component
-  const handleImageChange = (imageData: string | null) => {
-    if (!character) return;
-    
-    if (imageData) {
-      setCharacter({
-        ...character,
-        image_data: imageData
+    if (!character) {
+      console.error("Missing character data for portrait regeneration");
+      setFeedbackMessage({
+        type: 'error',
+        text: 'Cannot regenerate portrait: Missing character data'
       });
-    } else {
-      // If image is removed, make a copy of character without image_data
-      const { image_data, ...rest } = character;
-      setCharacter(rest as Character);
+      return;
     }
     
-    // Close image upload after change
-    setShowImageUpload(false);
+    console.log(`Regenerating portrait for character: ${character.name}`);
+    setIsRegeneratingPortrait(true);
+    
+    try {
+      const response = await fetch('/api/regenerate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          character: character, // Send the full character object instead of just the ID
+          field: 'portrait',
+          portraitOptions: {
+            ...character.portrait_options,
+            image_model: selectedImageModel
+          }
+        }),
+      });
+
+      console.log(`Portrait API response status: ${response.status}`);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Portrait API error response:", errorData);
+        throw new Error(errorData.error || `Failed to regenerate portrait (${response.status})`);
+      }
+
+      const data = await response.json();
+      console.log(`Portrait regeneration success: ${data.success}`);
+      
+      if (data.success && data.imageData) {
+        console.log("Received new portrait data, length:", data.imageData.length);
+        
+        // Store the image data in IndexedDB immediately
+        try {
+          // Import needed functions directly
+          const { saveImage } = await import('@/lib/character-storage');
+          
+          // Save image to IndexedDB right away
+          await saveImage(characterId, data.imageData);
+          console.log("Portrait saved to IndexedDB successfully");
+        } catch (dbError) {
+          console.error("Failed to save portrait to IndexedDB:", dbError);
+          // Continue even if IndexedDB save fails - we'll still update the state
+        }
+        
+        // Update the state with the new image data in an immutable way
+        setCharacter((prevChar) => {
+          if (!prevChar) return null;
+          
+          // Create a new character object with the same properties
+          const updatedChar: Character = {
+            ...prevChar,
+            // Add the image data
+            image_data: data.imageData
+          };
+          
+          // Force a state refresh with setTimeout
+          setTimeout(() => {
+            console.log("Forcing portrait display refresh");
+            const portraitElement = document.querySelector('.portrait-container img');
+            if (portraitElement) {
+              // Force the image to reload
+              (portraitElement as HTMLImageElement).src = data.imageData;
+              // Also update the key to force a React re-render
+              if (portraitElement.hasAttribute('key')) {
+                const newKey = `portrait-${Date.now()}`;
+                portraitElement.setAttribute('key', newKey);
+              }
+            }
+          }, 100);
+          
+          return updatedChar;
+        });
+        
+        // Show success message
+        setFeedbackMessage({
+          type: 'success',
+          text: 'Successfully regenerated portrait'
+        });
+        
+        // Clear success message after a delay
+        setTimeout(() => {
+          setFeedbackMessage(null);
+        }, 3000);
+      } else {
+        console.error("API returned invalid portrait data", data);
+        throw new Error(data.error || 'Portrait regeneration failed');
+      }
+    } catch (err) {
+      console.error('Error regenerating portrait:', err);
+      
+      // Show error message
+      setFeedbackMessage({
+        type: 'error',
+        text: err instanceof Error ? err.message : 'Failed to regenerate portrait'
+      });
+      
+      // Clear error message after a delay
+      setTimeout(() => {
+        setFeedbackMessage(null);
+      }, 5000);
+    } finally {
+      setIsRegeneratingPortrait(false);
+    }
+  };
+
+  const handleRegenerateField = async (field: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!character) {
+      console.error("Missing character data");
+      setFeedbackMessage({
+        type: 'error',
+        text: 'Cannot regenerate: Missing character data'
+      });
+      return;
+    }
+    
+    console.log(`Regenerating ${field} for character: ${character.name}`);
+    
+    // Set loading state for this specific field
+    setFieldLoadingStates(prev => ({ ...prev, [field]: true }));
+    
+    try {
+      const response = await fetch('/api/regenerate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          character: character, // Send the full character object instead of just the ID
+          field,
+          model: selectedTextModel,
+        }),
+      });
+
+      // Log response status for debugging
+      console.log(`API response status: ${response.status}`);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("API error response:", errorData);
+        throw new Error(errorData.error || `Failed to regenerate field (${response.status})`);
+      }
+
+      const data = await response.json();
+      console.log(`Regeneration response:`, data);
+      
+      if (data.success) {
+        // Handle different field types
+        if (field === 'name' || field === 'appearance' || field === 'personality' || field === 'backstory_hook') {
+          // Basic fields
+          setCharacter({
+            ...character,
+            [field]: data.regeneratedContent
+          });
+        } else if (field.startsWith('quest_') && field.includes('_')) {
+          // Quest parts
+          const parts = field.split('_');
+          const questIndex = parseInt(parts[1], 10);
+          const questPart = parts[2] || 'whole';
+          
+          if (!isNaN(questIndex) && character.quests && questIndex < character.quests.length) {
+            const updatedQuests = [...character.quests];
+            
+            if (questPart === 'whole') {
+              // Replace the entire quest
+              updatedQuests[questIndex] = data.regeneratedContent;
+            } else if (questPart === 'title' || questPart === 'description' || questPart === 'reward') {
+              // Update just one part of the quest
+              updatedQuests[questIndex] = {
+                ...updatedQuests[questIndex],
+                [questPart]: data.regeneratedContent
+              };
+            }
+            
+            setCharacter({
+              ...character,
+              quests: updatedQuests
+            });
+          }
+        } else if (field.startsWith('dialogue_')) {
+          // Dialogue lines
+          const parts = field.split('_');
+          const index = parseInt(parts[1], 10);
+          
+          if (!isNaN(index) && character.dialogue_lines && index < character.dialogue_lines.length) {
+            const updatedDialogue = [...character.dialogue_lines];
+            updatedDialogue[index] = data.regeneratedContent;
+            
+            setCharacter({
+              ...character,
+              dialogue_lines: updatedDialogue
+            });
+          }
+        } else if (field.startsWith('item_')) {
+          // Items
+          const parts = field.split('_');
+          const index = parseInt(parts[1], 10);
+          
+          if (!isNaN(index) && character.items && index < character.items.length) {
+            const updatedItems = [...character.items];
+            updatedItems[index] = data.regeneratedContent;
+            
+            setCharacter({
+              ...character,
+              items: updatedItems
+            });
+          }
+        }
+        
+        // Show success message
+        setFeedbackMessage({
+          type: 'success',
+          text: `Successfully regenerated ${formatFieldName(field)}`
+        });
+        
+        // Clear success message after a delay
+        setTimeout(() => {
+          setFeedbackMessage(null);
+        }, 3000);
+      } else {
+        console.error("API returned success: false", data);
+        throw new Error(data.error || 'Regeneration failed');
+      }
+    } catch (err) {
+      console.error(`Error regenerating ${field}:`, err);
+      
+      // Show error message
+      setFeedbackMessage({
+        type: 'error',
+        text: err instanceof Error ? err.message : 'Failed to regenerate content'
+      });
+      
+      // Clear error message after a delay
+      setTimeout(() => {
+        setFeedbackMessage(null);
+      }, 5000);
+    } finally {
+      // Clear loading state
+      setFieldLoadingStates(prev => ({ ...prev, [field]: false }));
+    }
   };
   
   // Handle array input changes
@@ -416,16 +662,40 @@ export default function CharacterEditorPage() {
     });
   };
   
-  // Function to regenerate field with AI (now uses selectedTextModel)
-  const handleRegenerateField = (field: string, e: React.MouseEvent) => {
+  // Handle portrait upload toggle
+  const handleToggleImageUpload = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    setShowImageUpload(!showImageUpload);
+  };
+  
+  // Handle image change from upload component
+  const handleImageChange = (imageData: string | null) => {
+    if (!character) return;
     
-    // This will be implemented with OpenAI integration later
-    alert(`Regenerating ${field} will use the ${selectedTextModel} model in a future update.`);
+    if (imageData) {
+      setCharacter({
+        ...character,
+        image_data: imageData
+      });
+      
+      // Also save to IndexedDB
+      try {
+        saveImage(characterId, imageData);
+      } catch (err) {
+        console.error("Failed to save uploaded image to IndexedDB:", err);
+      }
+    } else {
+      // If image is removed, make a copy of character without image_data
+      const { image_data, ...rest } = character;
+      setCharacter(rest as Character);
+    }
+    
+    // Close image upload after change
+    setShowImageUpload(false);
   };
 
-  // Add a new quest with explicit event handling
+  // Add a new quest
   const handleAddQuest = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -443,7 +713,7 @@ export default function CharacterEditorPage() {
     handleArrayInputChange('quests', updatedQuests);
   };
   
-  // Remove a quest with explicit event handling  
+  // Remove a quest
   const handleRemoveQuest = (index: number) => (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -521,10 +791,45 @@ export default function CharacterEditorPage() {
     }
   };
   
+  // Helper function to format field names for messages
+  const formatFieldName = (field: string): string => {
+    if (field === 'name' || field === 'appearance' || field === 'personality' || field === 'backstory_hook') {
+      return field.replace('_', ' ');
+    }
+    
+    if (field.startsWith('quest_') && field.includes('_')) {
+      const parts = field.split('_');
+      const questIndex = parseInt(parts[1], 10);
+      const questPart = parts[2] || 'whole';
+      
+      if (questPart === 'whole') {
+        return `quest #${questIndex + 1}`;
+      } else {
+        return `quest #${questIndex + 1} ${questPart}`;
+      }
+    }
+    
+    if (field.startsWith('dialogue_')) {
+      const parts = field.split('_');
+      const index = parseInt(parts[1], 10);
+      return `dialogue line #${index + 1}`;
+    }
+    
+    if (field.startsWith('item_')) {
+      const parts = field.split('_');
+      const index = parseInt(parts[1], 10);
+      return `item #${index + 1}`;
+    }
+    
+    return field;
+  };
+  
+  // Loading state
   if (isLoading) {
     return <div className="container mx-auto px-4 py-8 text-center">Loading character data...</div>;
   }
   
+  // Error state
   if (error && !character) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
@@ -549,6 +854,7 @@ export default function CharacterEditorPage() {
   
   return (
     <div className="container mx-auto px-4 py-8 pb-32">
+      {/* Header with back button and delete controls */}
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center">
           <Button
@@ -597,19 +903,19 @@ export default function CharacterEditorPage() {
         )}
       </div>
       
+      {/* Error message */}
       {error && (
         <div className="bg-red-50 p-4 rounded-md text-red-700 mb-6 dark:bg-red-900/20 dark:text-red-400">
           {error}
         </div>
       )}
       
+      {/* Feedback message */}
+      <FeedbackMessage message={feedbackMessage} />
+      
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Basic Information */}
-        <div className="bg-card p-6 rounded-lg border border-theme">
-          <h2 className="text-xl font-bold mb-4 flex items-center">
-            Basic Information
-          </h2>
-          
+        <FormSection title="Basic Information">
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">
               Name
@@ -621,14 +927,11 @@ export default function CharacterEditorPage() {
                 onChange={(e) => handleInputChange('name', e.target.value)}
                 className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
               />
-              <button
-                type="button"
+              <RegenerateButton
+                field="name"
                 onClick={(e) => handleRegenerateField('name', e)}
-                className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
-                title="Regenerate with AI"
-              >
-                <Sparkles className="h-5 w-5" />
-              </button>
+                isLoading={fieldLoadingStates['name'] || false}
+              />
             </div>
           </div>
           
@@ -665,14 +968,11 @@ export default function CharacterEditorPage() {
                 rows={4}
                 className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
               />
-              <button
-                type="button"
+              <RegenerateButton
+                field="appearance"
                 onClick={(e) => handleRegenerateField('appearance', e)}
-                className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
-                title="Regenerate with AI"
-              >
-                <Sparkles className="h-5 w-5" />
-              </button>
+                isLoading={fieldLoadingStates['appearance'] || false}
+              />
             </div>
           </div>
           
@@ -687,14 +987,11 @@ export default function CharacterEditorPage() {
                 rows={4}
                 className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
               />
-              <button
-                type="button"
+              <RegenerateButton
+                field="personality"
                 onClick={(e) => handleRegenerateField('personality', e)}
-                className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
-                title="Regenerate with AI"
-              >
-                <Sparkles className="h-5 w-5" />
-              </button>
+                isLoading={fieldLoadingStates['personality'] || false}
+              />
             </div>
           </div>
           
@@ -709,18 +1006,15 @@ export default function CharacterEditorPage() {
                 rows={2}
                 className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
               />
-              <button
-                type="button"
+              <RegenerateButton
+                field="backstory_hook"
                 onClick={(e) => handleRegenerateField('backstory_hook', e)}
-                className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
-                title="Regenerate with AI"
-              >
-                <Sparkles className="h-5 w-5" />
-              </button>
+                isLoading={fieldLoadingStates['backstory_hook'] || false}
+              />
             </div>
           </div>
 
-          {/* Added: Text Model Selector */}
+          {/* Text Model Selector */}
           <div className="mb-6 mt-6 p-4 bg-secondary rounded-lg border border-theme">
             <h3 className="text-lg font-semibold mb-4">Text Generation Model</h3>
             <p className="text-sm text-muted mb-4">
@@ -731,11 +1025,10 @@ export default function CharacterEditorPage() {
               onChange={setSelectedTextModel}
             />
           </div>
-        </div>
+        </FormSection>
         
-        {/* Portrait section - Updated with toggle between display and upload and added Image Model Selector */}
-        <div className="bg-card p-6 rounded-lg border border-theme">
-          <h2 className="text-xl font-bold mb-4">Portrait</h2>
+        {/* Portrait Section */}
+        <FormSection title="Portrait">
           <div className="flex flex-col md:flex-row gap-6">
             <div className="md:w-1/2">
               {showImageUpload ? (
@@ -776,7 +1069,7 @@ export default function CharacterEditorPage() {
               </p>
             </div>
             
-            {/* Added: Image Model Selector */}
+            {/* Image Model Selector */}
             <div className="md:w-1/2">
               <div className="bg-secondary p-4 rounded-lg border border-theme h-full">
                 <h3 className="text-lg font-semibold mb-4">Portrait Generation Model</h3>
@@ -790,12 +1083,10 @@ export default function CharacterEditorPage() {
               </div>
             </div>
           </div>
-        </div>
+        </FormSection>
         
         {/* Character Traits */}
-        <div className="bg-card p-6 rounded-lg border border-theme">
-          <h2 className="text-xl font-bold mb-4">Character Traits</h2>
-          
+        <FormSection title="Character Traits">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Select
               label="Gender"
@@ -867,11 +1158,10 @@ export default function CharacterEditorPage() {
               ))}
             </div>
           </div>
-        </div>
+        </FormSection>
         
         {/* Added Traits */}
-        <div className="bg-card p-6 rounded-lg border border-theme">
-          <h2 className="text-xl font-bold mb-4">Additional Traits</h2>
+        <FormSection title="Additional Traits">
           <p className="text-sm text-muted mb-4">
             These are additional traits that were generated by AI or that you can add yourself. You can edit, add, or remove traits as needed.
           </p>
@@ -953,12 +1243,11 @@ export default function CharacterEditorPage() {
               </button>
             </div>
           </div>
-        </div>
+        </FormSection>
         
         {/* Items */}
-        <div className="bg-card p-6 rounded-lg border border-theme">
+        <FormSection title="Items">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Items</h2>
             <Button 
               variant="secondary" 
               onClick={handleAddItem}
@@ -983,14 +1272,11 @@ export default function CharacterEditorPage() {
                     }}
                     className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
                   />
-                  <button
-                    type="button"
+                  <RegenerateButton
+                    field={`item_${index}`}
                     onClick={(e) => handleRegenerateField(`item_${index}`, e)}
-                    className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
-                    title="Regenerate with AI"
-                  >
-                    <Sparkles className="h-5 w-5" />
-                  </button>
+                    isLoading={fieldLoadingStates[`item_${index}`] || false}
+                  />
                   <button
                     type="button"
                     onClick={handleRemoveItem(index)}
@@ -1007,12 +1293,11 @@ export default function CharacterEditorPage() {
               <p className="text-muted">No items available. Add an item to get started.</p>
             </div>
           )}
-        </div>
+        </FormSection>
         
         {/* Dialogue Lines */}
-        <div className="bg-card p-6 rounded-lg border border-theme">
+        <FormSection title="Dialogue Lines">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Dialogue Lines</h2>
             <Button 
               variant="secondary" 
               onClick={handleAddDialogue}
@@ -1037,14 +1322,11 @@ export default function CharacterEditorPage() {
                     }}
                     className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
                   />
-                  <button
-                    type="button"
+                  <RegenerateButton
+                    field={`dialogue_${index}`}
                     onClick={(e) => handleRegenerateField(`dialogue_${index}`, e)}
-                    className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
-                    title="Regenerate with AI"
-                  >
-                    <Sparkles className="h-5 w-5" />
-                  </button>
+                    isLoading={fieldLoadingStates[`dialogue_${index}`] || false}
+                  />
                   <button
                     type="button"
                     onClick={handleRemoveDialogue(index)}
@@ -1061,12 +1343,11 @@ export default function CharacterEditorPage() {
               <p className="text-muted">No dialogue available. Add dialogue to get started.</p>
             </div>
           )}
-        </div>
+        </FormSection>
         
         {/* Quests */}
-        <div className="bg-card p-6 rounded-lg border border-theme">
+        <FormSection title="Quests">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Quests</h2>
             <Button 
               variant="secondary" 
               onClick={handleAddQuest}
@@ -1108,14 +1389,11 @@ export default function CharacterEditorPage() {
                         }}
                         className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
                       />
-                      <button
-                        type="button"
+                      <RegenerateButton
+                        field={`quest_${index}_title`}
                         onClick={(e) => handleRegenerateField(`quest_${index}_title`, e)}
-                        className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
-                        title="Regenerate Title"
-                      >
-                        <Sparkles className="h-5 w-5" />
-                      </button>
+                        isLoading={fieldLoadingStates[`quest_${index}_title`] || false}
+                      />
                     </div>
                   </div>
                   
@@ -1134,14 +1412,11 @@ export default function CharacterEditorPage() {
                         rows={3}
                         className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
                       />
-                      <button
-                        type="button"
+                      <RegenerateButton
+                        field={`quest_${index}_description`}
                         onClick={(e) => handleRegenerateField(`quest_${index}_description`, e)}
-                        className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
-                        title="Regenerate Description"
-                      >
-                        <Sparkles className="h-5 w-5" />
-                      </button>
+                        isLoading={fieldLoadingStates[`quest_${index}_description`] || false}
+                      />
                     </div>
                   </div>
                   
@@ -1160,14 +1435,11 @@ export default function CharacterEditorPage() {
                         }}
                         className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
                       />
-                      <button
-                        type="button"
+                      <RegenerateButton
+                        field={`quest_${index}_reward`}
                         onClick={(e) => handleRegenerateField(`quest_${index}_reward`, e)}
-                        className="ml-2 p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300"
-                        title="Regenerate Reward"
-                      >
-                        <Sparkles className="h-5 w-5" />
-                      </button>
+                        isLoading={fieldLoadingStates[`quest_${index}_reward`] || false}
+                      />
                     </div>
                   </div>
 
@@ -1175,11 +1447,27 @@ export default function CharacterEditorPage() {
                     <button
                       type="button"
                       onClick={(e) => handleRegenerateField(`quest_${index}_whole`, e)}
-                      className="w-full p-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 rounded-md dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300 flex items-center justify-center"
+                      className={`
+                        w-full p-2 rounded-md flex items-center justify-center
+                        ${fieldLoadingStates[`quest_${index}_whole`] 
+                          ? 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500' 
+                          : 'text-indigo-600 hover:text-indigo-800 bg-indigo-50 dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300'
+                        }
+                      `}
+                      disabled={fieldLoadingStates[`quest_${index}_whole`] || false}
                       title="Regenerate Entire Quest"
                     >
-                      <Sparkles className="h-5 w-5 mr-2" />
-                      Regenerate Entire Quest
+                      {fieldLoadingStates[`quest_${index}_whole`] ? (
+                        <>
+                          <div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600 dark:border-indigo-700 dark:border-t-indigo-300 mr-2"></div>
+                          Regenerating...
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw className="h-5 w-5 mr-2" />
+                          Regenerate Entire Quest
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -1190,7 +1478,7 @@ export default function CharacterEditorPage() {
               <p className="text-muted">No quests available. Add a quest to get started.</p>
             </div>
           )}
-        </div>
+        </FormSection>
         
         {/* Form controls */}
         <div className="flex justify-end">

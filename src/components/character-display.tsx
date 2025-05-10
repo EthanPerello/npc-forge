@@ -13,46 +13,78 @@ import { Download, Save, User, MessageSquare, Package, BookOpen, Image } from 'l
 import { getCharacterTraitsArray } from '@/lib/utils';
 import { Character } from '@/lib/types';
 
-// Use sessionStorage for temporary image caching during the session
-const IMAGE_CACHE_KEY = 'npc-forge-temp-image-cache';
+// FIXED: Use a simple image cache key without trying to store actual image data
+const IMAGE_CACHE_KEY = 'npc-forge-image-refs';
+
+// FIXED: Create a smaller object for image references
+interface ImageRef {
+  id: string;
+  timestamp: number;
+}
 
 export default function CharacterDisplay() {
-  const { character, formData, downloadCharacterJSON, error, isLoading, saveToLibrary } = useCharacter();
+  const { character, formData, downloadCharacterJSON, error, isLoading, saveToLibrary, setCharacter } = useCharacter();
   const [activeTab, setActiveTab] = useState('profile');
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [displayCharacter, setDisplayCharacter] = useState<Character | null>(null);
+  const [imagePreserved, setImagePreserved] = useState<boolean>(false);
   
   // Keep references to image data to prevent it from disappearing
-  const imageDataRef = useRef<string | null>(null);
+  const imageDataRef = useRef<string | undefined>(undefined);
   const characterKeyRef = useRef<string | null>(null);
   
+  // FIXED: Store image references instead of actual image data
+  const [cachedImageRefs, setCachedImageRefs] = useState<Record<string, ImageRef>>({});
+  
   // Initialize cached images from sessionStorage
-  const [cachedImages, setCachedImages] = useState<Record<string, string>>(() => {
-    // Try to load cached images from sessionStorage
+  useEffect(() => {
+    // Try to load cached image references from sessionStorage
     if (typeof window !== 'undefined') {
       try {
         const cached = sessionStorage.getItem(IMAGE_CACHE_KEY);
-        return cached ? JSON.parse(cached) : {};
+        if (cached) {
+          const cachedData = JSON.parse(cached);
+          if (cachedData && cachedData.refs) {
+            // Only load the references, not the actual images
+            const refs: Record<string, ImageRef> = {};
+            cachedData.refs.forEach((id: string) => {
+              refs[id] = { id, timestamp: Date.now() };
+            });
+            setCachedImageRefs(refs);
+          }
+        }
       } catch (e) {
-        console.warn("Failed to load cached images from sessionStorage:", e);
-        return {};
+        console.warn("Failed to load cached image refs from sessionStorage:", e);
       }
     }
-    return {};
-  });
+  }, []);
   
-  // Save cached images to sessionStorage when they change
+  // Save cached image references to sessionStorage when they change
   useEffect(() => {
-    if (typeof window !== 'undefined' && Object.keys(cachedImages).length > 0) {
+    if (typeof window !== 'undefined' && Object.keys(cachedImageRefs).length > 0) {
       try {
-        sessionStorage.setItem(IMAGE_CACHE_KEY, JSON.stringify(cachedImages));
+        // Only save the IDs to sessionStorage, not the actual image data
+        sessionStorage.setItem(IMAGE_CACHE_KEY, JSON.stringify({
+          refs: Object.keys(cachedImageRefs)
+        }));
       } catch (e) {
-        console.warn("Failed to save cached images to sessionStorage:", e);
+        console.warn("Failed to save cached image refs to sessionStorage:", e);
+        // If quota exceeded, clear older refs
+        if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+          const oldestRefs = Object.entries(cachedImageRefs)
+            .sort(([, a], [, b]) => a.timestamp - b.timestamp)
+            .slice(0, Math.floor(Object.keys(cachedImageRefs).length / 2))
+            .map(([key]) => key);
+          
+          const newRefs = { ...cachedImageRefs };
+          oldestRefs.forEach(key => delete newRefs[key]);
+          setCachedImageRefs(newRefs);
+        }
       }
     }
-  }, [cachedImages]);
+  }, [cachedImageRefs]);
   
   // Update display character when the main character changes
   useEffect(() => {
@@ -69,22 +101,18 @@ export default function CharacterDisplay() {
       
       // Check sources for image data in this priority order:
       // 1. Character's own image_data
-      // 2. Previously cached image for this character key
-      // 3. Current imageDataRef value
+      // 2. Current imageDataRef value
       
       if (characterCopy.image_data) {
-        // If character has image data, update our cache and ref
+        // If character has image data, update our ref
         imageDataRef.current = characterCopy.image_data;
-        setCachedImages(prev => ({
+        
+        // Add to cache refs without storing image data
+        setCachedImageRefs(prev => ({
           ...prev,
-          [characterKey]: characterCopy.image_data as string
+          [characterKey]: { id: characterKey, timestamp: Date.now() }
         }));
       } 
-      else if (cachedImages[characterKey]) {
-        // If we have cached image for this character, use it
-        characterCopy.image_data = cachedImages[characterKey];
-        imageDataRef.current = cachedImages[characterKey];
-      }
       else if (imageDataRef.current) {
         // If we have a current image in the ref, use it as fallback
         characterCopy.image_data = imageDataRef.current;
@@ -93,7 +121,7 @@ export default function CharacterDisplay() {
       setDisplayCharacter(characterCopy);
       setActiveTab('profile');
     }
-  }, [character, cachedImages]);
+  }, [character]);
 
   // If we don't have a character to display, return null
   if (!displayCharacter) {
@@ -155,16 +183,23 @@ export default function CharacterDisplay() {
       // Ensure we have the image data stored in the character
       if (displayCharacter) {
         // Create a deep copy to avoid mutations
-        const characterToSave = { ...displayCharacter };
+        const characterToSave = JSON.parse(JSON.stringify(displayCharacter));
         
         // Ensure the image data is included - check all possible sources
         if (!characterToSave.image_data) {
           // Try to get image from our ref or cache
           if (imageDataRef.current) {
             characterToSave.image_data = imageDataRef.current;
-          } else if (characterKeyRef.current && cachedImages[characterKeyRef.current]) {
-            characterToSave.image_data = cachedImages[characterKeyRef.current];
           }
+        } else {
+          // If character already has image data, preserve it
+          console.log("Preserving existing image data in character to save");
+        }
+        
+        // Log the character we're about to save
+        console.log("Saving character with image:", characterToSave.name);
+        if (characterToSave.image_data) {
+          console.log("Character has image data of length:", characterToSave.image_data.length);
         }
         
         // Save character with form data
@@ -173,6 +208,41 @@ export default function CharacterDisplay() {
         if (success) {
           // Show success message
           setSaveSuccess(true);
+          
+          // Keep track that we preserved the image
+          setImagePreserved(true);
+          
+          // IMPORTANT FIX: Make sure the character's image data remains in the context state
+          // TS FIX: Make sure we handle the undefined vs null correctly
+          setCharacter((prevChar: Character | null) => {
+            if (!prevChar) return prevChar;
+            
+            // Create a new character object with the same properties
+            const updatedChar: Character = { ...prevChar };
+            
+            // Only set image_data if we have data to preserve
+            if (prevChar.image_data || imageDataRef.current) {
+              updatedChar.image_data = prevChar.image_data || imageDataRef.current;
+            }
+            
+            return updatedChar;
+          });
+          
+          // Update the local displayCharacter as well to ensure UI consistency
+          // TS FIX: Make sure we handle the undefined vs null correctly
+          setDisplayCharacter((prevChar: Character | null) => {
+            if (!prevChar) return prevChar;
+            
+            // Create a new character object with the same properties
+            const updatedChar: Character = { ...prevChar };
+            
+            // Only set image_data if we have data to preserve
+            if (prevChar.image_data || imageDataRef.current) {
+              updatedChar.image_data = prevChar.image_data || imageDataRef.current;
+            }
+            
+            return updatedChar;
+          });
           
           // Clear success message after 3 seconds
           setTimeout(() => {
@@ -203,10 +273,7 @@ export default function CharacterDisplay() {
     e.stopPropagation();
     
     // Get the image data from all possible sources
-    let imageData = displayCharacter.image_data || 
-                   (characterKeyRef.current ? cachedImages[characterKeyRef.current] : null) ||
-                   imageDataRef.current ||
-                   displayCharacter.image_url;
+    let imageData = displayCharacter.image_data || imageDataRef.current || displayCharacter.image_url;
                    
     if (!imageData) {
       alert('No image available to download');
@@ -234,10 +301,7 @@ export default function CharacterDisplay() {
             <div className="mx-auto md:mx-0 w-full max-w-[300px]">
               <PortraitDisplay 
                 imageUrl={displayCharacter.image_url} 
-                imageData={displayCharacter.image_data || 
-                          (characterKeyRef.current ? cachedImages[characterKeyRef.current] : undefined) || 
-                          imageDataRef.current || 
-                          undefined}
+                imageData={displayCharacter.image_data || imageDataRef.current || undefined}
                 characterId={displayCharacter.name ? `${displayCharacter.name.replace(/\s+/g, '-')}-${Date.now()}` : undefined}
                 name={displayCharacter.name} 
                 size="medium"
@@ -287,7 +351,7 @@ export default function CharacterDisplay() {
                   disabled={isSaving}
                   type="button" // Explicitly set type to prevent form submission
                 >
-                  Save to Library
+                  {saveSuccess ? 'Saved!' : 'Save to Library'}
                 </Button>
                 
                 <Button
