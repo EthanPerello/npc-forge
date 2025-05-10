@@ -29,6 +29,7 @@ interface CharacterContextType {
   generateCharacter: () => Promise<void>;
   downloadCharacterJSON: () => void;
   saveToLibrary: (customCharacter?: Character) => Promise<boolean>;
+  setCharacter: (character: Character | null | ((prev: Character | null) => Character | null)) => void;
 }
 
 // Default form values using undefined instead of empty strings for enum types
@@ -209,7 +210,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     downloadJson(character, `${character.name.replace(/\s+/g, '_').toLowerCase()}.json`);
   }, [character]);
   
-  // Save to library - updated to handle custom character and ensure it returns a boolean
+  // Save to library - updated to ensure image persistence
   const saveToLibrary = useCallback(async (customCharacter?: Character): Promise<boolean> => {
     // Use the provided character if available, otherwise use state
     const characterToSave = customCharacter || character;
@@ -219,10 +220,49 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
       return false;
     }
     
+    console.log("Saving character to library:", characterToSave.name);
+    
     try {
-      // Save character with form data to IndexedDB - ensure boolean return
+      // First make sure image data is properly set
+      if (characterToSave.image_data) {
+        console.log("Character has image data to save");
+      } else if (characterToSave.image_url) {
+        console.log("Character has image URL but no data, attempting to fetch");
+        
+        try {
+          // Try to fetch the image through the proxy endpoint
+          const response = await fetch(`/api/proxy-image?url=${encodeURIComponent(characterToSave.image_url)}`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.imageData) {
+              console.log("Successfully fetched image data from URL");
+              // Modify the character object to include the image data
+              characterToSave.image_data = data.imageData;
+            }
+          }
+        } catch (imgError) {
+          console.error("Failed to fetch image from URL:", imgError);
+          // Continue without the image data if fetch fails
+        }
+      }
+      
+      // Save character with form data to IndexedDB
+      console.log("Saving character to IndexedDB");
       const result = await saveCharacter(characterToSave, formData);
-      // Simply check if the result is truthy, avoiding explicit type comparison
+      
+      // If we're on the main page (not editing), make sure the image stays visible
+      if (result && result.character && result.character.image_data) {
+        console.log("Setting image in current character state after save");
+        // Update the current character in state to keep the image
+        setCharacter(prevChar => {
+          if (!prevChar) return result.character;
+          return {
+            ...prevChar,
+            image_data: result.character.image_data
+          };
+        });
+      }
+      
       return !!result;
     } catch (error) {
       console.error('Error saving character to library:', error);
@@ -241,6 +281,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     generateCharacter,
     downloadCharacterJSON,
     saveToLibrary,
+    setCharacter,
   }), [
     character, 
     formData, 

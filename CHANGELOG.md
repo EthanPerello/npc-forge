@@ -7,12 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Character regeneration capabilities in the edit page:
+  - Ability to regenerate individual character attributes (name, appearance, personality, backstory)
+  - Support for regenerating portrait images with selected model
+  - Quest regeneration with options for entire quest or specific parts (title, description, reward)
+  - Dialogue line regeneration with proper formatting
+  - Item regeneration with character-appropriate descriptions
+- Loading states and visual feedback for all regeneration actions
+- Success/error feedback messages for regeneration operations
+- New API endpoint (/api/regenerate) for handling OpenAI regeneration requests
+
+### Changed
+- Improved character edit page with regenerate buttons for all editable fields
+- Enhanced portrait display with loading animation during regeneration
+- Updated model selectors to control which AI model is used for regeneration
+- - Added small amount of padding under buttons at button of character modal
+
+### Fixed
+- Prevented infinite update loops in portrait display component
+- Fixed portrait disappearing after saving to library or viewing a character
+
 ## [0.3.4] - 2025-05-08
 
 ### Fixed
-- Portrait persistence issues:
-  - Fixed portrait disappearing after saving to library or viewing a character
-  - Improved image handling across display, storage, and context components
+- Improved image handling across display, storage, and context components
 - UI consistency improvements:
   - Fixed icon/text color consistency in buttons across light/dark themes
   - Fixed delete button text color in light mode to ensure white text on red background
