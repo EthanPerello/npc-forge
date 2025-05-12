@@ -11,22 +11,8 @@ function prompt(query: string): Promise<string> {
   }));
 }
 
-// Function to format date as "Month Day, Year"
+// Function to format date as "YYYY-MM-DD" (for both changelog and release notes)
 function formatDate(date: Date): string {
-  const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-  
-  const month = monthNames[date.getMonth()];
-  const day = date.getDate();
-  const year = date.getFullYear();
-  
-  return `${month} ${day}, ${year}`;
-}
-
-// Format date as YYYY-MM-DD for changelog
-function formatISODate(date: Date): string {
   return date.toISOString().split('T')[0]; // YYYY-MM-DD
 }
 
@@ -46,10 +32,10 @@ function extractUnreleasedChanges(): { changes: string, categories: { [key: stri
   const lines = content.split('\n');
   const categories: { [key: string]: string[] } = {};
   let currentCategory = 'Uncategorized';
-  let currentLine = '';
-  let indentLevel = 0;
   
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    
     // Check if it's a category header
     const categoryMatch = line.match(/^###\s+(.*)/);
     if (categoryMatch) {
@@ -60,41 +46,15 @@ function extractUnreleasedChanges(): { changes: string, categories: { [key: stri
       continue;
     }
     
-    // Handle list items
-    if (line.match(/^-\s+/)) {
-      // This is a top-level list item
-      if (currentLine) {
-        // If we have a pending line, save it first
-        categories[currentCategory].push(currentLine);
-      }
-      currentLine = line;
-      indentLevel = 0;
-    } else if (line.match(/^\s+-\s+/)) {
-      // This is a nested list item
-      // If it's a new indent level, add the parent line first
-      if (indentLevel === 0 && currentLine) {
-        categories[currentCategory].push(currentLine);
-        currentLine = '';
-      }
-      // Add this nested item with proper indentation preserved
-      categories[currentCategory].push(line);
-      indentLevel = line.match(/^\s+/)?.[0].length || 2;
-    } else if (line.trim() === '') {
-      // Empty line - if we have a pending line, save it
-      if (currentLine) {
-        categories[currentCategory].push(currentLine);
-        currentLine = '';
-      }
-      indentLevel = 0;
-    } else if (indentLevel > 0 || currentLine) {
-      // Line is part of a previous list item, merge them
-      currentLine += '\n' + line;
+    // Skip empty lines
+    if (line.trim() === '') {
+      continue;
     }
-  }
-  
-  // Add any pending line
-  if (currentLine) {
-    categories[currentCategory].push(currentLine);
+    
+    // Add the line to the current category
+    if (line.trim()) {
+      categories[currentCategory].push(line);
+    }
   }
   
   return { changes: content, categories };
@@ -243,27 +203,31 @@ async function run() {
 
   const tag = `v${version}`;
   const formattedDate = formatDate(releaseDate);
-  const isoDate = formatISODate(releaseDate);
   const releaseNotePath = `release-notes/${tag}.md`;
 
-  console.log(`📅 Using release date: ${formattedDate} (${isoDate} in changelog)`);
+  console.log(`📅 Using release date: ${formattedDate}`);
 
   const { categories } = extractUnreleasedChanges();
 
+  // Create release note with the EXACT format we established
   let releaseNoteContent = `# NPC Forge ${tag} – ${title}\n\n**Release Date:** ${formattedDate}\n\n${summary}\n\n`;
-  const standardCategories = ["Added", "Changed", "Fixed", "Removed", "Security"];
+  
+  // Use the exact same order as established in the consistent format
+  const standardCategories = ["Added", "Changed", "Fixed", "Removed"];
 
   for (const category of standardCategories) {
     if (categories[category] && categories[category].length > 0) {
       releaseNoteContent += `## ${category}\n${categories[category].join('\n')}\n\n`;
-    } else {
-      releaseNoteContent += `## ${category}\n- _No changes in this category_\n\n`;
     }
+    // Don't add empty sections
   }
 
+  // Handle any other categories that might exist
   const otherCategories = Object.keys(categories).filter(cat => !standardCategories.includes(cat) && cat !== 'Uncategorized');
   for (const category of otherCategories) {
-    releaseNoteContent += `## ${category}\n${categories[category].join('\n')}\n\n`;
+    if (categories[category] && categories[category].length > 0) {
+      releaseNoteContent += `## ${category}\n${categories[category].join('\n')}\n\n`;
+    }
   }
 
   // Add any uncategorized items at the end
@@ -277,8 +241,8 @@ async function run() {
   console.log('📝 RELEASE NOTE CONTENT:\n');
   console.log(releaseNoteContent + '\nPlease verify this content appears correctly and includes all sections.\n');
 
-  // Update CHANGELOG, package files - now using the ISO date format for changelog
-  updateChangelog(version, isoDate);
+  // Update CHANGELOG, package files - using the same date format for both
+  updateChangelog(version, formattedDate);
   updatePackageJson(version);
   updatePackageLockJson(version);
 
@@ -317,15 +281,16 @@ async function run() {
     console.log(`  git push origin ${tag}`);
   }
 
-  // Create GitHub release
+  // Create GitHub release - using consistent title format
   try {
     execSync(`gh release delete ${tag} --yes 2>/dev/null || true`);
-    execSync(`gh release create ${tag} -F "${releaseNotePath}" -t "NPC Forge ${tag}"`, { stdio: 'inherit' });
+    // Use the exact same title format as in the release notes
+    execSync(`gh release create ${tag} -F "${releaseNotePath}" -t "NPC Forge ${tag} – ${title}"`, { stdio: 'inherit' });
     console.log('🎉 GitHub release published!');
   } catch (error) {
     console.error('❌ Failed to create GitHub release:', error);
     console.log('You can try manually:');
-    console.log(`  gh release create ${tag} -F "${releaseNotePath}" -t "NPC Forge ${tag}"`);
+    console.log(`  gh release create ${tag} -F "${releaseNotePath}" -t "NPC Forge ${tag} – ${title}"`);
   }
 }
 
