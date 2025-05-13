@@ -3,12 +3,11 @@
 import { useState, useEffect } from 'react';
 import { Image as ImageIcon, AlertCircle, RefreshCw, User, ZoomIn, Upload } from 'lucide-react';
 import Button from '@/components/ui/button';
-import { getImage } from '@/lib/character-storage';
 
 interface PortraitDisplayProps {
   imageUrl?: string;
   imageData?: string;
-  characterId?: string;  // For IndexedDB lookup
+  characterId?: string;  // Keep for library compatibility but don't use for current characters
   name: string;
   isLoading?: boolean;
   onRetry?: () => void;
@@ -38,47 +37,56 @@ export default function PortraitDisplay({
   const [loaded, setLoaded] = useState<boolean>(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [isZoomed, setIsZoomed] = useState<boolean>(false);
-  
-  // Create a unique key that changes when image sources change
-  // This forces the image to reload when sources change
-  const imageKey = `${characterId || ''}-${imageData ? imageData.substring(0, 30) : ''}-${imageUrl || ''}`;
+  const [forceRefresh, setForceRefresh] = useState<number>(0);
 
-  // Load image from various sources, with IndexedDB as a priority
+  // Simplified image loading logic - prioritize image_data over everything else
   useEffect(() => {
     const loadImage = async () => {
+      console.log('Loading image - imageData:', !!imageData, 'imageUrl:', !!imageUrl, 'characterId:', characterId);
+      
       // Reset states when image source changes
       setError(false);
       setLoaded(false);
 
-      // Try to load from IndexedDB first if we have a characterId
+      // Priority 1: Use provided imageData if available (for current/generated characters)
+      if (imageData) {
+        console.log('Using provided imageData');
+        setImageSrc(imageData);
+        return;
+      }
+
+      // Priority 2: Use imageUrl if available (fallback)
+      if (imageUrl) {
+        console.log('Using imageUrl');
+        setImageSrc(imageUrl);
+        return;
+      }
+
+      // Priority 3: Try to load from IndexedDB if we have a characterId (for library characters only)
       if (characterId) {
         try {
+          console.log('Attempting to load from IndexedDB for characterId:', characterId);
+          // Dynamically import to avoid SSR issues
+          const { getImage } = await import('@/lib/character-storage');
           const dbImage = await getImage(characterId);
           if (dbImage) {
+            console.log('Found image in IndexedDB');
             setImageSrc(dbImage);
             return;
           }
         } catch (err) {
           console.error('Error loading image from IndexedDB:', err);
-          // Continue to try other sources
+          // Continue to show placeholder
         }
       }
 
-      // If no IndexedDB image or error, fall back to provided sources
-      if (imageData) {
-        setImageSrc(imageData);
-      } else if (imageUrl) {
-        setImageSrc(imageUrl);
-      } else {
-        setImageSrc(null);
-      }
+      // No image available
+      console.log('No image source available');
+      setImageSrc(null);
     };
 
     loadImage();
-    
-    // Add a log to track when this effect runs
-    console.log(`PortraitDisplay effect running with key: ${imageKey}`);
-  }, [imageUrl, imageData, characterId, imageKey]); 
+  }, [imageUrl, imageData, characterId, forceRefresh]);
 
   const handleImageError = () => {
     console.error('Image failed to load');
@@ -87,6 +95,7 @@ export default function PortraitDisplay({
   };
 
   const handleImageLoad = () => {
+    console.log('Image loaded successfully');
     setLoaded(true);
   };
 
@@ -97,6 +106,11 @@ export default function PortraitDisplay({
       e.preventDefault();
       e.stopPropagation();
       onRegenerate(e);
+      
+      // Force a refresh after regeneration
+      setTimeout(() => {
+        setForceRefresh(prev => prev + 1);
+      }, 100);
     }
   };
 
@@ -162,7 +176,7 @@ export default function PortraitDisplay({
             </p>
             {onRetry && (
               <button 
-                type="button" // Explicitly set type to avoid form submission
+                type="button"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -200,7 +214,7 @@ export default function PortraitDisplay({
             {/* Image container with object-fit to ensure the entire image is visible */}
             <div className="relative w-full h-full">
               <img 
-                key={imageKey} // Add key to force re-render on image change
+                key={`${imageSrc}-${forceRefresh}`} // Force re-render on image change
                 src={imageSrc} 
                 alt={`Portrait of ${name}`}
                 className={`
