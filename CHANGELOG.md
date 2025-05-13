@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Fixed bug where character generation would trigger automatically without clicking the Generate button.
+- Fixed issue where character portraits would disappear after saving to the library.
+- Fixed bug causing stale portraits to appear after regeneration due to improper state and cache management.
+
 ## [0.12.0] - 2025-05-09
 
 ### Added

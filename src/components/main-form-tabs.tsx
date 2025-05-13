@@ -30,9 +30,9 @@ export default function MainFormTabs() {
     setActiveTab(tabId);
   };
 
-  // Handle form submission - make sure we don't accidentally trigger browser form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    // Prevent default form submission behavior which might cause page refreshes
+  // Handle generate button click - removed form submission handling
+  const handleGenerateClick = async (e: React.MouseEvent) => {
+    // Prevent any form submission
     e.preventDefault();
     e.stopPropagation();
     
@@ -135,16 +135,16 @@ export default function MainFormTabs() {
         </div>
       </div>
       
-      {/* Wrap form around the tab content to contain all our form elements */}
-      <form onSubmit={handleSubmit} className="p-6">
+      {/* Remove form wrapper to prevent accidental submissions */}
+      <div className="p-6">
         {tabs.find(tab => tab.id === activeTab)?.content}
         
-        {/* Generate button inside the form to make it the default submit action */}
+        {/* Generate button - now standalone, not part of a form */}
         <div className="mt-6 flex justify-center">
           <Button
             variant="primary"
-            type="submit"
-            onClick={handleSubmit}
+            type="button"  /* Changed from "submit" to "button" */
+            onClick={handleGenerateClick}  /* Use onClick handler instead of form submission */
             disabled={!formData.description || isLoading}
             isLoading={isLoading}
             leftIcon={<Sparkles className="h-5 w-5" />}
@@ -161,7 +161,7 @@ export default function MainFormTabs() {
           onClick={handleRandomize}
           className="hidden"
         />
-      </form>
+      </div>
       
       {/* Error and Success Messages */}
       {error && (

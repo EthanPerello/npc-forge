@@ -296,7 +296,9 @@ export async function deleteImage(characterId: string): Promise<void> {
 
 /**
  * Save a single character to IndexedDB
- * @param character - The character to save
+ * CRITICAL CHANGE: This function now preserves the original character object completely
+ * It creates a separate copy for storage without mutating the input
+ * @param character - The character to save (WILL NOT BE MODIFIED)
  * @param formData - Optional form data used to generate the character
  * @param isExample - Whether this is an example character
  * @returns Promise with the stored character
@@ -308,19 +310,25 @@ export async function saveCharacter(
 ): Promise<StoredCharacter> {
   console.log("Starting character save process...");
   
-  // Create a deep copy of the character to avoid modifying the original object
-  const characterCopy = JSON.parse(JSON.stringify(character)) as Character;
+  // CRITICAL: Create a deep copy immediately to avoid ANY mutation of the original
+  const originalCharacter = JSON.parse(JSON.stringify(character)) as Character;
   
   // Generate a unique ID for the character
-  const characterId = generateCharacterId(characterCopy);
+  const characterId = generateCharacterId(originalCharacter);
+  
+  // Create a copy specifically for storage (this one we can modify)
+  const storageCharacter = JSON.parse(JSON.stringify(originalCharacter)) as Character;
   
   // Process image if available
   let hasStoredImage = false;
   
-  if (characterCopy.image_data && isValidImageData(characterCopy.image_data)) {
+  if (storageCharacter.image_data && isValidImageData(storageCharacter.image_data)) {
     try {
-      const sizeInMB = getBase64Size(characterCopy.image_data);
+      const sizeInMB = getBase64Size(storageCharacter.image_data);
       console.log(`Original image size: ${sizeInMB.toFixed(2)}MB`);
+      
+      // Create a copy of the image data for storage
+      let imageDataForStorage = storageCharacter.image_data;
       
       // Compress large images before storing
       if (sizeInMB > 2.0) { // 2MB threshold
@@ -328,8 +336,8 @@ export async function saveCharacter(
         
         try {
           // Compress to 512px wide with medium quality
-          const compressedImage = await compressImage(characterCopy.image_data, 512, 0.6);
-          characterCopy.image_data = compressedImage;
+          const compressedImage = await compressImage(storageCharacter.image_data, 512, 0.6);
+          imageDataForStorage = compressedImage;
           console.log(`Compressed size: ${getBase64Size(compressedImage).toFixed(2)}MB`);
         } catch (compressError) {
           console.error('Compression error:', compressError);
@@ -337,81 +345,76 @@ export async function saveCharacter(
         }
       }
       
-      // Save image to IndexedDB
-      await saveImage(characterId, characterCopy.image_data);
+      // Save the image to IndexedDB using the copy
+      await saveImage(characterId, imageDataForStorage);
       hasStoredImage = true;
       
-      // Keep image_data in the character object temporarily to display on the current screen
-      // We'll clone it before saving to remove the data
+      // Remove image data from the STORAGE character only
+      // The original character passed in remains completely unchanged
+      delete storageCharacter.image_data;
+      
+      console.log('Image saved to IndexedDB and removed from storage character');
     } catch (error) {
       console.error('Error handling image:', error);
       // Continue without the image
-      delete characterCopy.image_data;
+      delete storageCharacter.image_data;
     }
   }
   
-  // Make sure selected traits are properly saved in the character
+  // Make sure selected traits are properly saved in the storage character
   if (formData) {
     // Save main genre and subgenre
-    if (formData.genre && !characterCopy.selected_traits.genre) {
-      characterCopy.selected_traits.genre = formData.genre;
+    if (formData.genre && !storageCharacter.selected_traits.genre) {
+      storageCharacter.selected_traits.genre = formData.genre;
     }
     
-    if (formData.sub_genre && !characterCopy.selected_traits.sub_genre) {
-      characterCopy.selected_traits.sub_genre = formData.sub_genre;
+    if (formData.sub_genre && !storageCharacter.selected_traits.sub_genre) {
+      storageCharacter.selected_traits.sub_genre = formData.sub_genre;
     }
     
     // Save other traits if not already present
-    if (formData.gender && !characterCopy.selected_traits.gender) {
-      characterCopy.selected_traits.gender = formData.gender;
+    if (formData.gender && !storageCharacter.selected_traits.gender) {
+      storageCharacter.selected_traits.gender = formData.gender;
     }
     
-    if (formData.age_group && !characterCopy.selected_traits.age_group) {
-      characterCopy.selected_traits.age_group = formData.age_group;
+    if (formData.age_group && !storageCharacter.selected_traits.age_group) {
+      storageCharacter.selected_traits.age_group = formData.age_group;
     }
     
-    if (formData.moral_alignment && !characterCopy.selected_traits.moral_alignment) {
-      characterCopy.selected_traits.moral_alignment = formData.moral_alignment;
+    if (formData.moral_alignment && !storageCharacter.selected_traits.moral_alignment) {
+      storageCharacter.selected_traits.moral_alignment = formData.moral_alignment;
     }
     
-    if (formData.relationship_to_player && !characterCopy.selected_traits.relationship_to_player) {
-      characterCopy.selected_traits.relationship_to_player = formData.relationship_to_player;
+    if (formData.relationship_to_player && !storageCharacter.selected_traits.relationship_to_player) {
+      storageCharacter.selected_traits.relationship_to_player = formData.relationship_to_player;
     }
     
     // Advanced options
     if (formData.advanced_options) {
-      if (formData.advanced_options.species && !characterCopy.selected_traits.species) {
-        characterCopy.selected_traits.species = formData.advanced_options.species;
+      if (formData.advanced_options.species && !storageCharacter.selected_traits.species) {
+        storageCharacter.selected_traits.species = formData.advanced_options.species;
       }
       
-      if (formData.advanced_options.occupation && !characterCopy.selected_traits.occupation) {
-        characterCopy.selected_traits.occupation = formData.advanced_options.occupation;
+      if (formData.advanced_options.occupation && !storageCharacter.selected_traits.occupation) {
+        storageCharacter.selected_traits.occupation = formData.advanced_options.occupation;
       }
       
       if (formData.advanced_options.personality_traits && 
           formData.advanced_options.personality_traits.length > 0 && 
-          !characterCopy.selected_traits.personality_traits) {
-        characterCopy.selected_traits.personality_traits = [...formData.advanced_options.personality_traits];
+          !storageCharacter.selected_traits.personality_traits) {
+        storageCharacter.selected_traits.personality_traits = [...formData.advanced_options.personality_traits];
       }
       
-      if (formData.advanced_options.social_class && !characterCopy.selected_traits.social_class) {
-        characterCopy.selected_traits.social_class = formData.advanced_options.social_class;
+      if (formData.advanced_options.social_class && !storageCharacter.selected_traits.social_class) {
+        storageCharacter.selected_traits.social_class = formData.advanced_options.social_class;
       }
     }
   }
   
-  // Clone the character before removing image_data for storage
-  const storageCharacter = JSON.parse(JSON.stringify(characterCopy)) as Character;
-  
-  // Remove image data from the storage character to save space
-  if (hasStoredImage && storageCharacter.image_data) {
-    delete storageCharacter.image_data;
-  }
-  
-  // Create a new stored character object
+  // Create a new stored character object using the storage character
   const newStoredCharacter: StoredCharacter = {
     id: characterId,
-    character: storageCharacter,
+    character: storageCharacter,  // This is the copy without image_data
     createdAt: new Date().toISOString(),
     isExample,
     formData,
@@ -455,13 +458,14 @@ export async function saveCharacter(
       }
     });
     
-    // Return the character with image data if it was saved
-    // This is important for showing the image on the current screen
-    const returnCharacter = {
+    // CRITICAL: Return a stored character that references the ORIGINAL character
+    // This way the caller still has all the original data including image_data
+    const returnCharacter: StoredCharacter = {
       ...newStoredCharacter,
-      character: characterCopy  // Use the version that might still have image_data
+      character: originalCharacter  // Return with the complete original character
     };
     
+    console.log('Character save complete - returning character with image_data intact');
     return returnCharacter;
   } catch (error) {
     console.error('Error saving character:', error);

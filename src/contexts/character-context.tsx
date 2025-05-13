@@ -189,6 +189,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
       }
 
       const data = await response.json();
+      console.log('Generated character:', data.character?.name, 'with image data:', !!data.character?.image_data);
       setCharacter(data.character);
       
       // Increment usage count for both models on successful generation
@@ -210,7 +211,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     downloadJson(character, `${character.name.replace(/\s+/g, '_').toLowerCase()}.json`);
   }, [character]);
   
-  // Save to library - updated to ensure image persistence
+  // Save to library - MUCH SIMPLER NOW
   const saveToLibrary = useCallback(async (customCharacter?: Character): Promise<boolean> => {
     // Use the provided character if available, otherwise use state
     const characterToSave = customCharacter || character;
@@ -220,48 +221,42 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
       return false;
     }
     
-    console.log("Saving character to library:", characterToSave.name);
+    console.log('Saving character to library:', characterToSave.name);
+    console.log('Character has image data:', !!characterToSave.image_data);
     
     try {
-      // First make sure image data is properly set
-      if (characterToSave.image_data) {
-        console.log("Character has image data to save");
-      } else if (characterToSave.image_url) {
-        console.log("Character has image URL but no data, attempting to fetch");
+      // Create a copy of the character to avoid mutating the original
+      const characterCopy = JSON.parse(JSON.stringify(characterToSave)) as Character;
+      
+      // If no image data but has image URL, try to fetch it
+      if (!characterCopy.image_data && characterCopy.image_url) {
+        console.log('Character has image URL but no data, attempting to fetch');
         
         try {
           // Try to fetch the image through the proxy endpoint
-          const response = await fetch(`/api/proxy-image?url=${encodeURIComponent(characterToSave.image_url)}`);
+          const response = await fetch(`/api/proxy-image?url=${encodeURIComponent(characterCopy.image_url)}`);
           if (response.ok) {
             const data = await response.json();
             if (data.imageData) {
-              console.log("Successfully fetched image data from URL");
-              // Modify the character object to include the image data
-              characterToSave.image_data = data.imageData;
+              console.log('Successfully fetched image data from URL');
+              characterCopy.image_data = data.imageData;
             }
           }
         } catch (imgError) {
-          console.error("Failed to fetch image from URL:", imgError);
+          console.error('Failed to fetch image from URL:', imgError);
           // Continue without the image data if fetch fails
         }
       }
       
       // Save character with form data to IndexedDB
-      console.log("Saving character to IndexedDB");
-      const result = await saveCharacter(characterToSave, formData);
+      // Note: saveCharacter now handles image storage internally
+      // and DOES NOT modify the original character object
+      console.log('Saving character to IndexedDB...');
+      const result = await saveCharacter(characterCopy, formData);
       
-      // If we're on the main page (not editing), make sure the image stays visible
-      if (result && result.character && result.character.image_data) {
-        console.log("Setting image in current character state after save");
-        // Update the current character in state to keep the image
-        setCharacter(prevChar => {
-          if (!prevChar) return result.character;
-          return {
-            ...prevChar,
-            image_data: result.character.image_data
-          };
-        });
-      }
+      // The character in our state still has its image_data intact
+      // No need to update anything - the display will continue showing the image
+      console.log('Character saved successfully to IndexedDB');
       
       return !!result;
     } catch (error) {
