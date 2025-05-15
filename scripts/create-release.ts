@@ -246,6 +246,17 @@ async function run() {
   updatePackageJson(version);
   updatePackageLockJson(version);
 
+  // Update README
+  const readmePath = 'README.md';
+  let readme = fs.readFileSync(readmePath, 'utf8');
+  readme = readme.replace(/version-[0-9]+\.[0-9]+\.[0-9]+-blue\.svg/g, `version-${version}-blue.svg`);
+  fs.writeFileSync(readmePath, readme, 'utf8');
+
+  // Delete existing release and create the new one
+  execSync(`gh release delete ${tag} --yes 2>/dev/null || true`);
+  execSync(`gh release create ${tag} -F "${releaseNotePath}" -t "NPC Forge ${tag} – ${title}"`, { stdio: 'inherit' });
+
+
   // Git commit, tag & push
   try {
     execSync(`git add CHANGELOG.md package.json package-lock.json "${releaseNotePath}"`);
