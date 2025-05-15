@@ -1,54 +1,61 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 interface DelayedLoadingMessageProps {
   isLoading: boolean;
-  delayMs?: number;
-  message?: string;
+  message: string;
+  delay?: number; // Delay in milliseconds, default 3000 (3 seconds)
 }
 
-export default function DelayedLoadingMessage({
-  isLoading,
-  delayMs = 3000,
-  message = "Character generation may take a second..."
+export default function DelayedLoadingMessage({ 
+  isLoading, 
+  message, 
+  delay = 3000 
 }: DelayedLoadingMessageProps) {
-  const [showMessage, setShowMessage] = useState(false);
+  const [showMessage, setShowMessage] = React.useState(false);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    
+    let timer: NodeJS.Timeout | null = null;
+
     if (isLoading) {
-      // Set a timeout to show the message after the specified delay
-      timeoutId = setTimeout(() => {
+      // Start the timer when loading begins
+      timer = setTimeout(() => {
         setShowMessage(true);
-      }, delayMs);
+      }, delay);
     } else {
       // Hide the message immediately when loading stops
       setShowMessage(false);
+      // Clear any existing timer
+      if (timer) {
+        clearTimeout(timer);
+      }
     }
-    
-    // Clean up the timeout when the component unmounts or isLoading changes
+
+    // Cleanup function to clear timer on unmount
     return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
+      if (timer) {
+        clearTimeout(timer);
       }
     };
-  }, [isLoading, delayMs]);
+  }, [isLoading, delay]);
 
-  if (!showMessage) {
+  // Don't render anything if not loading or message shouldn't show yet
+  if (!isLoading || !showMessage) {
     return null;
   }
 
   return (
-    <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-md text-sm font-bold dark:bg-yellow-900/30 dark:text-yellow-300 animate-pulse">
-      <p className="flex items-center">
-        <svg className="w-4 h-4 mr-2 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        {message}
-      </p>
+    <div className="fixed bottom-24 md:bottom-24 left-0 right-0 z-50 flex justify-center px-4">
+      <div className="mt-4 p-3 bg-yellow-50 text-yellow-800 rounded-md text-sm font-bold dark:bg-yellow-900/30 dark:text-yellow-200 animate-pulse shadow-lg border border-yellow-200 dark:border-yellow-800">
+        <p className="flex items-center">
+          <svg className="w-4 h-4 mr-2 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {message}
+        </p>
+      </div>
     </div>
   );
 }

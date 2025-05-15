@@ -128,18 +128,15 @@ export default function ItemsTab() {
     : 'any';
   
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-gray-600 dark:text-gray-400">
-        Configure the items this character will carry or offer.
-      </p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {/* Number of Items */}
         <Select
           label="Number of Items"
           options={itemNumberOptions}
           value={String(formData.item_options?.number_of_items || 3)}
           onChange={handleNumberChange}
+          fullWidth={false}
         />
         
         {/* Rarity Distribution */}
@@ -148,36 +145,17 @@ export default function ItemsTab() {
           options={rarityDistributionOptions}
           value={formData.item_options?.rarity_distribution || 'balanced'}
           onChange={handleRarityChange}
-          helperText="The quality and value of items"
+          fullWidth={false}
         />
         
         {/* Item Category */}
         <Select
-          label="Item Category Focus"
+          label="Category Focus"
           options={itemCategoryOptions}
           value={selectedCategory}
           onChange={handleCategoryChange}
-          helperText="Primary type of items to include"
+          fullWidth={false}
         />
-      </div>
-      
-      {/* Rarity Description */}
-      {formData.item_options?.rarity_distribution && formData.item_options.rarity_distribution !== 'any' && (
-        <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-sm dark:bg-gray-800 dark:border-gray-700">
-          <p className="text-gray-700 dark:text-gray-300">
-            {rarityDistributionOptions.find(opt => opt.value === formData.item_options?.rarity_distribution)?.description}
-          </p>
-        </div>
-      )}
-      
-      {/* Item Example */}
-      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-        <h3 className="text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">Example Items Format:</h3>
-        <ul className="space-y-1 text-gray-600 dark:text-gray-400 text-sm list-disc list-inside">
-          <li>Well-worn leather backpack with brass buckles</li>
-          <li>Weathered map of the northern territories</li>
-          <li>Silver pendant engraved with ancient runes</li>
-        </ul>
       </div>
     </div>
   );

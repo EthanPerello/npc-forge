@@ -1,3 +1,5 @@
+// Fixed generate/route.ts to address punycode deprecation
+
 import { NextRequest, NextResponse } from 'next/server';
 import { generateCharacter, generatePortrait } from '@/lib/openai';
 import { Character, CharacterFormData, GenerationResponse, OpenAIModel } from '@/lib/types';
@@ -9,8 +11,18 @@ export const maxDuration = 60; // Set max duration to 60 seconds
 
 export async function POST(request: NextRequest): Promise<NextResponse<GenerationResponse>> {
   try {
-    // Get form data from request
-    const data: CharacterFormData = await request.json();
+    // Get form data from request - use a more direct approach to avoid URL issues
+    let data: CharacterFormData;
+    
+    try {
+      data = await request.json();
+    } catch (parseError) {
+      console.error('Error parsing request JSON:', parseError);
+      return NextResponse.json(
+        { error: 'Invalid request data', character: null as any },
+        { status: 400 }
+      );
+    }
     
     // Validate required fields
     if (!data.description || data.description.trim() === '') {

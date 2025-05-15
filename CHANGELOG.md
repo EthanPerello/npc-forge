@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Redesigned character creation flow with a new step-by-step wizard interface:
+  - Four steps: Concept, Options, Model, Generate
+  - Sticky top progress bar with clickable navigation
+  - Welcome popup for first-time users introducing the flow
+- Generate Random Character button that creates a default character and navigates directly to the final step
+- Sticky footer rebuilt for the new wizard layout:
+  - Step-aware controls for Continue, Back, and New Character
+  - Progress indicators consistent across steps
+- Revised character display layout:
+  - Name, portrait, trait tags, and action buttons grouped on the left
+  - Profile, quests, dialogue, and items shown in tabbed content on the right
+
+### Changed
+- Character creation form replaced: old tabbed layout removed in favor of a guided wizard experience
+- Trait tags in character display and library modal now use Label: Value format and exclude non-trait metadata (e.g. appearance, personality, backstory)
+- Header layout and image adjusted to ensure all five character faces are clearly visible across screen sizes
+- Genre selection no longer auto-fills the description field
+
+### Removed
+- Legacy tabbed character creation interface and related components (e.g. main-form-tabs.tsx, character-form.tsx)
+
 ## [0.12.1] - 2025-05-14
 
 ### Fixed

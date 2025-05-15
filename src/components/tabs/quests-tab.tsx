@@ -2,138 +2,115 @@
 
 import { useCharacter } from '@/contexts/character-context';
 import Select from '@/components/ui/select';
-import { QuestTypeOption, RewardTypeOption } from '@/lib/types';
+import { DialogueToneOption, DialogueContextOption } from '@/lib/types';
 
-// Quest type options
-const questTypeOptions: QuestTypeOption[] = [
-  { value: 'any', label: 'Any Type', description: 'Let the AI choose an appropriate quest type' },
-  { value: 'fetch', label: 'Fetch/Collect', description: 'Retrieve or gather specific items' },
-  { value: 'defeat', label: 'Defeat/Combat', description: 'Defeat enemies or monsters' },
-  { value: 'rescue', label: 'Rescue/Escort', description: 'Save or protect someone' },
-  { value: 'deliver', label: 'Deliver/Courier', description: 'Transport an item to a location' },
-  { value: 'investigate', label: 'Investigate/Mystery', description: 'Solve a mystery or gather information' },
-  { value: 'exploration', label: 'Exploration', description: 'Discover a new location or secret' },
-  { value: 'crafting', label: 'Crafting/Building', description: 'Create or build something' },
-  { value: 'stealth', label: 'Stealth/Heist', description: 'Sneaking or stealing without detection' },
-  { value: 'diplomatic', label: 'Diplomatic', description: 'Negotiate, mediate, or solve conflicts' }
+// Dialogue tone options
+const dialogueToneOptions: DialogueToneOption[] = [
+  { value: 'any', label: 'Any Tone', description: 'Let the AI choose an appropriate tone' },
+  { value: 'friendly', label: 'Friendly', description: 'Warm, welcoming, and approachable' },
+  { value: 'formal', label: 'Formal', description: 'Proper, respectful, and distant' },
+  { value: 'mysterious', label: 'Mysterious', description: 'Cryptic, enigmatic, and intriguing' },
+  { value: 'aggressive', label: 'Aggressive', description: 'Hostile, threatening, or intimidating' },
+  { value: 'cautious', label: 'Cautious', description: 'Wary, suspicious, and guarded' },
+  { value: 'eccentric', label: 'Eccentric', description: 'Odd, quirky, or unusual speech patterns' },
+  { value: 'scholarly', label: 'Scholarly', description: 'Intellectual, academic, uses complex vocabulary' },
+  { value: 'humorous', label: 'Humorous', description: 'Witty, funny, or sarcastic' },
+  { value: 'sad', label: 'Melancholic', description: 'Sad, wistful, or regretful' }
 ];
 
-// Reward type options
-const rewardTypeOptions: RewardTypeOption[] = [
-  { value: 'any', label: 'Any Reward' },
-  { value: 'money', label: 'Money/Currency' },
-  { value: 'item', label: 'Item/Equipment' },
-  { value: 'information', label: 'Information/Knowledge' },
-  { value: 'reputation', label: 'Reputation/Standing' },
-  { value: 'skill', label: 'Skill/Training' },
-  { value: 'companion', label: 'Companion/Ally' },
-  { value: 'property', label: 'Property/Land' }
+// Dialogue context options
+const dialogueContextOptions: DialogueContextOption[] = [
+  { value: 'any', label: 'Any Context' },
+  { value: 'first_meeting', label: 'First Meeting' },
+  { value: 'quest_giving', label: 'Giving a Quest' },
+  { value: 'quest_progress', label: 'Discussing Quest Progress' },
+  { value: 'quest_completion', label: 'Quest Completion' },
+  { value: 'bargaining', label: 'Bargaining/Trading' },
+  { value: 'combat', label: 'During Combat' },
+  { value: 'casual', label: 'Casual Conversation' }
 ];
 
-// Quest number options
-const questNumberOptions = [
-  { value: '1', label: '1 Quest' },
-  { value: '2', label: '2 Quests' },
-  { value: '3', label: '3 Quests' }
+// Number of lines options
+const lineNumberOptions = [
+  { value: '3', label: '3 lines' },
+  { value: '5', label: '5 lines' },
+  { value: '7', label: '7 lines' },
+  { value: '10', label: '10 lines' }
 ];
 
-export default function QuestsTab() {
+export default function DialogueTab() {
   const { formData, updateFormData } = useCharacter();
   
-  // Initialize quest options if they don't exist
-  if (!formData.quest_options) {
+  // Initialize dialogue options if they don't exist
+  if (!formData.dialogue_options) {
     updateFormData({
-      quest_options: {
-        number_of_quests: 1,
-        reward_type: undefined,
-        quest_type: undefined
+      dialogue_options: {
+        number_of_lines: 3,
+        tone: undefined,
+        context: undefined
       }
     });
   }
   
-  // Handle quest type change
-  const handleQuestTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  // Handle dialogue tone change
+  const handleToneChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     updateFormData({ 
-      quest_options: { 
-        ...formData.quest_options,
-        quest_type: e.target.value || undefined
+      dialogue_options: { 
+        ...formData.dialogue_options,
+        tone: e.target.value || undefined
       } 
     });
   };
   
-  // Handle reward type change
-  const handleRewardTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  // Handle dialogue context change
+  const handleContextChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     updateFormData({ 
-      quest_options: { 
-        ...formData.quest_options,
-        reward_type: e.target.value || undefined
+      dialogue_options: { 
+        ...formData.dialogue_options,
+        context: e.target.value || undefined
       } 
     });
   };
   
-  // Handle number of quests change
+  // Handle number of lines change
   const handleNumberChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     updateFormData({ 
-      quest_options: { 
-        ...formData.quest_options,
-        number_of_quests: parseInt(e.target.value) || 1
+      dialogue_options: { 
+        ...formData.dialogue_options,
+        number_of_lines: parseInt(e.target.value) || 3
       } 
     });
   };
   
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-gray-600 dark:text-gray-400">
-        Configure the quests this character will offer to players.
-      </p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Number of Quests */}
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {/* Number of Lines */}
         <Select
-          label="Number of Quests"
-          options={questNumberOptions}
-          value={String(formData.quest_options?.number_of_quests || 1)}
+          label="Number of Lines"
+          options={lineNumberOptions}
+          value={String(formData.dialogue_options?.number_of_lines || 3)}
           onChange={handleNumberChange}
+          fullWidth={false}
         />
         
-        {/* Quest Type */}
+        {/* Dialogue Tone */}
         <Select
-          label="Quest Type"
-          options={questTypeOptions}
-          value={formData.quest_options?.quest_type || ''}
-          onChange={handleQuestTypeChange}
-          helperText="The general type of task or objective"
+          label="Dialogue Tone"
+          options={dialogueToneOptions}
+          value={formData.dialogue_options?.tone || ''}
+          onChange={handleToneChange}
+          fullWidth={false}
         />
         
-        {/* Reward Type */}
+        {/* Dialogue Context */}
         <Select
-          label="Reward Type"
-          options={rewardTypeOptions}
-          value={formData.quest_options?.reward_type || ''}
-          onChange={handleRewardTypeChange}
-          helperText="What the player will receive upon completion"
+          label="Context"
+          options={dialogueContextOptions}
+          value={formData.dialogue_options?.context || ''}
+          onChange={handleContextChange}
+          fullWidth={false}
         />
-      </div>
-      
-      {/* Quest Type Description */}
-      {formData.quest_options?.quest_type && formData.quest_options.quest_type !== 'any' && (
-        <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-sm dark:bg-gray-800 dark:border-gray-700">
-          <p className="text-gray-700 dark:text-gray-300">
-            {questTypeOptions.find(opt => opt.value === formData.quest_options?.quest_type)?.description}
-          </p>
-        </div>
-      )}
-
-      {/* Example Quest Format */}
-      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-        <h3 className="text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">Example Quest Format:</h3>
-        <div className="space-y-3 text-gray-600 dark:text-gray-400 text-sm">
-          <h4 className="font-semibold">The Stolen Artifact</h4>
-          <p>A valuable artifact has been stolen from the local museum. The thief is believed to be hiding in the abandoned district. Investigate the area and recover the artifact before it falls into the wrong hands.</p>
-          <div>
-            <span className="font-medium">Reward:</span> A rare magical pendant that grants enhanced perception in dark environments.
-          </div>
-        </div>
       </div>
     </div>
   );

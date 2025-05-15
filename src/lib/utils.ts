@@ -115,14 +115,19 @@ export function formatTraitValue(value: string): string {
 }
 
 /**
- * Get character traits as a flat array of strings for display
+ * Get character traits as a flat array of strings for display - excludes appearance, personality, backstory
  */
 export function getCharacterTraitsArray(character: Character): string[] {
   const traits: string[] = [];
   
-  // Add selected traits
+  // Add selected traits - exclude appearance, personality, backstory_hook
   if (character.selected_traits) {
     Object.entries(character.selected_traits).forEach(([key, value]) => {
+      // Skip these fields as they're displayed separately
+      if (key === 'appearance' || key === 'personality' || key === 'backstory_hook') {
+        return;
+      }
+      
       if (value) {
         // Handle different key types
         if (key === 'genre') {
@@ -131,6 +136,11 @@ export function getCharacterTraitsArray(character: Character): string[] {
             traits.push(`Genre: ${formatTraitValue(value)}`);
           } else if (Array.isArray(value)) {
             traits.push(`Genre: ${value.map(v => formatTraitValue(v)).join(', ')}`);
+          }
+        } else if (key === 'sub_genre') {
+          // Handle sub_genre
+          if (typeof value === 'string') {
+            traits.push(`Sub-genre: ${formatTraitValue(value)}`);
           }
         } else if (key === 'gender') {
           // Handle gender which should be a string
@@ -142,6 +152,11 @@ export function getCharacterTraitsArray(character: Character): string[] {
           if (typeof value === 'string') {
             traits.push(`Age: ${formatTraitValue(value)}`);
           }
+        } else if (key === 'species') {
+          // Handle species
+          if (typeof value === 'string') {
+            traits.push(`Species: ${formatTraitValue(value)}`);
+          }
         } else if (key === 'moral_alignment') {
           // Handle moral_alignment which should be a string
           if (typeof value === 'string') {
@@ -152,9 +167,43 @@ export function getCharacterTraitsArray(character: Character): string[] {
           if (typeof value === 'string') {
             traits.push(`Relation: ${formatTraitValue(value)}`);
           }
+        } else if (key === 'occupation') {
+          // Handle occupation
+          if (typeof value === 'string') {
+            traits.push(`Occupation: ${formatTraitValue(value)}`);
+          }
+        } else if (key === 'social_class') {
+          // Handle social class
+          if (typeof value === 'string') {
+            traits.push(`Social Class: ${formatTraitValue(value)}`);
+          }
+        } else if (key === 'height') {
+          // Handle height
+          if (typeof value === 'string') {
+            traits.push(`Height: ${formatTraitValue(value)}`);
+          }
+        } else if (key === 'build') {
+          // Handle build
+          if (typeof value === 'string') {
+            traits.push(`Build: ${formatTraitValue(value)}`);
+          }
+        } else if (key === 'distinctive_features') {
+          // Handle distinctive features
+          if (typeof value === 'string') {
+            traits.push(`Features: ${value}`);
+          }
+        } else if (key === 'homeland') {
+          // Handle homeland
+          if (typeof value === 'string') {
+            traits.push(`Homeland: ${value}`);
+          }
         } else if (key === 'personality_traits' && Array.isArray(value)) {
-          // Handle personality_traits array
-          traits.push(`Traits: ${value.map(v => formatTraitValue(v)).join(', ')}`);
+          // Handle personality_traits array - add each trait individually
+          value.forEach(trait => {
+            if (trait) {
+              traits.push(formatTraitValue(trait));
+            }
+          });
         } else if (typeof value === 'string') {
           // Handle any other string values
           traits.push(`${formatTraitKey(key)}: ${formatTraitValue(value)}`);
@@ -163,26 +212,32 @@ export function getCharacterTraitsArray(character: Character): string[] {
     });
   }
   
-  // Add AI-added traits
+  // Add AI-added traits (excluding appearance, personality, backstory_hook)
   if (character.added_traits) {
     Object.entries(character.added_traits).forEach(([key, value]) => {
-      if (typeof value === 'string') {
+      // Skip these fields as they're displayed separately
+      if (key === 'appearance' || key === 'personality' || key === 'backstory_hook') {
+        return;
+      }
+      
+      // Skip if this trait was already added from selected_traits
+      if (character.selected_traits && (character.selected_traits as any)[key]) {
+        return;
+      }
+      
+      if (Array.isArray(value)) {
+        value.forEach(item => {
+          if (item && typeof item === 'string') {
+            traits.push(formatTraitValue(item));
+          }
+        });
+      } else if (typeof value === 'string') {
         traits.push(`${formatTraitKey(key)}: ${formatTraitValue(value)}`);
       }
     });
   }
   
   return traits;
-}
-
-/**
- * Capitalize the first letter of each word in a string
- */
-export function capitalizeFirstLetter(string: string): string {
-  return string
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
 }
 
 /**
