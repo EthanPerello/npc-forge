@@ -26,7 +26,7 @@ interface CharacterContextType {
   error: string | null;
   updateFormData: (data: Partial<CharacterFormData>) => void;
   resetFormData: () => void;
-  generateCharacter: () => Promise<void>;
+  generateCharacter: (customFormData?: CharacterFormData) => Promise<void>;
   downloadCharacterJSON: () => void;
   saveToLibrary: (customCharacter?: Character) => Promise<boolean>;
   setCharacter: (character: Character | null | ((prev: Character | null) => Character | null)) => void;
@@ -152,18 +152,21 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     setFormData(defaultFormData);
   }, []);
 
-  // Generate character
-  const generateCharacter = useCallback(async () => {
+  // Generate character - FIXED to accept custom form data
+  const generateCharacter = useCallback(async (customFormData?: CharacterFormData) => {
     setIsLoading(true);
     setError(null);
 
     try {
+      // Use custom form data if provided, otherwise use current state
+      const dataToUse = customFormData || formData;
+      
       // Import usage limits (done inside the function to avoid SSR issues)
       const { hasReachedLimit, incrementUsage } = await import('@/lib/usage-limits');
       
       // Get selected models
-      const textModel = formData.model || DEFAULT_MODEL;
-      const imageModel = formData.portrait_options?.image_model || DEFAULT_IMAGE_MODEL;
+      const textModel = dataToUse.model || DEFAULT_MODEL;
+      const imageModel = dataToUse.portrait_options?.image_model || DEFAULT_IMAGE_MODEL;
       
       // Check if user has reached their monthly limit for either model
       if (hasReachedLimit(textModel)) {
@@ -180,7 +183,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToUse),
       });
 
       if (!response.ok) {
@@ -191,6 +194,11 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
       const data = await response.json();
       console.log('Generated character:', data.character?.name, 'with image data:', !!data.character?.image_data);
       setCharacter(data.character);
+      
+      // If we used custom form data, update the form state
+      if (customFormData) {
+        setFormData(customFormData);
+      }
       
       // Increment usage count for both models on successful generation
       incrementUsage(textModel);

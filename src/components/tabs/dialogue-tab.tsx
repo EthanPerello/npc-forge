@@ -83,18 +83,15 @@ export default function DialogueTab() {
   };
   
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-gray-600 dark:text-gray-400">
-        Configure the dialogue lines this character will speak.
-      </p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {/* Number of Lines */}
         <Select
-          label="Number of Dialogue Lines"
+          label="Number of Lines"
           options={lineNumberOptions}
           value={String(formData.dialogue_options?.number_of_lines || 3)}
           onChange={handleNumberChange}
+          fullWidth={false}
         />
         
         {/* Dialogue Tone */}
@@ -103,42 +100,17 @@ export default function DialogueTab() {
           options={dialogueToneOptions}
           value={formData.dialogue_options?.tone || ''}
           onChange={handleToneChange}
-          helperText="How the character speaks"
+          fullWidth={false}
         />
         
         {/* Dialogue Context */}
         <Select
-          label="Dialogue Context"
+          label="Context"
           options={dialogueContextOptions}
           value={formData.dialogue_options?.context || ''}
           onChange={handleContextChange}
-          helperText="The situation in which dialogue occurs"
+          fullWidth={false}
         />
-      </div>
-      
-      {/* Tone Description */}
-      {formData.dialogue_options?.tone && formData.dialogue_options.tone !== 'any' && (
-        <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-sm dark:bg-gray-800 dark:border-gray-700">
-          <p className="text-gray-700 dark:text-gray-300">
-            {dialogueToneOptions.find(opt => opt.value === formData.dialogue_options?.tone)?.description}
-          </p>
-        </div>
-      )}
-      
-      {/* Dialogue Example */}
-      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-        <h3 className="text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">Example Dialogue Format:</h3>
-        <div className="space-y-2 text-gray-600 dark:text-gray-400 text-sm">
-          <p className="italic">
-            "Greetings, traveler! Have you come seeking treasures from distant lands?"
-          </p>
-          <p className="italic">
-            "Hmph, don't waste my time unless you have something valuable to trade."
-          </p>
-          <p className="italic">
-            "Return to me when you've found the ancient scroll... if you survive, that is."
-          </p>
-        </div>
       </div>
     </div>
   );
