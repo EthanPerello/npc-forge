@@ -1,120 +1,226 @@
 # How to Use NPC Forge
 
-NPC Forge is an AI-powered character generator for games, storytelling, and creative projects. This guide will walk you through the core functionality and features.
+NPC Forge is an AI-powered character generator featuring a step-by-step wizard interface for creating detailed NPCs for games, storytelling, and creative projects. This guide will walk you through the new wizard-based creation process and all available features.
 
 ## Quick Start Guide
 
-### 1. Choose a template or write a description
+### 1. Welcome to the Wizard
 
-Start by selecting a genre template (Fantasy, Sci-Fi, Historical, or Contemporary) or write your own character description. The more specific your description, the more tailored your character will be.
+When you first visit NPC Forge, you'll see a welcome popup that introduces the new wizard interface. The wizard guides you through four steps to create your perfect character.
 
-Example description:
-> A scarred elven ranger who protects a sacred forest, harboring a secret connection to ancient magic.
+![Site Header](/public/images/site-header.png)
 
-![Character Tab Selections](/docs/images/character-tab-selections.png)
+### 2. Step 1: Concept
 
-### 2. Customize character details
+![Concept Step](/public/images/concept-step.png)
 
-Use the tabs to customize your character's traits, quests, dialogue, and inventory:
+**Choose your foundation:**
+- **Select a Genre**: Pick from Fantasy, Sci-Fi, Historical, or Contemporary
+- **Pick a Sub-Genre**: Choose from 16 specialized templates (e.g., High Fantasy, Cyberpunk, Medieval)
+- **Write Your Description**: Provide a detailed description of your character
 
-- **Character Tab**: Set gender, age, moral alignment, relationship to player, and more
-- **Quests Tab**: Configure quest types, rewards, and number of quests
-- **Dialogue Tab**: Set tone, context, and number of dialogue lines
-- **Items Tab**: Choose item categories, rarity, and number of items
+**Example description:**
+> A scarred elven ranger who protects a sacred forest, harboring a secret connection to ancient magic that causes plants to grow in her footsteps.
 
-![Advanced Character Options](/docs/images/advanced-character-tab-selections.png)
+**Pro Tip**: The more specific your description, the more tailored your character will be.
 
-For even more options, expand the "Advanced Options" section to specify:
-- Physical traits (height, build, distinctive features)
-- Social class and homeland
-- Occupation
-- Personality traits (up to 3)
+### 3. Step 2: Options
 
-### 3. Generate your character
+![Options Step](/public/images/options-step.png)
 
-Click the "Generate Character" button. The AI will process your inputs and create:
-- Complete character profile with name, appearance, personality, backstory
-- AI-generated portrait
-- Quests, dialogue, and items (if selected)
+**Customize character traits:**
+- **Basic Traits**: Set gender, age, moral alignment, and relationship to player
+- **Advanced Options** (expandable):
+  - Physical traits (height, build, distinctive features)
+  - Background (social class, homeland, occupation)
+  - Personality traits (unlimited selection)
+- **Additional Elements**:
+  - Enable/disable quests, dialogue, and items
+  - Customize quest types, dialogue tone, item categories
 
-### 4. Review and save
+**Navigation Tip**: Use the sticky progress bar at the top to jump between steps at any time.
 
-Review your character and use the tabs to explore all details. Download the JSON file to save your character for future reference.
+### 4. Step 3: Model Selection
 
-![Character Display](/docs/images/character-tab-results.png)
+![Model Step](/public/images/model-step.png)
 
-## Portrait Customization
+**Choose your AI models:**
 
-NPC Forge lets you customize how character portraits are generated:
+| Tier | Text Model | Image Model | Usage | Best For |
+|------|------------|-------------|--------|----------|
+| 🟢 Standard | gpt-4o-mini | dall-e-2 | Unlimited | Regular use |
+| 🟡 Enhanced | gpt-4.1-mini | dall-e-3 | 30/month | Higher quality |
+| 🔴 Premium | gpt-4o | gpt-image-1 | 10/month | Maximum detail |
 
-![Portrait Options](/docs/images/portrait-character-tab-selections.png)
+**Portrait Customization**:
+- Art style (realistic, fantasy, anime, etc.)
+- Expression/mood (neutral, happy, serious, etc.)
+- Framing (portrait, bust, full-body, action)
+- Background (plain, gradient, themed, etc.)
 
-- **Art Style**: Choose from realistic, fantasy art, anime, comic book, and more
-- **Expression/Mood**: Set facial expression (neutral, happy, serious, etc.)
-- **Framing**: Select portrait (head/shoulders), bust, full-body, or action poses
-- **Background**: Choose plain backgrounds, gradients, themed environments, and more
+For a comprehensive understanding of model tiers and usage strategies, see the [Model Selection Guide](/docs/models).
 
-> **Tip**: For best results, only specify the portrait options that are important to you. The AI often creates better portraits when given some creative freedom.
+### 5. Step 4: Generate
 
-## Understanding Usage Limits
+![Generate Step](/public/images/generate-step.png)
 
-NPC Forge is limited to 15 character generations per month per device:
+**Create your character:**
+- Click "Generate Character" to start the AI generation process
+- Watch the progress as your character is created
+- Review the complete character profile with tabs for different sections
 
-- **Monthly Reset**: Your generation count resets at the beginning of each month
-- **Remaining Generations**: View your remaining generations in the usage indicator
-- **Save Your Work**: Always download your characters as JSON files to keep them for future reference
+**Quick Generation**: Click "Generate Random Character" from any step to create a character with default settings instantly.
 
-## Advanced Tips
+## Character Library
 
-### Effective Descriptions
+![Character Library](/public/images/character-library.png)
 
-Write specific, evocative descriptions for better results. Include details about appearance, personality, background, and unique traits.
+### Saving Characters
 
-**Good example**: "A rogue android engineer living on a space station who modifies tech beyond legal limits. They have developed unique upgrades that give them an edge but also make them a target for corporate security forces."
+After generating a character, use the "Save to Library" button to add it to your collection.
 
-**Basic example**: "A tech engineer in space."
+### Managing Your Library
 
-### Using Templates
+- **Browse Characters**: View all saved characters with visual cards
+- **Search & Filter**: Find specific characters by name, genre, or traits
+- **Direct Actions**: Each card has buttons for editing, downloading, and deleting
+- **Import/Export**: Upload JSON files or download characters for backup
 
-Genre templates provide excellent starting points. Each genre has several sub-genres with specialized characteristics:
+For detailed library management, see the [Character Library Guide](/docs/library).
 
-- **Fantasy**: High Fantasy, Dark Fantasy, Urban Fantasy, Sword & Sorcery
-- **Sci-Fi**: Space Opera, Cyberpunk, Post-Apocalyptic, Hard Sci-Fi
-- **Historical**: Medieval, Ancient Civilizations, Renaissance, Age of Sail
-- **Contemporary**: Urban Life, Mystery & Thriller, Supernatural, Slice of Life
+### Editing Characters
 
-### Character Iterations
+![Edit Page](/public/images/edit-page.png)
 
-If you're not satisfied with a generated character:
-1. Adjust your inputs (try more specific descriptions)
-2. Generate again
-3. Repeat until you get the desired result
+**Full editing capabilities:**
+- Modify all character attributes
+- Add or remove quests, dialogue lines, and items
+- Regenerate specific character elements
+- Upload or regenerate portraits
+- Choose different AI models for regeneration
 
-### Randomizing Options
+Learn more about character editing in the [Character Library Guide](/docs/library).
 
-Use the "Randomize Options" button to quickly generate new character traits if you're feeling stuck or want inspiration.
+## Advanced Features
 
-### Clear Options
+### Character Regeneration
 
-The "Clear Options" button lets you reset all character traits while preserving your description and portrait settings.
+**Regenerate individual elements:**
+- Character attributes (name, appearance, personality, backstory)
+- Portrait with different models or styles
+- Individual quest components (title, description, reward)
+- Specific dialogue lines
+- Item descriptions
 
-## Example Use Cases
+**How to regenerate:**
+1. Open character in edit mode
+2. Click the regenerate icon next to any element
+3. Choose your preferred model (if applicable)
+4. Wait for the new content to generate
 
-- **Game Developers**: Create NPCs for your games with consistent traits and backstories
-- **Tabletop RPG Players**: Generate memorable characters for your campaigns
-- **Writers & Worldbuilders**: Develop supporting characters for your stories
-- **Game Masters**: Quickly create interesting NPCs for your sessions
+### Model Selection Tips
+
+- **Standard Tier**: Perfect for frequent use and experimentation
+- **Enhanced Tier**: Use for important characters requiring higher quality
+- **Premium Tier**: Reserve for key NPCs needing maximum detail
+
+For a comprehensive understanding of model tiers and usage strategies, see the [Model Selection Guide](/docs/models).
+
+### Portrait Customization Tips
+
+- Only specify options that matter most to you
+- Leave some options unset to give the AI creative freedom
+- Experiment with different art styles for variety
+
+## Common Workflows
+
+### Quick Character Creation
+
+1. Click "Generate Random Character" from any step
+2. Review the generated character
+3. Make minor edits if needed
+4. Save to library
+
+### Detailed Character Creation
+
+1. Start with Concept step and write a detailed description
+2. Set specific traits in Options step
+3. Choose appropriate model tier in Model step
+4. Generate and review in Generate step
+5. Edit and regenerate elements as needed
+
+### Creating Character Sets
+
+1. Create your first character with specific traits
+2. Save to library
+3. Use similar descriptions and traits for related characters
+4. Edit relationships and backstories to connect them
 
 ## Troubleshooting
 
-**Portrait generation failed**: Try again with different portrait options or simplify your request.
+### Generation Issues
 
-**Character generation failed**: Check your internet connection and try again. If the problem persists, your request might contain content that violates usage policies.
+- **Character generation failed**: Check your internet connection and try again
+- **Portrait generation failed**: Try with different portrait options or simpler descriptions
+- **Slow generation**: This is normal for higher-tier models; wait patiently
 
-**Usage limit reached**: Wait until the next month for your limit to reset.
+### Library Issues
+
+- **Characters not saving**: Your browser storage might be full; delete old characters
+- **Can't edit character**: Make sure it's a user-created character, not an example
+- **Lost characters**: Characters are stored locally; they don't sync between devices
+
+For more library troubleshooting, see the [Character Library Guide](/docs/library).
+
+### Usage Limits
+
+- **Reached monthly limit**: Wait for the monthly reset or use Standard tier
+- **Unexpected limit reached**: Check which models you're using and their individual limits
+
+Learn more about usage management in the [Model Selection Guide](/docs/models).
+
+## Tips for Best Results
+
+### Writing Descriptions
+
+- Be specific about key details (appearance, personality, background)
+- Include unique elements that make the character memorable
+- Mention any special abilities or distinctive features
+
+### Using Advanced Options
+
+- Select personality traits that complement each other
+- Choose occupation that fits the genre and character concept
+- Use physical traits to reinforce the character's background
+
+### Portrait Generation
+
+- Describe visual elements in your character description
+- Choose art style that matches your game's aesthetic
+- Use themed backgrounds for context
+
+### Library Organization
+
+- Use descriptive names for easy searching
+- Group related characters with similar naming conventions
+- Download important characters as JSON for backup
+
+## Keyboard Shortcuts
+
+- **Tab / Shift+Tab**: Navigate between form fields
+- **Enter**: Submit current step (equivalent to Continue/Generate)
+- **Escape**: Close modals and popups
 
 ## Next Steps
 
-- Check out [Character Examples](/docs/character-examples) to see what's possible
-- Explore [Generation Options](/docs/generation-options) for a detailed breakdown of all settings
-- Read the [FAQ](/docs/faq) for answers to common questions
+- Explore [Character Examples](/docs/character-examples) to see what's possible
+- Read about [Generation Options](/docs/generation-options) for detailed customization
+- Check the [Character Library Guide](/docs/library) for advanced management features
+- View the [Model Selection Guide](/docs/models) to understand AI model differences
+- See all available features in the [Features Overview](/docs/features)
+
+## Getting Help
+
+- Check the [FAQ](/docs/faq) for common questions
+- Report issues on [GitHub](https://github.com/EthanPerello/npc-forge/issues)
+- Contact support at [ethanperello@gmail.com](mailto:ethanperello@gmail.com)

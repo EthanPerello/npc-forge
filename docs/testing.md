@@ -10,30 +10,90 @@ NPC Forge currently relies on manual testing for quality assurance. This documen
 
 ### Core Functionality
 
-#### Character Generation
+#### Character Generation Wizard
 
-- [ ] Basic character generation with minimal inputs
-- [ ] Generation with all options specified
-- [ ] Generation with different genres and sub-genres
-- [ ] Validation of required fields (description)
-- [ ] Error handling for invalid inputs
-- [ ] Character JSON structure validation
+- [ ] **Concept Step**
+  - [ ] Genre selection updates sub-genre options correctly
+  - [ ] Sub-genre selection works for all genres
+  - [ ] Description field accepts input and persists across navigation
+  - [ ] Progress bar shows step 1 as active
+  - [ ] Continue button navigates to Options step
 
-#### Portrait Generation
+- [ ] **Options Step**
+  - [ ] Basic traits (gender, age, alignment, relationship) can be selected
+  - [ ] Advanced options expand/collapse correctly
+  - [ ] Personality traits allow multiple selection (unlimited)
+  - [ ] Occupation search dropdown functions properly
+  - [ ] Quest/dialogue/item toggles work
+  - [ ] Randomize button generates random traits
+  - [ ] Clear options resets fields but preserves description
+  - [ ] Progress bar navigation allows jumping to other steps
 
-- [ ] Basic portrait generation
-- [ ] Portrait generation with customization options
-- [ ] Fallback handling when portrait generation fails
-- [ ] Portrait rendering in the UI
+- [ ] **Model Step**
+  - [ ] Text model selection displays usage limits correctly
+  - [ ] Image model selection displays usage limits correctly
+  - [ ] Portrait customization options function
+  - [ ] Usage warnings appear when approaching limits
+  - [ ] Progress bar shows step 3 as active
 
-#### Usage Limits
+- [ ] **Generate Step**
+  - [ ] Character generation completes successfully
+  - [ ] Portrait generation works (or fails gracefully)
+  - [ ] Generated character displays in tabs
+  - [ ] Save to Library button functions
+  - [ ] New Character button resets wizard
 
-- [ ] Proper counting of character generations
-- [ ] Correct display of remaining generations
-- [ ] Monthly reset functionality
-- [ ] Dev mode bypass functionality
+#### Character Library
+
+- [ ] **Library Interface**
+  - [ ] Character cards display correctly
+  - [ ] Search functionality works
+  - [ ] Filter by genre/sub-genre functions
+  - [ ] Character viewer modal opens and displays data
+  - [ ] Direct action buttons (edit, delete, download) work
+
+- [ ] **Character Editing**
+  - [ ] Edit page loads character data correctly
+  - [ ] All character fields can be modified
+  - [ ] Portrait upload/regeneration works
+  - [ ] Add/remove quests functions
+  - [ ] Add/remove dialogue lines works
+  - [ ] Add/remove items works
+  - [ ] Individual regeneration buttons work
+  - [ ] Save changes persists modifications
+
+#### Character Regeneration
+
+- [ ] **Individual Attribute Regeneration**
+  - [ ] Name regeneration works
+  - [ ] Appearance regeneration works
+  - [ ] Personality regeneration works
+  - [ ] Backstory regeneration works
+  - [ ] Model selection affects regeneration quality
+
+- [ ] **Component Regeneration**
+  - [ ] Quest title regeneration
+  - [ ] Quest description regeneration
+  - [ ] Quest reward regeneration
+  - [ ] Full quest regeneration
+  - [ ] Dialogue line regeneration
+  - [ ] Item description regeneration
+
+- [ ] **Portrait Regeneration**
+  - [ ] Portrait regeneration with same model
+  - [ ] Portrait regeneration with different models
+  - [ ] Portrait options affect regeneration results
+  - [ ] Loading states show during regeneration
 
 ### User Interface
+
+#### Wizard Navigation
+
+- [ ] Progress bar correctly shows current step
+- [ ] Clicking progress bar steps navigates appropriately
+- [ ] Continue/Back buttons work in all steps
+- [ ] Sticky footer remains visible during scroll
+- [ ] Welcome popup appears for first-time users
 
 #### Form Controls
 
@@ -52,12 +112,47 @@ NPC Forge currently relies on manual testing for quality assurance. This documen
 - [ ] JSON data can be viewed
 - [ ] Download functionality works
 
+#### Model Selection Interface
+
+- [ ] Model tiers display correctly with indicators
+- [ ] Usage limits show current status
+- [ ] Model descriptions are accurate
+- [ ] Selection persists across navigation
+
 #### Responsive Design
 
 - [ ] Desktop layout renders correctly
 - [ ] Tablet layout adjusts appropriately
 - [ ] Mobile layout is usable
 - [ ] Touch interactions work on mobile devices
+- [ ] Wizard steps adapt to screen size
+
+### Data Management
+
+#### IndexedDB Storage
+
+- [ ] Characters save to library correctly
+- [ ] Characters load from library correctly
+- [ ] Character editing saves persist
+- [ ] Portrait images store and retrieve properly
+- [ ] Search index functions efficiently
+- [ ] Database recovery handles corruption
+
+#### Import/Export
+
+- [ ] JSON export includes all character data
+- [ ] JSON import adds characters to library
+- [ ] Individual character downloads work
+- [ ] Portrait downloads function correctly
+
+### Usage Limits
+
+- [ ] Standard tier shows unlimited correctly
+- [ ] Enhanced tier tracks 30/month limit
+- [ ] Premium tier tracks 10/month limit
+- [ ] Usage persists across browser sessions
+- [ ] Monthly reset functionality works
+- [ ] Development mode bypasses limits
 
 ### Edge Cases
 
@@ -66,6 +161,7 @@ NPC Forge currently relies on manual testing for quality assurance. This documen
 - [ ] Very short descriptions still produce reasonable results
 - [ ] Failure states are handled with appropriate messaging
 - [ ] Network interruptions are handled gracefully
+- [ ] Empty character library displays appropriately
 
 ## Test Environment Setup
 
@@ -78,43 +174,56 @@ To properly test NPC Forge, you should have:
 
 ## Testing Specific Features
 
-### Testing Genre and Sub-genre Selection
+### Testing the Wizard Interface
 
-1. Select each main genre and verify:
-   - Sub-genre options update appropriately
-   - Example description updates
-   - UI elements reflect the genre selection
+1. **Navigation Testing**:
+   - Complete the full wizard flow multiple times
+   - Navigate backwards and forwards between steps
+   - Test direct navigation via progress bar
+   - Verify data persistence across navigation
 
-2. Select each sub-genre and verify:
-   - Example description updates to match
-   - Generated characters reflect the sub-genre traits
+2. **Step Completion Testing**:
+   - Test each step with minimal data
+   - Test each step with maximal data
+   - Test validation on required fields
 
-### Testing Advanced Options
+### Testing Model Selection
 
-1. Test personality trait selection:
-   - Selecting up to 3 traits works
-   - Cannot select more than 3 traits
-   - Selected traits are reflected in generation
+1. **Usage Limit Testing**:
+   - Generate characters with different model combinations
+   - Verify usage counts increment correctly
+   - Test behavior when approaching limits
+   - Verify monthly reset functionality
 
-2. Test randomization feature:
-   - Randomize button provides different options each time
-   - Generated characters reflect randomized options
+2. **Model Quality Testing**:
+   - Compare outputs between model tiers
+   - Test mixed model selections (e.g., Standard text + Enhanced image)
 
-3. Test clear options:
-   - Clear options resets all fields except description
-   - Portrait options are preserved when specified
+### Testing Character Regeneration
 
-### Testing API Calls
+1. **Individual Regeneration**:
+   - Test each regeneration type separately
+   - Verify only selected elements change
+   - Test with different models
+   - Verify loading states and error handling
 
-1. Test API response handling:
-   - Successful responses render properly
-   - Error responses show appropriate messages
-   - Timeouts are handled gracefully
+2. **Component Regeneration**:
+   - Test quest component regeneration
+   - Verify dialogue and item regeneration
+   - Test add/remove functionality with regeneration
 
-2. Test API input validation:
-   - Empty descriptions are rejected
-   - Invalid enum values are handled
-   - Overly long inputs are truncated or rejected
+### Testing Library Management
+
+1. **CRUD Operations**:
+   - Create characters and save to library
+   - Read/view characters from library
+   - Update characters through editing
+   - Delete characters from library
+
+2. **Search and Filtering**:
+   - Test search with various queries
+   - Test filter combinations
+   - Verify results update in real-time
 
 ## Manual Testing Procedure
 
@@ -124,17 +233,19 @@ Follow this procedure when testing new features or changes:
    - Start with a clean development environment
    - Ensure you have the latest code
    - Set up the `.env.local` file with your OpenAI API key
+   - Clear browser cache and IndexedDB if testing storage
 
-2. **Basic Testing**
+2. **Basic Wizard Testing**
    - Test the happy path (expected inputs and workflow)
+   - Complete character creation with standard options
+   - Save character to library
    - Verify outputs match expected results
-   - Check UI rendering and interactions
 
-3. **Edge Case Testing**
-   - Test with minimal inputs
-   - Test with extreme inputs
-   - Test with unexpected inputs
-   - Test error conditions
+3. **Advanced Feature Testing**
+   - Test model selection variations
+   - Test character regeneration features
+   - Test library management operations
+   - Test edge cases and error conditions
 
 4. **Cross-browser Testing**
    - Verify functionality in Chrome, Firefox, Safari, and Edge
@@ -147,9 +258,53 @@ Follow this procedure when testing new features or changes:
    - Ensure text is readable and forms are usable
    - Test in both portrait and landscape orientations
 
-6. **Documentation Review**
-   - Ensure documentation reflects the current behavior
-   - Update documentation if needed
+6. **Performance Testing**
+   - Monitor generation times across models
+   - Test library performance with many characters
+   - Verify IndexedDB operations are efficient
+
+## Testing Scenarios
+
+### Character Generation Scenarios
+
+1. **Minimal Input Character**
+   - Only description provided
+   - Default model selections
+   - Basic traits only
+
+2. **Fully Customized Character**
+   - Detailed description
+   - All advanced options filled
+   - Premium models selected
+   - All components enabled
+
+3. **Different Genre Characters**
+   - Test each main genre
+   - Test multiple sub-genres
+   - Verify genre-specific templates work
+
+### Regeneration Scenarios
+
+1. **Selective Regeneration**
+   - Regenerate only appearance
+   - Regenerate specific quest components
+   - Change models between regenerations
+
+2. **Bulk Regeneration**
+   - Regenerate multiple elements
+   - Test regeneration performance
+   - Verify data consistency
+
+### Library Scenarios
+
+1. **Small Library (< 10 characters)**
+   - Test basic operations
+   - Verify search and filtering
+
+2. **Large Library (50+ characters)**
+   - Test performance
+   - Test search efficiency
+   - Test scroll and pagination behavior
 
 ## Future Automated Testing
 
@@ -159,9 +314,9 @@ While NPC Forge currently relies on manual testing, future development should in
 
 Implement unit tests for:
 - Utility functions in `/src/lib/utils.ts`
-- Context providers
+- Context providers and state management
 - API route handlers (mocking OpenAI responses)
-- Component props and state management
+- Character storage operations
 
 Recommended tools:
 - Jest
@@ -170,9 +325,10 @@ Recommended tools:
 ### Integration Tests
 
 Implement integration tests for:
-- Form submission workflows
-- Character generation flow
-- Navigation and routing
+- Wizard flow completion
+- Character library operations
+- Regeneration workflows
+- Model selection and usage tracking
 
 Recommended tools:
 - Cypress
@@ -183,7 +339,7 @@ Recommended tools:
 Implement end-to-end tests for:
 - Complete user journeys
 - Cross-browser compatibility
-- Mobile compatibility
+- Mobile functionality
 
 Recommended tools:
 - Cypress
@@ -192,9 +348,9 @@ Recommended tools:
 ### Visual Regression Tests
 
 Consider visual regression tests for:
-- UI components
-- Generated character cards
-- Responsive layouts
+- Wizard step interfaces
+- Character display layouts
+- Library grid layouts
 
 Recommended tools:
 - Percy
@@ -239,6 +395,26 @@ When reporting issues found during testing:
    - Minor: Cosmetic issues, non-blocking bugs
    - Enhancement: Suggestions for improvement
 
+## Performance Testing
+
+### Generation Performance
+
+- Monitor character generation times across different models
+- Test concurrent generation requests
+- Verify API timeout handling
+
+### Library Performance
+
+- Test library loading with large numbers of characters
+- Monitor search performance with complex queries
+- Verify IndexedDB operation efficiency
+
+### UI Performance
+
+- Test wizard navigation speed
+- Monitor rendering performance on different devices
+- Verify smooth animations and transitions
+
 ## Release Testing
 
 Before each release, perform these additional tests:
@@ -247,10 +423,9 @@ Before each release, perform these additional tests:
    - Verify all existing features still work
    - Check for unintended side effects
 
-2. **Performance Testing**
-   - Check load times
-   - Verify API call efficiency
-   - Test with multiple characters generated
+2. **Integration Testing**
+   - Test the complete user workflow
+   - Verify all features work together correctly
 
 3. **Documentation Review**
    - Ensure documentation is up to date
@@ -262,6 +437,7 @@ Before each release, perform these additional tests:
 
 ## Related Documentation
 
-- [Contributing Guidelines](contributing.md) - For contribution workflows
-- [Deployment Guide](deployment.md) - For deployment procedures
-- [Architecture Overview](architecture.md) - For system understanding
+- [Contributing Guidelines](/docs/contributing) - For contribution workflows
+- [Development Setup](/docs/dev-setup) - For development environment
+- [Architecture Overview](/docs/architecture) - For system understanding
+- [Character Library Guide](/docs/library) - For library feature testing

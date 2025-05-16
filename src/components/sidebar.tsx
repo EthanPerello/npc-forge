@@ -21,9 +21,10 @@ import {
   Scale,
   Menu,
   X,
-  History,
   Sparkles,
-  Library
+  Library,
+  Server,
+  Database
 } from 'lucide-react';
 import { ReactNode } from 'react';
 import { isValidElement } from 'react';
@@ -57,6 +58,8 @@ const navigationItems: NavItemType[] = [
       { title: 'Character Examples', path: '/docs/character-examples', icon: <File className="h-4 w-4" /> },
       { title: 'Generation Options', path: '/docs/generation-options', icon: <Settings className="h-4 w-4" /> },
       { title: 'Features', path: '/docs/features', icon: <List className="h-4 w-4" /> },
+      { title: 'Library Guide', path: '/docs/library', icon: <Database className="h-4 w-4" /> },
+      { title: 'Model Selection', path: '/docs/models', icon: <Server className="h-4 w-4" /> },
       { title: 'FAQ', path: '/docs/faq', icon: <HelpCircle className="h-4 w-4" /> },
       { 
         title: 'Developer Docs', 
@@ -70,7 +73,6 @@ const navigationItems: NavItemType[] = [
           { title: 'Testing', path: '/docs/testing', icon: <Code className="h-3 w-3" /> },
           { title: 'Deployment', path: '/docs/deployment', icon: <Rocket className="h-3 w-3" /> },
           { title: 'Roadmap', path: '/docs/roadmap', icon: <Rocket className="h-3 w-3" /> },
-          { title: 'Changelog', path: '/docs/changelog', icon: <History className="h-3 w-3" /> },
           { title: 'Credits', path: '/docs/credits', icon: <Award className="h-3 w-3" /> },
           { title: 'License', path: '/docs/license', icon: <Scale className="h-3 w-3" /> },
         ]
@@ -173,35 +175,52 @@ const NavItem = ({ item, depth = 0, isOpen = false, toggleOpen, isFullSidebar, t
     <div className="w-full">
       <div 
         className={`
-          flex justify-between items-center w-full px-4 py-2 rounded-md cursor-pointer mb-1
+          flex justify-between items-center w-full px-4 py-2 rounded-md mb-1
           ${isActive ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300' : 'hover:bg-secondary'}
           ${depth === 0 ? 'font-medium' : ''}
           ${depth === 2 ? 'text-sm' : ''}
         `}
-        onClick={(e) => {
-          handleItemClick(e);
-          handleBookIconClick(e);
-        }}
       >
-        <div className="flex items-center">
+        <div className="flex items-center flex-1">
           <span className="mr-2 text-indigo-600 dark:text-indigo-400">{item.icon}</span>
           
           {item.path ? (
-            <Link href={item.path} className="w-full" onClick={e => {
-              // If it has children and is not open, we want to open it first instead of navigating
-              if (hasChildren && !isOpen) {
-                e.preventDefault();
-              }
-            }}>
+            <Link 
+              href={item.path} 
+              className="flex-1 cursor-pointer"
+              onClick={e => {
+                // If it has children and is not open, we want to open it first instead of navigating
+                if (hasChildren && !isOpen) {
+                  e.preventDefault();
+                  toggleOpen();
+                }
+              }}
+            >
               {item.title}
             </Link>
           ) : (
-            <span>{item.title}</span>
+            <span 
+              className="flex-1 cursor-pointer"
+              onClick={(e) => {
+                if (hasChildren) {
+                  toggleOpen();
+                }
+                handleBookIconClick(e);
+              }}
+            >
+              {item.title}
+            </span>
           )}
         </div>
         
         {hasChildren && (
-          <span className="text-muted">
+          <span 
+            className="text-muted cursor-pointer p-1"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleOpen();
+            }}
+          >
             {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
           </span>
         )}
@@ -235,7 +254,8 @@ interface NavItemWithStateProps {
 // Wrapper component that manages state for each nav item
 const NavItemWithState = ({ item, depth = 0, isFullSidebar, toggleSidebar }: NavItemWithStateProps) => {
   const pathname = usePathname();
-  // Automatically expand if the current path matches this item or its children
+  
+  // Check if we're on a specific documentation page (not the main docs page)
   const isInPath = (item: NavItemType): boolean => {
     if (item.path === pathname) return true;
     if (item.path !== '/' && pathname?.startsWith(item.path!)) return true;
@@ -245,7 +265,17 @@ const NavItemWithState = ({ item, depth = 0, isFullSidebar, toggleSidebar }: Nav
     return false;
   };
   
-  const [isOpen, setIsOpen] = useState(isInPath(item));
+  // For the Documentation section, only auto-expand if we're on a specific docs page
+  // (not the main /docs page), otherwise start closed
+  const shouldStartOpen = () => {
+    if (item.title === 'Documentation') {
+      // Only auto-expand if we're on a specific docs page, not the main docs page
+      return pathname !== '/docs' && pathname?.startsWith('/docs');
+    }
+    return isInPath(item);
+  };
+  
+  const [isOpen, setIsOpen] = useState(shouldStartOpen());
   
   return (
     <NavItem 

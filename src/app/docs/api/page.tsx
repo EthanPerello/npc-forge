@@ -14,7 +14,7 @@ export default function ApiPage() {
         <h2 className="text-2xl font-semibold mb-4">API Endpoints</h2>
         
         <p className="mb-4 text-gray-700 dark:text-gray-300">
-          NPC Forge uses Next.js API routes for its backend functionality. The main endpoint is:
+          NPC Forge uses Next.js API routes for its backend functionality. The main endpoints are:
         </p>
         
         <div className="p-4 bg-indigo-50 border-l-4 border-indigo-500 mb-6 dark:bg-indigo-900/30 dark:border-indigo-500">
@@ -24,6 +24,26 @@ export default function ApiPage() {
           </h3>
           <p className="text-indigo-900 mb-1 dark:text-indigo-300 font-medium">
             Generates a character based on provided parameters.
+          </p>
+        </div>
+
+        <div className="p-4 bg-indigo-50 border-l-4 border-indigo-500 mb-6 dark:bg-indigo-900/30 dark:border-indigo-500">
+          <h3 className="text-lg font-semibold text-indigo-900 flex items-center mb-2 dark:text-indigo-300">
+            <Server className="h-5 w-5 mr-2" />
+            POST /api/regenerate (v0.12.0+)
+          </h3>
+          <p className="text-indigo-900 mb-1 dark:text-indigo-300 font-medium">
+            Regenerates specific character attributes or elements.
+          </p>
+        </div>
+
+        <div className="p-4 bg-indigo-50 border-l-4 border-indigo-500 mb-6 dark:bg-indigo-900/30 dark:border-indigo-500">
+          <h3 className="text-lg font-semibold text-indigo-900 flex items-center mb-2 dark:text-indigo-300">
+            <Server className="h-5 w-5 mr-2" />
+            GET /api/proxy-image
+          </h3>
+          <p className="text-indigo-900 mb-1 dark:text-indigo-300 font-medium">
+            Proxies external image URLs for CORS compatibility.
           </p>
         </div>
       </div>
@@ -50,7 +70,7 @@ export default function ApiPage() {
   advanced_options?: {
     species?: string;
     occupation?: string;
-    personality_traits?: string[];        // Up to 3 personality traits
+    personality_traits?: string[];        // Unlimited personality traits
     social_class?: string;
     height?: string;
     build?: string;
@@ -78,6 +98,8 @@ export default function ApiPage() {
     framing?: string;
     background?: string;
   };
+  text_model?: string;                    // Selected text generation model
+  image_model?: string;                   // Selected image generation model
 }`}
         </div>
       </div>
@@ -137,200 +159,127 @@ export default function ApiPage() {
       </div>
       
       <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4">Character Regeneration Endpoint</h2>
+        
+        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 mb-6">
+          <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Request Body</h3>
+          <div className="bg-gray-800 text-gray-200 p-3 rounded-lg overflow-auto max-h-48 text-sm font-mono dark:bg-gray-900">
+{`{
+  characterData: Character;           // Complete character object
+  regenerationType: 'character' | 'portrait' | 'quest' | 'dialogue' | 'item';
+  targetIndex?: number;               // For quest/dialogue/item regeneration
+  questComponent?: 'title' | 'description' | 'reward';  // For quest component regeneration
+  textModel?: string;                 // Model for text regeneration
+  imageModel?: string;                // Model for portrait regeneration
+}`}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h4 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Character Attribute Regeneration</h4>
+            <p className="text-gray-700 dark:text-gray-300 mb-2">For <code className="bg-gray-100 p-1 rounded dark:bg-gray-800">regenerationType: 'character'</code>:</p>
+            <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 text-sm">
+              <li>Name</li>
+              <li>Appearance</li>
+              <li>Personality</li>
+              <li>Backstory hook</li>
+            </ul>
+          </div>
+
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h4 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Component Regeneration</h4>
+            <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 text-sm">
+              <li><strong>Quest</strong>: Regenerate entire quest or specific components</li>
+              <li><strong>Dialogue</strong>: Regenerate individual dialogue lines</li>
+              <li><strong>Item</strong>: Regenerate individual item descriptions</li>
+              <li><strong>Portrait</strong>: Regenerate character portrait with selected image model</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div className="mb-10">
         <h2 className="text-2xl font-semibold mb-4">Core API Implementation</h2>
         
         <p className="mb-4 text-gray-700 dark:text-gray-300">
-          The endpoint is implemented in <code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/src/app/api/generate/route.ts</code>.
+          The main character generation endpoint is implemented in <code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/src/app/api/generate/route.ts</code>.
         </p>
         
         <div className="mb-6">
-          <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Key Functions</h3>
+          <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Character Generation Flow</h3>
           
           <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-            <h4 className="font-medium text-gray-800 mb-2 dark:text-gray-200">POST Handler</h4>
-            <p className="text-gray-700 mb-2 dark:text-gray-300">
-              The main handler for processing generation requests:
-            </p>
-            <div className="bg-gray-800 text-gray-200 p-3 rounded-lg overflow-auto max-h-48 text-sm font-mono dark:bg-gray-900">
-{`export async function POST(request: NextRequest): Promise<NextResponse<GenerationResponse>> {
-  try {
-    // Get form data from request
-    const data: CharacterFormData = await request.json();
-    
-    // Validate required fields
-    if (!data.description || data.description.trim() === '') {
-      return NextResponse.json(
-        { error: 'Character description is required', character: null as any },
-        { status: 400 }
-      );
-    }
-    
-    // Sanitize inputs
-    data.description = sanitizeUserInput(data.description);
-    
-    // Clean form data by removing empty values
-    const cleanedData = removeEmptyValues(data);
-    
-    // Build system prompt
-    const systemPrompt = buildSystemPrompt(cleanedData);
-    
-    // Generate character
-    const character = await generateCharacter(systemPrompt, data.description);
-    
-    // Generate portrait if successful
-    if (character) {
-      try {
-        // Transfer portrait options from form data to character object
-        if (data.portrait_options) {
-          character.portrait_options = data.portrait_options;
-        }
-        
-        const imageUrl = await generatePortrait(character);
-        character.image_url = imageUrl;
-      } catch (portraitError) {
-        // Continue without portrait if it fails
-        console.error('Failed to generate portrait:', portraitError);
-      }
-    }
-    
-    return NextResponse.json({ character });
-  } catch (error) {
-    // Error handling
-    console.error('Error in generate route:', error);
-    
-    return NextResponse.json(
-      { 
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
-        character: null as any
-      },
-      { status: 500 }
-    );
-  }
-}`}
-            </div>
+            <h4 className="font-medium text-gray-800 mb-2 dark:text-gray-200">Generation Process</h4>
+            <ol className="list-decimal list-inside space-y-1 text-gray-700 dark:text-gray-300">
+              <li><strong>Input Validation</strong>: Verify required fields and sanitize inputs</li>
+              <li><strong>Prompt Construction</strong>: Build AI prompts based on user selections</li>
+              <li><strong>Model Selection</strong>: Apply user-selected text and image models</li>
+              <li><strong>Character Generation</strong>: Request character data from OpenAI</li>
+              <li><strong>Portrait Generation</strong>: Create character portrait if successful</li>
+              <li><strong>Response Formatting</strong>: Return structured character data</li>
+            </ol>
           </div>
         </div>
       </div>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">OpenAI Integration</h2>
+        <h2 className="text-2xl font-semibold mb-4">Model Selection Integration</h2>
         
         <p className="mb-4 text-gray-700 dark:text-gray-300">
-          The OpenAI API integration is handled in <code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/src/lib/openai.ts</code>.
+          NPC Forge supports multiple AI models with tiered access:
         </p>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-            <h4 className="font-medium text-gray-800 mb-2 dark:text-gray-200">Character Generation</h4>
-            <div className="bg-gray-800 text-gray-200 p-3 rounded-lg overflow-auto max-h-48 text-sm font-mono dark:bg-gray-900">
-{`export async function generateCharacter(systemPrompt: string, description: string): Promise<Character> {
-  try {
-    // Call the OpenAI API with GPT-4o-mini
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Higher quota than gpt-4o
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: description }
-      ],
-      temperature: 0.8,
-    });
-
-    // Parse response and validate
-    // ...
-    
-    return character;
-  } catch (error) {
-    // Error handling
-    // ...
-  }
-}`}
-            </div>
+            <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Text Models</h3>
+            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 text-sm">
+              <li><strong>gpt-4o-mini</strong> (Standard): Unlimited usage</li>
+              <li><strong>gpt-4.1-mini</strong> (Enhanced): 30 generations/month</li>
+              <li><strong>gpt-4o</strong> (Premium): 10 generations/month</li>
+            </ul>
           </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-            <h4 className="font-medium text-gray-800 mb-2 dark:text-gray-200">Portrait Generation</h4>
-            <div className="bg-gray-800 text-gray-200 p-3 rounded-lg overflow-auto max-h-48 text-sm font-mono dark:bg-gray-900">
-{`export async function generatePortrait(character: Character): Promise<string> {
-  try {
-    // Gather appearance details from the character
-    // ...
-    
-    // Create a prompt for the image generation
-    const imagePrompt = \`Portrait of \${name}: \${appearanceText.substring(0, 250)}
-    \${visualTraits.length > 0 ? \`Important visual characteristics: \${visualTraits.join(', ')}.\` : ''}
-    \${artStyle} \${mood} \${framing} \${background}
-    High quality, detailed character portrait, professional digital art.\`;
-    
-    // Generate image with DALL-E 3
-    const response = await openai.images.generate({
-      model: "dall-e-3",
-      prompt: imagePrompt,
-      n: 1,
-      size: "1024x1024",
-      quality: "standard",
-    });
 
-    return response.data[0].url || '';
-  } catch (error) {
-    // Error handling
-    // ...
-  }
-}`}
-            </div>
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Image Models</h3>
+            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 text-sm">
+              <li><strong>dall-e-2</strong> (Standard): Unlimited usage</li>
+              <li><strong>dall-e-3</strong> (Enhanced): 30 generations/month</li>
+              <li><strong>gpt-image-1</strong> (Premium): 10 generations/month</li>
+            </ul>
           </div>
         </div>
       </div>
-      
+
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Usage Limits Integration</h2>
+        <h2 className="text-2xl font-semibold mb-4">Usage Limit Integration</h2>
         
         <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
           <div className="flex items-center mb-3">
             <Database className="h-5 w-5 text-indigo-600 mr-2 dark:text-indigo-400" />
-            <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">Client-Side Usage Tracking</h3>
+            <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">Per-Model Usage Tracking</h3>
           </div>
           <p className="mb-3 text-gray-700 dark:text-gray-300">
-            The application includes a client-side usage tracking system in <code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/src/lib/usage-limits.ts</code>.
+            The application includes a client-side usage tracking system in <code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/src/lib/usage-limits.ts</code>:
           </p>
           <div className="bg-gray-800 text-gray-200 p-3 rounded-lg overflow-auto max-h-48 text-sm font-mono dark:bg-gray-900">
-{`// Get the current usage data from localStorage
-export function getUsageData(): UsageData {
-  // Default data for new users
-  const defaultData: UsageData = {
-    count: 0,
-    monthKey: getCurrentMonthKey(),
-    lastUpdated: new Date().toISOString()
+{`// Per-model usage tracking
+export interface ModelUsageData {
+  [modelName: string]: {
+    count: number;
+    monthKey: string;
+    lastUpdated: string;
   };
-  
-  // Check if localStorage is available (will not be in SSR)
-  if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
-    return defaultData;
-  }
-  
-  try {
-    // Try to get and parse stored data
-    const storedData = localStorage.getItem(STORAGE_KEY);
-    if (!storedData) return defaultData;
-    
-    const parsedData: UsageData = JSON.parse(storedData);
-    const currentMonthKey = getCurrentMonthKey();
-    
-    // Reset count if it's a new month
-    if (parsedData.monthKey !== currentMonthKey) {
-      const resetData: UsageData = {
-        count: 0,
-        monthKey: currentMonthKey,
-        lastUpdated: new Date().toISOString()
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(resetData));
-      return resetData;
-    }
-    
-    return parsedData;
-  } catch (error) {
-    console.error('Error reading usage data:', error);
-    return defaultData;
-  }
+}
+
+// Get usage data for specific model
+export function getModelUsage(modelName: string): UsageData {
+  // Implementation handles per-model tracking
+}
+
+// Check if model usage is within limits
+export function canUseModel(modelName: string): boolean {
+  // Implementation checks individual model limits
 }`}
           </div>
         </div>
@@ -365,9 +314,15 @@ export function getUsageData(): UsageData {
           </li>
           <li>
             <Link href="/docs/prompts" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
-              OpenAI Prompts
+              Prompt Engineering
             </Link>
-            {" "}for details on prompt engineering
+            {" "}for details on prompt construction
+          </li>
+          <li>
+            <Link href="/docs/models" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Model Selection Guide
+            </Link>
+            {" "}for understanding model tiers and usage
           </li>
           <li>
             <Link href="/docs/security" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">

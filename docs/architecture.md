@@ -4,29 +4,33 @@ This document provides an overview of NPC Forge's architecture, explaining the k
 
 ## System Architecture
 
-NPC Forge is a Next.js 14 application with a React frontend and serverless API endpoints. It's designed to work primarily as a client-side application that communicates with the OpenAI API for character and portrait generation, with key business logic handled in API routes.
+NPC Forge is a Next.js 14 application with a React frontend and serverless API endpoints. It's designed as a client-side application that communicates with the OpenAI API for character and portrait generation, with comprehensive character management capabilities.
 
 ### Key Components
 
 1. **Frontend (Client-Side)**
-   - React components for tabbed interface
-   - Form handling for character customization
+   - React wizard interface for character creation
+   - Character library management with IndexedDB
    - State management with React Context
-   - Character display and rendering
-   - Local storage for usage tracking
-   - Welcome guide onboarding flow
+   - Character editing and regeneration
+   - Local storage for usage tracking and preferences
 
 2. **Backend (Serverless Functions)**
    - Next.js API routes for OpenAI integration
-   - Character generation prompt engineering
-   - Portrait generation with DALL-E 3
+   - Character generation and regeneration endpoints
+   - Model selection and tiered usage system
    - Input validation and sanitization
-   - Prompt injection protection
    - Error handling and response formatting
 
-3. **External Services**
-   - OpenAI API for text generation (GPT-4o-mini)
-   - OpenAI API for image generation (DALL-E 3)
+3. **Local Storage**
+   - IndexedDB for character library storage
+   - Portrait compression and storage
+   - Usage limit tracking per model
+   - User preferences and settings
+
+4. **External Services**
+   - Multiple OpenAI models for text generation
+   - Multiple OpenAI models for image generation
    - Vercel for hosting and deployment
 
 ## Project Structure
@@ -35,241 +39,432 @@ NPC Forge is a Next.js 14 application with a React frontend and serverless API e
 
 The project follows Next.js 14 App Router conventions with a well-organized structure:
 
-- **Source Code**
-  - `/src/app/` - Pages and API routes
-  - `/src/components/` - UI components
-  - `/src/contexts/` - React Context providers
-  - `/src/lib/` - Utilities and core logic
-
-- **Documentation**
-  - `/docs/` - Markdown documentation
-  - `/docs/images/` - Documentation visuals
-  - `/docs/examples/` - Example character JSON
-  - `/release-notes/` - Version history
-
-### Frontend Components
-
-The application is organized into reusable components located in the `/src/components/` directory:
-
-- **Core Components**
-  - `character-display.tsx`: Renders generated characters
-  - `main-form-tabs.tsx`: Manages the form tabs for character creation
-  - `portrait-display.tsx`: Handles displaying character portraits
-  - `character-form.tsx`: Form for character creation options
-  - `usage-limits-notice.tsx`: Shows usage limit information
-  - `welcome-guide.tsx`: Onboarding for new users
-  - `template-selector.tsx`: Preset character templates
-
-- **Tab Components**
-  - `/tabs/character-tab.tsx`: Core character options
-  - `/tabs/dialogue-tab.tsx`: Dialogue generation options
-  - `/tabs/items-tab.tsx`: Item generation options
-  - `/tabs/quests-tab.tsx`: Quest generation options
-  - `/tabs/portrait-options.tsx`: Portrait generation settings
-  - `/tabs/display/profile-tab.tsx`: Displays character profile
-  - `/tabs/display/dialogue-display-tab.tsx`: Shows generated dialogue
-
-### State Management
-
-NPC Forge uses React Context for state management:
-
-- `/src/contexts/character-context.tsx`: Manages character generation state including:
-  - Form data for all character options
-  - Generated character data
-  - Loading and error states
-  - Methods for character generation and export
-  - Genre and sub-genre selections
-  - Usage limit tracking
-
-### API Structure
-
-API endpoints are located in the `/src/app/api/` directory:
-
-- `/src/app/api/generate/route.ts`: Handles character generation requests
-  - Validates input data
-  - Constructs prompts for GPT-4o-mini
-  - Generates portrait descriptions for DALL-E 3
-  - Ensures sanitized response formatting
-  - Handles API errors and retry logic
-
-## Core Libraries and Utilities
-
-The `/src/lib/` directory contains essential utility modules:
-
-- `/src/lib/openai.ts`: API client wrappers for GPT and DALL-E integration
-- `/src/lib/templates.ts`: Prompt templates and default examples
-- `/src/lib/types.ts`: Shared TypeScript type definitions
-- `/src/lib/usage-limits.ts`: Quota tracking logic using localStorage
-- `/src/lib/utils.ts`: General helper functions (formatting, validation)
-
-## Data Flow
-
-1. **User Input Collection**
-   - User selects genre, traits, and other options across tabbed interface
-   - Form data is managed through the CharacterContext
-   - All options are consolidated when generation is triggered
-
-2. **Character Generation Request**
-   - Client sends a POST request to the `/api/generate` endpoint with form data
-   - The request includes all form data needed for generation
-   - Server-side validation checks input data
-   - Usage limits are checked (15 generations/month)
-
-3. **OpenAI API Interaction**
-   - Server constructs a system prompt based on user selections
-   - GPT-4o-mini generates the character text content
-   - Character data is parsed and validated for structure
-
-4. **Portrait Generation (if successful)**
-   - Character data is used to generate a detailed portrait prompt
-   - DALL-E 3 creates an image based on character descriptions with styling cues
-   - Portrait URL is added to the character data
-
-5. **Response and Display**
-   - Complete character data is returned to the client
-   - Character is displayed with tabs for different sections
-   - User can view the character in the tabbed UI
-
-6. **Usage Tracking**
-   - Generation count is updated in localStorage
-   - Visual indicators show remaining generations
-   - Warnings displayed when approaching limits
-
-## Detailed Project Structure
-
 ```
 npc-forge/
 ├── src/
-│   ├── app/
-│   │   ├── api/
-│   │   │   └── generate/
-│   │   │       └── route.ts          # API endpoint for generation
-│   │   ├── docs/                     # Documentation pages
-│   │   │   └── [various pages]       # Individual doc pages
-│   │   ├── globals.css               # Global styles
-│   │   ├── layout.tsx                # Root layout
-│   │   ├── manifest.ts               # PWA manifest
-│   │   └── page.tsx                  # Main application page
-│   ├── components/
-│   │   ├── character-card.tsx        # Character summary card
-│   │   ├── character-display.tsx     # Character display component
-│   │   ├── character-form.tsx        # Form for character creation
-│   │   ├── docs-navigation.tsx       # Documentation navigation
-│   │   ├── docs-sidebar.tsx          # Documentation sidebar
-│   │   ├── json-viewer.tsx           # JSON formatting display
-│   │   ├── main-form-tabs.tsx        # Tab container for form
-│   │   ├── portrait-display.tsx      # Portrait image display
-│   │   ├── template-selector.tsx     # Character template picker
-│   │   ├── usage-limit-display.tsx   # Shows usage metrics
-│   │   ├── usage-limits-notice.tsx   # Usage warning display
-│   │   ├── welcome-guide.tsx         # Onboarding component
-│   │   ├── ui/                       # Reusable UI components
-│   │   │   └── [various components]  # Buttons, inputs, etc.
-│   │   └── tabs/                     # Tab components
-│   │       ├── character-tab.tsx     # Character options tab
-│   │       ├── dialogue-tab.tsx      # Dialogue options tab
-│   │       ├── items-tab.tsx         # Items options tab
-│   │       ├── quests-tab.tsx        # Quests options tab
-│   │       ├── portrait-options.tsx  # Portrait settings
-│   │       └── display/              # Result display tabs
-│   │           └── [various tabs]    # Result display components
-│   ├── contexts/
-│   │   └── character-context.tsx     # Main state management
-│   └── lib/
-│       ├── openai.ts                 # OpenAI API integration
-│       ├── templates.ts              # Character templates
-│       ├── types.ts                  # TypeScript definitions
-│       ├── usage-limits.ts           # Usage tracking logic
-│       └── utils.ts                  # Utility functions
-├── public/                           # Static assets
-│   ├── images/                       # Documentation images
-│   ├── icons/                        # App icons
-│   └── [various files]               # Favicons, etc.
-├── docs/                             # Documentation markdown
-│   ├── images/                       # Documentation images
-│   ├── examples/                     # Example character JSON
-│   └── [various markdown files]      # Documentation content
-└── [config files]                    # Configuration files
+│   ├── app/                     # Next.js App Router
+│   │   ├── api/                 # API routes
+│   │   │   ├── generate/        # Character generation endpoint
+│   │   │   ├── regenerate/      # Character regeneration endpoint
+│   │   │   └── proxy-image/     # Image proxy endpoint
+│   │   ├── docs/                # Documentation pages
+│   │   ├── library/             # Character library pages
+│   │   │   └── edit/[id]/       # Character editing pages
+│   │   └── page.tsx             # Homepage with wizard
+│   ├── components/              # UI components
+│   │   ├── character-wizard.tsx # Main wizard component
+│   │   ├── character-library.tsx # Library management
+│   │   ├── edit-page/           # Character editing components
+│   │   ├── tabs/                # Tab-based components
+│   │   ├── ui/                  # Reusable UI components
+│   │   └── wizard-steps/        # Individual wizard steps
+│   ├── contexts/                # React contexts
+│   │   ├── character-context.tsx # Character state management
+│   │   └── theme-context.tsx    # Theme/dark mode state
+│   └── lib/                     # Utilities and core logic
+│       ├── character-storage.ts # IndexedDB operations
+│       ├── image-storage.ts     # Portrait storage
+│       ├── usage-limits.ts      # Model usage tracking
+│       ├── models.ts           # Model configuration
+│       ├── openai.ts           # OpenAI API integration
+│       └── types.ts            # TypeScript definitions
 ```
 
-## Security Considerations
+## Frontend Architecture
 
-The application includes several security measures:
+### Wizard-Based Interface (v0.13.0)
 
-1. **Input Validation and Sanitization**
-   - All user inputs are validated before processing
-   - Sanitization to prevent malicious inputs
-   - Input formatting to prevent prompt injection attacks
+The character creation wizard consists of four main steps:
 
-2. **API Security**
-   - Environment variables for API keys
-   - Server-side API calls to protect credentials
-   - Content filtering through OpenAI's moderation
+1. **Concept Step**: Genre selection and description input
+2. **Options Step**: Character traits and customization
+3. **Model Step**: AI model selection for text and images
+4. **Generate Step**: Character generation and results
 
-3. **Usage Limiting**
-   - Client-side usage tracking (15 generations/month)
-   - Visual indicators for remaining usage
-   - Prevents excessive API consumption
+#### Wizard Components
 
-4. **Error Handling**
-   - Graceful error handling with user feedback
-   - Structured response validation
-   - Fallback mechanisms for API failures
+- `character-wizard.tsx`: Main wizard container
+- `wizard-steps/concept-step.tsx`: Genre and description
+- `wizard-steps/options-step.tsx`: Character customization
+- `wizard-steps/model-step.tsx`: Model selection
+- `wizard-steps/results-step.tsx`: Generation results
 
-5. **Data Privacy**
-   - No server-side storage of generated characters
-   - Local storage for usage tracking only
-   - No personal data collection
+### Character Library System
 
-## Core Libraries and Dependencies
+#### Storage Architecture
 
-NPC Forge relies on several key libraries:
+The library uses IndexedDB for reliable local storage:
 
-- **Next.js 14**: React framework with App Router
-- **React**: UI library with hooks for state management
-- **TypeScript**: Type-safe JavaScript development
-- **Tailwind CSS**: Utility-first CSS framework
-- **OpenAI**: SDK for API integration (GPT-4o-mini and DALL-E 3)
-- **Lucide React**: SVG icon components
+```typescript
+// Database schema
+interface CharacterDatabase {
+  characters: Character[];          // Character data
+  portraits: PortraitData[];       // Compressed images
+  metadata: LibraryMetadata;       // Search indices
+}
 
-## Performance Considerations
+// Storage operations
+class CharacterStorage {
+  async saveCharacter(character: Character): Promise<void>
+  async getCharacter(id: string): Promise<Character>
+  async updateCharacter(character: Character): Promise<void>
+  async deleteCharacter(id: string): Promise<void>
+  async searchCharacters(query: string): Promise<Character[]>
+}
+```
 
-NPC Forge includes several optimizations:
+#### Library Components
 
-1. **Efficient API Usage**
-   - Uses GPT-4o-mini to balance quality and cost
-   - Carefully constructed prompts to minimize token usage
-   - Validation to prevent unnecessary API calls
+- `character-library.tsx`: Main library interface
+- `character-card.tsx`: Individual character cards
+- `library/filter-panel.tsx`: Search and filtering
+- `library/character-viewer-modal.tsx`: Character preview
 
-2. **Client-Side Optimizations**
-   - Responsive design for different devices
-   - Optimized image loading for portraits
-   - Progressive form unlock flow
+### Character Editing System
 
-3. **Error Handling**
-   - Graceful fallbacks for API failures
-   - Portrait generation is isolated from character generation
-   - Informative error messages for users
+#### Edit Page Architecture
+
+The edit system provides comprehensive character modification:
+
+- **Header Section**: Character name and basic info
+- **Portrait Section**: Image management and regeneration
+- **Character Traits**: Attribute editing and regeneration
+- **Elements Sections**: Quests, dialogue, items management
+
+#### Edit Components
+
+- `edit-page/header-section.tsx`: Name and basic info
+- `edit-page/portrait-section.tsx`: Portrait management
+- `edit-page/character-traits-section.tsx`: Trait editing
+- `edit-page/quests-section.tsx`: Quest management
+- `edit-page/dialogue-section.tsx`: Dialogue editing
+- `edit-page/items-section.tsx`: Item management
+
+### State Management
+
+#### Character Context
+
+```typescript
+interface CharacterContextType {
+  // Wizard state
+  currentStep: number
+  wizardData: WizardFormData
+  generatedCharacter: Character | null
+  
+  // Library state
+  savedCharacters: Character[]
+  searchQuery: string
+  filters: LibraryFilters
+  
+  // Operations
+  generateCharacter: () => Promise<void>
+  regenerateAttribute: (attribute: string) => Promise<void>
+  saveCharacter: (character: Character) => Promise<void>
+  updateCharacter: (character: Character) => Promise<void>
+}
+```
+
+#### Theme Context
+
+```typescript
+interface ThemeContextType {
+  isDarkMode: boolean
+  toggleDarkMode: () => void
+}
+```
+
+## Backend Architecture
+
+### API Endpoints
+
+#### Character Generation (`/api/generate`)
+
+```typescript
+interface GenerationRequest {
+  description: string
+  genre?: string
+  sub_genre?: string
+  // Character traits
+  text_model?: string
+  image_model?: string
+  // Additional options...
+}
+
+interface GenerationResponse {
+  character: Character
+  usage: ModelUsage
+}
+```
+
+#### Character Regeneration (`/api/regenerate`)
+
+```typescript
+interface RegenerationRequest {
+  characterData: Character
+  regenerationType: 'character' | 'portrait' | 'quest' | 'dialogue' | 'item'
+  targetIndex?: number
+  questComponent?: 'title' | 'description' | 'reward'
+  textModel?: string
+  imageModel?: string
+}
+```
+
+### Model Selection System
+
+#### Tiered Model Architecture
+
+```typescript
+interface ModelTier {
+  id: string
+  name: string
+  model: string
+  limit: number | null
+  cost: number
+  description: string
+}
+
+const TEXT_MODELS: ModelTier[] = [
+  { id: 'standard', model: 'gpt-4o-mini', limit: null },
+  { id: 'enhanced', model: 'gpt-4.1-mini', limit: 30 },
+  { id: 'premium', model: 'gpt-4o', limit: 10 }
+]
+
+const IMAGE_MODELS: ModelTier[] = [
+  { id: 'standard', model: 'dall-e-2', limit: null },
+  { id: 'enhanced', model: 'dall-e-3', limit: 30 },
+  { id: 'premium', model: 'gpt-image-1', limit: 10 }
+]
+```
+
+#### Usage Tracking
+
+```typescript
+interface ModelUsage {
+  [modelName: string]: {
+    count: number
+    monthKey: string
+    lastUpdated: string
+  }
+}
+
+class UsageLimits {
+  getModelUsage(modelName: string): UsageData
+  canUseModel(modelName: string): boolean
+  incrementUsage(modelName: string): void
+  resetMonthlyUsage(): void
+}
+```
+
+## Data Flow
+
+### Character Creation Flow
+
+1. **User Input Collection**
+   - Wizard collects data across four steps
+   - Form validation at each step
+   - Model selection with usage limit checking
+
+2. **Generation Request**
+   - Client sends POST to `/api/generate`
+   - Server validates and sanitizes input
+   - System prompt constructed based on selections
+
+3. **AI Model Interaction**
+   - Text generation with selected model
+   - Character data parsing and validation
+   - Portrait generation with selected image model
+
+4. **Response Processing**
+   - Character data returned to client
+   - Usage limits updated
+   - Character displayed in results step
+
+5. **Library Storage** (Optional)
+   - User can save character to library
+   - Character and portrait stored in IndexedDB
+   - Search indices updated
+
+### Character Regeneration Flow
+
+1. **Regeneration Request**
+   - User selects element to regenerate
+   - Model selection for regeneration
+   - Request sent to `/api/regenerate`
+
+2. **Selective Regeneration**
+   - Only specified element is regenerated
+   - Original character data preserved
+   - New content integrated into character
+
+3. **Update and Storage**
+   - Updated character returned
+   - Changes reflected in edit interface
+   - Library storage updated if saved
+
+## Security Architecture
+
+### Input Security
+
+```typescript
+// Input sanitization
+function sanitizeUserInput(input: string): string {
+  // Remove control characters
+  let sanitized = input.replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+  
+  // Normalize whitespace
+  sanitized = sanitized.replace(/[ \t\v\f]+/g, ' ')
+  
+  return sanitized.trim()
+}
+```
+
+### API Security
+
+- Server-side API key storage
+- Input validation and sanitization
+- Rate limiting through usage tracking
+- Error handling without information leakage
+
+### Data Privacy
+
+- No server-side character storage
+- Local IndexedDB storage only
+- No personal data collection
+- Complete user control over data
+
+## Performance Optimizations
+
+### Client-Side Optimizations
+
+1. **IndexedDB Usage**
+   - Efficient character storage and retrieval
+   - Indexed search capabilities
+   - Portrait compression for storage efficiency
+
+2. **Image Handling**
+   - Automatic portrait compression
+   - Lazy loading of character images
+   - Image proxy for CORS handling
+
+3. **State Management**
+   - Efficient React Context usage
+   - Selective re-rendering with memoization
+   - Local state for transient UI state
+
+### API Optimizations
+
+1. **Prompt Engineering**
+   - Optimized prompts for token efficiency
+   - Model-specific prompt variations
+   - Minimal API calls through regeneration
+
+2. **Error Handling**
+   - Graceful degradation for failed generations
+   - Retry logic for transient failures
+   - Fallback options for API issues
+
+## Extensibility
+
+### Plugin Architecture Potential
+
+The architecture supports future extensions:
+
+1. **Model Plugins**: Support for additional AI models
+2. **Storage Plugins**: Alternative storage backends
+3. **Export Plugins**: Multiple export formats
+4. **Game Engine Plugins**: Direct integration support
+
+### API Expansion
+
+The current API structure supports:
+
+1. **Additional Endpoints**: New generation types
+2. **Webhook Support**: Real-time updates
+3. **Batch Operations**: Multiple character processing
+4. **External Integrations**: Third-party service connections
+
+## Development Patterns
+
+### Component Architecture
+
+```typescript
+// Component pattern with hooks
+function CharacterLibrary() {
+  const { characters, searchQuery } = useCharacterContext()
+  const [filteredCharacters, setFilteredCharacters] = useState<Character[]>([])
+  
+  // Search and filter logic
+  useEffect(() => {
+    const filtered = characters.filter(character =>
+      character.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    setFilteredCharacters(filtered)
+  }, [characters, searchQuery])
+  
+  return (
+    <div className="character-library">
+      {filteredCharacters.map(character => (
+        <CharacterCard key={character.id} character={character} />
+      ))}
+    </div>
+  )
+}
+```
+
+### Error Boundary Pattern
+
+```typescript
+class CharacterErrorBoundary extends React.Component {
+  state = { hasError: false, error: null }
+  
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error }
+  }
+  
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('Character generation error:', error, errorInfo)
+  }
+  
+  render() {
+    if (this.state.hasError) {
+      return <CharacterErrorFallback error={this.state.error} />
+    }
+    
+    return this.props.children
+  }
+}
+```
 
 ## Future Architecture Considerations
 
-Future versions of NPC Forge may include:
+### Planned Enhancements
 
-1. **Character Library (v0.3.0)**
-   - Save/load from localStorage
-   - Rename/delete characters
-   - Export/import character files
-   - Share links
+1. **Chat Integration** (v0.14.0)
+   - WebSocket connections for real-time chat
+   - Character personality integration
+   - Conversation history storage
 
-2. **User Interaction (v0.4.0)**
-   - "Talk to NPC" chat functionality
-   - Character personality in system prompt
-   - Chat usage limits and tracking
+2. **User Accounts** (v0.15.0)
+   - Authentication system integration
+   - Cloud storage synchronization
+   - Multi-device character access
 
-3. **Full Release Features (v1.0.0)**
-   - Server-side usage validation
-   - Game engine exports (Unity, Unreal, JSON)
-   - TTRPG support (D&D 5e, Pathfinder)
-   - Relationship mapping (NPC connection graph)
+3. **Game Integration** (v1.0.0)
+   - RESTful API for external access
+   - WebHook support for real-time updates
+   - SDK for game engine integration
 
-For more detailed information about the codebase, see the [API Documentation](/docs/api), [Prompt Engineering](/docs/prompts), and [Development Roadmap](/docs/roadmap).
+### Scalability Considerations
+
+1. **Serverless Architecture**: Current design scales automatically
+2. **Edge Computing**: Potential CDN integration for images
+3. **Database Optimization**: Efficient IndexedDB usage patterns
+4. **API Rate Limiting**: Server-side enforcement for production
+
+## Related Documentation
+
+- [API Documentation](/docs/api) - Detailed API specifications
+- [Model Selection Guide](/docs/models) - Understanding the tier system
+- [Character Library Guide](/docs/library) - Library usage and management
+- [Development Setup](/docs/dev-setup) - Local development configuration
+- [Contributing Guidelines](/docs/contributing) - Architecture contribution standards

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Book, Code, User, FileText, Settings, HelpCircle, Calendar, Map, ShieldCheck, CodeSquare, Bell, Layers, Server, FileJson, Award } from 'lucide-react';
+import { Book, Code, User, FileText, Settings, HelpCircle, Calendar, Map, ShieldCheck, CodeSquare, Bell, Layers, Server, FileJson, Award, Database } from 'lucide-react';
 
 export const metadata = {
   title: 'NPC Forge Documentation',
@@ -30,7 +30,7 @@ export default function DocsIndexPage() {
               </Link>
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              Step-by-step guide to creating detailed NPCs for your games and stories.
+              Step-by-step guide to creating detailed NPCs using the wizard interface.
             </p>
           </div>
           
@@ -67,6 +67,30 @@ export default function DocsIndexPage() {
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
               Comprehensive guide to all available features and capabilities.
+            </p>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <Database className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/library" className="hover:text-indigo-800 dark:hover:text-indigo-300">
+                Character Library Guide
+              </Link>
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              Managing, editing, and organizing your character collection.
+            </p>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <Server className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/models" className="hover:text-indigo-800 dark:hover:text-indigo-300">
+                Model Selection Guide
+              </Link>
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              Understanding the tier system and choosing the right AI models.
             </p>
           </div>
           
@@ -174,18 +198,6 @@ export default function DocsIndexPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
             <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-              <Server className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-              <Link href="/docs/deployment" className="hover:text-indigo-800 dark:hover:text-indigo-300">
-                Deployment Guide
-              </Link>
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Instructions for deploying to Vercel and other platforms.
-            </p>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
               <Map className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
               <Link href="/docs/roadmap" className="hover:text-indigo-800 dark:hover:text-indigo-300">
                 Development Roadmap
@@ -193,18 +205,6 @@ export default function DocsIndexPage() {
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
               Upcoming features, release plans, and long-term vision.
-            </p>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-              <Calendar className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-              <Link href="/docs/changelog" className="hover:text-indigo-800 dark:hover:text-indigo-300">
-                Changelog
-              </Link>
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Version history with details of all updates and changes.
             </p>
           </div>
           
@@ -257,6 +257,12 @@ export default function DocsIndexPage() {
               Character Examples
             </Link>
             {" "}to see what's possible
+          </li>
+          <li>
+            <Link href="/docs/models" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Model Selection Guide
+            </Link>
+            {" "}to understand the tier system
           </li>
         </ul>
       </div>

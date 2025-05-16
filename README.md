@@ -15,41 +15,58 @@ Try NPC Forge live at: [https://npc-forge-ethan-perellos-projects.vercel.app/](h
 
 ## ✨ Features
 
-- Create detailed NPCs from simple descriptions or genre templates
-- Generate AI portraits with customizable style, mood, and framing
-- Build complete character profiles with:
+- **Wizard-Based Character Creation**: Step-by-step guided process with progress tracking
+- **Character Library**: Save, manage, edit, and organize your NPCs with full CRUD operations
+- **AI-Powered Generation**: Create detailed NPCs from simple descriptions or genre templates
+- **Multiple AI Models**: Choose from Standard, Enhanced, and Premium tiers for text and images
+- **Character Regeneration**: Regenerate individual character attributes, portraits, quests, dialogue, and items
+- **AI Portraits**: Generate customizable portraits with multiple styles, moods, and framing options
+- **Complete Character Profiles**: 
   - Appearance & personality descriptions
   - Backstory hooks & special abilities
   - Customizable quests with rewards
   - Character-specific dialogue lines
   - Item inventories with rarity options
-- Character Library for saving, managing, and sharing NPCs:
-  - Save generated characters to your library
-  - Edit existing characters or create variations
-  - Import/export characters as JSON
-  - Search and filter your collection
-  - Example characters included
-- Customize using an extensive set of options:
-  - Choose from 4 genres and 16 sub-genres
-  - Set traits like gender, age, alignment, and more
-  - Specify physical attributes and background elements
-  - Select personality traits
-- Multiple AI model tiers with varying levels of detail and quality
-- Light and dark mode support with persistent preferences
-- Responsive design works on desktop and mobile
+- **Advanced Customization**: Extensive options including:
+  - 4 genres and 16 sub-genres
+  - Physical traits, background elements, and personality characteristics
+  - Quest types, dialogue tones, and item categories
+- **Import/Export**: JSON import/export for character data
+- **Dark Mode**: Full dark mode support with persistent preferences
+- **Responsive Design**: Works seamlessly on desktop and mobile
 
-![NPC Forge Screenshot](/public/images/character-tab-results.png)
+## 🔄 New in v0.13.0: Wizard Interface
+
+![Character Creation Wizard](https://via.placeholder.com/800x400/6366f1/ffffff?text=Character+Creation+Wizard)
+
+- **Step-by-Step Creation**: Concept → Options → Model → Generate
+- **Progress Tracking**: Sticky progress bar with clickable navigation
+- **Quick Generation**: Generate Random Character button for instant results
+- **Welcome Guide**: Introduction popup for first-time users
+
+## 📚 Character Library
+
+![Character Library](/public/images/character-library.png)
+
+- Save unlimited characters to your browser storage
+- Edit existing characters or create variations
+- Search and filter your collection
+- Direct action buttons on character cards
+- JSON import/export functionality
+- Example characters included
 
 ## 📋 Documentation
 
 For comprehensive guides and documentation, check out:
 
-- [How to Use NPC Forge](/docs/how-to-use.md) - Step-by-step guide to creating characters
-- [Character Examples](/docs/character-examples.md) - Sample characters across different genres
-- [Features Overview](/docs/features.md) - Complete list of available features
-- [Generation Options](/docs/generation-options.md) - Detailed breakdown of customization options
-- [FAQ](/docs/faq.md) - Answers to common questions
-- [Roadmap](/docs/roadmap.md) - Future development plans
+- [How to Use NPC Forge](/docs/how-to-use) - Step-by-step guide with the new wizard interface
+- [Character Examples](/docs/character-examples) - Sample characters across different genres
+- [Features Overview](/docs/features) - Complete list of available features
+- [Character Library Guide](/docs/library) - Managing and editing your characters
+- [Generation Options](/docs/generation-options) - Detailed breakdown of all settings
+- [Model Selection](/docs/models) - Understanding the tier system and model options
+- [FAQ](/docs/faq) - Answers to common questions
+- [Roadmap](/docs/roadmap) - Future development plans
 
 ## 🛠️ Installation & Development
 
@@ -83,7 +100,7 @@ For comprehensive guides and documentation, check out:
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-For more detailed developer documentation, see [Dev Setup](/docs/dev-setup.md).
+For more detailed developer documentation, see [Dev Setup](/docs/dev-setup).
 
 ## 🏗️ Project Architecture
 
@@ -92,14 +109,28 @@ NPC Forge is built with:
 - **Next.js 14** - React framework with App Router
 - **TypeScript** - Type-safe JavaScript
 - **Tailwind CSS** - Utility-first CSS framework
-- **OpenAI API** - GPT-4o-mini for text generation, DALL-E 3 for images
+- **OpenAI API** - Multiple models for text and image generation
+- **IndexedDB** - Local storage for character library and portraits
 - **Lucide Icons** - SVG icon components
 
-For more details, check out the [Architecture Documentation](/docs/architecture.md).
+For more details, check out the [Architecture Documentation](/docs/architecture).
+
+## 🔧 Model Selection
+
+NPC Forge offers tiered model options:
+
+| Tier | Text Model | Image Model | Usage Limit |
+|------|------------|-------------|-------------|
+| 🟢 Standard | gpt-4o-mini | dall-e-2 | Unlimited |
+| 🟡 Enhanced | gpt-4.1-mini | dall-e-3 | 30/month |
+| 🔴 Premium | gpt-4o | gpt-image-1 | 10/month |
 
 ## 📊 Usage Limits
 
-NPC Forge has a limit of 15 character generations per month per device to manage API costs. This applies to the hosted version only. If you run your own instance with your API key, you can set your own limits.
+- **Standard Tier**: Unlimited generations
+- **Enhanced Tier**: 30 generations per month
+- **Premium Tier**: 10 generations per month
+- Limits reset monthly and apply per device
 
 ## 🔗 Related Projects
 
@@ -120,7 +151,7 @@ This project was developed with assistance from AI tools including Claude and Ch
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please check out the [Contributing Guidelines](/docs/contributing.md) before getting started.
+Contributions are welcome! Please check out the [Contributing Guidelines](/docs/contributing) before getting started.
 
 For bug reports, feature requests, or questions, please [open an issue](https://github.com/EthanPerello/npc-forge/issues).
 

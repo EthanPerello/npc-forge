@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Rewrote and updated all public documentation to match the current v0.13.0 features:
+  - Wizard-based character creation flow
+  - Model selection system with tiers and usage limits
+  - Regeneration tools for character attributes, portraits, quests, and dialogue
+  - Character library guide, advanced options, and updated architecture explanations
+- Updated sidebar navigation to reflect current documentation structure:
+  - Removed obsolete links (`changelog`, `prompts`)
+  - Added new sections: Character Library and Model Selection
+
+### Added
+- New documentation sections:
+  - Character Library
+  - Model Selection
+  - Regeneration overview
+- Updated main documentation landing page for improved navigation
+
+### Removed
+- Deprecated documentation pages: `changelog/` and `prompts/`
+
 ## [0.13.0] - 2025-05-15
 
 ### Added

@@ -1,6 +1,10 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { Layers, Code, Server, Database, Layout, FileText, Book, Shield } from 'lucide-react';
+
+export const metadata = {
+  title: 'Architecture Overview - NPC Forge Documentation',
+  description: 'System architecture, components, and data flow of NPC Forge',
+};
 
 export default function ArchitecturePage() {
   return (
@@ -15,7 +19,7 @@ export default function ArchitecturePage() {
         <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">System Architecture</h2>
         
         <p className="mb-4 text-gray-700 dark:text-gray-300">
-          NPC Forge is a Next.js 14 application with a React frontend and serverless API endpoints. It's designed to work primarily as a client-side application that communicates with the OpenAI API for character and portrait generation, with key business logic handled in API routes.
+          NPC Forge is a Next.js 14 application with a React frontend and serverless API endpoints. It's designed as a client-side application that communicates with the OpenAI API for character and portrait generation, with comprehensive character management capabilities.
         </p>
       </div>
       
@@ -29,26 +33,24 @@ export default function ArchitecturePage() {
               <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">Frontend (Client-Side)</h3>
             </div>
             <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
-              <li>React components for tabbed interface</li>
-              <li>Form handling for character customization</li>
+              <li>React wizard interface for character creation</li>
+              <li>Character library management with IndexedDB</li>
               <li>State management with React Context</li>
-              <li>Character display and rendering</li>
-              <li>Local storage for usage tracking</li>
-              <li>Welcome guide onboarding flow</li>
+              <li>Character editing and regeneration</li>
+              <li>Local storage for usage tracking and preferences</li>
             </ul>
           </div>
           
           <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <div className="flex items-center mb-3">
               <Server className="h-5 w-5 text-indigo-600 mr-2 dark:text-indigo-400" />
-              <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">Backend (Serverless)</h3>
+              <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">Backend (Serverless Functions)</h3>
             </div>
             <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
               <li>Next.js API routes for OpenAI integration</li>
-              <li>Character generation prompt engineering</li>
-              <li>Portrait generation with DALL-E 3</li>
+              <li>Character generation and regeneration endpoints</li>
+              <li>Model selection and tiered usage system</li>
               <li>Input validation and sanitization</li>
-              <li>Prompt injection protection</li>
               <li>Error handling and response formatting</li>
             </ul>
           </div>
@@ -56,11 +58,13 @@ export default function ArchitecturePage() {
           <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <div className="flex items-center mb-3">
               <Database className="h-5 w-5 text-indigo-600 mr-2 dark:text-indigo-400" />
-              <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">External Services</h3>
+              <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">Local Storage & External Services</h3>
             </div>
             <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
-              <li>OpenAI API for text generation (GPT-4o-mini)</li>
-              <li>OpenAI API for image generation (DALL-E 3)</li>
+              <li>IndexedDB for character library storage</li>
+              <li>Portrait compression and storage</li>
+              <li>Usage limit tracking per model</li>
+              <li>Multiple OpenAI models for text/images</li>
               <li>Vercel for hosting and deployment</li>
             </ul>
           </div>
@@ -76,139 +80,149 @@ export default function ArchitecturePage() {
             The project follows Next.js 14 App Router conventions with a well-organized structure:
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <div className="flex items-center mb-2">
-                <FileText className="h-4 w-4 text-indigo-600 mr-2 dark:text-indigo-400" />
-                <h4 className="font-medium text-gray-800 dark:text-gray-200">Source Code</h4>
-              </div>
-              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 text-sm space-y-1">
-                <li><code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/src/app/</code> - Pages and API routes</li>
-                <li><code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/src/components/</code> - UI components</li>
-                <li><code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/src/contexts/</code> - React Context providers</li>
-                <li><code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/src/lib/</code> - Utilities and core logic</li>
-              </ul>
-            </div>
-            
-            <div>
-              <div className="flex items-center mb-2">
-                <Book className="h-4 w-4 text-indigo-600 mr-2 dark:text-indigo-400" />
-                <h4 className="font-medium text-gray-800 dark:text-gray-200">Documentation</h4>
-              </div>
-              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 text-sm space-y-1">
-                <li><code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/docs/</code> - Markdown documentation</li>
-                <li><code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/docs/images/</code> - Documentation visuals</li>
-                <li><code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/docs/examples/</code> - Example character JSON</li>
-                <li><code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/release-notes/</code> - Version history</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        
-        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm mb-6 dark:bg-gray-800 dark:border-gray-700">
-          <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Frontend Components</h3>
-          <p className="mb-2 text-gray-700 dark:text-gray-300">
-            The application is organized into reusable components located in the <code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/src/components/</code> directory:
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h4 className="font-medium text-gray-800 mb-2 dark:text-gray-200">Core Components</h4>
-              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 text-sm">
-                <li>character-display.tsx</li>
-                <li>main-form-tabs.tsx</li>
-                <li>portrait-display.tsx</li>
-                <li>character-form.tsx</li>
-                <li>usage-limits-notice.tsx</li>
-                <li>welcome-guide.tsx</li>
-                <li>template-selector.tsx</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-medium text-gray-800 mb-2 dark:text-gray-200">Tab Components</h4>
-              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 text-sm">
-                <li>/tabs/character-tab.tsx</li>
-                <li>/tabs/dialogue-tab.tsx</li>
-                <li>/tabs/items-tab.tsx</li>
-                <li>/tabs/quests-tab.tsx</li>
-                <li>/tabs/portrait-options.tsx</li>
-                <li>/tabs/display/profile-tab.tsx</li>
-                <li>/tabs/display/dialogue-display-tab.tsx</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        
-        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm mb-6 dark:bg-gray-800 dark:border-gray-700">
-          <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">State Management</h3>
-          <p className="mb-2 text-gray-700 dark:text-gray-300">
-            NPC Forge uses React Context for state management:
-          </p>
-          <div className="bg-gray-50 p-3 rounded-md dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-            <p className="text-gray-800 dark:text-gray-200 font-medium">/src/contexts/character-context.tsx</p>
-            <p className="text-gray-600 text-sm dark:text-gray-400">Manages character generation state including:</p>
-            <ul className="list-disc list-inside text-sm text-gray-600 dark:text-gray-400">
-              <li>Form data for all character options</li>
-              <li>Generated character data</li>
-              <li>Loading and error states</li>
-              <li>Methods for character generation and export</li>
-              <li>Genre and sub-genre selections</li>
-              <li>Usage limit tracking</li>
-            </ul>
-          </div>
-        </div>
-        
-        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">API Structure</h3>
-          <p className="mb-2 text-gray-700 dark:text-gray-300">
-            API endpoints are located in the <code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/src/app/api/</code> directory:
-          </p>
-          <div className="bg-gray-50 p-3 rounded-md dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-            <p className="text-gray-800 dark:text-gray-200 font-medium">/src/app/api/generate/route.ts</p>
-            <p className="text-gray-600 text-sm dark:text-gray-400">Handles character generation requests:</p>
-            <ul className="list-disc list-inside text-sm text-gray-600 dark:text-gray-400">
-              <li>Validates input data</li>
-              <li>Constructs prompts for GPT-4o-mini</li>
-              <li>Generates portrait descriptions for DALL-E 3</li>
-              <li>Ensures sanitized response formatting</li>
-              <li>Handles API errors and retry logic</li>
-            </ul>
+          <div className="bg-gray-800 text-gray-200 p-3 rounded-md text-sm font-mono mb-3 dark:bg-gray-900 overflow-x-auto">
+{`npc-forge/
+├── src/
+│   ├── app/                     # Next.js App Router
+│   │   ├── api/                 # API routes
+│   │   │   ├── generate/        # Character generation endpoint
+│   │   │   ├── regenerate/      # Character regeneration endpoint
+│   │   │   └── proxy-image/     # Image proxy endpoint
+│   │   ├── docs/                # Documentation pages
+│   │   ├── library/             # Character library pages
+│   │   │   └── edit/[id]/       # Character editing pages
+│   │   └── page.tsx             # Homepage with wizard
+│   ├── components/              # UI components
+│   │   ├── character-wizard.tsx # Main wizard component
+│   │   ├── character-library.tsx # Library management
+│   │   ├── edit-page/           # Character editing components
+│   │   ├── tabs/                # Tab-based components
+│   │   ├── ui/                  # Reusable UI components
+│   │   └── wizard-steps/        # Individual wizard steps
+│   ├── contexts/                # React contexts
+│   │   ├── character-context.tsx # Character state management
+│   │   └── theme-context.tsx    # Theme/dark mode state
+│   └── lib/                     # Utilities and core logic
+│       ├── character-storage.ts # IndexedDB operations
+│       ├── image-storage.ts     # Portrait storage
+│       ├── usage-limits.ts      # Model usage tracking
+│       ├── models.ts           # Model configuration
+│       ├── openai.ts           # OpenAI API integration
+│       └── types.ts            # TypeScript definitions`}
           </div>
         </div>
       </div>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Core Libraries and Utilities</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Frontend Architecture</h2>
         
+        <h3 className="text-xl font-medium mb-3 text-indigo-700 dark:text-indigo-400">Wizard-Based Interface (v0.13.0)</h3>
         <p className="mb-4 text-gray-700 dark:text-gray-300">
-          The <code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/src/lib/</code> directory contains essential utility modules:
+          The character creation wizard consists of four main steps:
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="p-3 bg-gray-50 rounded-md border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-            <p className="text-gray-800 dark:text-gray-200 font-medium">/src/lib/openai.ts</p>
-            <p className="text-gray-600 text-sm dark:text-gray-400">API client wrappers for GPT and DALL-E integration</p>
+            <p className="font-medium text-gray-800 dark:text-gray-200">1. Concept Step</p>
+            <p className="text-gray-600 text-sm dark:text-gray-400">Genre selection and description input</p>
+          </div>
+          <div className="p-3 bg-gray-50 rounded-md border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+            <p className="font-medium text-gray-800 dark:text-gray-200">2. Options Step</p>
+            <p className="text-gray-600 text-sm dark:text-gray-400">Character traits and customization</p>
+          </div>
+          <div className="p-3 bg-gray-50 rounded-md border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+            <p className="font-medium text-gray-800 dark:text-gray-200">3. Model Step</p>
+            <p className="text-gray-600 text-sm dark:text-gray-400">AI model selection for text and images</p>
+          </div>
+          <div className="p-3 bg-gray-50 rounded-md border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+            <p className="font-medium text-gray-800 dark:text-gray-200">4. Generate Step</p>
+            <p className="text-gray-600 text-sm dark:text-gray-400">Character generation and results</p>
+          </div>
+        </div>
+        
+        <h3 className="text-xl font-medium mb-3 text-indigo-700 dark:text-indigo-400">Character Library System</h3>
+        
+        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm mb-6 dark:bg-gray-800 dark:border-gray-700">
+          <h4 className="font-medium text-indigo-700 dark:text-indigo-400 mb-2">Storage Architecture</h4>
+          <p className="text-gray-700 dark:text-gray-300 mb-3">The library uses IndexedDB for reliable local storage:</p>
+          
+          <div className="bg-gray-800 text-gray-200 p-3 rounded-md text-sm font-mono dark:bg-gray-900">
+{`// Database schema
+interface CharacterDatabase {
+  characters: Character[];          // Character data
+  portraits: PortraitData[];       // Compressed images
+  metadata: LibraryMetadata;       // Search indices
+}
+
+// Storage operations
+class CharacterStorage {
+  async saveCharacter(character: Character): Promise<void>
+  async getCharacter(id: string): Promise<Character>
+  async updateCharacter(character: Character): Promise<void>
+  async deleteCharacter(id: string): Promise<void>
+  async searchCharacters(query: string): Promise<Character[]>
+}`}
+          </div>
+        </div>
+      </div>
+      
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Backend Architecture</h2>
+        
+        <h3 className="text-xl font-medium mb-3 text-indigo-700 dark:text-indigo-400">API Endpoints</h3>
+        
+        <div className="space-y-4 mb-6">
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <h4 className="font-medium text-indigo-700 dark:text-indigo-400 mb-2">Character Generation (/api/generate)</h4>
+            <div className="bg-gray-800 text-gray-200 p-3 rounded-md text-sm font-mono dark:bg-gray-900">
+{`interface GenerationRequest {
+  description: string
+  genre?: string
+  sub_genre?: string
+  // Character traits
+  text_model?: string
+  image_model?: string
+  // Additional options...
+}
+
+interface GenerationResponse {
+  character: Character
+  usage: ModelUsage
+}`}
+            </div>
           </div>
           
-          <div className="p-3 bg-gray-50 rounded-md border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-            <p className="text-gray-800 dark:text-gray-200 font-medium">/src/lib/templates.ts</p>
-            <p className="text-gray-600 text-sm dark:text-gray-400">Prompt templates and default examples</p>
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <h4 className="font-medium text-indigo-700 dark:text-indigo-400 mb-2">Character Regeneration (/api/regenerate)</h4>
+            <div className="bg-gray-800 text-gray-200 p-3 rounded-md text-sm font-mono dark:bg-gray-900">
+{`interface RegenerationRequest {
+  characterData: Character
+  regenerationType: 'character' | 'portrait' | 'quest' | 'dialogue' | 'item'
+  targetIndex?: number
+  questComponent?: 'title' | 'description' | 'reward'
+  textModel?: string
+  imageModel?: string
+}`}
+            </div>
           </div>
-          
-          <div className="p-3 bg-gray-50 rounded-md border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-            <p className="text-gray-800 dark:text-gray-200 font-medium">/src/lib/types.ts</p>
-            <p className="text-gray-600 text-sm dark:text-gray-400">Shared TypeScript type definitions</p>
-          </div>
-          
-          <div className="p-3 bg-gray-50 rounded-md border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-            <p className="text-gray-800 dark:text-gray-200 font-medium">/src/lib/usage-limits.ts</p>
-            <p className="text-gray-600 text-sm dark:text-gray-400">Quota tracking logic using localStorage</p>
-          </div>
-          
-          <div className="p-3 bg-gray-50 rounded-md border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-            <p className="text-gray-800 dark:text-gray-200 font-medium">/src/lib/utils.ts</p>
-            <p className="text-gray-600 text-sm dark:text-gray-400">General helper functions (formatting, validation)</p>
+        </div>
+        
+        <h3 className="text-xl font-medium mb-3 text-indigo-700 dark:text-indigo-400">Model Selection System</h3>
+        
+        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm mb-6 dark:bg-gray-800 dark:border-gray-700">
+          <h4 className="font-medium text-indigo-700 dark:text-indigo-400 mb-2">Tiered Model Architecture</h4>
+          <div className="bg-gray-800 text-gray-200 p-3 rounded-md text-sm font-mono dark:bg-gray-900">
+{`const TEXT_MODELS: ModelTier[] = [
+  { id: 'standard', model: 'gpt-4o-mini', limit: null },
+  { id: 'enhanced', model: 'gpt-4.1-mini', limit: 30 },
+  { id: 'premium', model: 'gpt-4o', limit: 10 }
+]
+
+const IMAGE_MODELS: ModelTier[] = [
+  { id: 'standard', model: 'dall-e-2', limit: null },
+  { id: 'enhanced', model: 'dall-e-3', limit: 30 },
+  { id: 'premium', model: 'gpt-image-1', limit: 10 }
+]`}
           </div>
         </div>
       </div>
@@ -216,64 +230,84 @@ export default function ArchitecturePage() {
       <div className="mb-10">
         <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Data Flow</h2>
         
-        <ol className="space-y-4 list-decimal list-inside text-gray-700 dark:text-gray-300">
-          <li>
-            <span className="font-medium">User Input Collection</span>
-            <p className="ml-6 mt-1">User selects genre, traits, and other options across tabbed interface. Form data is managed through the CharacterContext.</p>
-          </li>
-          <li>
-            <span className="font-medium">Character Generation Request</span>
-            <p className="ml-6 mt-1">Client sends a POST request to the <code className="bg-gray-100 p-1 rounded dark:bg-gray-800">/api/generate</code> endpoint with form data and handles usage limits.</p>
-          </li>
-          <li>
-            <span className="font-medium">OpenAI API Interaction</span>
-            <p className="ml-6 mt-1">Server constructs a system prompt and sends it to GPT-4o-mini, then validates the response structure.</p>
-          </li>
-          <li>
-            <span className="font-medium">Portrait Generation</span>
-            <p className="ml-6 mt-1">Character data is used to generate a detailed portrait prompt for DALL-E 3 with styling cues.</p>
-          </li>
-          <li>
-            <span className="font-medium">Response and Display</span>
-            <p className="ml-6 mt-1">Complete character data is returned to the client and displayed in the tabbed UI.</p>
-          </li>
-          <li>
-            <span className="font-medium">Usage Tracking</span>
-            <p className="ml-6 mt-1">Generation count is updated in localStorage with limits (15/month) and visual indicators.</p>
-          </li>
-        </ol>
-      </div>
-      
-      <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Security Considerations</h2>
-        
-        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <div className="flex items-center mb-3">
-            <Shield className="h-5 w-5 text-indigo-600 mr-2 dark:text-indigo-400" />
-            <h3 className="text-lg font-medium text-indigo-700 dark:text-indigo-400">Security Measures</h3>
+        <div className="space-y-6">
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-2 text-indigo-700 dark:text-indigo-400">Character Creation Flow</h3>
+            <ol className="list-decimal list-inside space-y-2 text-gray-700 dark:text-gray-300">
+              <li><strong>User Input Collection</strong>: Wizard collects data across four steps</li>
+              <li><strong>Generation Request</strong>: Client sends POST to /api/generate with validation</li>
+              <li><strong>AI Model Interaction</strong>: Text/image generation with selected models</li>
+              <li><strong>Response Processing</strong>: Character data returned and displayed</li>
+              <li><strong>Library Storage</strong>: Optional save to IndexedDB</li>
+            </ol>
           </div>
-          <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
-            <li>API key stored securely in environment variables</li>
-            <li>Input sanitization to prevent prompt injection</li>
-            <li>Client-side usage limits to prevent abuse</li>
-            <li>Structured response validation</li>
-            <li>Error handling with graceful degradation</li>
-          </ul>
+          
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-2 text-indigo-700 dark:text-indigo-400">Character Regeneration Flow</h3>
+            <ol className="list-decimal list-inside space-y-2 text-gray-700 dark:text-gray-300">
+              <li><strong>Regeneration Request</strong>: User selects element to regenerate</li>
+              <li><strong>Selective Regeneration</strong>: Only specified element is regenerated</li>
+              <li><strong>Update and Storage</strong>: Changes reflected and library updated</li>
+            </ol>
+          </div>
         </div>
       </div>
       
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Core Libraries and Dependencies</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Security Architecture</h2>
         
-        <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-            <li><strong>Next.js 14</strong>: React framework with App Router</li>
-            <li><strong>React</strong>: UI library with hooks for state management</li>
-            <li><strong>TypeScript</strong>: Type-safe JavaScript development</li>
-            <li><strong>Tailwind CSS</strong>: Utility-first CSS framework</li>
-            <li><strong>OpenAI</strong>: SDK for API integration (GPT-4o-mini and DALL-E 3)</li>
-            <li><strong>Lucide React</strong>: SVG icon components</li>
-          </ul>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <h3 className="font-medium text-indigo-700 dark:text-indigo-400 mb-2">Input Security</h3>
+            <div className="bg-gray-800 text-gray-200 p-3 rounded-md text-sm font-mono dark:bg-gray-900">
+{`// Input sanitization
+function sanitizeUserInput(input: string): string {
+  // Remove control characters
+  let sanitized = input.replace(/[\\u0000-\\u001F\\u007F-\\u009F]/g, '')
+  
+  // Normalize whitespace
+  sanitized = sanitized.replace(/[ \\t\\v\\f]+/g, ' ')
+  
+  return sanitized.trim()
+}`}
+            </div>
+          </div>
+          
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <h3 className="font-medium text-indigo-700 dark:text-indigo-400 mb-2">API Security</h3>
+            <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+              <li>Server-side API key storage</li>
+              <li>Input validation and sanitization</li>
+              <li>Rate limiting through usage tracking</li>
+              <li>Error handling without information leakage</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Performance Optimizations</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <h3 className="font-medium text-indigo-700 dark:text-indigo-400 mb-2">Client-Side Optimizations</h3>
+            <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+              <li>Efficient IndexedDB usage</li>
+              <li>Automatic portrait compression</li>
+              <li>Lazy loading of character images</li>
+              <li>State management with memoization</li>
+            </ul>
+          </div>
+          
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <h3 className="font-medium text-indigo-700 dark:text-indigo-400 mb-2">API Optimizations</h3>
+            <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+              <li>Optimized prompts for token efficiency</li>
+              <li>Model-specific prompt variations</li>
+              <li>Retry logic for transient failures</li>
+              <li>Fallback options for API issues</li>
+            </ul>
+          </div>
         </div>
       </div>
       
@@ -284,31 +318,31 @@ export default function ArchitecturePage() {
             <Link href="/docs/api" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               API Documentation
             </Link>
-            {" "}for details about OpenAI integration
+            {" "}for detailed API specifications
           </li>
           <li>
-            <Link href="/docs/prompts" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
-              Prompt Engineering
+            <Link href="/docs/models" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Model Selection Guide
             </Link>
-            {" "}for information about GPT and DALL-E prompts
+            {" "}for understanding the tier system
+          </li>
+          <li>
+            <Link href="/docs/library" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Character Library Guide
+            </Link>
+            {" "}for library usage and management
           </li>
           <li>
             <Link href="/docs/dev-setup" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               Development Setup
             </Link>
-            {" "}for environment configuration and local setup
+            {" "}for local development configuration
           </li>
           <li>
-            <Link href="/docs/security" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
-              Security Documentation
+            <Link href="/docs/contributing" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Contributing Guidelines
             </Link>
-            {" "}for information about security measures
-          </li>
-          <li>
-            <Link href="/docs/roadmap" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
-              Development Roadmap
-            </Link>
-            {" "}for future architecture plans
+            {" "}for architecture contribution standards
           </li>
         </ul>
       </div>
