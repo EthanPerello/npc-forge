@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.1] - 2025-05-16
+
 ### Changed
 - Rewrote and updated all public documentation to match the current v0.13.0 features:
   - Wizard-based character creation flow
@@ -391,7 +393,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Export to JSON feature
 - Fully responsive UI for desktop and mobile
 
-[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.13.0...HEAD
+[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.13.1...HEAD
+[0.13.1]: https://github.com/EthanPerello/npc-forge/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/EthanPerello/npc-forge/compare/v0.12.1...v0.13.0
 [0.12.1]: https://github.com/EthanPerello/npc-forge/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/EthanPerello/npc-forge/compare/v0.11.1...v0.12.0
