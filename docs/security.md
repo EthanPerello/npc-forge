@@ -16,8 +16,10 @@ NPC Forge is designed with security in mind, implementing various measures to pr
    - Environment variables store sensitive credentials
 
 2. **Rate Limiting**
-   - Usage limits (15 generations per month) help prevent abuse
-   - Client-side tracking through localStorage provides basic rate limiting
+   - Usage limits help prevent abuse through client-side tracking
+   - Standard tier: Unlimited usage
+   - Enhanced tier: 30 generations per month
+   - Premium tier: 10 generations per month
    - Future versions may implement server-side rate limiting
 
 3. **Error Handling**
@@ -31,6 +33,7 @@ NPC Forge is designed with security in mind, implementing various measures to pr
    - All form inputs are validated before processing
    - Required fields are checked for presence
    - Enumerations (like gender, age group, etc.) are validated against allowed values
+   - Character descriptions are limited to reasonable lengths
 
 2. **Input Sanitization**
    - All free-text inputs are sanitized before processing
@@ -69,6 +72,7 @@ export function sanitizeUserInput(input: string): string {
 2. **Prompt Design**
    - System prompts are designed to generate appropriate content
    - Instructions emphasize creating content suitable for game scenarios
+   - Clear separation between system instructions and user input
 
 3. **Fallback Systems**
    - If portrait generation fails due to content policy, the character is still returned
@@ -76,20 +80,21 @@ export function sanitizeUserInput(input: string): string {
 
 ### Data Privacy
 
-1. **No Server-Side Storage**
-   - Generated characters are not stored on the server
-   - No database is used for character data
-   - Users must download their characters as JSON to save them
+1. **Local-Only Storage**
+   - Generated characters are stored locally using IndexedDB
+   - No character data is transmitted to or stored on servers
+   - Users have complete control over their character data
 
-2. **Local Storage Usage**
-   - Only usage tracking information is stored in localStorage
-   - No personal data is collected or stored
-   - Data is periodically reset (monthly for usage counts)
-
-3. **No Account System**
+2. **No User Tracking**
    - No user accounts or authentication required
    - No collection of personal information
    - No tracking or analytics beyond basic usage counts
+   - Usage statistics stored locally only
+
+3. **Data Portability**
+   - Users can export characters as JSON
+   - Complete data ownership and portability
+   - No vendor lock-in for character data
 
 ### Frontend Security
 
@@ -106,6 +111,18 @@ export function sanitizeUserInput(input: string): string {
    - Appropriate CORS settings to control access to resources
    - API routes secured against cross-origin attacks
 
+### Character Regeneration Security
+
+1. **Regeneration Validation**
+   - All regeneration requests validate the original character data
+   - Regeneration maintains data consistency
+   - Model selection validated against available options
+
+2. **Controlled Regeneration**
+   - Users can only regenerate their own locally stored characters
+   - Regeneration respects usage limits
+   - No ability to regenerate system-generated examples
+
 ## Potential Vulnerabilities and Mitigations
 
 ### Prompt Injection
@@ -117,50 +134,89 @@ export function sanitizeUserInput(input: string): string {
 - Input validation and sanitization
 - Model parameters tuned to resist injection
 - Prompt structure designed to maintain control
+- Character regeneration uses validated base character data
 
 ### Denial of Service
 
 **Vulnerability**: Excessive API calls could lead to rate limiting or increased costs.
 
 **Mitigation**:
-- Client-side usage limits
+- Client-side usage limits per model tier
+- Development mode bypass for testing only
+- Input length limitations
+- Graceful handling of API failures
 - Future implementation of server-side rate limiting
-- Vercel's built-in DDoS protection
 
 ### Content Policy Violations
 
 **Vulnerability**: Users might attempt to generate inappropriate or harmful content.
 
 **Mitigation**:
-- Input validation
-- OpenAI's content filters
-- Reporting mechanisms for inappropriate content
-- Prompt design to encourage appropriate outputs
+- Input validation and sanitization
+- OpenAI's built-in content filters
+- System prompts designed to encourage appropriate outputs
+- Error handling for policy violations
+
+### Local Storage Manipulation
+
+**Vulnerability**: Users could potentially manipulate local character storage.
+
+**Mitigation**:
+- Characters stored locally only affect the user's own data
+- No shared character galleries to protect
+- Character validation on import
+- No server-side dependencies on client storage
+
+## Model Selection Security
+
+### Usage Validation
+- Client-side usage tracking with local verification
+- Model availability checked before generation
+- Usage limits enforced per model tier
+- Monthly reset mechanisms prevent accumulation
+
+### Model Access Control
+- Premium models require explicit selection
+- Usage warnings before high-tier model use
+- No unauthorized access to model APIs
 
 ## Security Roadmap
 
 Future security enhancements planned for NPC Forge include:
 
-1. **Server-Side Rate Limiting**
-   - Implementation of more robust rate limiting
-   - IP-based tracking to prevent circumvention of limits
+### Server-Side Rate Limiting (v0.15.0+)
+- Implementation of robust rate limiting per IP
+- Abuse detection and prevention
+- Enhanced monitoring of API usage
 
-2. **Enhanced Validation**
-   - More comprehensive input validation
-   - Additional sanitization for complex inputs
+### Enhanced Input Validation
+- More comprehensive input validation rules
+- Advanced sanitization for complex inputs
+- Regex-based content filtering
 
-3. **User Accounts and Authentication**
-   - If implemented, will include:
-     - Secure authentication practices
-     - Password hashing and salting
-     - Session management
-     - Multi-factor authentication options
+### Optional User Accounts (v0.15.0)
+- If implemented, will include:
+  - Secure authentication practices
+  - Password hashing and salting (bcrypt)
+  - Session management with JWT
+  - Optional multi-factor authentication
 
-4. **Community Content Moderation**
-   - If sharing features are added, will include:
-     - Report mechanisms
-     - Content review processes
-     - Automated filtering
+### Content Moderation Improvements
+- Enhanced prompt injection detection
+- Community reporting mechanisms (if sharing features added)
+- Automated content review processes
+
+## Security Monitoring
+
+### Error Logging
+- Server-side error logging for security events
+- API failure tracking and analysis
+- No user data included in error logs
+
+### Usage Analytics
+- Basic usage statistics for performance monitoring
+- No personally identifiable information collected
+- Local storage for usage tracking only
 
 ## Security Contact
 
@@ -173,8 +229,38 @@ If you discover a security vulnerability in NPC Forge, please report it by email
 
 We take all security reports seriously and will respond as quickly as possible.
 
+## Security Best Practices for Users
+
+### Character Data Protection
+- Regularly export important characters as JSON backups
+- Use descriptive filenames for exports
+- Store backups securely
+
+### API Key Security (Developers)
+- Never commit `.env.local` files to version control
+- Use environment-specific API keys
+- Monitor API usage for unexpected patterns
+
+### Browser Security
+- Keep browser updated for latest security patches
+- Use browsers with good security track records
+- Be cautious of browser extensions that access local storage
+
+## Compliance and Standards
+
+### Data Protection
+- GDPR compliance through local-only storage
+- No data retention policies needed (user-controlled)
+- Right to deletion through local storage management
+
+### API Usage
+- Compliance with OpenAI's Terms of Service
+- Responsible AI usage practices
+- Content policy adherence
+
 ## Related Documentation
 
-- [API Documentation](api.md) - For details on the API implementation
-- [Contributing Guidelines](contributing.md) - For contribution workflows
-- [Architecture Overview](architecture.md) - For high-level system design
+- [API Documentation](/docs/api) - For details on the API implementation
+- [Contributing Guidelines](/docs/contributing) - For contribution workflows
+- [Architecture Overview](/docs/architecture) - For high-level system design
+- [Character Library Guide](/docs/library) - For local storage management

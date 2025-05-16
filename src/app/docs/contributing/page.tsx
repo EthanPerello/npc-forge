@@ -1,6 +1,11 @@
 import Link from 'next/link';
 import { GitBranch, GitMerge, GitPullRequest, Code, CheckCircle } from 'lucide-react';
 
+export const metadata = {
+  title: 'Contributing Guidelines - NPC Forge Documentation',
+  description: 'How to contribute to NPC Forge development',
+};
+
 export default function ContributingPage() {
   return (
     <div className="max-w-4xl mx-auto">
@@ -225,6 +230,24 @@ Brief explanation of what this PR does.
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-2 text-indigo-700 dark:text-indigo-400">Wizard Interface Components</h3>
+            <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+              <li>Follow the established step pattern in wizard-steps/</li>
+              <li>Maintain consistent navigation and progress tracking</li>
+              <li>Ensure responsive design across all steps</li>
+            </ul>
+          </div>
+          
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-2 text-indigo-700 dark:text-indigo-400">Character Library Components</h3>
+            <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+              <li>Maintain IndexedDB integration patterns</li>
+              <li>Follow the established component structure</li>
+              <li>Ensure regeneration features work consistently</li>
+            </ul>
+          </div>
+          
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <h3 className="text-lg font-medium mb-2 text-indigo-700 dark:text-indigo-400">TypeScript</h3>
             <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
               <li>Use TypeScript for all new code</li>
@@ -288,11 +311,45 @@ Brief explanation of what this PR does.
               <code className="text-indigo-900 dark:text-indigo-300 font-medium">security.md</code>
             </div>
             <div className="bg-indigo-100 p-2 rounded border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800">
-              <code className="text-indigo-900 dark:text-indigo-300 font-medium">architecture.md</code>
+              <code className="text-indigo-900 dark:text-indigo-300 font-medium">models.md</code>
             </div>
             <div className="bg-indigo-100 p-2 rounded border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800">
-              <code className="text-indigo-900 dark:text-indigo-300 font-medium">README.md</code>
+              <code className="text-indigo-900 dark:text-indigo-300 font-medium">library.md</code>
             </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4 text-indigo-700 dark:text-indigo-400">Key Development Considerations</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <h3 className="font-medium text-indigo-700 dark:text-indigo-400 mb-2">Model Selection Integration</h3>
+            <p className="text-gray-700 dark:text-gray-300 text-sm">
+              The tiered model system affects various parts of the application including usage tracking, UI components, API handling, and regeneration features.
+            </p>
+          </div>
+          
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <h3 className="font-medium text-indigo-700 dark:text-indigo-400 mb-2">Character State Management</h3>
+            <p className="text-gray-700 dark:text-gray-300 text-sm">
+              The character context manages wizard state, form data, generated character data, and library operations.
+            </p>
+          </div>
+          
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <h3 className="font-medium text-indigo-700 dark:text-indigo-400 mb-2">IndexedDB Integration</h3>
+            <p className="text-gray-700 dark:text-gray-300 text-sm">
+              The storage system provides reliable character persistence, portrait compression, search indexing, and error handling.
+            </p>
+          </div>
+          
+          <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <h3 className="font-medium text-indigo-700 dark:text-indigo-400 mb-2">Testing Areas</h3>
+            <p className="text-gray-700 dark:text-gray-300 text-sm">
+              Key areas include wizard navigation, library operations, regeneration features, model selection, and responsive design.
+            </p>
           </div>
         </div>
       </div>

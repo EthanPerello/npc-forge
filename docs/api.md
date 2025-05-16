@@ -4,11 +4,11 @@ This document describes the internal API structure and functionality of NPC Forg
 
 ## API Endpoints
 
-NPC Forge uses Next.js API routes for its backend functionality. The main endpoint is:
+NPC Forge uses Next.js API routes for its backend functionality. The main endpoints are:
 
 ### `POST /api/generate`
 
-Generates a character based on provided parameters.
+Generates a new character based on provided parameters.
 
 #### Request Body
 
@@ -29,7 +29,7 @@ The request body follows the `CharacterFormData` type (defined in `src/lib/types
   advanced_options?: {
     species?: string;
     occupation?: string;
-    personality_traits?: string[];        // Up to 3 personality traits
+    personality_traits?: string[];        // Unlimited personality traits
     social_class?: string;
     height?: string;
     build?: string;
@@ -57,6 +57,8 @@ The request body follows the `CharacterFormData` type (defined in `src/lib/types
     framing?: string;
     background?: string;
   };
+  text_model?: string;                    // Selected text generation model
+  image_model?: string;                   // Selected image generation model
 }
 ```
 
@@ -102,281 +104,269 @@ Error response (400/500):
 }
 ```
 
-## Core API Implementation
+### `POST /api/regenerate` (v0.12.0+)
 
-The endpoint is implemented in `/src/app/api/generate/route.ts`.
+Regenerates specific character attributes or elements.
 
-### Key Functions
-
-#### `POST` Handler
-
-The main handler for processing generation requests:
+#### Request Body
 
 ```typescript
-export async function POST(request: NextRequest): Promise<NextResponse<GenerationResponse>> {
-  try {
-    // Get form data from request
-    const data: CharacterFormData = await request.json();
-    
-    // Validate required fields
-    if (!data.description || data.description.trim() === '') {
-      return NextResponse.json(
-        { error: 'Character description is required', character: null as any },
-        { status: 400 }
-      );
-    }
-    
-    // Sanitize inputs
-    data.description = sanitizeUserInput(data.description);
-    
-    // Clean form data by removing empty values
-    const cleanedData = removeEmptyValues(data);
-    
-    // Build system prompt
-    const systemPrompt = buildSystemPrompt(cleanedData);
-    
-    // Generate character
-    const character = await generateCharacter(systemPrompt, data.description);
-    
-    // Generate portrait if successful
-    if (character) {
-      try {
-        // Transfer portrait options from form data to character object
-        if (data.portrait_options) {
-          character.portrait_options = data.portrait_options;
-        }
-        
-        const imageUrl = await generatePortrait(character);
-        character.image_url = imageUrl;
-      } catch (portraitError) {
-        // Continue without portrait if it fails
-        console.error('Failed to generate portrait:', portraitError);
-      }
-    }
-    
-    return NextResponse.json({ character });
-  } catch (error) {
-    // Error handling
-    console.error('Error in generate route:', error);
-    
-    return NextResponse.json(
-      { 
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
-        character: null as any
-      },
-      { status: 500 }
-    );
-  }
+{
+  characterData: Character;           // Complete character object
+  regenerationType: 'character' | 'portrait' | 'quest' | 'dialogue' | 'item';
+  targetIndex?: number;               // For quest/dialogue/item regeneration
+  questComponent?: 'title' | 'description' | 'reward';  // For quest component regeneration
+  textModel?: string;                 // Model for text regeneration
+  imageModel?: string;                // Model for portrait regeneration
 }
 ```
 
-#### `buildSystemPrompt` Function
+#### Character Attribute Regeneration
 
-Builds the prompt for OpenAI based on user selections:
+For `regenerationType: 'character'`, you can regenerate:
+- Name
+- Appearance
+- Personality
+- Backstory hook
+
+#### Component Regeneration
+
+- **Quest**: Regenerate entire quest or specific components (title, description, reward)
+- **Dialogue**: Regenerate individual dialogue lines
+- **Item**: Regenerate individual item descriptions
+- **Portrait**: Regenerate character portrait with selected image model
+
+#### Response
+
+Success response (200 OK):
 
 ```typescript
-function buildSystemPrompt(data: Partial<CharacterFormData>): string {
-  // Base prompt structure
-  let prompt = `
-You are an expert RPG character generator. Generate a detailed NPC profile based on the description and parameters provided.
-
-IMPORTANT: You must only respond with valid JSON matching the structure below. Do not include any additional text, explanations, or commentary outside the JSON.
-
-Return ONLY valid JSON with the following structure:
 {
-  "name": "Character Name",
-  "selected_traits": {
-    // Copy of the traits that were selected by the user
-  },
-  "added_traits": {
-    // Additional traits you've added that weren't specified
-  },
-  "appearance": "Detailed physical description as a paragraph",
-  "personality": "Detailed personality description as a paragraph",
-  "backstory_hook": "A 1-2 sentence hook about the character's past or motivation",
-  "special_ability": "A unique ability or power the character possesses"`;
-  
-  // Add conditional components based on user selections
-  // ...
-  
-  // Close JSON structure and add additional guidance
-  // ...
-  
-  return prompt;
+  character: Character;               // Updated character object
+  regeneratedField?: string;          // Field that was regenerated
+  success: boolean;                   // Operation success status
+}
+```
+
+### `GET /api/proxy-image`
+
+Proxies external image URLs for CORS compatibility.
+
+#### Query Parameters
+
+```typescript
+{
+  url: string;                        // External image URL to proxy
+}
+```
+
+## Core API Implementation
+
+### Character Generation Flow
+
+The main character generation endpoint (`/src/app/api/generate/route.ts`) follows this process:
+
+1. **Input Validation**: Verify required fields and sanitize inputs
+2. **Prompt Construction**: Build AI prompts based on user selections
+3. **Model Selection**: Apply user-selected text and image models
+4. **Character Generation**: Request character data from OpenAI
+5. **Portrait Generation**: Create character portrait if successful
+6. **Response Formatting**: Return structured character data
+
+### Model Selection Integration
+
+NPC Forge supports multiple AI models with tiered access:
+
+#### Text Models
+- **gpt-4o-mini** (Standard): Unlimited usage
+- **gpt-4.1-mini** (Enhanced): 30 generations/month  
+- **gpt-4o** (Premium): 10 generations/month
+
+#### Image Models
+- **dall-e-2** (Standard): Unlimited usage
+- **dall-e-3** (Enhanced): 30 generations/month
+- **gpt-image-1** (Premium): 10 generations/month
+
+### Usage Limit Integration
+
+The application includes a client-side usage tracking system in `/src/lib/usage-limits.ts`:
+
+```typescript
+// Per-model usage tracking
+export interface ModelUsageData {
+  [modelName: string]: {
+    count: number;
+    monthKey: string;
+    lastUpdated: string;
+  };
+}
+
+// Get usage data for specific model
+export function getModelUsage(modelName: string): UsageData {
+  // Implementation handles per-model tracking
+}
+
+// Check if model usage is within limits
+export function canUseModel(modelName: string): boolean {
+  // Implementation checks individual model limits
+}
+```
+
+### Regeneration API Implementation
+
+The regeneration endpoint supports granular updates:
+
+```typescript
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  try {
+    const { characterData, regenerationType, targetIndex, textModel, imageModel } = await request.json();
+    
+    let regeneratedCharacter = { ...characterData };
+    
+    switch (regenerationType) {
+      case 'character':
+        // Regenerate character attributes
+        break;
+      case 'portrait':
+        // Regenerate portrait with selected model
+        break;
+      case 'quest':
+        // Regenerate quest element
+        break;
+      case 'dialogue':
+        // Regenerate dialogue line
+        break;
+      case 'item':
+        // Regenerate item description
+        break;
+    }
+    
+    return NextResponse.json({ character: regeneratedCharacter, success: true });
+  } catch (error) {
+    return NextResponse.json({ error: error.message, success: false }, { status: 500 });
+  }
 }
 ```
 
 ## OpenAI Integration
 
-The OpenAI API integration is handled in `/src/lib/openai.ts`.
+### Enhanced Prompt Engineering
 
-### Character Generation
+The OpenAI integration (`/src/lib/openai.ts`) includes:
 
-```typescript
-export async function generateCharacter(systemPrompt: string, description: string): Promise<Character> {
-  try {
-    // Call the OpenAI API with GPT-4o-mini
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Higher quota than gpt-4o
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: description }
-      ],
-      temperature: 0.8,
-    });
+- **Dynamic Model Selection**: Support for multiple text and image models
+- **Optimized Prompts**: Efficient token usage across different model tiers
+- **Error Handling**: Graceful fallbacks for API failures
+- **Content Filtering**: Automatic content policy compliance
 
-    // Parse response and validate
-    // ...
-    
-    return character;
-  } catch (error) {
-    // Error handling
-    // ...
-  }
-}
-```
-
-### Portrait Generation
+### Portrait Generation with Model Selection
 
 ```typescript
-export async function generatePortrait(character: Character): Promise<string> {
+export async function generatePortrait(
+  character: Character, 
+  imageModel: string = 'dall-e-3'
+): Promise<string> {
   try {
-    // Gather appearance details from the character
-    // ...
+    const imagePrompt = buildPortraitPrompt(character);
     
-    // Create a prompt for the image generation
-    const imagePrompt = `Portrait of ${name}: ${appearanceText.substring(0, 250)}
-    ${visualTraits.length > 0 ? `Important visual characteristics: ${visualTraits.join(', ')}.` : ''}
-    ${artStyle} ${mood} ${framing} ${background}
-    High quality, detailed character portrait, professional digital art.`;
+    // Model-specific parameters
+    const modelConfig = getImageModelConfig(imageModel);
     
-    // Generate image with DALL-E 3
     const response = await openai.images.generate({
-      model: "dall-e-3",
+      model: imageModel,
       prompt: imagePrompt,
-      n: 1,
-      size: "1024x1024",
-      quality: "standard",
+      ...modelConfig
     });
 
     return response.data[0].url || '';
   } catch (error) {
-    // Error handling
-    // ...
+    console.error(`Portrait generation failed with ${imageModel}:`, error);
+    throw error;
   }
 }
 ```
 
-## Usage Limits Integration
+## Character Library Integration
 
-The application includes a client-side usage tracking system in `/src/lib/usage-limits.ts`.
+### IndexedDB Storage
+
+NPC Forge uses IndexedDB for reliable local storage:
 
 ```typescript
-// Get the current usage data from localStorage
-export function getUsageData(): UsageData {
-  // Default data for new users
-  const defaultData: UsageData = {
-    count: 0,
-    monthKey: getCurrentMonthKey(),
-    lastUpdated: new Date().toISOString()
-  };
-  
-  // Check if localStorage is available (will not be in SSR)
-  if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
-    return defaultData;
-  }
-  
-  try {
-    // Try to get and parse stored data
-    const storedData = localStorage.getItem(STORAGE_KEY);
-    if (!storedData) return defaultData;
-    
-    const parsedData: UsageData = JSON.parse(storedData);
-    const currentMonthKey = getCurrentMonthKey();
-    
-    // Reset count if it's a new month
-    if (parsedData.monthKey !== currentMonthKey) {
-      const resetData: UsageData = {
-        count: 0,
-        monthKey: currentMonthKey,
-        lastUpdated: new Date().toISOString()
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(resetData));
-      return resetData;
-    }
-    
-    return parsedData;
-  } catch (error) {
-    console.error('Error reading usage data:', error);
-    return defaultData;
-  }
+// Character storage with IndexedDB
+export async function saveCharacter(character: Character): Promise<void> {
+  const db = await openDatabase();
+  const transaction = db.transaction(['characters'], 'readwrite');
+  await transaction.objectStore('characters').put(character);
+}
+
+// Portrait storage with compression
+export async function savePortrait(characterId: string, imageUrl: string): Promise<void> {
+  const compressedImage = await compressImage(imageUrl);
+  const db = await openDatabase();
+  const transaction = db.transaction(['portraits'], 'readwrite');
+  await transaction.objectStore('portraits').put({ id: characterId, data: compressedImage });
 }
 ```
 
-## Utility Functions
+### Character CRUD Operations
 
-Various utility functions in `/src/lib/utils.ts` support the API:
+The library supports full character management:
 
-```typescript
-// Sanitizes user input to remove potential control characters and normalize whitespace
-export function sanitizeUserInput(input: string): string {
-    if (!input) return '';
-    
-    // Remove any control characters
-    let sanitized = input.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
-    
-    // Normalize whitespace (but preserve paragraph breaks)
-    sanitized = sanitized.replace(/[ \t\v\f]+/g, ' ');
-    
-    // Trim leading/trailing whitespace
-    return sanitized.trim();
-}
+- **Create**: Save new characters to IndexedDB
+- **Read**: Retrieve characters with filtering and search
+- **Update**: Edit character attributes and regenerate elements
+- **Delete**: Remove characters and associated portraits
 
-// Filters out undefined or null values from an object
-export function removeEmptyValues<T extends Record<string, any>>(obj: T): Partial<T> {
-  return Object.entries(obj).reduce((acc, [key, value]) => {
-    if (value !== undefined && value !== null) {
-      // Handle nested objects and arrays
-      // ...
-    }
-    return acc;
-  }, {} as Partial<T>);
-}
-```
+## Security Considerations
 
-## API Security Considerations
+### API Security Measures
 
-- The API endpoint uses server-side validation to prevent invalid inputs
-- User inputs are sanitized to prevent control characters or malicious content
-- Empty or null values are removed to create cleaner prompts
-- Environment variables secure the OpenAI API key
-- Error handling prevents sensitive information leakage
+- **Input Sanitization**: All user inputs are sanitized before processing
+- **Model Validation**: Selected models are validated against allowed options
+- **Rate Limiting**: Client-side usage tracking prevents abuse
+- **Error Handling**: Structured error responses without sensitive data exposure
+
+### Content Moderation
+
+- **OpenAI Content Policy**: Automatic filtering of inappropriate content
+- **Prompt Design**: System prompts designed to encourage appropriate outputs
+- **Input Validation**: Rejection of potentially harmful inputs
 
 ## Testing the API
 
-To test the API endpoint manually:
+### Manual Testing
 
-1. Use a tool like cURL, Postman, or Insomnia
-2. Send a POST request to `/api/generate`
-3. Include a JSON body with the required fields
-
-Example cURL request:
+Use tools like cURL, Postman, or Insomnia to test the endpoints:
 
 ```bash
-curl -X POST \
-  http://localhost:3000/api/generate \
+# Test character generation
+curl -X POST http://localhost:3000/api/generate \
   -H 'Content-Type: application/json' \
   -d '{
     "description": "A mysterious elven ranger",
     "include_quests": true,
     "include_dialogue": true,
     "include_items": true,
-    "genre": "fantasy"
+    "genre": "fantasy",
+    "text_model": "gpt-4o-mini",
+    "image_model": "dall-e-3"
+  }'
+
+# Test character regeneration
+curl -X POST http://localhost:3000/api/regenerate \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "characterData": {...},
+    "regenerationType": "character",
+    "textModel": "gpt-4o"
   }'
 ```
 
 ## Related Documentation
 
 - [Architecture Overview](architecture.md) - For high-level system design
-- [OpenAI Prompts](prompts.md) - For details on prompt engineering
+- [Prompt Engineering](prompts.md) - For details on AI prompt construction
+- [Model Selection Guide](models.md) - For understanding model tiers and usage
 - [Contributing Guidelines](contributing.md) - For contribution workflows
+- [Character Library Documentation](library.md) - For storage and management details

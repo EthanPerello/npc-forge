@@ -166,6 +166,20 @@ We use a simplified GitFlow workflow:
 - Use React Context for state that needs to be shared across components
 - Follow the React file structure of the existing project
 
+### Wizard Interface Components
+
+When working with the wizard interface:
+- Follow the established step pattern in `src/components/wizard-steps/`
+- Maintain consistent navigation and progress tracking
+- Ensure responsive design across all steps
+
+### Character Library Components
+
+When modifying library features:
+- Maintain IndexedDB integration patterns
+- Follow the established component structure in `src/components/edit-page/`
+- Ensure regeneration features work consistently
+
 ### CSS/Styling
 
 - Use Tailwind CSS for styling
@@ -199,6 +213,8 @@ Update the relevant Markdown files in the `/docs` directory:
 - Update usage instructions in `how-to-use.md`
 - Add API changes to `api.md`
 - Update security information in `security.md`
+- Document new model features in `models.md`
+- Update library documentation in `library.md`
 
 ### README
 
@@ -216,6 +232,31 @@ We currently rely on manual testing. When implementing changes:
 2. Test on different screen sizes
 3. Test edge cases and failure modes
 4. Verify performance is acceptable
+5. Test wizard navigation thoroughly
+6. Test character library operations
+7. Test regeneration features if applicable
+
+### Key Testing Areas
+
+#### Wizard Interface
+- Test all step transitions
+- Verify data persistence across navigation
+- Test progress bar functionality
+
+#### Character Library
+- Test CRUD operations
+- Verify search and filtering
+- Test IndexedDB operations
+
+#### Regeneration Features
+- Test individual attribute regeneration
+- Test component-level regeneration
+- Verify model selection affects output
+
+#### Model Selection
+- Test usage limit tracking
+- Verify different model combinations
+- Test monthly reset functionality
 
 ## Release Process
 
@@ -257,6 +298,32 @@ When submitting a bug report:
 4. Include screenshots if applicable
 5. List your browser, OS, and any relevant configuration
 
+## Development Areas
+
+### Core Features
+- Wizard interface improvements
+- Character library enhancements
+- Regeneration system refinements
+- Model selection optimization
+
+### UI/UX Improvements
+- Responsive design enhancements
+- Accessibility improvements
+- Performance optimizations
+- Dark mode refinements
+
+### API Integration
+- New model support
+- Enhanced error handling
+- Usage tracking improvements
+- Rate limiting enhancements
+
+### Storage & Data
+- IndexedDB optimizations
+- Import/export enhancements
+- Search performance improvements
+- Data validation strengthening
+
 ## Resources
 
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
@@ -264,5 +331,22 @@ When submitting a bug report:
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 - [OpenAI API Documentation](https://platform.openai.com/docs/api-reference)
+
+## Development Tips
+
+### Working with the Wizard
+- Maintain state consistency across steps
+- Follow the established navigation patterns
+- Test with various data combinations
+
+### Character Library Development
+- Understand IndexedDB patterns used
+- Follow established regeneration patterns
+- Test with large character collections
+
+### Model Integration
+- Understand the tiered model system
+- Test usage limit functionality
+- Verify error handling across models
 
 Thank you for contributing to NPC Forge! Your efforts help make the project better for everyone.

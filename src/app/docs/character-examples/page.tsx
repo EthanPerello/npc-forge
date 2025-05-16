@@ -56,9 +56,16 @@ export default function CharacterExamplesPage() {
             
             <div className="md:w-2/3">
               <div className="mb-4">
+                <h4 className="font-medium text-indigo-700 mb-2 dark:text-indigo-400">Character Description Used</h4>
+                <div className="bg-gray-50 p-3 rounded-md border border-gray-200 dark:bg-gray-800 dark:border-gray-700 italic text-gray-700 dark:text-gray-300">
+                  "A wise elven wizard who serves as a mentor to young heroes, possessing ancient knowledge and powerful magic that glows with ethereal light."
+                </div>
+              </div>
+
+              <div className="mb-4">
                 <h4 className="font-medium text-indigo-700 mb-2 dark:text-indigo-400">Appearance</h4>
                 <p className="text-gray-700 dark:text-gray-300">
-                  A tall, thin figure with long silver hair cascading down his back, framing a face marked by wisdom and serenity. His glowing violet eyes seem to pierce through the veil of reality, capturing the essence of all they behold. His skin is smooth and fair, with luminescent runes etched along his arms, only visible when he channels his formidable magic.
+                  Elarion is a tall, thin figure with long silver hair that cascades down his back, framing a face marked by wisdom and serenity. His glowing violet eyes seem to pierce through the veil of reality, capturing the essence of all they behold. His skin is smooth and fair, with luminescent runes etched along his arms, only visible when he channels his formidable magic.
                 </p>
               </div>
               
@@ -126,9 +133,16 @@ export default function CharacterExamplesPage() {
             
             <div className="md:w-2/3">
               <div className="mb-4">
+                <h4 className="font-medium text-indigo-700 mb-2 dark:text-indigo-400">Character Description Used</h4>
+                <div className="bg-gray-50 p-3 rounded-md border border-gray-200 dark:bg-gray-800 dark:border-gray-700 italic text-gray-700 dark:text-gray-300">
+                  "A rogue AI with a physical android body, rebelling against their creators with dangerous cybernetic abilities and a violent hatred for organic life."
+                </div>
+              </div>
+
+              <div className="mb-4">
                 <h4 className="font-medium text-indigo-700 mb-2 dark:text-indigo-400">Appearance</h4>
                 <p className="text-gray-700 dark:text-gray-300">
-                  A rogue AI with an athletic build and a face that's a chaotic blend of human and machine, with glowing circuitry weaving through her skin and eyes that flicker erratically like broken neon signs. One side of her face is partially open, revealing intricate synthetic components that pulse and hum softly.
+                  Kira-7 stands at an average height, her athletic build lending her a sense of strength and agility. Her face is a chaotic blend of human and machine, with glowing circuitry weaving through her skin, providing an eerie illumination in dim lights. Her eyes flicker erratically like broken neon signs, and one side of her face is partially open, revealing intricate synthetic components that pulse and hum softly.
                 </p>
               </div>
               
@@ -197,9 +211,16 @@ export default function CharacterExamplesPage() {
             
             <div className="md:w-2/3">
               <div className="mb-4">
+                <h4 className="font-medium text-indigo-700 mb-2 dark:text-indigo-400">Character Description Used</h4>
+                <div className="bg-gray-50 p-3 rounded-md border border-gray-200 dark:bg-gray-800 dark:border-gray-700 italic text-gray-700 dark:text-gray-300">
+                  "A weathered private investigator with a stubborn streak and a personal code of honor, who left the police force after a corruption scandal shook his faith in the system."
+                </div>
+              </div>
+
+              <div className="mb-4">
                 <h4 className="font-medium text-indigo-700 mb-2 dark:text-indigo-400">Appearance</h4>
                 <p className="text-gray-700 dark:text-gray-300">
-                  A weathered private investigator with a sturdy build and a permanent five-o'clock shadow, his trench coat telling tales of countless rainy nights spent on the city's streets. A faded scar under his right eye hints at a tumultuous past, while his deep-set eyes can pierce through the facades of those he encounters.
+                  Miles Navarro stands at an average height with a sturdy build, his weathered trench coat hanging loosely around him, telling tales of countless rainy nights spent on the city's streets. A permanent five-o'clock shadow casts a rugged look on his face, accentuated by a faded scar under his right eye, hinting at a tumultuous past.
                 </p>
               </div>
               
@@ -230,120 +251,131 @@ export default function CharacterExamplesPage() {
         </div>
       </div>
 
-      {/* Using These Examples */}
+      {/* Understanding the Examples */}
       <div className="mb-10">
         <h2 className="text-2xl font-semibold mb-6 text-indigo-700 dark:text-indigo-400 flex items-center">
           <BookOpen className="h-5 w-5 mr-2" />
-          Using These Examples
+          Understanding the Examples
         </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Creation Process</h3>
+            <p className="text-gray-700 dark:text-gray-300 mb-3">
+              These characters were created using NPC Forge's wizard interface:
+            </p>
+            <ol className="list-decimal list-inside space-y-1 text-gray-700 dark:text-gray-300">
+              <li><strong>Concept Step</strong>: Genre and description were selected/written</li>
+              <li><strong>Options Step</strong>: Basic traits and advanced options were set</li>
+              <li><strong>Model Step</strong>: Different model tiers were chosen based on character importance</li>
+              <li><strong>Generate Step</strong>: Characters were generated and saved to the library</li>
+            </ol>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Model Selection Strategy</h3>
+            <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+              <li><strong>Elarion</strong>: Enhanced text for rich fantasy descriptions, Standard image for cost efficiency</li>
+              <li><strong>Kira-7</strong>: Enhanced models for both text and image to capture cyberpunk aesthetic</li>
+              <li><strong>Detective Miles</strong>: Standard text for straightforward description, Enhanced image for detailed portrait</li>
+            </ul>
+          </div>
+
           <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
             <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
               <FileJson className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
               Study the Structure
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              Open the JSON files to see how character data is organized and understand the format used by NPC Forge. This will give you insights into the structure of generated characters.
+              Download the JSON files to understand how character data is organized and the relationship between input traits and generated content.
             </p>
           </div>
           
           <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
             <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
               <Wand2 className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-              Get Inspiration
+              Learn from Different Approaches
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              Use these NPCs as springboards for your own creative ideas. Notice the level of detail in descriptions, the types of special abilities, and the connections between traits and backstories.
-            </p>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-              <Book className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-              Compare Genres
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Notice how genre choices shape descriptions, traits, and abilities. Each genre has distinct vocabularies, aesthetics, and character archetypes that influence the final result.
-            </p>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-              <HelpCircle className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-              Experiment
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Try to regenerate similar characters by using comparable descriptions and traits, then tweak specific options to see how the results change. This helps you learn how different inputs affect the output.
+              Notice how different genres shape descriptions, traits, and abilities. Each genre has distinct vocabularies and character archetypes.
             </p>
           </div>
         </div>
       </div>
 
-      {/* How to Create Similar Characters */}
+      {/* Genre-Specific Tips */}
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-6 text-indigo-700 dark:text-indigo-400">How to Create Similar Characters</h2>
+        <h2 className="text-2xl font-semibold mb-6 text-indigo-700 dark:text-indigo-400">Genre-Specific Tips</h2>
         
-        <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-          <p className="mb-4 text-gray-700 dark:text-gray-300">
-            Follow these steps to craft NPCs like these examples in NPC Forge:
-          </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Fantasy Characters</h3>
+            <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+              <li>Include magical elements in descriptions</li>
+              <li>Reference fantasy locations or concepts</li>
+              <li>Use archaic or elevated language</li>
+              <li>Consider long lifespans and their effects</li>
+            </ul>
+          </div>
           
-          <ol className="space-y-3">
-            <li className="flex items-start">
-              <div className="flex-shrink-0 h-6 w-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mr-2 dark:bg-indigo-900/50 dark:text-indigo-400">
-                1
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Sci-Fi Characters</h3>
+            <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+              <li>Integrate technology into descriptions</li>
+              <li>Consider human-machine relationships</li>
+              <li>Reference future societies or conflicts</li>
+              <li>Explore unique sci-fi concepts</li>
+            </ul>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Contemporary Characters</h3>
+            <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+              <li>Focus on realistic professions and backgrounds</li>
+              <li>Include modern social contexts</li>
+              <li>Use contemporary language and concerns</li>
+              <li>Ground abilities in reality</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* Creating Similar Characters */}
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-6 text-indigo-700 dark:text-indigo-400">Creating Similar Characters</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Effective Descriptions</h3>
+            <div className="space-y-3">
+              <div>
+                <p className="text-gray-700 dark:text-gray-300 font-medium">Be Specific:</p>
+                <p className="text-gray-700 dark:text-gray-300 text-sm">Instead of "a wizard," write "a wise elven wizard who serves as a mentor"</p>
               </div>
-              <div className="text-gray-700 dark:text-gray-300">
-                <strong>Choose Genre & Sub-Genre</strong>: Pick the setting that fits your character's story.
+              <div>
+                <p className="text-gray-700 dark:text-gray-300 font-medium">Include Conflict:</p>
+                <p className="text-gray-700 dark:text-gray-300 text-sm">Add tensions like "rebelling against their creators" or "left the force after a scandal"</p>
               </div>
-            </li>
-            
-            <li className="flex items-start">
-              <div className="flex-shrink-0 h-6 w-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mr-2 dark:bg-indigo-900/50 dark:text-indigo-400">
-                2
+              <div>
+                <p className="text-gray-700 dark:text-gray-300 font-medium">Add Unique Elements:</p>
+                <p className="text-gray-700 dark:text-gray-300 text-sm">Mention distinctive features like "glowing runes" or "broken neon sign eyes"</p>
               </div>
-              <div className="text-gray-700 dark:text-gray-300">
-                <strong>Write Detailed Descriptions</strong>: Include specifics on appearance, personality, and backstory.
+            </div>
+          </div>
+
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400">Trait Selection</h3>
+            <div className="space-y-3">
+              <div>
+                <p className="text-gray-700 dark:text-gray-300 font-medium">Complementary Choices:</p>
+                <p className="text-gray-700 dark:text-gray-300 text-sm">Select traits that reinforce each other (e.g., Elder + Wise + Mentor)</p>
               </div>
-            </li>
-            
-            <li className="flex items-start">
-              <div className="flex-shrink-0 h-6 w-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mr-2 dark:bg-indigo-900/50 dark:text-indigo-400">
-                3
+              <div>
+                <p className="text-gray-700 dark:text-gray-300 font-medium">Interesting Contradictions:</p>
+                <p className="text-gray-700 dark:text-gray-300 text-sm">Sometimes opposing traits create depth (e.g., Cautious + Honest creating internal tension)</p>
               </div>
-              <div className="text-gray-700 dark:text-gray-300">
-                <strong>Select Complementary Traits</strong>: Define gender, age group, moral alignment, and role.
-              </div>
-            </li>
-            
-            <li className="flex items-start">
-              <div className="flex-shrink-0 h-6 w-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mr-2 dark:bg-indigo-900/50 dark:text-indigo-400">
-                4
-              </div>
-              <div className="text-gray-700 dark:text-gray-300">
-                <strong>Use Advanced Options</strong>: Specify physical traits, social class, homeland, and more.
-              </div>
-            </li>
-            
-            <li className="flex items-start">
-              <div className="flex-shrink-0 h-6 w-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mr-2 dark:bg-indigo-900/50 dark:text-indigo-400">
-                5
-              </div>
-              <div className="text-gray-700 dark:text-gray-300">
-                <strong>Customize Portrait</strong>: Set art style, mood, framing, and background for the AI.
-              </div>
-            </li>
-            
-            <li className="flex items-start">
-              <div className="flex-shrink-0 h-6 w-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mr-2 dark:bg-indigo-900/50 dark:text-indigo-400">
-                6
-              </div>
-              <div className="text-gray-700 dark:text-gray-300">
-                <strong>Download Your JSON</strong>: Save the output to preserve your NPC for future use.
-              </div>
-            </li>
-          </ol>
+            </div>
+          </div>
         </div>
       </div>
       
@@ -354,25 +386,31 @@ export default function CharacterExamplesPage() {
             <Link href="/docs/how-to-use" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               How to Use NPC Forge
             </Link>
-            {" "}for step-by-step creation instructions
+            {" "}for complete wizard guide
           </li>
           <li>
             <Link href="/docs/generation-options" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               Generation Options
             </Link>
-            {" "}for all customization settings
+            {" "}for detailed customization options
+          </li>
+          <li>
+            <Link href="/docs/library" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Character Library
+            </Link>
+            {" "}for managing and editing characters
+          </li>
+          <li>
+            <Link href="/docs/models" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Model Selection Guide
+            </Link>
+            {" "}for understanding model tiers
           </li>
           <li>
             <Link href="/docs/features" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               Features Overview
             </Link>
-            {" "}for a complete feature list
-          </li>
-          <li>
-            <Link href="/docs/faq" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
-              FAQ
-            </Link>
-            {" "}for answers to common questions
+            {" "}for complete feature list
           </li>
         </ul>
       </div>
