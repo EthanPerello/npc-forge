@@ -246,21 +246,29 @@ async function run() {
   updatePackageJson(version);
   updatePackageLockJson(version);
 
-  // Update README
+  // Update README with logging
   const readmePath = 'README.md';
   let readme = fs.readFileSync(readmePath, 'utf8');
+  const originalReadme = readme;
   readme = readme.replace(/version-[0-9]+\.[0-9]+\.[0-9]+-blue\.svg/g, `version-${version}-blue.svg`);
+  
+  if (originalReadme === readme) {
+    console.log('⚠️ No version badges found to update in README.md');
+    console.log('Looking for pattern: version-X.X.X-blue.svg');
+  } else {
+    console.log('✅ README.md version badge updated');
+  }
+  
   fs.writeFileSync(readmePath, readme, 'utf8');
 
   // Delete existing release and create the new one
   execSync(`gh release delete ${tag} --yes 2>/dev/null || true`);
   execSync(`gh release create ${tag} -F "${releaseNotePath}" -t "NPC Forge ${tag} – ${title}"`, { stdio: 'inherit' });
 
-
   // Git commit, tag & push
   try {
-    execSync(`git add CHANGELOG.md package.json package-lock.json "${releaseNotePath}"`);
-    console.log('✅ Staged CHANGELOG.md, package.json, package-lock.json, and release note');
+    execSync(`git add CHANGELOG.md package.json package-lock.json README.md "${releaseNotePath}"`);
+    console.log('✅ Staged CHANGELOG.md, package.json, package-lock.json, README.md, and release note');
 
     execSync(`git commit -m "chore: release ${tag}"`);
     console.log('✅ Changes committed');
@@ -271,7 +279,7 @@ async function run() {
   } catch (error) {
     console.warn('⚠️ Git staging/commit/tag failed:', error);
     console.log('Try doing these steps manually:');
-    console.log(`  git add CHANGELOG.md package.json package-lock.json "${releaseNotePath}"`);
+    console.log(`  git add CHANGELOG.md package.json package-lock.json README.md "${releaseNotePath}"`);
     console.log(`  git commit -m "chore: release ${tag}"`);
     console.log(`  git tag ${tag}`);
   }
