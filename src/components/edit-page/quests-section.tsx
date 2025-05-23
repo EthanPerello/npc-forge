@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Character, Quest } from '@/lib/types';
 import Button from '@/components/ui/button';
 import { FormSection, RegenerateButton } from './shared';
@@ -8,7 +9,7 @@ import { PlusCircle, Trash2, RefreshCw } from 'lucide-react';
 interface QuestsSectionProps {
   character: Character;
   onArrayInputChange: <T extends unknown>(field: keyof Character, value: T[]) => void;
-  onRegenerateField: (field: string, e: React.MouseEvent) => void;
+  onRegenerateField: (field: string, e: React.MouseEvent<HTMLButtonElement>) => void;
   fieldLoadingStates: Record<string, boolean>;
 }
 
@@ -20,7 +21,7 @@ export const QuestsSection = ({
 }: QuestsSectionProps) => {
   
   // Add a new quest
-  const handleAddQuest = (e: React.MouseEvent) => {
+  const handleAddQuest = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     
@@ -38,7 +39,7 @@ export const QuestsSection = ({
   };
   
   // Remove a quest
-  const handleRemoveQuest = (index: number) => (e: React.MouseEvent) => {
+  const handleRemoveQuest = (index: number) => (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     
@@ -52,7 +53,6 @@ export const QuestsSection = ({
   return (
     <FormSection title="Quests">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Quests</h2>
         <Button 
           variant="secondary" 
           onClick={handleAddQuest}

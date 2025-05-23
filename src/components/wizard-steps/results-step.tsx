@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useCharacter } from '@/contexts/character-context';
 import { Character } from '@/lib/types';
-import { Download, FileJson, Save, User, Heart, Book, Target, MessageSquare, Package, AlertTriangle } from 'lucide-react';
+import { Download, FileJson, Save, User, Heart, Book, Target, MessageSquare, Package, AlertTriangle, Library } from 'lucide-react';
 import Button from '../ui/button';
 import TabInterface, { Tab } from '../ui/tab-interface';
 import { getCharacterTraitsArray } from '@/lib/utils';
@@ -103,6 +104,7 @@ const ItemsTab = ({ items }: { items: string[] }) => (
 );
 
 export default function ResultsStep({ onNext, isGenerating }: ResultsStepProps) {
+  const router = useRouter();
   const { character, downloadCharacterJSON, saveToLibrary, formData } = useCharacter();
   const [isSaving, setIsSaving] = useState(false);
 
@@ -111,11 +113,17 @@ export default function ResultsStep({ onNext, isGenerating }: ResultsStepProps) 
     setIsSaving(true);
     try {
       await saveToLibrary();
+      // Navigate to library after saving
+      router.push('/library');
     } catch (error) {
       console.error('Error saving character:', error);
     } finally {
       setIsSaving(false);
     }
+  };
+  
+  const handleViewLibrary = () => {
+    router.push('/library');
   };
 
   if (!character) {
@@ -217,7 +225,7 @@ export default function ResultsStep({ onNext, isGenerating }: ResultsStepProps) 
               isLoading={isSaving}
               size="sm"
             >
-              Save
+              Save to Library
             </Button>
             
             <Button
@@ -250,6 +258,16 @@ export default function ResultsStep({ onNext, isGenerating }: ResultsStepProps) 
                 Portrait
               </Button>
             )}
+            
+            {/* New button to view library */}
+            <Button
+              variant="secondary"
+              onClick={handleViewLibrary}
+              leftIcon={<Library className="h-4 w-4" />}
+              size="sm"
+            >
+              View Library
+            </Button>
           </div>
 
           {/* Portrait - Only show if there's image data or URL */}

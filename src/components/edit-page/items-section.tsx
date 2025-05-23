@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Character } from '@/lib/types';
 import Button from '@/components/ui/button';
 import { FormSection, RegenerateButton } from './shared';
@@ -8,7 +9,7 @@ import { PlusCircle, Trash2 } from 'lucide-react';
 interface ItemsSectionProps {
   character: Character;
   onArrayInputChange: <T extends unknown>(field: keyof Character, value: T[]) => void;
-  onRegenerateField: (field: string, e: React.MouseEvent) => void;
+  onRegenerateField: (field: string, e: React.MouseEvent<HTMLButtonElement>) => void;
   fieldLoadingStates: Record<string, boolean>;
 }
 
@@ -20,7 +21,7 @@ export const ItemsSection = ({
 }: ItemsSectionProps) => {
   
   // Add a new item
-  const handleAddItem = (e: React.MouseEvent) => {
+  const handleAddItem = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     
@@ -32,7 +33,7 @@ export const ItemsSection = ({
   };
   
   // Remove an item
-  const handleRemoveItem = (index: number) => (e: React.MouseEvent) => {
+  const handleRemoveItem = (index: number) => (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     
@@ -46,7 +47,6 @@ export const ItemsSection = ({
   return (
     <FormSection title="Items">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Items</h2>
         <Button 
           variant="secondary" 
           onClick={handleAddItem}
