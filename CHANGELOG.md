@@ -7,8 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.14.0] - 2025-05-22
-
 ### Added
 - `EditPageFooter` component to support consistent navigation on the Edit screen.
 
@@ -25,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Integrated a sticky footer for persistent navigation actions on the Edit page.
   - Simplified and polished existing edit-page components for clarity and reusability (e.g., `HeaderSection`, `PortraitSection`, `CharacterTraitsSection`, etc.).
 
-## [0.13.2] - 2025-05-22
+## [0.14.0] - 2025-05-22
 
 ### Changed
 - Rewrote random character generation logic to bypass delayed state updates and directly pass generated data to the API.
