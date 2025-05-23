@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.2] - 2025-05-23
+
 ### Changed
 - Rewrote random character generation logic to bypass delayed state updates and directly pass generated data to the API.
 - Updated generation limits:
@@ -405,7 +407,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Export to JSON feature
 - Fully responsive UI for desktop and mobile
 
-[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.13.1...HEAD
+[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.13.2...HEAD
+[0.13.2]: https://github.com/EthanPerello/npc-forge/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/EthanPerello/npc-forge/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/EthanPerello/npc-forge/compare/v0.12.1...v0.13.0
 [0.12.1]: https://github.com/EthanPerello/npc-forge/compare/v0.12.0...v0.12.1
