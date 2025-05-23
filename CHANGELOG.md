@@ -5,24 +5,6 @@ All notable changes to NPC Forge will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
-### Added
-- `EditPageFooter` component to support consistent navigation on the Edit screen.
-
-### Changed
-- Improved navigation layout:
-  - Added header to the Edit and Library pages for a consistent experience across views.
-  - On mobile:
-    - The header now auto-closes when the sidebar opens.
-    - The stepper is now hidden when the sidebar is open to reduce visual clutter.
-    - Adjusted spacing to ensure the sidebar toggle does not overlap the header title.
-- Enhanced user flow:
-  - Added a "Back to Library" button after character generation for quicker navigation.
-- Refactored Edit Page layout:
-  - Integrated a sticky footer for persistent navigation actions on the Edit page.
-  - Simplified and polished existing edit-page components for clarity and reusability (e.g., `HeaderSection`, `PortraitSection`, `CharacterTraitsSection`, etc.).
-
 ## [0.14.0] - 2025-05-22
 
 ### Changed
