@@ -1,14 +1,16 @@
 'use client';
 
+import React from 'react';
 import { Character, OpenAIModel } from '@/lib/types';
 import Select from '@/components/ui/select';
 import ModelSelector from '@/components/model-selector';
 import { FormSection, RegenerateButton } from './shared';
+import { GENRE_TEMPLATES } from '@/lib/templates';
 
 interface BasicInfoSectionProps {
   character: Character;
   onInputChange: (field: string, value: string) => void;
-  onRegenerateField: (field: string, e: React.MouseEvent) => void;
+  onRegenerateField: (field: string, e: React.MouseEvent<HTMLButtonElement>) => void;
   onGenreChange: (section: 'selected_traits' | 'added_traits', field: string, value: string) => void;
   currentGenre: string;
   subGenres: {value: string, label: string}[];
@@ -28,14 +30,6 @@ export const BasicInfoSection = ({
   selectedTextModel,
   onModelChange
 }: BasicInfoSectionProps) => {
-  // Import this from your templates.ts file in a real implementation
-  const GENRE_TEMPLATES = [
-    { id: 'fantasy', label: 'Fantasy' },
-    { id: 'sci-fi', label: 'Science Fiction' },
-    { id: 'historical', label: 'Historical' },
-    { id: 'contemporary', label: 'Contemporary' }
-  ];
-
   return (
     <FormSection title="Basic Information">
       <div className="mb-4">

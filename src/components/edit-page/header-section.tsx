@@ -2,32 +2,52 @@
 
 import { ArrowLeft, Trash2 } from 'lucide-react';
 import Button from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface HeaderSectionProps {
   characterName: string;
-  showDeleteConfirm: boolean;
   isDeleting: boolean;
   onDelete: (e: React.MouseEvent) => void;
-  onCancelDelete: (e: React.MouseEvent) => void;
-  onBack: () => void;
 }
 
 export const HeaderSection = ({
   characterName,
-  showDeleteConfirm,
   isDeleting,
-  onDelete,
-  onCancelDelete,
-  onBack
+  onDelete
 }: HeaderSectionProps) => {
+  const router = useRouter();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
+  const handleCancelDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowDeleteConfirm(false);
+  };
+  
+  const handleDeleteConfirm = (e: React.MouseEvent) => {
+    if (!showDeleteConfirm) {
+      e.preventDefault();
+      e.stopPropagation();
+      setShowDeleteConfirm(true);
+      return;
+    }
+    
+    onDelete(e);
+  };
+  
+  const handleBack = () => {
+    router.push('/library');
+  };
+  
   return (
-    <div className="mb-6 flex items-center justify-between">
+    <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
       <div className="flex items-center">
         <Button
           variant="secondary"
           onClick={(e) => {
             e.preventDefault();
-            onBack();
+            handleBack();
           }}
           className="mr-4"
           type="button"
@@ -44,7 +64,7 @@ export const HeaderSection = ({
           <span className="mr-2 text-sm text-red-600 dark:text-red-400">Confirm delete?</span>
           <Button
             variant="secondary"
-            onClick={onCancelDelete}
+            onClick={handleCancelDelete}
             className="mr-2"
             type="button"
           >
@@ -63,7 +83,7 @@ export const HeaderSection = ({
       ) : (
         <Button
           variant="danger"
-          onClick={onDelete}
+          onClick={handleDeleteConfirm}
           type="button"
         >
           <Trash2 className="h-4 w-4 mr-1" />

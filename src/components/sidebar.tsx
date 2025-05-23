@@ -82,9 +82,14 @@ const navigationItems: NavItemType[] = [
 ];
 
 // Event to notify other components of sidebar state changes
-const emitSidebarEvent = (expanded: boolean) => {
+const emitSidebarEvent = (expanded: boolean, mobileOpen?: boolean) => {
   if (typeof window !== 'undefined') {
-    const event = new CustomEvent('sidebarStateChange', { detail: { expanded } });
+    const event = new CustomEvent('sidebarStateChange', { 
+      detail: { 
+        expanded,
+        mobileOpen // Pass mobile state as well
+      }
+    });
     window.dispatchEvent(event);
   }
 };
@@ -304,10 +309,20 @@ export default function Sidebar() {
     emitSidebarEvent(newExpandedState);
   };
   
+  // Toggle the mobile sidebar state
+  const toggleMobileSidebar = () => {
+    const newMobileState = !isMobileOpen;
+    setIsMobileOpen(newMobileState);
+    // Pass both states to the event
+    emitSidebarEvent(isExpanded, newMobileState);
+  };
+  
   // Close mobile sidebar when route changes
   useEffect(() => {
     setIsMobileOpen(false);
-  }, [pathname]);
+    // Notify that mobile sidebar is closed
+    emitSidebarEvent(isExpanded, false);
+  }, [pathname, isExpanded]);
   
   // Close mobile sidebar when clicking outside
   useEffect(() => {
@@ -326,6 +341,8 @@ export default function Sidebar() {
         isMobileOpen
       ) {
         setIsMobileOpen(false);
+        // Notify that mobile sidebar is closed
+        emitSidebarEvent(isExpanded, false);
       }
     };
     
@@ -333,7 +350,7 @@ export default function Sidebar() {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isMobileOpen]);
+  }, [isMobileOpen, isExpanded]);
   
   return (
     <>
@@ -341,7 +358,7 @@ export default function Sidebar() {
       <div className="block lg:hidden fixed top-4 left-4 z-50">
         <button
           id="mobile-sidebar-toggle"
-          onClick={() => setIsMobileOpen(!isMobileOpen)}
+          onClick={toggleMobileSidebar}
           className="flex items-center justify-center w-10 h-10 bg-card border border-theme rounded-md shadow-sm"
           aria-label="Toggle navigation"
         >
@@ -425,7 +442,7 @@ export default function Sidebar() {
       {isMobileOpen && (
         <div 
           className="fixed inset-0 bg-gray-800 bg-opacity-50 z-30 lg:hidden"
-          onClick={() => setIsMobileOpen(false)}
+          onClick={toggleMobileSidebar}
         />
       )}
     </>

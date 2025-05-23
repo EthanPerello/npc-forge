@@ -1,8 +1,10 @@
 'use client';
 
+import React from 'react';
 import { Character } from '@/lib/types';
 import { FormSection } from './shared';
 import { PlusCircle, Trash2 } from 'lucide-react';
+import Button from '@/components/ui/button';
 
 interface AdditionalTraitsSectionProps {
   character: Character;
@@ -13,6 +15,22 @@ export const AdditionalTraitsSection = ({
   character,
   setCharacter
 }: AdditionalTraitsSectionProps) => {
+  const handleAddTrait = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Create a unique key for the new trait
+    const newTraitKey = `custom_trait_${Object.keys(character.added_traits).length + 1}`;
+    
+    setCharacter({
+      ...character,
+      added_traits: {
+        ...character.added_traits,
+        [newTraitKey]: "New trait value"
+      }
+    });
+  };
+  
   return (
     <FormSection title="Additional Traits">
       <p className="text-sm text-muted mb-4">
@@ -62,7 +80,7 @@ export const AdditionalTraitsSection = ({
             </div>
             <button
               type="button"
-              onClick={(e) => {
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                 e.preventDefault();
                 e.stopPropagation();
                 const newTraits = { ...character.added_traits };
@@ -82,26 +100,14 @@ export const AdditionalTraitsSection = ({
         
         {/* Add new trait button */}
         <div className="mt-4">
-          <button
+          <Button
+            variant="secondary"
+            onClick={handleAddTrait}
+            leftIcon={<PlusCircle className="h-4 w-4" />}
             type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              // Create a unique key for the new trait
-              const newTraitKey = `custom_trait_${Object.keys(character.added_traits).length + 1}`;
-              setCharacter({
-                ...character,
-                added_traits: {
-                  ...character.added_traits,
-                  [newTraitKey]: "New trait value"
-                }
-              });
-            }}
-            className="px-4 py-2 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded-md dark:bg-indigo-900 dark:text-indigo-300 dark:hover:bg-indigo-800 flex items-center"
           >
-            <PlusCircle className="h-5 w-5 mr-2" />
             Add Custom Trait
-          </button>
+          </Button>
         </div>
       </div>
     </FormSection>
