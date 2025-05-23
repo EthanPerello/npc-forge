@@ -43,7 +43,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         >
           <div className="flex justify-between items-center h-12">
             {/* Only show app title on medium+ screens or when sidebar is collapsed */}
-            <div className={`${isExpanded ? 'hidden lg:flex' : 'flex'} items-center`}>
+            <div className={`${isExpanded ? 'hidden lg:flex' : 'flex'} items-center pl-12 sm:pl-0`}>
               <Link href="/" className="text-xl font-bold flex items-center">
                 <Sparkles className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
                 NPC Forge
