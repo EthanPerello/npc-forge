@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.13.2] - 2025-05-23
+## [0.13.2] - 2025-05-22
 
 ### Changed
 - Rewrote random character generation logic to bypass delayed state updates and directly pass generated data to the API.
