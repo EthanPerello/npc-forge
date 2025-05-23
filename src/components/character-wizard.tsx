@@ -21,6 +21,7 @@ export default function CharacterWizard() {
   const [currentStep, setCurrentStep] = useState(0);
   const [forceStep, setForceStep] = useState<number | null>(null);
   const manualNavRef = useRef<boolean>(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   
   const { 
     formData, 
@@ -31,6 +32,22 @@ export default function CharacterWizard() {
     error, 
     generateRandomCharacter 
   } = useCharacter();
+
+  // Listen for sidebar state changes
+  useEffect(() => {
+    const handleSidebarChange = (e: CustomEvent) => {
+      // If mobile sidebar state is provided, update our state
+      if (e.detail.mobileOpen !== undefined) {
+        setIsMobileSidebarOpen(e.detail.mobileOpen);
+      }
+    };
+    
+    window.addEventListener('sidebarStateChange' as any, handleSidebarChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('sidebarStateChange' as any, handleSidebarChange as EventListener);
+    };
+  }, []);
 
   // Handle step navigation - allow navigation to any step if description exists
   const goToStep = (stepIndex: number) => {
@@ -203,37 +220,39 @@ export default function CharacterWizard() {
 
   return (
     <div className="max-w-full">
-      {/* Sticky Progress Header */}
-      <div className="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 mb-8">
-        <div className="max-w-full px-4 py-4">
-          <div className="flex justify-center">
-            {STEPS.map((step, index) => (
-              <div key={step.id} className="flex items-center">
-                <button
-                  onClick={() => goToStep(index)}
-                  className={`
-                    w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors
-                    ${index <= currentStep 
-                      ? 'bg-indigo-600 text-white cursor-pointer hover:bg-indigo-700' 
-                      : isStepAccessible(index)
-                        ? 'bg-gray-300 text-gray-700 cursor-pointer hover:bg-gray-400 dark:bg-gray-600 dark:text-gray-100'
-                        : 'bg-gray-200 text-gray-500 cursor-not-allowed dark:bg-gray-700 dark:text-gray-400'}
-                  `}
-                  disabled={!isStepAccessible(index)}
-                >
-                  {index + 1}
-                </button>
-                <span className={`ml-2 text-sm ${index <= currentStep ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}`}>
-                  {step.label}
-                </span>
-                {index < STEPS.length - 1 && (
-                  <ChevronRight className="mx-3 h-4 w-4 text-gray-400" />
-                )}
-              </div>
-            ))}
+      {/* Sticky Progress Header - Hide when mobile sidebar is open */}
+      {!isMobileSidebarOpen && (
+        <div className="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 mb-8">
+          <div className="max-w-full px-4 py-4">
+            <div className="flex justify-center">
+              {STEPS.map((step, index) => (
+                <div key={step.id} className="flex items-center">
+                  <button
+                    onClick={() => goToStep(index)}
+                    className={`
+                      w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors
+                      ${index <= currentStep 
+                        ? 'bg-indigo-600 text-white cursor-pointer hover:bg-indigo-700' 
+                        : isStepAccessible(index)
+                          ? 'bg-gray-300 text-gray-700 cursor-pointer hover:bg-gray-400 dark:bg-gray-600 dark:text-gray-100'
+                          : 'bg-gray-200 text-gray-500 cursor-not-allowed dark:bg-gray-700 dark:text-gray-400'}
+                    `}
+                    disabled={!isStepAccessible(index)}
+                  >
+                    {index + 1}
+                  </button>
+                  <span className={`ml-2 text-sm ${index <= currentStep ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                    {step.label}
+                  </span>
+                  {index < STEPS.length - 1 && (
+                    <ChevronRight className="mx-3 h-4 w-4 text-gray-400" />
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Step Content */}
       <div className="px-4 mb-16">
