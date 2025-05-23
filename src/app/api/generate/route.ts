@@ -1,5 +1,3 @@
-// Fixed generate/route.ts to address punycode deprecation
-
 import { NextRequest, NextResponse } from 'next/server';
 import { generateCharacter, generatePortrait } from '@/lib/openai';
 import { Character, CharacterFormData, GenerationResponse, OpenAIModel } from '@/lib/types';
@@ -9,13 +7,82 @@ import { DEFAULT_MODEL } from '@/lib/models';
 
 export const maxDuration = 60; // Set max duration to 60 seconds
 
+// Track recent API calls to implement server-side rate limiting
+const recentApiCalls: Map<string, number[]> = new Map();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const MAX_CALLS_PER_WINDOW = 10; // Increased from 5 to 10 for better UX
+
+// Clean up old entries periodically (only on server)
+if (typeof setInterval !== 'undefined' && typeof window === 'undefined') {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [ip, timestamps] of recentApiCalls.entries()) {
+      // Keep only timestamps within the window
+      const recentTimestamps = timestamps.filter(t => now - t < RATE_LIMIT_WINDOW);
+      if (recentTimestamps.length === 0) {
+        recentApiCalls.delete(ip);
+      } else {
+        recentApiCalls.set(ip, recentTimestamps);
+      }
+    }
+  }, 300000); // Clean up every 5 minutes
+}
+
+// Check if a request is rate limited
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  
+  // Get existing timestamps for this IP or initialize empty array
+  const timestamps = recentApiCalls.get(ip) || [];
+  
+  // Filter to only include timestamps within the rate limit window
+  const recentTimestamps = timestamps.filter(t => now - t < RATE_LIMIT_WINDOW);
+  
+  // Check if there are too many recent calls
+  if (recentTimestamps.length >= MAX_CALLS_PER_WINDOW) {
+    return true;
+  }
+  
+  // Update timestamps and store
+  recentApiCalls.set(ip, [...recentTimestamps, now]);
+  return false;
+}
+
 export async function POST(request: NextRequest): Promise<NextResponse<GenerationResponse>> {
+  console.log('=== Character Generation API Called ===');
+  
   try {
-    // Get form data from request - use a more direct approach to avoid URL issues
+    // Get client IP for rate limiting (use CloudFlare headers if available)
+    const forwarded = request.headers.get('x-forwarded-for');
+    const ip = forwarded ? 
+      forwarded.split(',')[0] : // Extract the first IP from x-forwarded-for
+      'unknown-ip'; // Fallback
+    
+    console.log(`Request from IP: ${ip}`);
+    
+    // For showcase purposes, we won't actually block any requests,
+    // just check if we would rate limit and log it
+    if (process.env.NODE_ENV !== 'development') {
+      const wouldRateLimit = isRateLimited(ip);
+      if (wouldRateLimit) {
+        console.log(`Rate limiting would apply for IP: ${ip} (but allowing request for showcase)`);
+      }
+    }
+    
+    // Get form data from request
     let data: CharacterFormData;
     
     try {
       data = await request.json();
+      console.log('Received form data:', {
+        description: data.description ? `"${data.description.substring(0, 50)}..."` : 'MISSING',
+        model: data.model,
+        include_portrait: data.include_portrait,
+        include_quests: data.include_quests,
+        include_dialogue: data.include_dialogue,
+        include_items: data.include_items,
+        genre: data.genre
+      });
     } catch (parseError) {
       console.error('Error parsing request JSON:', parseError);
       return NextResponse.json(
@@ -26,28 +93,27 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generatio
     
     // Validate required fields
     if (!data.description || data.description.trim() === '') {
+      console.error('Validation failed: Missing description');
+      console.log('Full data object:', data);
       return NextResponse.json(
-        { error: 'Character description is required', character: null as any },
+        { error: 'Character description is required. Please describe your character.', character: null as any },
         { status: 400 }
       );
     }
     
-    // Use the selected model or fall back to default
+    // Use the selected model as provided (don't force to cheapest)
     const model: OpenAIModel = data.model || DEFAULT_MODEL;
     
-    // Check if user has reached limit for the selected model
-    if (hasReachedLimit(model)) {
-      return NextResponse.json(
-        { 
-          error: `You've reached your monthly limit for ${model} generations. Try a different model or come back next month.`,
-          character: null as any
-        },
-        { status: 429 }
-      );
-    }
+    console.log(`Using text model: ${model} for generation`);
+    console.log(`Portrait generation: ${data.include_portrait ? 'ENABLED' : 'DISABLED'}`);
     
     // Sanitize the character description
+    const originalDescription = data.description;
     data.description = sanitizeUserInput(data.description);
+    
+    if (originalDescription !== data.description) {
+      console.log('Description was sanitized');
+    }
     
     // Also sanitize any other free-text inputs
     if (data.advanced_options?.distinctive_features) {
@@ -63,34 +129,90 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generatio
     // Clean form data by removing empty values
     const cleanedData = removeEmptyValues(data);
     
-    console.log('Generating character with options:', JSON.stringify(cleanedData, null, 2));
+    console.log('Cleaned data summary:', {
+      hasDescription: !!cleanedData.description,
+      textModel: cleanedData.model,
+      imageModel: cleanedData.portrait_options?.image_model,
+      includePortrait: cleanedData.include_portrait
+    });
     
     // Build system prompt
     const systemPrompt = buildSystemPrompt(cleanedData);
     
-    // Generate character with the selected model
-    const character = await generateCharacter(systemPrompt, data.description, model);
-    
-    // Generate portrait if successful
-    if (character) {
-      try {
-        // Transfer portrait options from form data to character object
-        if (data.portrait_options) {
-          character.portrait_options = data.portrait_options;
-        }
-        
-        const imageUrl = await generatePortrait(character);
-        character.image_url = imageUrl;
-      } catch (portraitError) {
-        console.error('Failed to generate portrait:', portraitError);
-        // Continue without portrait if it fails
+    try {
+      console.log('=== Starting Character Generation ===');
+      
+      // Generate character with the selected model
+      const character = await generateCharacter(systemPrompt, data.description, model);
+      
+      console.log(`Generated character: ${character.name}`);
+      
+      // Check if this is a fallback example character
+      const isFallback = !!character.added_traits?.fallback_note;
+      
+      if (isFallback) {
+        console.log('Using fallback example character');
       }
       
-      // Increment usage counter for the selected model
-      incrementUsage(model);
+      // Generate portrait if needed and if portrait generation is enabled
+      if (data.include_portrait && (!isFallback || (!character.image_data && !character.image_url))) {
+        console.log('=== Starting Portrait Generation ===');
+        
+        try {
+          // Transfer portrait options from form data to character object
+          if (data.portrait_options) {
+            character.portrait_options = data.portrait_options;
+            console.log(`Using image model: ${data.portrait_options.image_model || 'default'}`);
+          }
+          
+          const imageUrl = await generatePortrait(character);
+          
+          if (imageUrl) {
+            character.image_url = imageUrl;
+            console.log('Portrait generation successful');
+          } else {
+            console.log('Portrait generation returned empty result');
+          }
+        } catch (portraitError) {
+          console.error('Failed to generate portrait:', portraitError);
+          // Continue without portrait if it fails
+        }
+      } else {
+        if (!data.include_portrait) {
+          console.log('Portrait generation skipped - not requested by user');
+        } else {
+          console.log('Portrait generation skipped - example character already has portrait');
+        }
+      }
+      
+      // Only increment usage counter for real API calls (not fallbacks)
+      if (!isFallback) {
+        console.log('Incrementing usage counters');
+        incrementUsage(model);
+        if (data.include_portrait && data.portrait_options?.image_model) {
+          incrementUsage(data.portrait_options.image_model);
+        }
+      } else {
+        console.log('Skipping usage increment for fallback character');
+      }
+      
+      console.log('=== Character Generation Complete ===');
+      
+      return NextResponse.json({ character });
+    } catch (error) {
+      // Handle OpenAI errors specifically
+      console.error('Error in generate route:', error);
+      
+      // Example fallback is handled in generateCharacter
+      // This should rarely be reached, but just in case:
+      return NextResponse.json(
+        { 
+          error: error instanceof Error ? error.message : 'An unknown error occurred',
+          character: null as any
+        },
+        { status: 500 }
+      );
     }
-    
-    return NextResponse.json({ character });
   } catch (error) {
     console.error('Error in generate route:', error);
     

@@ -1,4 +1,4 @@
-// Fixed character-viewer-modal.tsx with better traits layout
+// Fixed character-viewer-modal.tsx with better traits layout and single column when no portrait
 
 'use client';
 
@@ -72,6 +72,9 @@ export default function CharacterViewerModal({
   const modalRef = useRef<HTMLDivElement>(null);
   const [contentTab, setContentTab] = useState<'profile' | 'quests' | 'dialogue' | 'items'>('profile');
 
+  // Check if portrait exists
+  const hasPortrait = !!(fullCharacter?.image_url || fullCharacter?.image_data);
+
   // Ensure modal padding doesn't overlap with footer
   useEffect(() => {
     if (modalRef.current) {
@@ -100,7 +103,27 @@ export default function CharacterViewerModal({
   const renderTabContent = () => {
     switch(contentTab) {
       case 'profile':
-        return <ProfileSection character={selectedCharacter.character} />;
+        return (
+          <div>
+            <ProfileSection character={selectedCharacter.character} />
+            
+            {/* Show traits below profile when no portrait */}
+            {!hasPortrait && traits.length > 0 && (
+              <div className="mt-6">
+                <h4 className="text-lg font-semibold text-blue-800 mb-3 dark:text-blue-300">
+                  Traits
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {traits.map((trait, index) => (
+                    <span key={index} className="character-trait-tag">
+                      {trait}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
       case 'quests':
         return selectedCharacter.character.quests && selectedCharacter.character.quests.length > 0 && (
           <div>
@@ -141,7 +164,27 @@ export default function CharacterViewerModal({
           </div>
         );
       default:
-        return <ProfileSection character={selectedCharacter.character} />;
+        return (
+          <div>
+            <ProfileSection character={selectedCharacter.character} />
+            
+            {/* Show traits below profile when no portrait */}
+            {!hasPortrait && traits.length > 0 && (
+              <div className="mt-6">
+                <h4 className="text-lg font-semibold text-blue-800 mb-3 dark:text-blue-300">
+                  Traits
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {traits.map((trait, index) => (
+                    <span key={index} className="character-trait-tag">
+                      {trait}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
     }
   };
 
@@ -168,45 +211,118 @@ export default function CharacterViewerModal({
           </div>
         </div>
         
-        {/* Content area with scrolling - Two Column Layout like results step */}
+        {/* Content area with scrolling */}
         <div className="flex-1 overflow-auto p-4">
           {activeTab === 'details' ? (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Left Column - Portrait and Character Info */}
-              <div className="lg:col-span-1 space-y-4">
-                {/* Character image - Updated with key to force re-rendering */}
-                <div className="flex justify-center">
-                  <PortraitDisplay
-                    imageUrl={fullCharacter?.image_url}
-                    imageData={fullCharacter?.image_data}
-                    characterId={selectedCharacter.id}
-                    name={selectedCharacter.character.name}
-                    size="large"
-                    className="mx-auto"
-                    isLoading={imageLoading}
-                    key={`portrait-${selectedCharacter.id}-${Date.now()}`}
-                  />
-                </div>
-                
-                {/* Character traits tags - FIXED: Left-aligned flow layout */}
-                {traits.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Traits
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {traits.map((trait, index) => (
-                        <span key={index} className="character-trait-tag">
-                          {trait}
-                        </span>
-                      ))}
-                    </div>
+            hasPortrait ? (
+              /* Two Column Layout - With Portrait */
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Column - Portrait and Character Info */}
+                <div className="lg:col-span-1 space-y-4">
+                  {/* Character image */}
+                  <div className="flex justify-center">
+                    <PortraitDisplay
+                      imageUrl={fullCharacter?.image_url}
+                      imageData={fullCharacter?.image_data}
+                      characterId={selectedCharacter.id}
+                      name={selectedCharacter.character.name}
+                      size="large"
+                      className="mx-auto"
+                      isLoading={imageLoading}
+                      key={`portrait-${selectedCharacter.id}-${Date.now()}`}
+                    />
                   </div>
-                )}
-              </div>
+                  
+                  {/* Character traits tags */}
+                  {traits.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Traits
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {traits.map((trait, index) => (
+                          <span key={index} className="character-trait-tag">
+                            {trait}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-              {/* Right Column - Tabbed Content */}
-              <div className="lg:col-span-2">
+                {/* Right Column - Tabbed Content */}
+                <div className="lg:col-span-2">
+                  {/* Tab Navigation for Content */}
+                  <div className="border-b border-theme mb-4">
+                    <ul className="flex flex-wrap text-sm font-medium text-center">
+                      <li className="mr-2">
+                        <button 
+                          onClick={() => setContentTab('profile')}
+                          className={`inline-block p-3 border-b-2 rounded-t-lg ${
+                            contentTab === 'profile' 
+                              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
+                              : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
+                          }`}
+                          type="button"
+                        >
+                          Profile
+                        </button>
+                      </li>
+                      {selectedCharacter.character.quests && selectedCharacter.character.quests.length > 0 && (
+                        <li className="mr-2">
+                          <button 
+                            onClick={() => setContentTab('quests')}
+                            className={`inline-block p-3 border-b-2 rounded-t-lg ${
+                              contentTab === 'quests' 
+                                ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
+                                : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
+                            }`}
+                            type="button"
+                          >
+                            Quests
+                          </button>
+                        </li>
+                      )}
+                      {selectedCharacter.character.dialogue_lines && selectedCharacter.character.dialogue_lines.length > 0 && (
+                        <li className="mr-2">
+                          <button 
+                            onClick={() => setContentTab('dialogue')}
+                            className={`inline-block p-3 border-b-2 rounded-t-lg ${
+                              contentTab === 'dialogue' 
+                                ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
+                                : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
+                            }`}
+                            type="button"
+                          >
+                            Dialogue
+                          </button>
+                        </li>
+                      )}
+                      {selectedCharacter.character.items && selectedCharacter.character.items.length > 0 && (
+                        <li className="mr-2">
+                          <button 
+                            onClick={() => setContentTab('items')}
+                            className={`inline-block p-3 border-b-2 rounded-t-lg ${
+                              contentTab === 'items' 
+                                ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
+                                : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
+                            }`}
+                            type="button"
+                          >
+                            Items
+                          </button>
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+
+                  {/* Content based on active content tab */}
+                  {renderTabContent()}
+                </div>
+              </div>
+            ) : (
+              /* Single Column Layout - No Portrait */
+              <div className="max-w-4xl mx-auto">
                 {/* Tab Navigation for Content */}
                 <div className="border-b border-theme mb-4">
                   <ul className="flex flex-wrap text-sm font-medium text-center">
@@ -274,7 +390,7 @@ export default function CharacterViewerModal({
                 {/* Content based on active content tab */}
                 {renderTabContent()}
               </div>
-            </div>
+            )
           ) : (
             // JSON View
             <pre className="text-xs whitespace-pre-wrap bg-gray-100 p-4 rounded dark:bg-gray-800 dark:text-gray-300 text-gray-800 overflow-auto h-full">

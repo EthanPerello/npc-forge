@@ -291,14 +291,14 @@ export default function CharacterEditorPage() {
         }
       };
       
-      // Create form data with the selected text model
+      // Create form data with the selected text model - FIX: Include include_portrait
       const formData = {
         model: selectedTextModel,
-        // Add other required form data fields with default values
         description: `${character.name} - ${character.appearance?.substring(0, 50)}...`,
         include_quests: true,
         include_dialogue: true,
         include_items: true,
+        include_portrait: !!(character.image_data || character.image_url), // FIX: Add this required field
       };
       
       console.log("Saving character updates...");

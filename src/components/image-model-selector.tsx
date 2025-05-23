@@ -11,19 +11,26 @@ interface ImageModelSelectorProps {
 }
 
 export default function ImageModelSelector({ value, onChange }: ImageModelSelectorProps) {
-  const [remaining, setRemaining] = useState<Record<string, number | string>>({});
+  const [remaining, setRemaining] = useState<Record<string, string | number>>({});
   
   // Initialize with default model if none selected
   const selectedModel = value || DEFAULT_IMAGE_MODEL;
   
   // Get remaining generations for each model when component mounts
   useEffect(() => {
-    const remainingCounts: Record<string, number | string> = {};
+    const remainingCounts: Record<string, string | number> = {};
     IMAGE_MODEL_CONFIGS.forEach(config => {
-      remainingCounts[config.id] = getRemainingGenerations(config.id);
+      const value = getRemainingGenerations(config.id);
+      remainingCounts[config.id] = value;
     });
     setRemaining(remainingCounts);
   }, []);
+  
+  // Format the remaining count for display
+  const formatRemaining = (count: string | number): string => {
+    if (count === "Unlimited" || count === "∞") return "∞";
+    return String(count);
+  };
   
   return (
     <div className="mb-4">
@@ -52,11 +59,11 @@ export default function ImageModelSelector({ value, onChange }: ImageModelSelect
               <div className="flex-shrink-0">
                 {selectedModel === config.id ? (
                   <span className="text-xs px-2 py-1 rounded-full font-medium bg-indigo-600 text-white inline-flex items-center whitespace-nowrap">
-                    {remaining[config.id] === "Unlimited" ? "∞" : `${remaining[config.id]}`} left
+                    {formatRemaining(remaining[config.id])} left
                   </span>
                 ) : (
                   <span className="text-xs px-2 py-1 rounded-full font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 inline-flex items-center whitespace-nowrap">
-                    {remaining[config.id] === "Unlimited" ? "∞" : `${remaining[config.id]}`} left
+                    {formatRemaining(remaining[config.id])} left
                   </span>
                 )}
               </div>

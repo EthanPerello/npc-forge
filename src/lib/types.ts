@@ -97,8 +97,9 @@ export interface CharacterFormData {
   include_quests: boolean;
   include_dialogue: boolean;
   include_items: boolean;
+  include_portrait: boolean; // NEW: Flag to control portrait generation
   genre?: string;
-  sub_genre?: string; // Added sub-genre field
+  sub_genre?: string;
   gender?: 'male' | 'female' | 'nonbinary' | 'unknown';
   age_group?: 'child' | 'teen' | 'adult' | 'elder';
   moral_alignment?: 'good' | 'neutral' | 'evil';
@@ -106,7 +107,7 @@ export interface CharacterFormData {
   advanced_options?: {
     species?: string;
     occupation?: string;
-    personality_traits?: string[]; // Changed from personality_trait to array
+    personality_traits?: string[];
     social_class?: string;
     height?: string;
     build?: string;
@@ -129,7 +130,7 @@ export interface CharacterFormData {
     item_categories?: string[];
   };
   portrait_options?: PortraitOptions;
-  model?: OpenAIModel; // New field for text generation model selection
+  model?: OpenAIModel;
 }
 
 export interface GenerationResponse {

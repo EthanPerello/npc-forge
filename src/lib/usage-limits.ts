@@ -157,11 +157,6 @@ export function hasReachedLimit(model: OpenAIModel | ImageModel = DEFAULT_MODEL)
     monthlyLimit = 15;
   }
   
-  // If monthly limit is Infinity, the user never reaches the limit
-  if (monthlyLimit === Infinity) {
-    return false;
-  }
-  
   const { count } = getUsageData(model);
   return count >= monthlyLimit;
 }
@@ -170,7 +165,7 @@ export function hasReachedLimit(model: OpenAIModel | ImageModel = DEFAULT_MODEL)
  * Get the number of remaining generations for the current month for a specific model
  */
 export function getRemainingGenerations(model: OpenAIModel | ImageModel = DEFAULT_MODEL): number | string {
-  // In development mode, always return unlimited
+  // In development mode, return "Unlimited" for UI display
   if (isDevMode()) {
     return "Unlimited";
   }
@@ -186,13 +181,8 @@ export function getRemainingGenerations(model: OpenAIModel | ImageModel = DEFAUL
   } else if (isImageModel) {
     monthlyLimit = getImageModelConfig(model as ImageModel).monthlyLimit;
   } else {
-    // Default to a reasonable limit if model not found
-    monthlyLimit = 15;
-  }
-  
-  // If monthly limit is Infinity, return "Unlimited"
-  if (monthlyLimit === Infinity) {
-    return "Unlimited";
+    // Default to a low limit if model not found
+    monthlyLimit = 10;
   }
   
   const { count } = getUsageData(model);
@@ -203,7 +193,7 @@ export function getRemainingGenerations(model: OpenAIModel | ImageModel = DEFAUL
  * Get the monthly limit for a specific model
  */
 export function getMonthlyLimit(model: OpenAIModel | ImageModel = DEFAULT_MODEL): number | string {
-  // In development mode, return "Unlimited"
+  // In development mode, return "Unlimited" for UI display
   if (isDevMode()) {
     return "Unlimited";
   }
@@ -219,13 +209,8 @@ export function getMonthlyLimit(model: OpenAIModel | ImageModel = DEFAULT_MODEL)
   } else if (isImageModel) {
     monthlyLimit = getImageModelConfig(model as ImageModel).monthlyLimit;
   } else {
-    // Default to a reasonable limit if model not found
-    monthlyLimit = 15;
-  }
-  
-  // If monthly limit is Infinity, return "Unlimited"
-  if (monthlyLimit === Infinity) {
-    return "Unlimited";
+    // Default to a low limit if model not found
+    monthlyLimit = 10;
   }
   
   return monthlyLimit;

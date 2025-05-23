@@ -1,8 +1,6 @@
-// Fixed character-wizard.tsx with reduced bottom spacing
-
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useCharacter } from '@/contexts/character-context';
 import ConceptStep from './wizard-steps/concept-step';
 import OptionsStep from './wizard-steps/options-step';
@@ -10,8 +8,7 @@ import ModelStep from './wizard-steps/model-step';
 import ResultsStep from './wizard-steps/results-step';
 import StickyFooter from './sticky-footer';
 import DelayedLoadingMessage from './delayed-loading-message';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import Button from './ui/button';
+import { ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
 
 const STEPS = [
   { id: 'concept', label: 'Concept' },
@@ -22,9 +19,18 @@ const STEPS = [
 
 export default function CharacterWizard() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isRandomGenerating, setIsRandomGenerating] = useState(false);
-  const { formData, generateCharacter, character, resetFormData } = useCharacter();
+  const [forceStep, setForceStep] = useState<number | null>(null);
+  const manualNavRef = useRef<boolean>(false);
+  
+  const { 
+    formData, 
+    generateCharacter, 
+    character, 
+    resetFormData, 
+    isLoading, 
+    error, 
+    generateRandomCharacter 
+  } = useCharacter();
 
   // Handle step navigation - allow navigation to any step if description exists
   const goToStep = (stepIndex: number) => {
@@ -35,6 +41,8 @@ export default function CharacterWizard() {
       return;
     }
     
+    // Mark that this is a manual navigation
+    manualNavRef.current = true;
     setCurrentStep(stepIndex);
   };
 
@@ -44,22 +52,30 @@ export default function CharacterWizard() {
       handleNewCharacter();
     } else if (currentStep === STEPS.length - 2) {
       // On model step, generate character
-      setIsGenerating(true);
-      await generateCharacter();
-      setIsGenerating(false);
-      setCurrentStep(currentStep + 1);
+      try {
+        manualNavRef.current = true;
+        await generateCharacter();
+        setCurrentStep(currentStep + 1);
+      } catch (error) {
+        console.error("Error generating character:", error);
+      } finally {
+        manualNavRef.current = false;
+      }
     } else {
+      manualNavRef.current = true;
       setCurrentStep(currentStep + 1);
     }
   };
 
   const goToPrevious = () => {
     if (currentStep > 0) {
+      manualNavRef.current = true;
       setCurrentStep(currentStep - 1);
     }
   };
 
   const handleNewCharacter = () => {
+    manualNavRef.current = true;
     resetFormData();
     setCurrentStep(0);
   };
@@ -82,45 +98,64 @@ export default function CharacterWizard() {
     return !!formData.description;
   };
 
-  // Handle random character generation from concept step
-  const handleRandomGeneration = async () => {
-    setIsRandomGenerating(true);
-    setIsGenerating(true);
+  // COMPLETELY REWRITTEN: Direct random character generation with no state dependencies
+  const handleRandomGeneration = useCallback(async () => {
+    if (isLoading) return;
     
     try {
-      // The random generation is handled in the concept step
-      // After generation completes, navigate to results
-      setCurrentStep(3); // Skip to results step
-    } catch (error) {
-      console.error('Error with random generation navigation:', error);
-    } finally {
-      setIsRandomGenerating(false);
-      setIsGenerating(false);
-    }
-  };
-
-  // Listen for character updates to know when random generation is complete
-  useEffect(() => {
-    if (character && isRandomGenerating) {
-      // Character was generated via random button, go to results
+      console.log('Starting direct random character generation');
+      
+      // 1. Generate random data
+      const randomData = await generateRandomCharacter();
+      
+      // 2. Generate character directly with the random data (no state dependency)
+      await generateCharacter(randomData);
+      
+      // 3. Force navigation to results
+      manualNavRef.current = true;
       setCurrentStep(3);
-      setIsRandomGenerating(false);
-      setIsGenerating(false);
+    } catch (error) {
+      console.error('Error in random generation:', error);
     }
-  }, [character, isRandomGenerating]);
+  }, [generateRandomCharacter, generateCharacter, isLoading]);
 
-  // Navigate directly to results (for random generation)
-  const goToResults = () => {
+  // Direct navigation to results
+  const goToResults = useCallback(() => {
+    manualNavRef.current = true;
     setCurrentStep(3);
-  };
+  }, []);
+
+  // FIXED: Add navigation prevention for non-manual changes
+  useEffect(() => {
+    // Only auto-navigate if NOT a manual navigation AND there's a character
+    // and we're on the model step
+    if (!manualNavRef.current && character && currentStep === 2) {
+      setCurrentStep(3);
+    }
+    
+    // Reset the manual nav flag after use
+    manualNavRef.current = false;
+  }, [character, currentStep]);
+
+  // Handle forced step navigation
+  useEffect(() => {
+    if (forceStep !== null) {
+      setCurrentStep(forceStep);
+      setForceStep(null);
+    }
+  }, [forceStep]);
 
   // Render the current step component
   const renderStepContent = () => {
     switch (currentStep) {
-      case 0: return <ConceptStep onNext={goToNext} onNavigateToResults={goToResults} isGenerating={isGenerating} />;
-      case 1: return <OptionsStep onNext={goToNext} isGenerating={isGenerating} />;
-      case 2: return <ModelStep onNext={goToNext} isGenerating={isGenerating} />;
-      case 3: return <ResultsStep onNext={goToNext} isGenerating={isGenerating} />;
+      case 0: return <ConceptStep 
+                onNext={goToNext} 
+                onNavigateToResults={goToResults} 
+                isGenerating={isLoading}
+                onRandomGenerate={handleRandomGeneration} />;
+      case 1: return <OptionsStep onNext={goToNext} isGenerating={isLoading} />;
+      case 2: return <ModelStep onNext={goToNext} isGenerating={isLoading} />;
+      case 3: return <ResultsStep onNext={goToNext} isGenerating={isLoading} />;
       default: return null;
     }
   };
@@ -146,9 +181,9 @@ export default function CharacterWizard() {
         onStepClick: goToStep,
         onPrevious: goToPrevious,
         onNext: goToNext,
-        nextLabel: isGenerating ? 'Generating...' : 'Generate',
-        nextDisabled: !formData.description || isGenerating,
-        isLoading: isGenerating
+        nextLabel: isLoading ? 'Generating...' : 'Generate',
+        nextDisabled: !formData.description || isLoading,
+        isLoading: isLoading
       };
     } else {
       const isFirstStep = currentStep === 0;
@@ -200,20 +235,31 @@ export default function CharacterWizard() {
         </div>
       </div>
 
-      {/* Step Content - FIXED: Reduced bottom margin from mb-24 to mb-16 */}
-      <div className="px-4 mb-16"> {/* Reduced bottom padding for sticky footer */}
+      {/* Step Content */}
+      <div className="px-4 mb-16">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
           {renderStepContent()}
         </div>
       </div>
 
-      {/* Loading message for generation */}
-      {isGenerating && (
-        <DelayedLoadingMessage 
-          isLoading={isGenerating} 
-          message="Character generation may take a second... Creating your unique NPC with AI."
-        />
+      {/* Display error message if there is one */}
+      {error && (
+        <div className="fixed bottom-24 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+          <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm font-bold dark:bg-red-900/30 dark:text-red-200 shadow-lg border border-red-200 dark:border-red-800 w-full max-w-5xl mx-4">
+            <p className="flex items-center justify-center">
+              <AlertTriangle className="w-4 h-4 mr-2" />
+              {error}
+            </p>
+          </div>
+        </div>
       )}
+
+      {/* Loading message for generation */}
+      <DelayedLoadingMessage 
+        isLoading={isLoading} 
+        message="Character generation may take a second... Creating your unique NPC with AI."
+        delay={1000}
+      />
 
       {/* Sticky Footer with Navigation */}
       <StickyFooter {...getStickyFooterProps()} />
