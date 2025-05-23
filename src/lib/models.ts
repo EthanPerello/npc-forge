@@ -1,35 +1,35 @@
-// Define available OpenAI models for character generation
+// Define available OpenAI models
 import { OpenAIModel, ModelConfig } from './types';
 
-// Model configurations
+// Model configurations with updated limits
 export const MODEL_CONFIGS: ModelConfig[] = [
   {
     id: 'gpt-4o-mini',
     label: 'Standard',
-    description: 'Balanced option with good quality and speed',
+    description: 'Balanced mix of speed and quality',
     tier: 'cheap',
     emoji: '🟢',
-    monthlyLimit: Infinity // Unlimited for cheapest tier
+    monthlyLimit: 50 // Updated to 50 (was 30)
   },
   {
     id: 'gpt-4.1-mini',
     label: 'Enhanced',
-    description: 'Higher quality with more nuanced characters',
+    description: 'Better quality with more detail',
     tier: 'mid',
     emoji: '🟡',
-    monthlyLimit: 30
+    monthlyLimit: 30 // Kept at 30
   },
   {
     id: 'gpt-4o',
     label: 'Premium',
-    description: 'Highest quality for the most detailed characters',
+    description: 'Highest quality with maximum detail',
     tier: 'premium',
     emoji: '🔴',
-    monthlyLimit: 10
+    monthlyLimit: 10 // Updated to 10 (was 5)
   }
 ];
 
-// Default model to use if none is specified
+// Default model
 export const DEFAULT_MODEL: OpenAIModel = 'gpt-4o-mini';
 
 // Get config for a specific model

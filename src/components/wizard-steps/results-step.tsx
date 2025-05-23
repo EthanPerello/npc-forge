@@ -1,11 +1,9 @@
-// Fixed results-step.tsx with proper layout and trait handling
-
 'use client';
 
 import { useState } from 'react';
 import { useCharacter } from '@/contexts/character-context';
 import { Character } from '@/lib/types';
-import { Download, FileJson, Save, User, Heart, Book, Target, MessageSquare, Package } from 'lucide-react';
+import { Download, FileJson, Save, User, Heart, Book, Target, MessageSquare, Package, AlertTriangle } from 'lucide-react';
 import Button from '../ui/button';
 import TabInterface, { Tab } from '../ui/tab-interface';
 import { getCharacterTraitsArray } from '@/lib/utils';
@@ -130,6 +128,9 @@ export default function ResultsStep({ onNext, isGenerating }: ResultsStepProps) 
     );
   }
 
+  // Check if this is a fallback example character
+  const isFallbackExample = character.added_traits?.fallback_note;
+
   // Get character traits - filtering out appearance, personality, backstory
   const traits = getCharacterTraitsArray(character);
 
@@ -170,12 +171,38 @@ export default function ResultsStep({ onNext, isGenerating }: ResultsStepProps) 
     });
   }
 
+  // Check if we have an image (either data or URL) to display
+  const hasPortrait = !!(character.image_data || character.image_url);
+
   return (
     <div className="p-6">
-      {/* Two Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Fallback Notice - Only shown for example characters used as fallbacks */}
+      {isFallbackExample && (
+        <div className="mb-6 p-4 border border-amber-200 bg-amber-50 rounded-lg dark:bg-amber-900/20 dark:border-amber-700">
+          <div className="flex items-start">
+            <AlertTriangle className="h-5 w-5 text-amber-500 mr-3 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-medium text-amber-800 dark:text-amber-300">
+                Example Character Displayed
+              </h3>
+              <p className="mt-1 text-sm text-amber-700 dark:text-amber-400">
+                Due to API rate limits, an example character is being shown instead of generating a new one. 
+                This helps keep the app responsive during high usage. Try again later for a custom character!
+              </p>
+              {character.added_traits?.original_request && (
+                <p className="mt-2 text-xs text-amber-600 dark:text-amber-500">
+                  <strong>Your request:</strong> "{character.added_traits.original_request}"
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Adjust layout based on whether portrait is present */}
+      <div className={`grid grid-cols-1 ${hasPortrait ? 'lg:grid-cols-3' : ''} gap-6`}>
         {/* Left Column - Portrait and Character Info */}
-        <div className="lg:col-span-1 space-y-4">
+        <div className={`${hasPortrait ? 'lg:col-span-1' : ''} space-y-4`}>
           {/* Character Name */}
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
             {character.name}
@@ -202,7 +229,8 @@ export default function ResultsStep({ onNext, isGenerating }: ResultsStepProps) 
               JSON
             </Button>
             
-            {(character.image_data || character.image_url) && (
+            {/* Only show portrait download button if we have a portrait */}
+            {hasPortrait && (
               <Button
                 variant="secondary"
                 onClick={() => {
@@ -224,8 +252,8 @@ export default function ResultsStep({ onNext, isGenerating }: ResultsStepProps) 
             )}
           </div>
 
-          {/* Portrait */}
-          {(character.image_data || character.image_url) && (
+          {/* Portrait - Only show if there's image data or URL */}
+          {hasPortrait && (
             <div className="aspect-square w-full max-w-sm mx-auto">
               <img
                 src={character.image_data || character.image_url}
@@ -253,8 +281,8 @@ export default function ResultsStep({ onNext, isGenerating }: ResultsStepProps) 
           )}
         </div>
 
-        {/* Right Column - Content Tabs */}
-        <div className="lg:col-span-2">
+        {/* Right Column - Content Tabs - Adjust column span based on portrait presence */}
+        <div className={`${hasPortrait ? 'lg:col-span-2' : ''}`}>
           <TabInterface 
             tabs={tabs}
             defaultTabId="profile"

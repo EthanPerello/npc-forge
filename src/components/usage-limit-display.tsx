@@ -1,266 +1,221 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { getUsageData, getMonthlyLimit, getRemainingGenerations } from '@/lib/usage-limits';
+import { useState, useEffect } from 'react';
 import { useCharacter } from '@/contexts/character-context';
-import { getModelConfig } from '@/lib/models';
-import { getImageModelConfig } from '@/lib/image-models';
+import { getRemainingGenerations } from '@/lib/usage-limits';
+import { OpenAIModel } from '@/lib/types';
+import { MODEL_CONFIGS } from '@/lib/models';
+import { IMAGE_MODEL_CONFIGS } from '@/lib/image-models';
+import { InfoIcon } from 'lucide-react';
 
-interface UsageLimitDisplayProps {
-  variant?: 'compact' | 'detailed';
-  showWhenFull?: boolean;
-  className?: string;
-  refreshKey?: number; // Add a key to force refresh
-  onRefresh?: () => void; // Optional callback after refresh
-}
-
-export default function UsageLimitDisplay({ 
-  variant = 'compact', 
-  showWhenFull = true,
-  className = '',
-  refreshKey = 0,
-  onRefresh
-}: UsageLimitDisplayProps) {
+export default function UsageLimitDisplay() {
   const { formData } = useCharacter();
-  const [mostLimitedInfo, setMostLimitedInfo] = useState<{
-    modelType: 'text' | 'image';
-    modelId: string;
-    modelName: string;
-    count: number;
-    limit: number | string;
-    remaining: number | string;
-    label: string;
-    emoji: string;
-  } | null>(null);
-  const [isClient, setIsClient] = useState(false);
-  const initialRender = useRef(true);
-  
-  // Update usage data on mount, refreshKey change, and when component is visible
+  const [textRemaining, setTextRemaining] = useState<number | string>(0);
+  const [imageRemaining, setImageRemaining] = useState<number | string>(0);
+  const [textModel, setTextModel] = useState<string>('');
+  const [imageModel, setImageModel] = useState<string>('');
+  const [textTotal, setTextTotal] = useState<number | string>(0);
+  const [imageTotal, setImageTotal] = useState<number | string>(0);
+  const [isDevMode, setIsDevMode] = useState<boolean>(false);
+
+  // Check if in development mode
   useEffect(() => {
-    // Avoid state updates during initial server-side rendering
-    if (typeof window === 'undefined') return;
+    setIsDevMode(process.env.NODE_ENV === 'development');
+  }, []);
+
+  // Update values when form data changes
+  useEffect(() => {
+    // Get text model and remaining generations
+    const currentTextModel = formData.model || MODEL_CONFIGS[0].id;
+    const textConfig = MODEL_CONFIGS.find(config => config.id === currentTextModel);
+    const remaining = getRemainingGenerations(currentTextModel);
     
-    setIsClient(true);
+    setTextRemaining(remaining);
+    setTextModel(currentTextModel);
+    setTextTotal(textConfig?.monthlyLimit || 30);
     
-    const updateUsage = () => {
-      // Get the selected models
-      const textModel = formData.model;
-      const imageModel = formData.portrait_options?.image_model;
+    // Get image model and remaining generations if include_portrait is true
+    if (formData.include_portrait) {
+      const currentImageModel = formData.portrait_options?.image_model || IMAGE_MODEL_CONFIGS[0].id;
+      const imageConfig = IMAGE_MODEL_CONFIGS.find(config => config.id === currentImageModel);
+      const imageRemaining = getRemainingGenerations(currentImageModel);
       
-      if (!textModel && !imageModel) return;
-      
-      // Get text model info
-      let textRemaining: number | string = Infinity;
-      let textModelInfo = null;
-      
-      if (textModel) {
-        const textModelConfig = getModelConfig(textModel);
-        const textUsageData = getUsageData(textModel);
-        const textLimit = getMonthlyLimit(textModel);
-        textRemaining = getRemainingGenerations(textModel);
-        
-        textModelInfo = {
-          modelType: 'text' as const,
-          modelId: textModel,
-          modelName: textModel,
-          count: textUsageData.count,
-          limit: textLimit,
-          remaining: textRemaining,
-          label: textModelConfig.label,
-          emoji: textModelConfig.emoji
-        };
-      }
-      
-      // Get image model info
-      let imageRemaining: number | string = Infinity;
-      let imageModelInfo = null;
-      
-      if (imageModel) {
-        const imageModelConfig = getImageModelConfig(imageModel);
-        const imageUsageData = getUsageData(imageModel);
-        const imageLimit = getMonthlyLimit(imageModel);
-        imageRemaining = getRemainingGenerations(imageModel);
-        
-        imageModelInfo = {
-          modelType: 'image' as const,
-          modelId: imageModel,
-          modelName: imageModel,
-          count: imageUsageData.count,
-          limit: imageLimit,
-          remaining: imageRemaining,
-          label: imageModelConfig.label,
-          emoji: imageModelConfig.emoji
-        };
-      }
-      
-      // Compare to find the most limited option
-      // If one is "Unlimited", use the other
-      // If both are numbers, use the smaller one
-      // If both are "Unlimited", use text model
-      
-      if (textRemaining === "Unlimited" && imageRemaining === "Unlimited") {
-        setMostLimitedInfo(textModelInfo);
-      }
-      else if (textRemaining === "Unlimited") {
-        setMostLimitedInfo(imageModelInfo);
-      }
-      else if (imageRemaining === "Unlimited") {
-        setMostLimitedInfo(textModelInfo);
-      }
-      else if (typeof textRemaining === 'number' && typeof imageRemaining === 'number') {
-        // Both are numbers, choose the smaller one
-        setMostLimitedInfo(textRemaining <= imageRemaining ? textModelInfo : imageModelInfo);
-      }
-      else {
-        // Fallback in case of unexpected types
-        setMostLimitedInfo(textModelInfo || imageModelInfo);
-      }
+      setImageRemaining(imageRemaining);
+      setImageModel(currentImageModel);
+      setImageTotal(imageConfig?.monthlyLimit || 10);
+    }
+  }, [formData]);
+
+  // Get emoji and label for a text model
+  const getTextModelInfo = (modelId: OpenAIModel) => {
+    const config = MODEL_CONFIGS.find(config => config.id === modelId);
+    return {
+      emoji: config?.emoji || '🟢',
+      label: config?.label || 'Standard'
     };
-    
-    // Initial update
-    updateUsage();
-    
-    // Update when window gains focus - but only attach listener after first render
-    if (!initialRender.current) {
-      const handleFocus = () => updateUsage();
-      window.addEventListener('focus', handleFocus);
-      
-      return () => {
-        window.removeEventListener('focus', handleFocus);
+  };
+  
+  // Function to get most constrained model (lowest remaining/total ratio)
+  const getMostConstrainedModel = () => {
+    // In development mode, always show unlimited
+    if (isDevMode) {
+      return {
+        isText: true,
+        emoji: getTextModelInfo(textModel as OpenAIModel).emoji,
+        remaining: "∞",
+        total: "∞"
       };
     }
     
-    // Mark initial render complete
-    initialRender.current = false;
-    
-  }, [refreshKey, formData.model, formData.portrait_options?.image_model]); // Add model dependencies
-  
-  // Call refresh callback in a separate effect to avoid infinite loops
-  useEffect(() => {
-    if (isClient && onRefresh && !initialRender.current) {
-      onRefresh();
+    if (!formData.include_portrait) {
+      // If portrait not included, only consider text model
+      return {
+        isText: true,
+        emoji: getTextModelInfo(textModel as OpenAIModel).emoji,
+        remaining: textRemaining,
+        total: textTotal
+      };
     }
-  }, [isClient, onRefresh]);
-  
-  // Wait for client-side hydration or for most limited info to be determined
-  if (!isClient || !mostLimitedInfo) return null;
-  
-  // Destructure the most limited info
-  const { count, limit, remaining, modelType, modelName, label, emoji } = mostLimitedInfo;
-  
-  // Don't show anything if no usage and showWhenFull is false
-  if (count === 0 && !showWhenFull) return null;
-  
-  // Calculate percentage for progress bar
-  const usagePercentage = typeof limit === 'string' && limit === 'Unlimited' 
-    ? 0 // If unlimited, show 0% used
-    : Math.min(100, Math.round((count / (limit as number)) * 100));
-  
-  // Determine color based on usage percentage
-  const getColorClass = () => {
-    if (usagePercentage >= 90) return 'bg-red-500';
-    if (usagePercentage >= 70) return 'bg-yellow-500';
-    return 'bg-green-500';
+    
+    // If either value is "Unlimited", use the numeric one
+    if (textRemaining === "Unlimited") {
+      return {
+        isText: false,
+        emoji: IMAGE_MODEL_CONFIGS.find(config => config.id === imageModel)?.emoji || '🟢',
+        remaining: imageRemaining,
+        total: imageTotal
+      };
+    }
+    
+    if (imageRemaining === "Unlimited") {
+      return {
+        isText: true,
+        emoji: getTextModelInfo(textModel as OpenAIModel).emoji,
+        remaining: textRemaining,
+        total: textTotal
+      };
+    }
+    
+    // Calculate constraint ratios (lower is more constrained)
+    // Only if both are numeric values
+    if (typeof textRemaining === 'number' && typeof imageRemaining === 'number' &&
+        typeof textTotal === 'number' && typeof imageTotal === 'number') {
+      const textRatio = textRemaining / textTotal;
+      const imageRatio = imageRemaining / imageTotal;
+      
+      if (textRatio <= imageRatio) {
+        // Text model is more constrained
+        return {
+          isText: true,
+          emoji: getTextModelInfo(textModel as OpenAIModel).emoji,
+          remaining: textRemaining,
+          total: textTotal
+        };
+      } else {
+        // Image model is more constrained
+        const config = IMAGE_MODEL_CONFIGS.find(config => config.id === imageModel);
+        return {
+          isText: false,
+          emoji: config?.emoji || '🟢',
+          remaining: imageRemaining,
+          total: imageTotal
+        };
+      }
+    }
+    
+    // Default fallback
+    return {
+      isText: true,
+      emoji: getTextModelInfo(textModel as OpenAIModel).emoji,
+      remaining: textRemaining,
+      total: textTotal
+    };
   };
   
-  // Create a readable label for the limit message
-  const limitTypeLabel = modelType === 'text' ? 'Characters' : 'Portraits';
+  // Get the most constrained model info
+  const constrained = getMostConstrainedModel();
   
-  if (variant === 'compact') {
-    // If unlimited, show a simpler message
-    if (remaining === "Unlimited") {
-      return (
-        <div className={`text-sm flex items-center ${className}`}>
-          <div className="w-32 bg-gray-200 rounded-full h-2.5 mr-2 dark:bg-gray-700">
-            <div 
-              className="h-2.5 rounded-full bg-green-500" 
-              style={{ width: '0%' }}
-            ></div>
-          </div>
-          <span className="text-gray-800 font-medium dark:text-gray-400">
-            {emoji} Unlimited {limitTypeLabel}
-          </span>
-        </div>
-      );
+  // Determine text and classes based on remaining amount
+  let statusText = '';
+  let statusClass = '';
+  
+  if (isDevMode) {
+    statusText = '∞ left';
+    statusClass = 'text-green-600 dark:text-green-400';
+  } else if (constrained.remaining === 0) {
+    statusText = 'Limit reached';
+    statusClass = 'text-red-600 dark:text-red-400';
+  } else if (constrained.remaining === "Unlimited" || constrained.remaining === "∞") {
+    statusText = '∞ left';
+    statusClass = 'text-green-600 dark:text-green-400';
+  } else if (typeof constrained.remaining === 'number' && typeof constrained.total === 'number') {
+    // Only calculate percentages if both values are numeric
+    if (constrained.remaining < constrained.total * 0.2) {
+      statusText = `${constrained.remaining}/${constrained.total} left`;
+      statusClass = 'text-red-600 dark:text-red-400';
+    } else if (constrained.remaining < constrained.total * 0.5) {
+      statusText = `${constrained.remaining}/${constrained.total} left`;
+      statusClass = 'text-amber-600 dark:text-amber-400';
+    } else {
+      statusText = `${constrained.remaining}/${constrained.total} left`;
+      statusClass = 'text-green-600 dark:text-green-400';
     }
-    
-    return (
-      <div className={`text-sm flex items-center ${className}`}>
-        <div className="w-32 bg-gray-200 rounded-full h-2.5 mr-2 dark:bg-gray-700">
-          <div 
-            className={`h-2.5 rounded-full ${getColorClass()}`} 
-            style={{ width: `${usagePercentage}%` }}
-          ></div>
-        </div>
-        <span className="text-gray-800 font-medium dark:text-gray-400">
-          {emoji} {remaining} {limitTypeLabel} remaining
-        </span>
-      </div>
-    );
+  } else {
+    // Default fallback for mixed types
+    statusText = `${constrained.remaining} left`;
+    statusClass = 'text-green-600 dark:text-green-400';
   }
   
-  // For detailed variant
-  if (remaining === "Unlimited") {
-    return (
-      <div className={`p-4 bg-white rounded-lg shadow-md dark:bg-gray-800 ${className}`}>
-        <h3 className="text-lg font-medium text-gray-800 mb-2 dark:text-white">
-          {emoji} {label} {limitTypeLabel}
-        </h3>
-        
-        <div className="mb-1 flex justify-between text-sm">
-          <span className="text-gray-700 dark:text-gray-300">
-            Unlimited usage
-          </span>
-        </div>
-        
-        <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-          <div className="h-2.5 rounded-full bg-green-500" style={{ width: '0%' }}></div>
-        </div>
-        
-        <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 italic">
-          Powered by {modelName}
-        </div>
-      </div>
-    );
-  }
+  // Determine the message for the tooltip
+  let messageText = '';
   
+  // Format more human-readable messages
+  if (isDevMode) {
+    messageText = 'Development mode: Unlimited generations available for all models.';
+  } else if (textRemaining === "Unlimited" || imageRemaining === "Unlimited") {
+    messageText = 'Unlimited generations available in development mode.';
+  } else if (typeof textRemaining === 'number' && typeof imageRemaining === 'number') {
+    if (textRemaining > 20 && imageRemaining > 10) {
+      messageText = `You have a good number of generations left for both text and images.`;
+    } else if (textRemaining <= 5 || imageRemaining <= 3) {
+      messageText = `You are running low on ${textRemaining <= 5 ? 'text' : ''}${textRemaining <= 5 && imageRemaining <= 3 ? ' and ' : ''}${imageRemaining <= 3 ? 'image' : ''} generations.`;
+    } else {
+      messageText = `You have ${textRemaining} text generations and ${formData.include_portrait ? `${imageRemaining} image generations` : "no portrait generation"} remaining this month.`;
+    }
+  } else {
+    messageText = 'Check your remaining generations for each model type.';
+  }
+
   return (
-    <div className={`p-4 bg-white rounded-lg shadow-md dark:bg-gray-800 ${className}`}>
-      <h3 className="text-lg font-medium text-gray-800 mb-2 dark:text-white">
-        {emoji} {label} {limitTypeLabel}
-      </h3>
-      
-      <div className="mb-1 flex justify-between text-sm">
-        <span className="text-gray-700 dark:text-gray-300">
-          {count} of {limit} used this month
-        </span>
-        <span className={remaining === 0 ? 'text-red-500 font-medium' : 'text-gray-600 dark:text-gray-400'}>
-          {remaining} remaining
-        </span>
+    <div className="flex items-center group relative">
+      <div className={`mr-1 text-sm font-medium ${statusClass}`}>
+        {constrained.emoji} {statusText}
       </div>
       
-      <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-        <div 
-          className={`h-2.5 rounded-full ${getColorClass()}`} 
-          style={{ width: `${usagePercentage}%` }}
-        ></div>
+      <InfoIcon className="h-4 w-4 text-gray-400 dark:text-gray-500 cursor-help" />
+      
+      <div className="absolute bottom-full mb-2 right-0 w-64 p-2 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 text-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+        <p className="text-gray-700 dark:text-gray-300">{messageText}</p>
+        
+        {!isDevMode && (
+          <div className="mt-1.5 space-y-1">
+            <div className="flex justify-between text-xs">
+              <span className="text-gray-600 dark:text-gray-400">Text ({getTextModelInfo(textModel as OpenAIModel).label}):</span>
+              <span className={typeof textRemaining === 'number' && textRemaining < 5 ? 'text-red-600 dark:text-red-400' : 'text-gray-700 dark:text-gray-300'}>
+                {textRemaining === "Unlimited" ? "∞" : textRemaining}/{textTotal === "Unlimited" ? "∞" : textTotal}
+              </span>
+            </div>
+            {formData.include_portrait && (
+              <div className="flex justify-between text-xs">
+                <span className="text-gray-600 dark:text-gray-400">Image:</span>
+                <span className={typeof imageRemaining === 'number' && imageRemaining < 3 ? 'text-red-600 dark:text-red-400' : 'text-gray-700 dark:text-gray-300'}>
+                  {imageRemaining === "Unlimited" ? "∞" : imageRemaining}/{imageTotal === "Unlimited" ? "∞" : imageTotal}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-      
-      <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 italic">
-        Powered by {modelName}
-      </div>
-      
-      {remaining === 0 && (
-        <p className="mt-2 text-sm text-red-600 dark:text-red-400">
-          You've reached your monthly limit. Try selecting a different model or wait until next month.
-        </p>
-      )}
-      
-      {remaining !== 0 && (typeof remaining === 'number' && remaining <= 3) && (
-        <p className="mt-2 text-sm text-yellow-600 dark:text-yellow-400">
-          You're approaching your monthly limit. Use your remaining generations wisely!
-        </p>
-      )}
     </div>
   );
 }

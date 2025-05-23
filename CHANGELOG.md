@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Rewrote random character generation logic to bypass delayed state updates and directly pass generated data to the API.
+- Updated generation limits:
+  - Text models: 50 (Standard), 30 (Enhanced), 10 (Premium)
+  - Portrait models: 10 (Standard), 5 (Enhanced), 3 (Premium)
+- Adjusted layout in the results step to a single-column format when no portrait is generated.
+- Updated default text in the character description input field for clarity and consistency.
+- Adjusted layout in the results step and character modal to a single-column format when no portrait is present.
+
+### Added
+- `include_portrait` toggle in concept step, allowing users to enable or disable portrait generation.
+
 ## [0.13.1] - 2025-05-16
 
 ### Changed

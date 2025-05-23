@@ -1,7 +1,7 @@
 // Define available OpenAI models for image generation
 import { ImageModel, ImageModelConfig } from './types';
 
-// Model configurations
+// Model configurations with updated limits
 export const IMAGE_MODEL_CONFIGS: ImageModelConfig[] = [
   {
     id: 'dall-e-2',
@@ -9,7 +9,7 @@ export const IMAGE_MODEL_CONFIGS: ImageModelConfig[] = [
     description: 'Faster generation with good quality',
     tier: 'cheap',
     emoji: '🟢',
-    monthlyLimit: Infinity // Unlimited for cheapest tier
+    monthlyLimit: 10 // Updated to 10
   },
   {
     id: 'dall-e-3',
@@ -17,7 +17,7 @@ export const IMAGE_MODEL_CONFIGS: ImageModelConfig[] = [
     description: 'Higher quality with more detailed imagery',
     tier: 'mid',
     emoji: '🟡',
-    monthlyLimit: 30
+    monthlyLimit: 5 // Updated to 5
   },
   {
     id: 'gpt-image-1',
@@ -25,7 +25,7 @@ export const IMAGE_MODEL_CONFIGS: ImageModelConfig[] = [
     description: 'Highest quality with photorealistic results',
     tier: 'premium',
     emoji: '🔴',
-    monthlyLimit: 10
+    monthlyLimit: 3 // Kept at 3
   }
 ];
 

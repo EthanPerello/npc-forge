@@ -11,30 +11,37 @@ interface ModelSelectorProps {
 }
 
 export default function ModelSelector({ value, onChange }: ModelSelectorProps) {
-  const [remaining, setRemaining] = useState<Record<string, number | string>>({});
+  const [remaining, setRemaining] = useState<Record<string, string | number>>({});
   
   // Initialize with default model if none selected
   const selectedModel = value || DEFAULT_MODEL;
   
   // Get remaining generations for each model when component mounts
   useEffect(() => {
-    const remainingCounts: Record<string, number | string> = {};
+    const remainingCounts: Record<string, string | number> = {};
     MODEL_CONFIGS.forEach(config => {
-      remainingCounts[config.id] = getRemainingGenerations(config.id);
+      const value = getRemainingGenerations(config.id);
+      remainingCounts[config.id] = value;
     });
     setRemaining(remainingCounts);
   }, []);
   
+  // Format the remaining count for display
+  const formatRemaining = (count: string | number): string => {
+    if (count === "Unlimited" || count === "∞") return "∞";
+    return String(count);
+  };
+  
   return (
-    <div className="mb-6">
+    <div className="mb-4">
       <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-        Character Generation Model
+        Text Generation Model
       </label>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         {MODEL_CONFIGS.map((config) => (
           <div 
             key={config.id}
-            onClick={() => onChange(config.id as OpenAIModel)}
+            onClick={() => onChange(config.id)}
             className={`
               cursor-pointer border rounded-lg p-3 transition-colors
               ${selectedModel === config.id 
@@ -42,20 +49,24 @@ export default function ModelSelector({ value, onChange }: ModelSelectorProps) {
                 : 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600'}
             `}
           >
-            <div className="flex justify-between items-center mb-1">
-              <h3 className="font-medium">
-                {config.emoji} {config.label}
-              </h3>
-              {/* Use different classes to avoid the global CSS override */}
-              {selectedModel === config.id ? (
-                <span className="model-badge-selected text-xs px-2 py-1 rounded-full">
-                  {remaining[config.id] === "Unlimited" ? "∞" : `${remaining[config.id]}`} left
-                </span>
-              ) : (
-                <span className="model-badge-unselected text-xs px-2 py-1 rounded-full">
-                  {remaining[config.id] === "Unlimited" ? "∞" : `${remaining[config.id]}`} left
-                </span>
-              )}
+            <div className="flex flex-wrap items-center justify-between mb-1 gap-2">
+              <div className="flex items-center">
+                <span className="mr-2 flex-shrink-0">{config.emoji}</span>
+                <h3 className="font-medium">{config.label}</h3>
+              </div>
+              
+              {/* Badge for remaining generations */}
+              <div className="flex-shrink-0">
+                {selectedModel === config.id ? (
+                  <span className="text-xs px-2 py-1 rounded-full font-medium bg-indigo-600 text-white inline-flex items-center whitespace-nowrap">
+                    {formatRemaining(remaining[config.id])} left
+                  </span>
+                ) : (
+                  <span className="text-xs px-2 py-1 rounded-full font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 inline-flex items-center whitespace-nowrap">
+                    {formatRemaining(remaining[config.id])} left
+                  </span>
+                )}
+              </div>
             </div>
             <p className="text-xs text-gray-600 dark:text-gray-400">
               {config.description}
