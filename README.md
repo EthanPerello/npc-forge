@@ -4,7 +4,7 @@
 
 NPC Forge is an AI-powered character generator for games, tabletop RPGs, and storytelling. Create detailed NPCs with personalities, quests, dialogue, items, and AI-generated portraits.
 
-[![Version](https://img.shields.io/badge/version-0.14.0-blue.svg)](https://github.com/EthanPerello/npc-forge/releases)
+[![Version](https://img.shields.io/badge/version-0.15.0-blue.svg)](https://github.com/EthanPerello/npc-forge/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/built%20with-Next.js%2014-black)](https://nextjs.org/)
 [![OpenAI](https://img.shields.io/badge/powered%20by-OpenAI-lightgrey)](https://openai.com/)
