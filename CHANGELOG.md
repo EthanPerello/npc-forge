@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Save to Library button now shows success notification and keeps users on current page instead of redirecting to Library
+- Success messages now appear as centered toast notifications that auto-dismiss after 5 seconds
+
+### Fixed
+- Premium portrait generation now works correctly with `gpt-image-1` model
+- Field regeneration on character edit pages now works reliably without errors
+- AI-generated content no longer includes unwanted formatting or prefixes in regenerated fields
+
 ## [0.15.0] - 2025-05-23
 
 ### Added

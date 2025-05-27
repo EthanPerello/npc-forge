@@ -1,10 +1,11 @@
+// src/components/wizard-steps/results-step.tsx
 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCharacter } from '@/contexts/character-context';
 import { Character } from '@/lib/types';
-import { Download, FileJson, Save, User, Heart, Book, Target, MessageSquare, Package, AlertTriangle, Library } from 'lucide-react';
+import { Download, FileJson, Save, User, Heart, Book, Target, MessageSquare, Package, AlertTriangle, Library, CheckCircle } from 'lucide-react';
 import Button from '../ui/button';
 import TabInterface, { Tab } from '../ui/tab-interface';
 import { getCharacterTraitsArray } from '@/lib/utils';
@@ -103,27 +104,86 @@ const ItemsTab = ({ items }: { items: string[] }) => (
   </div>
 );
 
+// Success Toast Component
+const SuccessToast = ({ message, onClose }: { message: string; onClose: () => void }) => (
+  <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-4 rounded-lg shadow-xl flex items-center z-[60] animate-in slide-in-from-bottom duration-300 max-w-md">
+    <CheckCircle className="h-5 w-5 mr-3 flex-shrink-0" />
+    <span className="font-medium">{message}</span>
+    <button 
+      onClick={onClose}
+      className="ml-4 text-green-200 hover:text-white flex-shrink-0 text-xl leading-none"
+    >
+      ×
+    </button>
+  </div>
+);
+
 export default function ResultsStep({ onNext, isGenerating }: ResultsStepProps) {
   const router = useRouter();
   const { character, downloadCharacterJSON, saveToLibrary, formData } = useCharacter();
   const [isSaving, setIsSaving] = useState(false);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
-  const handleSaveToLibrary = async () => {
+  const handleSaveToLibrary = async (e?: React.MouseEvent) => {
+    // Explicitly prevent any default behavior or event propagation
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
     if (!character) return;
+    
+    console.log('=== SAVE TO LIBRARY CLICKED ===');
+    console.log('Character to save:', character.name);
+    console.log('Current location:', window.location.pathname);
+    
     setIsSaving(true);
+    
     try {
-      await saveToLibrary();
-      // Navigate to library after saving
-      router.push('/library');
+      console.log('Calling saveToLibrary...');
+      const success = await saveToLibrary();
+      
+      console.log('Save result:', success);
+      
+      if (success) {
+        console.log('Save successful - showing toast, NO REDIRECT');
+        
+        // Explicitly check that we're still on the same page
+        console.log('Current location after save:', window.location.pathname);
+        
+        setSuccessMessage(`${character.name} saved to library successfully!`);
+        setShowSuccessToast(true);
+        
+        // Auto-hide toast after 5 seconds
+        setTimeout(() => {
+          setShowSuccessToast(false);
+        }, 5000);
+        
+        console.log('Toast shown, staying on current page');
+      } else {
+        throw new Error('Save operation returned false');
+      }
+      
     } catch (error) {
       console.error('Error saving character:', error);
+      setSuccessMessage('Failed to save character. Please try again.');
+      setShowSuccessToast(true);
+      setTimeout(() => {
+        setShowSuccessToast(false);
+      }, 5000);
     } finally {
       setIsSaving(false);
+      console.log('=== SAVE TO LIBRARY COMPLETE ===');
     }
   };
   
   const handleViewLibrary = () => {
     router.push('/library');
+  };
+
+  const handleCloseToast = () => {
+    setShowSuccessToast(false);
   };
 
   if (!character) {
@@ -184,6 +244,14 @@ export default function ResultsStep({ onNext, isGenerating }: ResultsStepProps) 
 
   return (
     <div className="p-6">
+      {/* Success Toast */}
+      {showSuccessToast && (
+        <SuccessToast 
+          message={successMessage} 
+          onClose={handleCloseToast}
+        />
+      )}
+
       {/* Fallback Notice - Only shown for example characters used as fallbacks */}
       {isFallbackExample && (
         <div className="mb-6 p-4 border border-amber-200 bg-amber-50 rounded-lg dark:bg-amber-900/20 dark:border-amber-700">
@@ -224,8 +292,9 @@ export default function ResultsStep({ onNext, isGenerating }: ResultsStepProps) 
               leftIcon={<Save className="h-4 w-4" />}
               isLoading={isSaving}
               size="sm"
+              type="button"
             >
-              Save to Library
+              {isSaving ? 'Saving...' : 'Save to Library'}
             </Button>
             
             <Button
@@ -259,7 +328,7 @@ export default function ResultsStep({ onNext, isGenerating }: ResultsStepProps) 
               </Button>
             )}
             
-            {/* New button to view library */}
+            {/* Button to view library - but doesn't auto-redirect */}
             <Button
               variant="secondary"
               onClick={handleViewLibrary}

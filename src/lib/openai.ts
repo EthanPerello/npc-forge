@@ -1,3 +1,4 @@
+// src/lib/openai.ts
 import OpenAI from 'openai';
 import { Character, OpenAIModel, ImageModel } from './types';
 import { DEFAULT_MODEL } from './models';
@@ -267,31 +268,62 @@ export async function generatePortrait(character: Character): Promise<string> {
 
     console.log(`Generating portrait with prompt: "${imagePrompt.substring(0, 100)}..."`);
 
-    // Base configuration for DALL-E 2/3 or GPT Image models
+    // Base configuration - start with common parameters
     const generateOptions: any = {
       model: imageModel,
       prompt: imagePrompt,
       n: 1,
-      size: "1024x1024",
-      response_format: "b64_json"
+      size: "1024x1024"
     };
     
-    // Special options for DALL-E 3
-    if (imageModel === 'dall-e-3') {
+    // Model-specific configurations
+    if (imageModel === 'dall-e-2') {
+      // DALL-E 2 settings
+      generateOptions.response_format = "b64_json";
+    } else if (imageModel === 'dall-e-3') {
+      // DALL-E 3 settings
+      generateOptions.response_format = "b64_json";
       generateOptions.quality = 'standard';
       generateOptions.style = 'vivid';
+    } else if (imageModel === 'gpt-image-1') {
+      // GPT Image 1 specific settings - does NOT support response_format parameter
+      generateOptions.quality = 'high';
+      // Note: gpt-image-1 returns base64 by default, no response_format needed
     }
     
-    // Special options for GPT Image
-    if (imageModel === 'gpt-image-1') {
-      generateOptions.quality = 'high';
-    }
+    console.log(`Calling OpenAI Images API with model: ${imageModel}`, {
+      model: generateOptions.model,
+      size: generateOptions.size,
+      quality: generateOptions.quality
+    });
     
     // Call the API to generate the image
     const response = await openai.images.generate(generateOptions);
 
-    // Get base64 data
-    const b64Image = response.data[0].b64_json;
+    // Get base64 data - handle different response formats by model
+    let b64Image: string | undefined;
+    
+    if (imageModel === 'gpt-image-1') {
+      // GPT Image 1 returns base64 data directly in the response
+      b64Image = response.data[0].b64_json || response.data[0].url;
+      
+      // If we got a URL instead of base64, we need to fetch and convert it
+      if (b64Image && b64Image.startsWith('http')) {
+        console.log("GPT Image 1 returned URL, converting to base64...");
+        try {
+          const imageResponse = await fetch(b64Image);
+          const imageBuffer = await imageResponse.arrayBuffer();
+          const base64String = Buffer.from(imageBuffer).toString('base64');
+          b64Image = base64String;
+        } catch (fetchError) {
+          console.error("Failed to convert URL to base64:", fetchError);
+          throw new Error("Failed to process image from GPT Image 1");
+        }
+      }
+    } else {
+      // DALL-E models return base64 in b64_json field
+      b64Image = response.data[0].b64_json;
+    }
       
     if (!b64Image) {
       throw new Error("No base64 image data returned from OpenAI");
@@ -303,12 +335,21 @@ export async function generatePortrait(character: Character): Promise<string> {
     // Store the data URL in the character
     character.image_data = dataUrl;
     
-    console.log(`Successfully generated portrait for ${name}`);
+    console.log(`Successfully generated portrait for ${name} using ${imageModel}`);
     
     // Return the data URL
     return dataUrl;
   } catch (error) {
     console.error("Error generating portrait:", error);
+    
+    // Enhanced error logging for debugging premium model issues
+    if (error instanceof Error) {
+      console.error(`Portrait generation error details:`, {
+        message: error.message,
+        model: character.portrait_options?.image_model,
+        characterName: character.name
+      });
+    }
     
     // If this is already a fallback example character but we failed to get the image,
     // try to get its image via the example system
