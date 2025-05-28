@@ -7,7 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Unsaved changes warning banner on character edit pages when portrait modifications haven't been saved yet
+- Enhanced error handling with retry logic for portrait generation failures
+- Model-specific tips and generation status indicators in portrait section
+
+### Changed
+- Portrait regeneration on edit pages now requires explicit "Save Changes" action to persist modifications
+- Improved error messages for portrait generation with specific guidance for different failure types (rate limits, quotas, network issues)
+- Enhanced portrait generation reliability with automatic retry mechanism for temporary API failures
+
 ### Fixed
+- Portrait regeneration no longer auto-saves changes without user confirmation on character edit pages
+- Portrait generation errors now provide actionable feedback instead of generic failure messages
+- API error handling now properly categorizes different types of failures (authentication, rate limits, server errors)
+- Improved timeout handling and base64 validation for portrait generation requests
 - Mobile stepper display now shows only step numbers on small screens to prevent text overflow and improve readability
 - Random character generation now properly respects user's content type selections (portraits, quests, dialogue, items)
 - Random character generation now correctly counts against monthly usage limits like regular character generation

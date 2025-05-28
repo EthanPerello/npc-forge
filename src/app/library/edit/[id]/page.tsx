@@ -1,3 +1,4 @@
+// src/app/library/edit/[id]/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -31,6 +32,9 @@ export default function CharacterEditorPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Track unsaved changes for portraits
+  const [hasUnsavedPortraitChanges, setHasUnsavedPortraitChanges] = useState(false);
   
   // UI state
   const [currentGenre, setCurrentGenre] = useState<string>('');
@@ -195,6 +199,10 @@ export default function CharacterEditorPage() {
       
       if (success) {
         console.log("Character saved successfully");
+        
+        // Reset unsaved changes flag
+        setHasUnsavedPortraitChanges(false);
+        
         setFeedbackMessage({
           type: 'success',
           text: 'Changes saved successfully!'
@@ -226,7 +234,7 @@ export default function CharacterEditorPage() {
     });
   };
 
-  // Handle portrait regeneration - using more generic React.MouseEvent
+  // Handle portrait regeneration - FIXED: No longer auto-saves to IndexedDB
   const handleRegeneratePortrait = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -262,9 +270,27 @@ export default function CharacterEditorPage() {
       console.log(`Portrait API response status: ${response.status}`);
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error("Portrait API error response:", errorData);
-        throw new Error(errorData.error || `Failed to regenerate portrait (${response.status})`);
+        let errorMessage = 'Failed to regenerate portrait';
+        
+        try {
+          const errorData = await response.json();
+          console.error("Portrait API error response:", errorData);
+          errorMessage = errorData.error || errorMessage;
+          
+          // Handle specific error types
+          if (errorData.type === 'rate_limit') {
+            errorMessage = 'Rate limit exceeded. Please try again in a few minutes.';
+          } else if (errorData.type === 'quota_exceeded') {
+            errorMessage = 'Monthly quota exceeded for this model tier.';
+          } else if (errorData.type === 'invalid_request') {
+            errorMessage = 'Invalid request parameters. Please try different settings.';
+          }
+        } catch (parseError) {
+          console.error("Failed to parse error response:", parseError);
+          errorMessage = `Server error (${response.status}). Please try again.`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -273,15 +299,8 @@ export default function CharacterEditorPage() {
       if (data.success && data.imageData) {
         console.log("Received new portrait data, length:", data.imageData.length);
         
-        // Store the image data in IndexedDB immediately
-        try {
-          await saveImage(characterId, data.imageData);
-          console.log("Portrait saved to IndexedDB successfully");
-        } catch (dbError) {
-          console.error("Failed to save portrait to IndexedDB:", dbError);
-        }
-        
-        // Update the state with the new image data
+        // FIXED: Only update component state, don't save to IndexedDB yet
+        // The image will be saved when the user clicks "Save Changes"
         setCharacter((prevChar) => {
           if (!prevChar) return null;
           
@@ -291,33 +310,45 @@ export default function CharacterEditorPage() {
           };
         });
         
-        // Show success message
+        // Mark that there are unsaved portrait changes
+        setHasUnsavedPortraitChanges(true);
+        
+        // Show success message with note about saving
         setFeedbackMessage({
           type: 'success',
-          text: 'Successfully regenerated portrait'
+          text: 'Portrait regenerated successfully! Click "Save Changes" to keep it.'
         });
         
-        // Clear success message after a delay
+        // Clear success message after a longer delay
         setTimeout(() => {
           setFeedbackMessage(null);
-        }, 3000);
+        }, 5000);
       } else {
         console.error("API returned invalid portrait data", data);
-        throw new Error(data.error || 'Portrait regeneration failed');
+        throw new Error(data.error || 'Portrait regeneration failed - invalid response');
       }
     } catch (err) {
       console.error('Error regenerating portrait:', err);
       
-      // Show error message
+      // Determine error type and provide appropriate message
+      let errorMessage = 'Failed to regenerate portrait';
+      
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      }
+      
+      // Show error message with more context
       setFeedbackMessage({
         type: 'error',
-        text: err instanceof Error ? err.message : 'Failed to regenerate portrait'
+        text: `${errorMessage}. You can try again or upload a custom image instead.`
       });
       
-      // Clear error message after a delay
+      // Clear error message after a longer delay
       setTimeout(() => {
         setFeedbackMessage(null);
-      }, 5000);
+      }, 7000);
     } finally {
       setIsRegeneratingPortrait(false);
     }
@@ -356,9 +387,25 @@ export default function CharacterEditorPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error("API error response:", errorData);
-        throw new Error(errorData.error || `Failed to regenerate field (${response.status})`);
+        let errorMessage = `Failed to regenerate ${formatFieldName(field)}`;
+        
+        try {
+          const errorData = await response.json();
+          console.error("API error response:", errorData);
+          errorMessage = errorData.error || errorMessage;
+          
+          // Handle specific error types
+          if (errorData.type === 'rate_limit') {
+            errorMessage = 'Rate limit exceeded. Please try again in a few minutes.';
+          } else if (errorData.type === 'quota_exceeded') {
+            errorMessage = 'Monthly quota exceeded for this model tier.';
+          }
+        } catch (parseError) {
+          console.error("Failed to parse error response:", parseError);
+          errorMessage = `Server error (${response.status}). Please try again.`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -447,7 +494,7 @@ export default function CharacterEditorPage() {
       // Show error message
       setFeedbackMessage({
         type: 'error',
-        text: err instanceof Error ? err.message : 'Failed to regenerate content'
+        text: err instanceof Error ? err.message : `Failed to regenerate ${formatFieldName(field)}`
       });
       
       // Clear error message after a delay
@@ -514,16 +561,13 @@ export default function CharacterEditorPage() {
         image_data: imageData
       });
       
-      // Also save to IndexedDB
-      try {
-        saveImage(characterId, imageData);
-      } catch (err) {
-        console.error("Failed to save uploaded image to IndexedDB:", err);
-      }
+      // Mark that there are unsaved portrait changes
+      setHasUnsavedPortraitChanges(true);
     } else {
       // If image is removed, make a copy of character without image_data
       const { image_data, ...rest } = character;
       setCharacter(rest as Character);
+      setHasUnsavedPortraitChanges(true);
     }
   };
   
@@ -594,6 +638,13 @@ export default function CharacterEditorPage() {
         isDeleting={isDeleting}
         onDelete={handleDeleteCharacter}
       />
+      
+      {/* Unsaved changes warning */}
+      {hasUnsavedPortraitChanges && (
+        <div className="bg-yellow-50 p-4 rounded-md text-yellow-700 mb-6 dark:bg-yellow-900/20 dark:text-yellow-400">
+          ⚠️ You have unsaved portrait changes. Remember to click "Save Changes" to keep your modifications.
+        </div>
+      )}
       
       {/* Error message */}
       {error && (
