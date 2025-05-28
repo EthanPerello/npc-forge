@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Mobile stepper display now shows only step numbers on small screens to prevent text overflow and improve readability
+- Random character generation now properly respects user's content type selections (portraits, quests, dialogue, items)
+- Random character generation now correctly counts against monthly usage limits like regular character generation
+
 ## [0.15.1] - 2025-05-26
 
 ### Changed

@@ -157,8 +157,8 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     setError(null);
   }, []);
 
-  // COMPLETELY REWRITTEN APPROACH: Generate random character data
-  // Instead of updating state and relying on it, returns the generated data directly
+  // FIXED: Generate random character data without updating state
+  // Returns pure random data that can be merged with user preferences
   const generateRandomCharacter = useCallback(async (): Promise<CharacterFormData> => {
     try {
       // Select a random genre template
@@ -181,24 +181,33 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
         'good', 'neutral', 'evil', undefined
       ];
       
+      const relationships: ('ally' | 'neutral' | 'enemy' | 'mentor' | 'rival' | 'betrayer' | undefined)[] = [
+        'ally', 'neutral', 'enemy', 'mentor', 'rival', 'betrayer', undefined
+      ];
+      
       // Select random values from arrays
       const gender = genders[Math.floor(Math.random() * genders.length)];
       const age = ages[Math.floor(Math.random() * ages.length)];
       const alignment = alignments[Math.floor(Math.random() * alignments.length)];
+      const relationship = relationships[Math.floor(Math.random() * relationships.length)];
       
-      // Create a complete random data object
+      // Create random data object - NOTE: Don't include content type flags
+      // These will be preserved from the user's current selections
       const randomData: CharacterFormData = {
         ...defaultFormData,
-        description,  // Ensure description is set
+        description,  // The key random element - description and genre
         genre: randomGenre.id as Genre,
+        sub_genre: randomGenre.subGenres && randomGenre.subGenres.length > 0 
+          ? randomGenre.subGenres[Math.floor(Math.random() * randomGenre.subGenres.length)].id 
+          : undefined,
         gender,
         age_group: age,
         moral_alignment: alignment,
+        relationship_to_player: relationship,
+        // Use standard model for random generation
         model: 'gpt-4o-mini',
-        include_quests: false,
-        include_dialogue: false,
-        include_items: false,
-        include_portrait: false,
+        // DON'T set content type flags - these will be merged from user preferences
+        // include_quests, include_dialogue, include_items, include_portrait will be preserved
         portrait_options: {
           art_style: '',
           mood: '',
@@ -208,22 +217,23 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
         }
       };
       
-      // Update state
-      setFormData(randomData);
+      // DON'T update state here - let the caller handle merging and state updates
+      // This prevents race conditions and preserves user selections properly
       
-      console.log("Generated random character with description:", description.substring(0, 30) + "...");
+      console.log("Generated random character data with description:", description.substring(0, 30) + "...");
+      console.log("Random character genre:", randomGenre.id);
       
-      // Return the complete random data object
+      // Return the random data object for merging
       return randomData;
     } catch (error) {
       console.error("Error generating random character:", error);
       
-      // Fallback data
+      // Fallback random data
       const fallbackData: CharacterFormData = {
         ...defaultFormData,
         description: "A mysterious character with unique abilities and an interesting backstory.",
+        genre: 'fantasy',
         model: 'gpt-4o-mini',
-        include_portrait: false,
         portrait_options: {
           art_style: '',
           mood: '',
@@ -233,10 +243,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
         }
       };
       
-      // Update state with fallback
-      setFormData(fallbackData);
-      
-      // Return the fallback data
+      // Return the fallback data (don't update state)
       return fallbackData;
     }
   }, []);
@@ -256,12 +263,25 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
       // Use custom form data if provided, otherwise use current state
       const dataToUse = customFormData || formData;
       
+      // Update form data state if custom data was provided
+      // This ensures the UI reflects the data being used for generation
+      if (customFormData) {
+        console.log("Updating form data with custom data for generation");
+        setFormData(customFormData);
+      }
+      
       // Extra validation for description field
       if (!dataToUse.description || dataToUse.description.trim() === '') {
         throw new Error("Character description is required. Please describe your character or use random generation.");
       }
       
       console.log("Generating character with description:", dataToUse.description.substring(0, 50) + "...");
+      console.log("Content types enabled:", {
+        portrait: dataToUse.include_portrait,
+        quests: dataToUse.include_quests,
+        dialogue: dataToUse.include_dialogue,
+        items: dataToUse.include_items
+      });
       
       // Call the API endpoint
       const response = await fetch('/api/generate', {
