@@ -115,26 +115,50 @@ export default function CharacterWizard() {
     return !!formData.description;
   };
 
-  // COMPLETELY REWRITTEN: Direct random character generation with no state dependencies
+  // FIXED: Random character generation that respects user content selections
   const handleRandomGeneration = useCallback(async () => {
     if (isLoading) return;
     
     try {
-      console.log('Starting direct random character generation');
+      console.log('Starting random character generation with user content preferences');
       
-      // 1. Generate random data
+      // 1. Generate random data while preserving user content type selections
       const randomData = await generateRandomCharacter();
       
-      // 2. Generate character directly with the random data (no state dependency)
-      await generateCharacter(randomData);
+      // 2. Merge random data with current user selections for content types
+      const mergedData = {
+        ...randomData,
+        // Preserve user's content type selections
+        include_portrait: formData.include_portrait,
+        include_quests: formData.include_quests,
+        include_dialogue: formData.include_dialogue,
+        include_items: formData.include_items,
+        // Preserve user's model selections
+        model: formData.model,
+        portrait_options: formData.portrait_options,
+        // Preserve user's content options if they exist
+        quest_options: formData.quest_options,
+        dialogue_options: formData.dialogue_options,
+        item_options: formData.item_options
+      };
       
-      // 3. Force navigation to results
+      console.log('Merged random data with user preferences:', {
+        include_portrait: mergedData.include_portrait,
+        include_quests: mergedData.include_quests,
+        include_dialogue: mergedData.include_dialogue,
+        include_items: mergedData.include_items
+      });
+      
+      // 3. Generate character with merged data (this will hit the API and count usage)
+      await generateCharacter(mergedData);
+      
+      // 4. Force navigation to results
       manualNavRef.current = true;
       setCurrentStep(3);
     } catch (error) {
       console.error('Error in random generation:', error);
     }
-  }, [generateRandomCharacter, generateCharacter, isLoading]);
+  }, [generateRandomCharacter, generateCharacter, isLoading, formData]);
 
   // Direct navigation to results
   const goToResults = useCallback(() => {
@@ -220,7 +244,7 @@ export default function CharacterWizard() {
 
   return (
     <div className="max-w-full">
-      {/* Sticky Progress Header - Hide when mobile sidebar is open */}
+      {/* FIXED: Mobile-Responsive Sticky Progress Header */}
       {!isMobileSidebarOpen && (
         <div className="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 mb-8">
           <div className="max-w-full px-4 py-4">
@@ -241,11 +265,12 @@ export default function CharacterWizard() {
                   >
                     {index + 1}
                   </button>
-                  <span className={`ml-2 text-sm ${index <= currentStep ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                  {/* Show step labels on larger screens, hide on mobile */}
+                  <span className={`ml-2 text-sm hidden sm:inline ${index <= currentStep ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}`}>
                     {step.label}
                   </span>
                   {index < STEPS.length - 1 && (
-                    <ChevronRight className="mx-3 h-4 w-4 text-gray-400" />
+                    <ChevronRight className="mx-2 sm:mx-3 h-4 w-4 text-gray-400" />
                   )}
                 </div>
               ))}
