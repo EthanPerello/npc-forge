@@ -1,376 +1,328 @@
 // src/app/api/regenerate/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { generatePortrait } from '@/lib/openai';
-import { Character, OpenAIModel } from '@/lib/types';
+import { Character, OpenAIModel, ImageModel } from '@/lib/types';
+import OpenAI from 'openai';
+
+// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+  timeout: 90000, // 90 seconds timeout
+});
+
+// Helper function to categorize errors
+const categorizeError = (error: any): { type: string; message: string; status: number } => {
+  if (error?.status || error?.code) {
+    const status = error.status;
+    const code = error.code || error.error?.code;
+    const message = error.message || error.error?.message || 'Unknown API error';
+    
+    switch (status) {
+      case 429:
+        return {
+          type: 'rate_limit',
+          message: 'Rate limit exceeded. Please try again in a few minutes.',
+          status: 429
+        };
+      case 400:
+        return {
+          type: 'invalid_request',
+          message: 'Invalid request parameters. Please check your settings.',
+          status: 400
+        };
+      case 401:
+        return {
+          type: 'authentication',
+          message: 'Authentication failed. Please check API configuration.',
+          status: 401
+        };
+      case 403:
+        return {
+          type: 'quota_exceeded',
+          message: 'Monthly quota exceeded for this model tier.',
+          status: 403
+        };
+      case 500:
+      case 502:
+      case 503:
+      case 504:
+        return {
+          type: 'server_error',
+          message: 'OpenAI server error. Please try again.',
+          status: 502
+        };
+      default:
+        return {
+          type: 'api_error',
+          message: `API error: ${message}`,
+          status: status || 500
+        };
+    }
+  }
+  
+  // Handle network/timeout errors
+  if (error?.name === 'AbortError' || error?.message?.includes('timeout')) {
+    return {
+      type: 'timeout',
+      message: 'Request timed out. Please try again.',
+      status: 408
+    };
+  }
+  
+  if (error?.message?.includes('fetch') || error?.message?.includes('network')) {
+    return {
+      type: 'network',
+      message: 'Network error. Please check your connection.',
+      status: 503
+    };
+  }
+  
+  // Default error
+  return {
+    type: 'unknown',
+    message: error?.message || 'An unexpected error occurred',
+    status: 500
+  };
+};
 
 export async function POST(request: NextRequest) {
   try {
-    const data = await request.json();
-    const { character, field, model, portraitOptions } = data;
+    const body = await request.json();
+    const { character, field, model, portraitOptions } = body;
 
-    // Validate required parameters with improved logging
     if (!character) {
-      console.error("Missing character data in regeneration request");
-      return NextResponse.json({ error: 'Character data is required' }, { status: 400 });
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Character data is required',
+          type: 'invalid_request'
+        },
+        { status: 400 }
+      );
     }
 
-    if (!field && !portraitOptions) {
-      console.error("Missing field or portraitOptions in regeneration request");
-      return NextResponse.json({ error: 'Field or portraitOptions is required' }, { status: 400 });
+    if (!field) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Field parameter is required',
+          type: 'invalid_request'
+        },
+        { status: 400 }
+      );
     }
 
-    console.log(`Regeneration request for: Field=${field}, Character=${character.name}`);
-    
+    console.log(`Regenerating ${field} for character: ${character.name}`);
+
     // Handle portrait regeneration
     if (field === 'portrait') {
-      if (!portraitOptions) {
-        return NextResponse.json({ error: 'Portrait options are required for portrait regeneration' }, { status: 400 });
-      }
-
-      console.log("Regenerating portrait with options:", portraitOptions);
-
-      // Update the character's portrait_options
-      character.portrait_options = {
-        ...character.portrait_options,
-        ...portraitOptions
-      };
-
-      // Generate the new portrait
       try {
-        const imageData = await generatePortrait(character);
+        // Create a character object with the portrait options
+        const characterWithOptions = {
+          ...character,
+          portrait_options: {
+            ...character.portrait_options,
+            ...portraitOptions
+          }
+        };
+
+        console.log(`Using image model: ${characterWithOptions.portrait_options?.image_model || 'default'}`);
         
-        console.log("Portrait generation successful");
-        return NextResponse.json({ 
-          success: true, 
-          field: 'portrait',
-          imageData
+        const imageData = await generatePortrait(characterWithOptions);
+        
+        if (!imageData) {
+          throw new Error('No image data returned from portrait generation');
+        }
+
+        return NextResponse.json({
+          success: true,
+          imageData,
+          field: 'portrait'
         });
       } catch (error) {
-        console.error("Portrait generation failed:", error);
-        return NextResponse.json({ 
-          error: error instanceof Error ? error.message : 'Failed to generate portrait' 
-        }, { status: 500 });
+        console.error('Portrait regeneration error:', error);
+        
+        const errorInfo = categorizeError(error);
+        return NextResponse.json(
+          {
+            success: false,
+            error: errorInfo.message,
+            type: errorInfo.type,
+            field: 'portrait'
+          },
+          { status: errorInfo.status }
+        );
       }
     }
-    
+
     // Handle text field regeneration
-    if (!field || field === 'portrait') {
-      return NextResponse.json({ error: 'Invalid field for regeneration' }, { status: 400 });
-    }
+    const textModel: OpenAIModel = model || 'gpt-4o-mini';
+    console.log(`Using text model: ${textModel} for field: ${field}`);
 
-    console.log(`Regenerating field: ${field} using model: ${model}`);
+    try {
+      let prompt: string;
+      let systemPrompt: string;
 
-    // Use the specified model or fall back to a default
-    const selectedModel = model as OpenAIModel || 'gpt-4o-mini';
-    
-    // Handle different field types
-    if (field.startsWith('quest_') && field.includes('_')) {
-      const parts = field.split('_');
-      const questIndex = parseInt(parts[1], 10);
-      const questPart = parts[2] || 'whole';
-      
-      if (isNaN(questIndex) || questIndex < 0 || !character.quests || questIndex >= character.quests.length) {
-        console.error(`Invalid quest index: ${questIndex}`);
-        return NextResponse.json({ error: 'Invalid quest index' }, { status: 400 });
-      }
-      
-      console.log(`Regenerating quest ${questIndex}, part: ${questPart}`);
-      const regeneratedQuest = await regenerateQuest(character, questIndex, questPart, selectedModel);
-      
-      return NextResponse.json({
-        success: true,
-        field,
-        regeneratedContent: regeneratedQuest
-      });
-    }
-    
-    if (field.startsWith('dialogue_') || field.startsWith('item_')) {
-      const parts = field.split('_');
-      const index = parseInt(parts[1], 10);
-      const type = field.startsWith('dialogue_') ? 'dialogue' : 'item';
-      
-      let array: string[] | undefined;
-      if (type === 'dialogue') {
-        array = character.dialogue_lines;
+      // Generate appropriate prompts based on the field
+      if (field === 'name') {
+        systemPrompt = `Generate a single character name that fits this character's appearance and background. Return only the name, no additional text or formatting.`;
+        prompt = `Character: ${character.appearance || 'A character'}\nBackground: ${character.backstory_hook || 'Unknown background'}\nGenre: ${character.selected_traits?.genre || 'fantasy'}`;
+      } else if (field === 'appearance') {
+        systemPrompt = `Generate a detailed physical appearance description for this character. Include facial features, build, clothing, and distinguishing characteristics. Return only the description, no additional text or formatting.`;
+        prompt = `Character Name: ${character.name}\nPersonality: ${character.personality}\nGenre: ${character.selected_traits?.genre || 'fantasy'}`;
+      } else if (field === 'personality') {
+        systemPrompt = `Generate a detailed personality description for this character. Include traits, mannerisms, motivations, and behavioral patterns. Return only the description, no additional text or formatting.`;
+        prompt = `Character Name: ${character.name}\nAppearance: ${character.appearance}\nBackground: ${character.backstory_hook}\nGenre: ${character.selected_traits?.genre || 'fantasy'}`;
+      } else if (field === 'backstory_hook') {
+        systemPrompt = `Generate an engaging backstory hook for this character. Include their origin, key life events, and what drives them. Return only the backstory, no additional text or formatting.`;
+        prompt = `Character Name: ${character.name}\nAppearance: ${character.appearance}\nPersonality: ${character.personality}\nGenre: ${character.selected_traits?.genre || 'fantasy'}`;
+      } else if (field.startsWith('quest_')) {
+        // Handle quest regeneration
+        const parts = field.split('_');
+        const questIndex = parseInt(parts[1], 10);
+        const questPart = parts[2] || 'whole';
+
+        if (isNaN(questIndex) || !character.quests || questIndex >= character.quests.length) {
+          return NextResponse.json(
+            { 
+              success: false, 
+              error: 'Invalid quest index',
+              type: 'invalid_request'
+            },
+            { status: 400 }
+          );
+        }
+
+        const quest = character.quests[questIndex];
+
+        if (questPart === 'title') {
+          systemPrompt = `Generate a compelling quest title. Return only the title, no additional text or formatting.`;
+          prompt = `Quest Description: ${quest.description}\nCharacter: ${character.name}\nGenre: ${character.selected_traits?.genre || 'fantasy'}`;
+        } else if (questPart === 'description') {
+          systemPrompt = `Generate a detailed quest description. Include the objective, stakes, and any relevant context. Return only the description, no additional text or formatting.`;
+          prompt = `Quest Title: ${quest.title}\nCharacter: ${character.name}\nGenre: ${character.selected_traits?.genre || 'fantasy'}`;
+        } else if (questPart === 'reward') {
+          systemPrompt = `Generate an appropriate quest reward. Include both tangible and intangible benefits. Return only the reward description, no additional text or formatting.`;
+          prompt = `Quest: ${quest.title} - ${quest.description}\nCharacter: ${character.name}\nGenre: ${character.selected_traits?.genre || 'fantasy'}`;
+        } else {
+          // Regenerate entire quest
+          systemPrompt = `Generate a complete quest object with title, description, and reward. Return as JSON object with fields: title, description, reward.`;
+          prompt = `Character: ${character.name}\nAppearance: ${character.appearance}\nPersonality: ${character.personality}\nGenre: ${character.selected_traits?.genre || 'fantasy'}`;
+        }
+      } else if (field.startsWith('dialogue_')) {
+        const parts = field.split('_');
+        const index = parseInt(parts[1], 10);
+
+        if (isNaN(index) || !character.dialogue_lines || index >= character.dialogue_lines.length) {
+          return NextResponse.json(
+            { 
+              success: false, 
+              error: 'Invalid dialogue index',
+              type: 'invalid_request'
+            },
+            { status: 400 }
+          );
+        }
+
+        systemPrompt = `Generate a dialogue line that this character would say. Make it consistent with their personality and background. Return only the dialogue, no quotes or additional formatting.`;
+        prompt = `Character: ${character.name}\nPersonality: ${character.personality}\nBackground: ${character.backstory_hook}\nExisting dialogue style: ${character.dialogue_lines[0] || 'Unknown'}`;
+      } else if (field.startsWith('item_')) {
+        const parts = field.split('_');
+        const index = parseInt(parts[1], 10);
+
+        if (isNaN(index) || !character.items || index >= character.items.length) {
+          return NextResponse.json(
+            { 
+              success: false, 
+              error: 'Invalid item index',
+              type: 'invalid_request'
+            },
+            { status: 400 }
+          );
+        }
+
+        systemPrompt = `Generate an item that this character would own or carry. Include its name, description, and significance. Return only the item description, no additional text or formatting.`;
+        prompt = `Character: ${character.name}\nOccupation: ${character.selected_traits?.occupation || 'Unknown'}\nPersonality: ${character.personality}\nGenre: ${character.selected_traits?.genre || 'fantasy'}`;
       } else {
-        array = character.items;
+        return NextResponse.json(
+          { 
+            success: false, 
+            error: `Unsupported field for regeneration: ${field}`,
+            type: 'invalid_request'
+          },
+          { status: 400 }
+        );
       }
-      
-      if (isNaN(index) || index < 0 || !array || index >= array.length) {
-        console.error(`Invalid ${type} index: ${index}`);
-        return NextResponse.json({ error: `Invalid ${type} index` }, { status: 400 });
-      }
-      
-      console.log(`Regenerating ${type} at index: ${index}`);
-      const regeneratedLine = await regenerateSingleLine(type, character, index, selectedModel);
-      
-      return NextResponse.json({
-        success: true,
-        field,
-        regeneratedContent: regeneratedLine
-      });
-    }
-    
-    // Handle basic field regeneration (name, appearance, personality, backstory_hook)
-    console.log(`Regenerating basic field: ${field}`);
-    const result = await generateBasicField(field, character, selectedModel);
-    
-    return NextResponse.json({
-      success: true,
-      field,
-      regeneratedContent: result
-    });
-    
-  } catch (error) {
-    console.error('Error in regeneration API:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Failed to regenerate content';
-    return NextResponse.json({ 
-      error: errorMessage
-    }, { status: 500 });
-  }
-}
 
-/**
- * Clean generated content to ensure consistent formatting
- */
-function cleanGeneratedContent(content: string, type: string = ''): string {
-  if (!content) return '';
-  
-  // Remove markdown formatting (asterisks for bold/italic)
-  let cleaned = content.replace(/\*\*|__|\*|_/g, '');
-  
-  // Remove common prefixes based on content type
-  const prefixPatterns: {[key: string]: RegExp} = {
-    item: /^(item:|item name:|description:|item description:)/i,
-    quest_title: /^(quest:|quest title:|title:)/i,
-    quest_description: /^(quest description:|description:)/i,
-    quest_reward: /^(quest reward:|reward:)/i,
-    dialogue: /^(dialogue:|dialogue line:|character says:|says:)/i,
-    name: /^(name:|character name:)/i
-  };
-  
-  // Apply specific prefix removal if type is specified
-  if (type && prefixPatterns[type]) {
-    cleaned = cleaned.replace(prefixPatterns[type], '');
-  } else {
-    // Otherwise try to remove any common prefixes
-    cleaned = cleaned.replace(/^(item:|item name:|description:|quest title:|title:|quest description:|quest reward:|reward:|dialogue:|character says:|says:|name:)/i, '');
-  }
-  
-  // Remove any remaining markdown-style formatting
-  cleaned = cleaned.replace(/\[|\]|\(|\)|#/g, '');
-  
-  // Apply reasonable length limits
-  if (type === 'quest_title' && cleaned.length > 100) {
-    cleaned = cleaned.substring(0, 100);
-  } else if (type === 'item' && cleaned.length > 300) {
-    cleaned = cleaned.substring(0, 300);
-  } else if (type === 'quest_description' && cleaned.length > 500) {
-    cleaned = cleaned.substring(0, 500);
-  } else if (type === 'quest_reward' && cleaned.length > 200) {
-    cleaned = cleaned.substring(0, 200);
-  }
-  
-  // Trim whitespace
-  cleaned = cleaned.trim();
-  
-  return cleaned;
-}
-
-/**
- * Make a robust API call to OpenAI
- */
-async function makeOpenAICall(model: OpenAIModel, systemPrompt: string, userPrompt: string): Promise<string> {
-  try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: model,
+      // Call OpenAI API with retry logic
+      const response = await openai.chat.completions.create({
+        model: textModel,
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
+          { role: "user", content: prompt }
         ],
-        temperature: 0.7,
-        max_tokens: 500, // Reasonable limit to prevent excessively long responses
-      })
-    });
+        temperature: 0.8,
+        max_tokens: 500
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error(`OpenAI API error: ${response.status}`, errorData);
-      throw new Error(`OpenAI API error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+      const content = response.choices[0].message.content;
+      if (!content) {
+        throw new Error("No content returned from OpenAI");
+      }
+
+      // Clean up the response
+      let regeneratedContent = content.trim();
+
+      // Remove common formatting artifacts
+      regeneratedContent = regeneratedContent.replace(/^["'`]|["'`]$/g, ''); // Remove surrounding quotes
+      regeneratedContent = regeneratedContent.replace(/^\*\*|\*\*$/g, ''); // Remove bold markers
+      regeneratedContent = regeneratedContent.replace(/^#+\s*/, ''); // Remove markdown headers
+
+      // For quest whole regeneration, try to parse as JSON
+      if (field.includes('quest_') && field.endsWith('_whole')) {
+        try {
+          const questData = JSON.parse(regeneratedContent);
+          regeneratedContent = questData;
+        } catch (e) {
+          // If parsing fails, return as-is
+          console.warn('Failed to parse quest JSON, using as text');
+        }
+      }
+
+      console.log(`Successfully regenerated ${field}`);
+
+      return NextResponse.json({
+        success: true,
+        regeneratedContent,
+        field
+      });
+
+    } catch (error) {
+      console.error(`Text regeneration error for field ${field}:`, error);
+      
+      const errorInfo = categorizeError(error);
+      return NextResponse.json(
+        {
+          success: false,
+          error: errorInfo.message,
+          type: errorInfo.type,
+          field
+        },
+        { status: errorInfo.status }
+      );
     }
 
-    const data = await response.json();
-    
-    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      throw new Error('Invalid response structure from OpenAI API');
-    }
-    
-    return data.choices[0].message.content.trim();
   } catch (error) {
-    console.error('OpenAI API call failed:', error);
-    throw error;
-  }
-}
-
-/**
- * Generate basic character fields (name, appearance, personality, backstory_hook)
- */
-async function generateBasicField(field: string, character: Character, model: OpenAIModel): Promise<string> {
-  const characterInfo = `
-Character: ${character.name}
-Genre: ${character.selected_traits.genre || "unspecified"}
-${character.selected_traits.sub_genre ? `Sub-genre: ${character.selected_traits.sub_genre}` : ""}
-${character.selected_traits.occupation ? `Occupation: ${character.selected_traits.occupation}` : ""}
-${character.selected_traits.species ? `Species: ${character.selected_traits.species}` : ""}
-${character.selected_traits.gender ? `Gender: ${character.selected_traits.gender}` : ""}
-${character.selected_traits.age_group ? `Age: ${character.selected_traits.age_group}` : ""}
-`.trim();
-
-  const fieldPrompts: {[key: string]: {system: string, user: string}} = {
-    name: {
-      system: "You are an expert character creator. Generate only a character name that fits the provided character details.",
-      user: `${characterInfo}\n\nGenerate a new name for this character. Respond with ONLY the name, no formatting or prefixes.`
-    },
-    appearance: {
-      system: "You are an expert character creator. Generate only a detailed appearance description.",
-      user: `${characterInfo}\n\nGenerate a new appearance description (2-3 sentences) for this character. Respond with ONLY the description, no formatting or prefixes.`
-    },
-    personality: {
-      system: "You are an expert character creator. Generate only a detailed personality description.",
-      user: `${characterInfo}\n\nGenerate a new personality description (2-3 sentences) for this character. Respond with ONLY the description, no formatting or prefixes.`
-    },
-    backstory_hook: {
-      system: "You are an expert character creator. Generate only a brief backstory hook.",
-      user: `${characterInfo}\n\nGenerate a new backstory hook (1-2 sentences) for this character. Respond with ONLY the hook, no formatting or prefixes.`
-    }
-  };
-
-  const prompts = fieldPrompts[field];
-  if (!prompts) {
-    throw new Error(`Unknown field: ${field}`);
-  }
-
-  const result = await makeOpenAICall(model, prompts.system, prompts.user);
-  return cleanGeneratedContent(result, field);
-}
-
-/**
- * Generate dialogue line or item
- */
-async function regenerateSingleLine(
-  type: 'dialogue' | 'item',
-  character: Character, 
-  index: number,
-  model: OpenAIModel
-): Promise<string> {
-  const characterInfo = `
-Character: ${character.name}
-Genre: ${character.selected_traits.genre || "unspecified"}
-${character.selected_traits.sub_genre ? `Sub-genre: ${character.selected_traits.sub_genre}` : ""}
-${character.selected_traits.occupation ? `Occupation: ${character.selected_traits.occupation}` : ""}
-${character.personality ? `Personality: ${character.personality.substring(0, 100)}...` : ""}
-`.trim();
-
-  let systemPrompt = "";
-  let userPrompt = "";
-  
-  if (type === 'dialogue') {
-    systemPrompt = "You are an expert character creator. Generate only a single dialogue line that fits the character.";
-    userPrompt = `${characterInfo}\n\nGenerate a new dialogue line for this character. Make it sound natural and reflect their personality. Respond with ONLY the dialogue text, no quotes or prefixes.`;
-  } else {
-    systemPrompt = "You are an expert character creator. Generate only a single item description that fits the character.";
-    userPrompt = `${characterInfo}\n\nGenerate a new item for this character's inventory. Make it appropriate for their role and setting. Respond with ONLY the item description, no prefixes.`;
-  }
-  
-  const result = await makeOpenAICall(model, systemPrompt, userPrompt);
-  return cleanGeneratedContent(result, type);
-}
-
-/**
- * Generate quest content
- */
-async function regenerateQuest(
-  character: Character, 
-  questIndex: number, 
-  part: string, 
-  model: OpenAIModel
-): Promise<any> {
-  const quest = character.quests?.[questIndex];
-  if (!quest) throw new Error('Quest not found');
-  
-  const characterInfo = `
-Character: ${character.name}
-Genre: ${character.selected_traits.genre || "unspecified"}
-${character.selected_traits.sub_genre ? `Sub-genre: ${character.selected_traits.sub_genre}` : ""}
-${character.selected_traits.occupation ? `Occupation: ${character.selected_traits.occupation}` : ""}
-`.trim();
-
-  if (part === 'whole') {
-    // Regenerate entire quest
-    const systemPrompt = "You are an expert quest designer. Generate a complete quest in JSON format.";
-    const userPrompt = `${characterInfo}\n\nGenerate a complete quest for this character. Respond with valid JSON in this exact format:
-{
-  "title": "Quest Title (3-6 words)",
-  "description": "Quest description (30-60 words)",
-  "reward": "Quest reward (10-20 words)",
-  "type": "${quest.type || 'any'}"
-}`;
+    console.error('Request processing error:', error);
     
-    const result = await makeOpenAICall(model, systemPrompt, userPrompt);
-    
-    try {
-      // Extract JSON from response
-      const jsonMatch = result.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsedQuest = JSON.parse(jsonMatch[0]);
-        
-        return {
-          title: cleanGeneratedContent(parsedQuest.title, 'quest_title'),
-          description: cleanGeneratedContent(parsedQuest.description, 'quest_description'),
-          reward: cleanGeneratedContent(parsedQuest.reward, 'quest_reward'),
-          type: parsedQuest.type || quest.type || 'any'
-        };
-      }
-      throw new Error("No valid JSON found in response");
-    } catch (e) {
-      console.error("Failed to parse quest JSON:", e);
-      // Fallback
-      return {
-        title: "New Quest",
-        description: cleanGeneratedContent(result, 'quest_description'),
-        reward: "Quest reward",
-        type: quest.type || 'any'
-      };
-    }
-  } else {
-    // Regenerate specific part
-    const prompts: {[key: string]: {system: string, user: string}} = {
-      title: {
-        system: "You are an expert quest designer. Generate only a quest title.",
-        user: `${characterInfo}\n\nCurrent quest: "${quest.description}"\n\nGenerate a new title for this quest (3-6 words). Respond with ONLY the title, no formatting.`
+    const errorInfo = categorizeError(error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: errorInfo.message,
+        type: errorInfo.type
       },
-      description: {
-        system: "You are an expert quest designer. Generate only a quest description.",
-        user: `${characterInfo}\n\nQuest title: "${quest.title}"\nQuest reward: "${quest.reward}"\n\nGenerate a new description for this quest (30-60 words). Respond with ONLY the description, no formatting.`
-      },
-      reward: {
-        system: "You are an expert quest designer. Generate only a quest reward.",
-        user: `${characterInfo}\n\nQuest: "${quest.title}" - ${quest.description}\n\nGenerate a new reward for this quest (10-20 words). Respond with ONLY the reward, no formatting.`
-      }
-    };
-
-    const prompt = prompts[part];
-    if (!prompt) {
-      throw new Error(`Unknown quest part: ${part}`);
-    }
-
-    const result = await makeOpenAICall(model, prompt.system, prompt.user);
-    return cleanGeneratedContent(result, `quest_${part}`);
+      { status: errorInfo.status }
+    );
   }
 }
