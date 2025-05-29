@@ -1,3 +1,4 @@
+// src/app/api/generate/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { generateCharacter, generatePortrait } from '@/lib/openai';
 import { Character, CharacterFormData, GenerationResponse, OpenAIModel } from '@/lib/types';
@@ -48,7 +49,16 @@ function isRateLimited(ip: string): boolean {
   return false;
 }
 
-export async function POST(request: NextRequest): Promise<NextResponse<GenerationResponse>> {
+// Enhanced error response interface
+interface ErrorResponse {
+  error: string;
+  character: null;
+  errorType?: string;
+  shouldRetry?: boolean;
+  userMessage?: string;
+}
+
+export async function POST(request: NextRequest): Promise<NextResponse<GenerationResponse | ErrorResponse>> {
   console.log('=== Character Generation API Called ===');
   
   try {
@@ -86,7 +96,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generatio
     } catch (parseError) {
       console.error('Error parsing request JSON:', parseError);
       return NextResponse.json(
-        { error: 'Invalid request data', character: null as any },
+        { 
+          error: 'Invalid request data format', 
+          character: null as any,
+          errorType: 'validation_error',
+          userMessage: 'Request format is invalid. Please try again.'
+        },
         { status: 400 }
       );
     }
@@ -96,7 +111,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generatio
       console.error('Validation failed: Missing description');
       console.log('Full data object:', data);
       return NextResponse.json(
-        { error: 'Character description is required. Please describe your character.', character: null as any },
+        { 
+          error: 'Character description is required. Please describe your character.', 
+          character: null as any,
+          errorType: 'validation_error',
+          userMessage: 'Character description is required. Please describe your character before generating.'
+        },
         { status: 400 }
       );
     }
@@ -173,9 +193,22 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generatio
           } else {
             console.log('Portrait generation returned empty result');
           }
-        } catch (portraitError) {
+        } catch (portraitError: any) {
           console.error('Failed to generate portrait:', portraitError);
-          // Continue without portrait if it fails
+          
+          // Add portrait error information to character for user feedback
+          if (!character.added_traits) {
+            character.added_traits = {};
+          }
+          
+          // Store error details for the frontend
+          character.added_traits.portrait_generation_failed = 'true';
+          character.added_traits.portrait_error_message = portraitError.message || 'Portrait generation failed';
+          character.added_traits.portrait_error_type = portraitError.type || 'unknown';
+          character.added_traits.portrait_should_retry = portraitError.shouldRetry ? 'true' : 'false';
+          
+          console.log('Portrait generation failed, but continuing with character without portrait');
+          // Continue without portrait - don't fail the entire request
         }
       } else {
         if (!data.include_portrait) {
@@ -199,30 +232,47 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generatio
       console.log('=== Character Generation Complete ===');
       
       return NextResponse.json({ character });
-    } catch (error) {
-      // Handle OpenAI errors specifically
-      console.error('Error in generate route:', error);
+    } catch (error: any) {
+      // Handle character generation errors specifically
+      console.error('Error in character generation:', error);
       
-      // Example fallback is handled in generateCharacter
-      // This should rarely be reached, but just in case:
-      return NextResponse.json(
-        { 
-          error: error instanceof Error ? error.message : 'An unknown error occurred',
-          character: null as any
-        },
-        { status: 500 }
-      );
+      // Enhanced error handling with type information
+      const errorResponse: ErrorResponse = {
+        error: error.message || 'Character generation failed',
+        character: null,
+        errorType: error.type || 'generation_error',
+        shouldRetry: error.shouldRetry !== false, // Default to true unless explicitly false
+        userMessage: error.message || 'Character generation failed. Please try again.'
+      };
+      
+      // Specific handling for different error types
+      if (error.type === 'json_parse') {
+        errorResponse.userMessage = 'AI response was unclear. Please try again with a simpler description.';
+      } else if (error.type === 'timeout') {
+        errorResponse.userMessage = 'Request timed out. Please try again.';
+        errorResponse.shouldRetry = true;
+      } else if (error.type === 'rate_limit') {
+        errorResponse.userMessage = 'Too many requests. Please wait a moment and try again.';
+        errorResponse.shouldRetry = true;
+      } else if (error.type === 'quota_exceeded') {
+        errorResponse.userMessage = 'Monthly usage limit reached for this model tier. Try a different model or wait until next month.';
+        errorResponse.shouldRetry = false;
+      }
+      
+      return NextResponse.json(errorResponse, { status: 500 });
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in generate route:', error);
     
-    return NextResponse.json(
-      { 
-        error: error instanceof Error ? error.message : 'An unknown error occurred',
-        character: null as any
-      },
-      { status: 500 }
-    );
+    const errorResponse: ErrorResponse = {
+      error: error.message || 'An unknown error occurred',
+      character: null,
+      errorType: 'server_error',
+      shouldRetry: true,
+      userMessage: 'Server error occurred. Please try again.'
+    };
+    
+    return NextResponse.json(errorResponse, { status: 500 });
   }
 }
 
@@ -232,7 +282,13 @@ function buildSystemPrompt(data: Partial<CharacterFormData>): string {
   let prompt = `
 You are an expert RPG character generator. Generate a detailed NPC profile based on the description and parameters provided.
 
-IMPORTANT: You must only respond with valid JSON matching the structure below. Do not include any additional text, explanations, or commentary outside the JSON.
+CRITICAL INSTRUCTIONS:
+- You must respond with ONLY valid JSON
+- Do not include any text, explanations, or commentary outside the JSON
+- Ensure all strings are properly escaped with backslashes before quotes
+- Do not use unescaped quotes within string values
+- End all arrays and objects properly with closing brackets/braces
+- Do not include trailing commas before closing brackets/braces
 
 Return ONLY valid JSON with the following structure:
 {
@@ -275,7 +331,7 @@ Return ONLY valid JSON with the following structure:
       "title": "Quest Title",
       "description": "Quest Description",
       "reward": "Quest Reward",
-      "type": "Quest Type" // Optional
+      "type": "Quest Type"
     }
     // Include ${data.quest_options?.number_of_quests || 1} quests
   ]`;
@@ -380,8 +436,8 @@ Return ONLY valid JSON with the following structure:
   // Add final guidance
   prompt += `\n\nBe creative, detailed, and ensure the character feels cohesive and interesting. The character should feel realistic and well-rounded, with a distinct personality and appearance that matches their background and traits.`;
   
-  // Add reminder to only return JSON
-  prompt += `\n\nRemember: Your response must be ONLY the JSON object. Do not include any explanatory text before or after.`;
+  // Add reminder to only return JSON with enhanced instructions
+  prompt += `\n\nCRITICAL: Your response must be ONLY the JSON object. No explanatory text before or after. No markdown formatting. Just pure, valid JSON that can be parsed directly.`;
   
   return prompt;
 }
