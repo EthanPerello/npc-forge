@@ -7,7 +7,7 @@ import { DEFAULT_IMAGE_MODEL } from './image-models';
 // Initialize the OpenAI client with increased timeout settings
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-  timeout: 90000, // Increased to 90 seconds for better reliability
+  timeout: 120000, // Increased to 120 seconds (2 minutes) for image generation
   maxRetries: 0, // We'll handle retries manually for better control
 });
 
@@ -40,8 +40,225 @@ interface ExtendedCharacter extends Character {
   genre?: string; // Add optional genre property for example character matching
 }
 
-// Function to categorize error types
-const categorizeError = (error: any): { type: string; message: string; shouldRetry: boolean } => {
+// Enhanced JSON parsing utilities
+class JSONParser {
+  // Clean and normalize JSON string
+  static cleanJSONString(jsonStr: string): string {
+    return jsonStr
+      // Remove control characters
+      .replace(/[\u0000-\u001F]+/g, " ")
+      // Fix common formatting issues
+      .replace(/\n\s*\n/g, "\n")
+      // Remove trailing commas before closing braces/brackets (more comprehensive)
+      .replace(/,(\s*[}\]])/g, "$1")
+      // Fix trailing commas after quoted strings
+      .replace(/("(?:[^"\\]|\\.)*"),(\s*[}\]])/g, '$1$2')
+      // Fix unescaped quotes in strings (basic attempt)
+      .replace(/([^\\])"([^"]*)"([^,}\]\s])/g, '$1\\"$2\\"$3')
+      // Remove any text before the first {
+      .replace(/^[^{]*/, "")
+      // Remove any text after the last }
+      .replace(/}[^}]*$/, "}")
+      // Clean up multiple spaces
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  // Extract JSON from various formats
+  static extractJSON(content: string): string[] {
+    const candidates: string[] = [];
+
+    // Try to find JSON in markdown code blocks
+    const codeBlockMatch = content.match(/```json\s*([\s\S]*?)\s*```/i);
+    if (codeBlockMatch) {
+      candidates.push(codeBlockMatch[1]);
+    }
+
+    // Find all potential JSON objects
+    const jsonMatches = content.match(/\{[\s\S]*?\}/g);
+    if (jsonMatches) {
+      candidates.push(...jsonMatches);
+    }
+
+    // Try the whole content if it looks like it might be JSON
+    if (content.trim().startsWith('{') && content.trim().endsWith('}')) {
+      candidates.push(content);
+    }
+
+    return candidates;
+  }
+
+  // Attempt to fix common JSON issues
+  static fixCommonIssues(jsonStr: string): string {
+    let fixed = jsonStr;
+
+    try {
+      // More aggressive trailing comma removal
+      fixed = fixed.replace(/,(\s*[}\]])/g, '$1');
+      
+      // Fix trailing commas after property values (more specific patterns)
+      fixed = fixed.replace(/,(\s*\n\s*[}\]])/g, '$1');
+      fixed = fixed.replace(/,(\s*$)/gm, '');
+      
+      // Fix specific patterns like: "value",\n  }
+      fixed = fixed.replace(/("[^"]*"),(\s*\n\s*[}\]])/g, '$1$2');
+      
+      // Fix incomplete arrays/objects
+      const openBraces = (fixed.match(/\{/g) || []).length;
+      const closeBraces = (fixed.match(/\}/g) || []).length;
+      const openBrackets = (fixed.match(/\[/g) || []).length;
+      const closeBrackets = (fixed.match(/\]/g) || []).length;
+
+      // Add missing closing braces
+      if (openBraces > closeBraces) {
+        fixed += '}';
+      }
+
+      // Add missing closing brackets
+      if (openBrackets > closeBrackets) {
+        fixed += ']';
+      }
+
+      // Fix quotes in the middle of strings (more careful approach)
+      // Only fix obvious cases where there are unescaped quotes
+      fixed = fixed.replace(/"([^"]*)"([^"]*)"([^",}\]\s:,}])/g, '"$1\\"$2\\"$3');
+
+      // One more pass at trailing comma removal
+      fixed = fixed.replace(/,(\s*[}\]])/g, '$1');
+
+      return fixed;
+    } catch (error) {
+      console.warn('Error in JSON fixing:', error);
+      return jsonStr;
+    }
+  }
+
+  // Validate and fix character object
+  static validateAndFixCharacter(obj: any): Character {
+    const character = obj as Character;
+
+    // Ensure required fields exist - only set defaults if they're truly missing
+    if (!character.name || typeof character.name !== 'string' || character.name.trim() === '') {
+      character.name = 'Unknown Character';
+    }
+
+    if (!character.appearance || typeof character.appearance !== 'string' || character.appearance.trim() === '') {
+      character.appearance = 'A mysterious figure with no clear description.';
+    }
+
+    if (!character.personality || typeof character.personality !== 'string' || character.personality.trim() === '') {
+      character.personality = 'An enigmatic personality that remains unclear.';
+    }
+
+    if (!character.backstory_hook || typeof character.backstory_hook !== 'string' || character.backstory_hook.trim() === '') {
+      character.backstory_hook = 'A character with a mysterious past.';
+    }
+
+    // Ensure objects exist
+    if (!character.selected_traits || typeof character.selected_traits !== 'object') {
+      character.selected_traits = {};
+    }
+
+    if (!character.added_traits || typeof character.added_traits !== 'object') {
+      character.added_traits = {};
+    }
+
+    // Fix array fields
+    if (character.items && !Array.isArray(character.items)) {
+      character.items = [];
+    }
+
+    if (character.dialogue_lines && !Array.isArray(character.dialogue_lines)) {
+      character.dialogue_lines = [];
+    }
+
+    if (character.quests && !Array.isArray(character.quests)) {
+      character.quests = [];
+    }
+
+    // Fix quest structure
+    if (character.quests) {
+      character.quests = character.quests.map(quest => {
+        if (typeof quest === 'string') {
+          return {
+            title: quest,
+            description: quest,
+            reward: 'Unknown reward'
+          };
+        }
+        return {
+          title: quest.title || 'Untitled Quest',
+          description: quest.description || 'No description available',
+          reward: quest.reward || 'Unknown reward',
+          type: quest.type
+        };
+      });
+    }
+
+    return character;
+  }
+
+  // Main parsing function with multiple strategies
+  static parseCharacterJSON(content: string): Character {
+    console.log('=== Starting JSON parsing process ===');
+    console.log('Raw content length:', content.length);
+    console.log('Content preview:', content.substring(0, 300) + '...');
+    
+    const candidates = this.extractJSON(content);
+    console.log(`Found ${candidates.length} JSON candidates`);
+    
+    for (let i = 0; i < candidates.length; i++) {
+      const candidate = candidates[i];
+      console.log(`\n--- Trying candidate ${i + 1} ---`);
+      console.log('Candidate preview:', candidate.substring(0, 200) + '...');
+      
+      // Try multiple cleaning and fixing strategies
+      const strategies = [
+        candidate, // Original
+        this.cleanJSONString(candidate), // Cleaned
+        this.fixCommonIssues(candidate), // Fixed only
+        this.fixCommonIssues(this.cleanJSONString(candidate)), // Cleaned and fixed
+        // Additional strategy: aggressive trailing comma removal
+        candidate.replace(/,(\s*[}\]])/g, '$1').replace(/,(\s*\n\s*[}\]])/g, '$1'),
+      ];
+
+      for (let j = 0; j < strategies.length; j++) {
+        const jsonStr = strategies[j];
+        try {
+          console.log(`Trying strategy ${j + 1} for candidate ${i + 1}`);
+          const parsed = JSON.parse(jsonStr);
+          console.log('Parsed JSON successfully, raw parsed object:', {
+            name: parsed.name,
+            hasAppearance: !!parsed.appearance,
+            hasPersonality: !!parsed.personality,
+            keys: Object.keys(parsed)
+          });
+          
+          const character = this.validateAndFixCharacter(parsed);
+          console.log('After validation, character name:', character.name);
+          
+          // Basic validation - ensure it looks like a character
+          if (character.name && character.name !== 'Unknown Character' && (character.appearance || character.personality)) {
+            console.log(`Successfully parsed character: ${character.name}`);
+            return character;
+          } else {
+            console.log('Character validation failed - name or content missing');
+          }
+        } catch (parseError) {
+          console.log('JSON parse attempt failed:', parseError instanceof Error ? parseError.message : String(parseError));
+          // Continue to next strategy
+          continue;
+        }
+      }
+    }
+
+    console.log('=== All parsing strategies failed ===');
+    throw new Error('Failed to parse valid character JSON from response');
+  }
+}
+
+// Function to categorize error types with more specificity
+const categorizeError = (error: any): { type: string; message: string; shouldRetry: boolean; userMessage: string } => {
   // Handle OpenAI API errors
   if (error?.status || error?.code) {
     const status = error.status;
@@ -53,25 +270,37 @@ const categorizeError = (error: any): { type: string; message: string; shouldRet
         return {
           type: 'rate_limit',
           message: 'Rate limit exceeded. Please try again in a few minutes.',
-          shouldRetry: true
+          shouldRetry: true,
+          userMessage: 'Too many requests. Please wait a moment and try again.'
         };
       case 400:
+        if (message.toLowerCase().includes('quota')) {
+          return {
+            type: 'quota_exceeded',
+            message: 'Monthly quota exceeded for this model.',
+            shouldRetry: false,
+            userMessage: 'Monthly usage limit reached for this model tier. Try a different model or wait until next month.'
+          };
+        }
         return {
           type: 'invalid_request',
           message: 'Invalid request parameters. Please check your settings.',
-          shouldRetry: false
+          shouldRetry: false,
+          userMessage: 'Invalid request. Please try adjusting your character description or options.'
         };
       case 401:
         return {
           type: 'authentication',
           message: 'Authentication failed. Please check API configuration.',
-          shouldRetry: false
+          shouldRetry: false,
+          userMessage: 'Authentication error. Please contact support.'
         };
       case 403:
         return {
           type: 'quota_exceeded',
           message: 'Monthly quota exceeded for this model tier.',
-          shouldRetry: false
+          shouldRetry: false,
+          userMessage: 'Monthly usage limit reached. Try a lower tier model or wait until next month.'
         };
       case 500:
       case 502:
@@ -80,31 +309,49 @@ const categorizeError = (error: any): { type: string; message: string; shouldRet
         return {
           type: 'server_error',
           message: 'OpenAI server error. Please try again.',
-          shouldRetry: true
+          shouldRetry: true,
+          userMessage: 'Server temporarily unavailable. Retrying automatically...'
         };
       default:
         return {
           type: 'api_error',
           message: `API error: ${message}`,
-          shouldRetry: status >= 500
+          shouldRetry: status >= 500,
+          userMessage: `API error occurred. ${status >= 500 ? 'Retrying...' : 'Please try again.'}`
         };
     }
   }
   
   // Handle network errors
-  if (error?.name === 'AbortError' || error?.message?.includes('timeout')) {
+  if (error?.name === 'AbortError' || error?.message?.includes('timeout') || 
+      error?.code === 'ETIMEDOUT' || error?.errno === 'ETIMEDOUT' || 
+      error?.message?.includes('ETIMEDOUT')) {
     return {
       type: 'timeout',
       message: 'Request timed out. Please try again.',
-      shouldRetry: true
+      shouldRetry: true,
+      userMessage: 'Request timed out. Retrying with longer timeout...'
     };
   }
   
-  if (error?.message?.includes('fetch') || error?.message?.includes('network')) {
+  if (error?.message?.includes('fetch') || error?.message?.includes('network') ||
+      error?.code === 'ECONNRESET' || error?.code === 'ENOTFOUND' ||
+      error?.message?.includes('connect') || error?.message?.includes('ECONNREFUSED')) {
     return {
       type: 'network',
       message: 'Network error. Please check your connection.',
-      shouldRetry: true
+      shouldRetry: true,
+      userMessage: 'Network error. Please check your connection and try again.'
+    };
+  }
+  
+  // Handle JSON parsing errors
+  if (error?.message?.includes('JSON') || error?.message?.includes('parse')) {
+    return {
+      type: 'json_parse',
+      message: 'Failed to parse AI response. Please try again.',
+      shouldRetry: true,
+      userMessage: 'AI response was unclear. Trying again with better instructions...'
     };
   }
   
@@ -112,7 +359,8 @@ const categorizeError = (error: any): { type: string; message: string; shouldRet
   return {
     type: 'unknown',
     message: error?.message || 'An unexpected error occurred',
-    shouldRetry: false
+    shouldRetry: false,
+    userMessage: 'An unexpected error occurred. Please try again.'
   };
 };
 
@@ -167,11 +415,12 @@ const getExampleCharacter = (description: string): Character => {
   return character;
 };
 
-// Retry mechanism with exponential backoff
+// Enhanced retry mechanism with different strategies for different error types
 async function retryWithBackoff<T>(
   operation: () => Promise<T>,
   maxRetries: number = 3,
-  baseDelay: number = 1000
+  baseDelay: number = 1000,
+  operationType: 'character' | 'portrait' = 'character'
 ): Promise<T> {
   let lastError: any;
   
@@ -191,24 +440,45 @@ async function retryWithBackoff<T>(
       lastApiCallTime = Date.now();
       
       const result = await operation();
-      console.log(`Operation succeeded on attempt ${attempt + 1}`);
+      console.log(`${operationType} operation succeeded on attempt ${attempt + 1}`);
       return result;
     } catch (error) {
       lastError = error;
-      console.error(`Attempt ${attempt + 1} failed:`, error);
+      console.error(`Attempt ${attempt + 1} failed for ${operationType}:`, error);
       
       const errorInfo = categorizeError(error);
       
-      // Don't retry if it's not a retryable error
-      if (!errorInfo.shouldRetry || attempt === maxRetries) {
-        console.log(`Not retrying: shouldRetry=${errorInfo.shouldRetry}, attempt=${attempt}, maxRetries=${maxRetries}`);
-        throw error;
+      // Special handling for different error types
+      if (errorInfo.type === 'json_parse' && operationType === 'character') {
+        // For JSON parse errors, we might want to try with modified prompts
+        console.log('JSON parse error - will attempt with cleaner prompt on retry');
       }
       
-      // Calculate delay with exponential backoff
+      if (errorInfo.type === 'timeout' && operationType === 'portrait') {
+        console.log('Portrait generation timeout - will retry with longer delay');
+      }
+      
+      // Don't retry if it's not a retryable error
+      if (!errorInfo.shouldRetry || attempt === maxRetries) {
+        console.log(`Not retrying: shouldRetry=${errorInfo.shouldRetry}, attempt=${attempt}, maxRetries=${maxRetries}, errorType=${errorInfo.type}`);
+        
+        // Enhance error with user-friendly message
+        const enhancedError = new Error(errorInfo.userMessage);
+        (enhancedError as any).type = errorInfo.type;
+        (enhancedError as any).originalMessage = errorInfo.message;
+        (enhancedError as any).shouldRetry = errorInfo.shouldRetry;
+        
+        throw enhancedError;
+      }
+      
+      // Calculate delay with exponential backoff, with jitter
       const delay = baseDelay * Math.pow(2, attempt) + Math.random() * 1000;
-      console.log(`Retrying in ${delay}ms... (attempt ${attempt + 1}/${maxRetries})`);
-      await sleep(delay);
+      
+      // For portrait generation, use longer delays due to potential rate limits
+      const actualDelay = operationType === 'portrait' ? delay * 1.5 : delay;
+      
+      console.log(`Retrying ${operationType} in ${actualDelay}ms... (attempt ${attempt + 1}/${maxRetries})`);
+      await sleep(actualDelay);
     }
   }
   
@@ -235,14 +505,22 @@ export async function generateCharacter(
 
     // Use retry mechanism for character generation
     const result = await retryWithBackoff(async () => {
-      const response = await openai.chat.completions.create({
-        model: requestModel,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: description }
-        ],
-        temperature: 0.8,
-      });
+      const response = await Promise.race([
+        openai.chat.completions.create({
+          model: requestModel,
+          messages: [
+            { 
+              role: "system", 
+              content: systemPrompt + "\n\nIMPORTANT: Respond only with valid JSON. Do not include any text before or after the JSON object. Ensure all strings are properly escaped and the JSON is complete." 
+            },
+            { role: "user", content: description }
+          ],
+          temperature: 0.8,
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Character generation timeout after 60 seconds')), 60000)
+        )
+      ]) as any;
 
       // Parse the response
       const content = response.choices[0].message.content;
@@ -250,44 +528,15 @@ export async function generateCharacter(
         throw new Error("No content returned from OpenAI");
       }
 
-      // Extract the JSON from the response
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error("No valid JSON found in the response");
-      }
+      console.log('Raw API response length:', content.length);
+      console.log('Response preview:', content.substring(0, 200) + '...');
 
-      try {
-        // Parse the JSON
-        const character: Character = JSON.parse(jsonMatch[0]);
-        
-        // Validate essential fields are present
-        const requiredFields = ['name', 'appearance', 'personality', 'backstory_hook'];
-        for (const field of requiredFields) {
-          if (!character[field as keyof Character]) {
-            throw new Error(`Generated character missing required field: ${field}`);
-          }
-        }
-        
-        console.log(`Successfully generated character: ${character.name}`);
-        return character;
-      } catch (parseError) {
-        console.error("JSON parsing error:", parseError);
-        // Try to clean the JSON string if parsing fails
-        const cleaned = jsonMatch[0].replace(/[\u0000-\u001F]+/g, " ").trim();
-        const character = JSON.parse(cleaned);
-        
-        // Still validate after cleaning
-        const requiredFields = ['name', 'appearance', 'personality', 'backstory_hook'];
-        for (const field of requiredFields) {
-          if (!character[field as keyof Character]) {
-            throw new Error(`Generated character missing required field: ${field}`);
-          }
-        }
-        
-        console.log(`Successfully generated character (after cleaning): ${character.name}`);
-        return character; 
-      }
-    }, 2); // Allow 2 retries for character generation
+      // Use enhanced JSON parsing
+      const character = JSONParser.parseCharacterJSON(content);
+      
+      console.log(`Successfully generated character: ${character.name}`);
+      return character;
+    }, 2, 1000, 'character'); // Allow 2 retries for character generation
 
     return result;
   } catch (error) {
@@ -386,7 +635,7 @@ export async function generatePortrait(character: Character): Promise<string> {
 
     console.log(`Generating portrait with prompt: "${imagePrompt.substring(0, 100)}..."`);
 
-    // Use retry mechanism for portrait generation
+    // Use enhanced retry mechanism for portrait generation
     const result = await retryWithBackoff(async () => {
       // Base configuration - start with common parameters
       const generateOptions: any = {
@@ -417,8 +666,13 @@ export async function generatePortrait(character: Character): Promise<string> {
         quality: generateOptions.quality
       });
       
-      // Call the API to generate the image
-      const response = await openai.images.generate(generateOptions);
+      // Call the API to generate the image with timeout wrapper
+      const response = await Promise.race([
+        openai.images.generate(generateOptions),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Portrait generation timeout after 2 minutes')), 120000)
+        )
+      ]) as any;
 
       // Get base64 data - handle different response formats by model
       let b64Image: string | undefined;
@@ -463,7 +717,7 @@ export async function generatePortrait(character: Character): Promise<string> {
       console.log(`Successfully generated portrait for ${name} using ${imageModel}`);
       
       return dataUrl;
-    }, 3); // Allow 3 retries for portrait generation
+    }, 3, 3000, 'portrait'); // Allow 3 retries for portrait generation with 3 second base delay
     
     // Store the result in the character and return it
     character.image_data = result;
@@ -481,7 +735,8 @@ export async function generatePortrait(character: Character): Promise<string> {
         message: error.message,
         model: character.portrait_options?.image_model,
         characterName: character.name,
-        errorType: errorInfo.type
+        errorType: errorInfo.type,
+        userMessage: errorInfo.userMessage
       });
     }
     
@@ -504,18 +759,21 @@ export async function generatePortrait(character: Character): Promise<string> {
       return exampleCharacters[0].image_data;
     }
     
-    // Add error information to character
+    // Add error information to character for user feedback
     if (!character.added_traits) {
       character.added_traits = {};
     }
-    character.added_traits.portrait_error = errorInfo.message;
+    character.added_traits.portrait_error = errorInfo.userMessage;
     character.added_traits.portrait_error_type = errorInfo.type;
     
-    console.log("Portrait generation failed completely, returning empty string");
+    console.log("Portrait generation failed completely, throwing error for user feedback");
     
-    // Throw the error so the calling code can handle it appropriately
-    const enhancedError = new Error(errorInfo.message);
+    // Throw the enhanced error so the calling code can handle it appropriately
+    const enhancedError = new Error(errorInfo.userMessage);
     (enhancedError as any).type = errorInfo.type;
+    (enhancedError as any).originalMessage = errorInfo.message;
+    (enhancedError as any).shouldRetry = errorInfo.shouldRetry;
+    
     throw enhancedError;
   }
 }

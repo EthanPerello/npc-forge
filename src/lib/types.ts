@@ -1,3 +1,4 @@
+// src/lib/types.ts
 // Available OpenAI models
 export type OpenAIModel = 'gpt-4o-mini' | 'gpt-4.1-mini' | 'gpt-4o';
 
@@ -24,6 +25,18 @@ export interface ImageModelConfig {
   monthlyLimit: number; // How many generations allowed per month
 }
 
+// Error types for better error handling
+export type ErrorType = 'rate_limit' | 'timeout' | 'network' | 'authentication' | 'quota_exceeded' | 'invalid_request' | 'server_error' | 'json_parse' | 'validation_error' | 'generation_error' | 'api_error' | 'unknown';
+
+// Enhanced error interface
+export interface APIError {
+  type: ErrorType;
+  message: string;
+  userMessage: string;
+  shouldRetry: boolean;
+  originalMessage?: string;
+}
+
 export interface Character {
   name: string;
   selected_traits: {
@@ -43,7 +56,17 @@ export interface Character {
     homeland?: string;
   };
   added_traits: {
-    [key: string]: string; // Additional traits AI added that weren't selected
+    [key: string]: string | undefined; // Additional traits AI added that weren't selected
+    // Enhanced error tracking fields
+    fallback_note?: string;
+    original_request?: string;
+    api_error?: string;
+    error_type?: string;
+    portrait_error?: string;
+    portrait_error_type?: string;
+    portrait_error_message?: string;
+    portrait_should_retry?: string;
+    portrait_generation_failed?: string;
   };
   appearance: string; // Now a freeform paragraph
   personality: string; // Now a freeform paragraph
@@ -133,9 +156,27 @@ export interface CharacterFormData {
   model?: OpenAIModel;
 }
 
+// Enhanced generation response with better error handling
 export interface GenerationResponse {
   character: Character;
   error?: string;
+}
+
+// Enhanced error response interface
+export interface ErrorResponse {
+  error: string;
+  character: null;
+  errorType?: ErrorType;
+  shouldRetry?: boolean;
+  userMessage?: string;
+}
+
+// Union type for API responses
+export type APIResponse = GenerationResponse | ErrorResponse;
+
+// Type guard to check if response is an error
+export function isErrorResponse(response: APIResponse): response is ErrorResponse {
+  return response.character === null && 'error' in response;
 }
 
 // Modified option interfaces for selects to allow empty string values
@@ -213,4 +254,19 @@ export interface RarityDistributionOption {
   value: string;
   label: string;
   description: string;
+}
+
+// New interfaces for enhanced error handling and retry logic
+export interface RetryConfig {
+  maxRetries: number;
+  baseDelay: number;
+  operationType: 'character' | 'portrait';
+}
+
+export interface GenerationStatus {
+  isGenerating: boolean;
+  currentStep?: string;
+  progress?: number;
+  estimatedTimeRemaining?: number;
+  lastError?: APIError;
 }

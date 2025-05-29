@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Enhanced error handling with automatic retry logic for portrait generation failures
+- User-friendly error messages with specific guidance for different failure types (rate limits, timeouts, network issues)
+- Comprehensive JSON parsing with multiple fallback strategies to handle malformed AI responses
+
+### Changed
+- Portrait generation timeout increased from 90 to 120 seconds with automatic retry on failure
+- Character generation now includes timeout protection and enhanced error recovery
+- API error categorization system now provides more specific and actionable user guidance
+
+### Fixed
+- Portrait generation no longer hangs indefinitely on network timeouts or API connectivity issues
+- Character generation failures due to malformed JSON responses with trailing commas or incomplete formatting
+- Network timeout errors (ETIMEDOUT) now properly trigger retry logic instead of failing immediately
+- Portrait regeneration reliability significantly improved with enhanced error recovery and user feedback
+
 ## [0.16.0] - 2025-05-27
 
 ### Added
