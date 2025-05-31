@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.0] - 2025-05-30
+
 ### Added
 - Comprehensive trait filtering system with dropdown filters for all character trait categories (personality, occupation, species, social class, height, build, homeland, etc.)
 - Automatic trait discovery that creates filter dropdowns based on existing character data
@@ -486,7 +488,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Export to JSON feature
 - Fully responsive UI for desktop and mobile
 
-[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.17.0...HEAD
+[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.18.0...HEAD
+[0.18.0]: https://github.com/EthanPerello/npc-forge/compare/v0.17.0...v0.18.0
 [0.17.0]: https://github.com/EthanPerello/npc-forge/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/EthanPerello/npc-forge/compare/v0.15.1...v0.16.0
 [0.15.1]: https://github.com/EthanPerello/npc-forge/compare/v0.15.0...v0.15.1
