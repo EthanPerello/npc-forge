@@ -115,104 +115,72 @@ export function formatTraitValue(value: string): string {
 }
 
 /**
- * Get character traits as a flat array of strings for display - excludes appearance, personality, backstory
+ * Get all character traits as a flat array of strings with consistent prefixes
+ * This ensures all traits are displayed with their category prefix
  */
 export function getCharacterTraitsArray(character: Character): string[] {
   const traits: string[] = [];
   
-  // Add selected traits - exclude appearance, personality, backstory_hook
+  // Define trait category mappings with user-friendly labels
+  const traitCategoryLabels: Record<string, string> = {
+    genre: 'Genre',
+    sub_genre: 'Sub-genre',
+    gender: 'Gender',
+    age_group: 'Age',
+    species: 'Species',
+    moral_alignment: 'Alignment',
+    relationship_to_player: 'Relation',
+    occupation: 'Occupation',
+    social_class: 'Social Class',
+    height: 'Height',
+    build: 'Build',
+    distinctive_features: 'Features',
+    homeland: 'Homeland',
+    personality_traits: 'Personality',
+    physical_traits: 'Physical',
+    background_traits: 'Background',
+    skills: 'Skills',
+    abilities: 'Abilities',
+    quirks: 'Quirks',
+    flaws: 'Flaws',
+    motivations: 'Motivations',
+    fears: 'Fears',
+    goals: 'Goals'
+  };
+  
+  // Process selected traits - exclude appearance, personality, backstory_hook as they're displayed separately
   if (character.selected_traits) {
     Object.entries(character.selected_traits).forEach(([key, value]) => {
-      // Skip these fields as they're displayed separately
+      // Skip these fields as they're displayed separately in the profile
       if (key === 'appearance' || key === 'personality' || key === 'backstory_hook') {
         return;
       }
       
       if (value) {
-        // Handle different key types
-        if (key === 'genre') {
-          // Handle genre which might be string or string[]
-          if (typeof value === 'string') {
-            traits.push(`Genre: ${formatTraitValue(value)}`);
-          } else if (Array.isArray(value)) {
-            traits.push(`Genre: ${value.map(v => formatTraitValue(v)).join(', ')}`);
-          }
-        } else if (key === 'sub_genre') {
-          // Handle sub_genre
-          if (typeof value === 'string') {
-            traits.push(`Sub-genre: ${formatTraitValue(value)}`);
-          }
-        } else if (key === 'gender') {
-          // Handle gender which should be a string
-          if (typeof value === 'string') {
-            traits.push(`Gender: ${formatTraitValue(value)}`);
-          }
-        } else if (key === 'age_group') {
-          // Handle age_group which should be a string
-          if (typeof value === 'string') {
-            traits.push(`Age: ${formatTraitValue(value)}`);
-          }
-        } else if (key === 'species') {
-          // Handle species
-          if (typeof value === 'string') {
-            traits.push(`Species: ${formatTraitValue(value)}`);
-          }
-        } else if (key === 'moral_alignment') {
-          // Handle moral_alignment which should be a string
-          if (typeof value === 'string') {
-            traits.push(`Alignment: ${formatTraitValue(value)}`);
-          }
-        } else if (key === 'relationship_to_player') {
-          // Handle relationship_to_player which should be a string
-          if (typeof value === 'string') {
-            traits.push(`Relation: ${formatTraitValue(value)}`);
-          }
-        } else if (key === 'occupation') {
-          // Handle occupation
-          if (typeof value === 'string') {
-            traits.push(`Occupation: ${formatTraitValue(value)}`);
-          }
-        } else if (key === 'social_class') {
-          // Handle social class
-          if (typeof value === 'string') {
-            traits.push(`Social Class: ${formatTraitValue(value)}`);
-          }
-        } else if (key === 'height') {
-          // Handle height
-          if (typeof value === 'string') {
-            traits.push(`Height: ${formatTraitValue(value)}`);
-          }
-        } else if (key === 'build') {
-          // Handle build
-          if (typeof value === 'string') {
-            traits.push(`Build: ${formatTraitValue(value)}`);
-          }
-        } else if (key === 'distinctive_features') {
-          // Handle distinctive features
-          if (typeof value === 'string') {
-            traits.push(`Features: ${value}`);
-          }
-        } else if (key === 'homeland') {
-          // Handle homeland
-          if (typeof value === 'string') {
-            traits.push(`Homeland: ${value}`);
-          }
-        } else if (key === 'personality_traits' && Array.isArray(value)) {
-          // Handle personality_traits array - add each trait individually
+        const label = traitCategoryLabels[key] || formatTraitKey(key);
+        
+        if (key === 'personality_traits' && Array.isArray(value)) {
+          // Handle personality_traits array - add each trait with Personality prefix
           value.forEach(trait => {
             if (trait) {
-              traits.push(formatTraitValue(trait));
+              traits.push(`Personality: ${formatTraitValue(trait)}`);
+            }
+          });
+        } else if (Array.isArray(value)) {
+          // Handle other array values
+          value.forEach(item => {
+            if (item && typeof item === 'string') {
+              traits.push(`${label}: ${formatTraitValue(item)}`);
             }
           });
         } else if (typeof value === 'string') {
-          // Handle any other string values
-          traits.push(`${formatTraitKey(key)}: ${formatTraitValue(value)}`);
+          traits.push(`${label}: ${formatTraitValue(value)}`);
         }
       }
     });
   }
   
-  // Add AI-added traits (excluding appearance, personality, backstory_hook)
+  // Process AI-added traits (excluding appearance, personality, backstory_hook)
   if (character.added_traits) {
     Object.entries(character.added_traits).forEach(([key, value]) => {
       // Skip these fields as they're displayed separately
@@ -225,19 +193,196 @@ export function getCharacterTraitsArray(character: Character): string[] {
         return;
       }
       
+      const label = traitCategoryLabels[key] || formatTraitKey(key);
+      
       if (Array.isArray(value)) {
         value.forEach(item => {
           if (item && typeof item === 'string') {
-            traits.push(formatTraitValue(item));
+            traits.push(`${label}: ${formatTraitValue(item)}`);
           }
         });
       } else if (typeof value === 'string') {
-        traits.push(`${formatTraitKey(key)}: ${formatTraitValue(value)}`);
+        traits.push(`${label}: ${formatTraitValue(value)}`);
       }
     });
   }
   
   return traits;
+}
+
+/**
+ * Get all traits from a character as a searchable string for filtering
+ * This creates a comprehensive string that includes all trait data for searching
+ */
+export function getCharacterTraitsForSearch(character: Character): string {
+  const searchableTraits: string[] = [];
+  
+  // Add basic character info
+  searchableTraits.push(character.name.toLowerCase());
+  
+  // Add all traits from getCharacterTraitsArray (already includes prefixes)
+  const formattedTraits = getCharacterTraitsArray(character);
+  searchableTraits.push(...formattedTraits.map(trait => trait.toLowerCase()));
+  
+  // Add appearance, personality, and backstory for comprehensive search
+  if (character.appearance) {
+    searchableTraits.push(`appearance: ${character.appearance.toLowerCase()}`);
+  }
+  if (character.personality) {
+    searchableTraits.push(`personality: ${character.personality.toLowerCase()}`);
+  }
+  if (character.backstory_hook) {
+    searchableTraits.push(`backstory: ${character.backstory_hook.toLowerCase()}`);
+  }
+  
+  // Add quest, dialogue, and item data for comprehensive search
+  if (character.quests && character.quests.length > 0) {
+    character.quests.forEach(quest => {
+      searchableTraits.push(`quest: ${quest.title.toLowerCase()}`);
+      searchableTraits.push(`quest: ${quest.description.toLowerCase()}`);
+    });
+  }
+  
+  if (character.dialogue_lines && character.dialogue_lines.length > 0) {
+    character.dialogue_lines.forEach(line => {
+      searchableTraits.push(`dialogue: ${line.toLowerCase()}`);
+    });
+  }
+  
+  if (character.items && character.items.length > 0) {
+    character.items.forEach(item => {
+      // Handle both string items and object items
+      if (typeof item === 'string') {
+        searchableTraits.push(`item: ${item.toLowerCase()}`);
+      } else if (item && typeof item === 'object') {
+        // Cast to any to handle unknown item object structure
+        const itemObj = item as any;
+        // If item is an object, try to access name and description properties
+        if (itemObj.name) {
+          searchableTraits.push(`item: ${String(itemObj.name).toLowerCase()}`);
+        }
+        if (itemObj.description) {
+          searchableTraits.push(`item: ${String(itemObj.description).toLowerCase()}`);
+        }
+        // Also search the entire item as a string if it has a toString method
+        searchableTraits.push(`item: ${String(item).toLowerCase()}`);
+      }
+    });
+  }
+  
+  return searchableTraits.join(' ');
+}
+
+/**
+ * Filter characters by trait search query
+ * Supports partial matches, case-insensitive search, and prefix-aware filtering
+ */
+export function filterCharactersByTraits<T extends { character: Character }>(
+  characters: T[], 
+  searchQuery: string
+): T[] {
+  if (!searchQuery.trim()) return characters;
+  
+  const query = searchQuery.toLowerCase().trim();
+  
+  return characters.filter(stored => {
+    const searchableContent = getCharacterTraitsForSearch(stored.character);
+    
+    // Support multiple search terms (space-separated)
+    const searchTerms = query.split(/\s+/);
+    
+    // All search terms must match (AND logic)
+    return searchTerms.every(term => {
+      // Support both "trait:value" and "value" search patterns
+      if (term.includes(':')) {
+        // Direct prefix:value search
+        return searchableContent.includes(term);
+      } else {
+        // Partial match search - matches anywhere in the content
+        return searchableContent.includes(term);
+      }
+    });
+  });
+}
+
+/**
+ * Get unique trait values from characters for filter dropdowns
+ * This extracts all possible values for each trait category
+ */
+export function getUniqueTraitValues<T extends { character: Character }>(characters: T[]): {
+  [category: string]: string[]
+} {
+  const traitValues: { [category: string]: Set<string> } = {};
+  
+  characters.forEach(stored => {
+    const traits = getCharacterTraitsArray(stored.character);
+    
+    traits.forEach(trait => {
+      if (trait.includes(':')) {
+        const [category, value] = trait.split(':', 2);
+        const categoryKey = category.trim().toLowerCase();
+        const categoryValue = value.trim();
+        
+        if (!traitValues[categoryKey]) {
+          traitValues[categoryKey] = new Set();
+        }
+        traitValues[categoryKey].add(categoryValue);
+      }
+    });
+  });
+  
+  // Convert Sets to sorted arrays
+  const result: { [category: string]: string[] } = {};
+  Object.entries(traitValues).forEach(([category, valueSet]) => {
+    result[category] = Array.from(valueSet).sort();
+  });
+  
+  return result;
+}
+
+/**
+ * Normalize trait data to ensure consistent prefix format
+ * This should be called when saving or updating character data
+ */
+export function normalizeCharacterTraits(character: Character): Character {
+  const normalized = JSON.parse(JSON.stringify(character)) as Character;
+  
+  // Ensure selected_traits are properly formatted
+  if (normalized.selected_traits) {
+    // Process personality_traits to ensure they don't already have prefixes
+    if (normalized.selected_traits.personality_traits && Array.isArray(normalized.selected_traits.personality_traits)) {
+      normalized.selected_traits.personality_traits = normalized.selected_traits.personality_traits.map(trait => {
+        if (typeof trait === 'string') {
+          // Remove existing "Personality: " prefix if present
+          return trait.replace(/^personality:\s*/i, '');
+        }
+        return trait;
+      });
+    }
+  }
+  
+  // Ensure added_traits are properly formatted
+  if (normalized.added_traits) {
+    Object.entries(normalized.added_traits).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        // Remove any existing prefixes from array values
+        (normalized.added_traits as any)[key] = value.map(item => {
+          if (typeof item === 'string') {
+            // Remove category prefix if it exists (e.g., "Skills: archery" -> "archery")
+            const colonIndex = item.indexOf(':');
+            return colonIndex !== -1 ? item.substring(colonIndex + 1).trim() : item;
+          }
+          return item;
+        });
+      } else if (typeof value === 'string') {
+        // Remove category prefix if it exists
+        const colonIndex = value.indexOf(':');
+        (normalized.added_traits as any)[key] = colonIndex !== -1 ? value.substring(colonIndex + 1).trim() : value;
+      }
+    });
+  }
+  
+  return normalized;
 }
 
 /**
@@ -277,6 +422,7 @@ export function sanitizeUserInput(input: string): string {
     // Trim leading/trailing whitespace
     return sanitized.trim();
 }
+
 /**
  * Compresses a base64 image to a smaller size while maintaining reasonable quality
  * @param base64Image - The base64 image data URL to compress

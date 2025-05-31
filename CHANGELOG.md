@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Comprehensive trait filtering system with dropdown filters for all character trait categories (personality, occupation, species, social class, height, build, homeland, etc.)
+- Automatic trait discovery that creates filter dropdowns based on existing character data
+- Enhanced trait display system showing all traits with category prefixes (e.g., "Personality: brave", "Occupation: knight")
+- Organized filter panel with collapsible interface and categorized sections (Basic Information, Physical Traits, Background & Social, Personality)
+
+### Changed
+- Search functionality enhanced to intelligently handle trait-specific queries using "category: value" syntax
+- Library filtering logic upgraded to support both dropdown filters and trait search simultaneously
+- Filter panel redesigned with expandable sections and improved organization
+
 ## [0.17.0] - 2025-05-28
 
 ### Added

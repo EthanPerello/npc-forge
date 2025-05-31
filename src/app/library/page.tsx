@@ -6,8 +6,8 @@ import { getStoredCharacters, deleteCharacter, initializeLibrary, StoredCharacte
 import { Character } from '@/lib/types';
 import CharacterCard from '@/components/character-card';
 import Button from '@/components/ui/button';
-import { Library, Search, Upload, X, RefreshCw, ArrowUp } from 'lucide-react';
-import { downloadJson } from '@/lib/utils';
+import { Library, Search, Upload, X, RefreshCw, ArrowUp, Filter, ChevronDown } from 'lucide-react';
+import { downloadJson, filterCharactersByTraits, getUniqueTraitValues } from '@/lib/utils';
 import StickyFooter from '@/components/sticky-footer';
 import FilterPanel from '@/components/library/filter-panel';
 import CharacterViewerModal from '@/components/library/character-viewer-modal';
@@ -17,11 +17,24 @@ export default function CharacterLibraryPage() {
   
   // State variables
   const [characters, setCharacters] = useState<StoredCharacter[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(''); // Single unified search
+  
+  // Basic filter state
   const [selectedGenre, setSelectedGenre] = useState<string>('');
   const [selectedAlignment, setSelectedAlignment] = useState<string>('');
   const [selectedGender, setSelectedGender] = useState<string>('');
   const [selectedRelationship, setSelectedRelationship] = useState<string>('');
+  
+  // Extended trait filter state
+  const [selectedPersonality, setSelectedPersonality] = useState<string>('');
+  const [selectedOccupation, setSelectedOccupation] = useState<string>('');
+  const [selectedSpecies, setSelectedSpecies] = useState<string>('');
+  const [selectedSocialClass, setSelectedSocialClass] = useState<string>('');
+  const [selectedHeight, setSelectedHeight] = useState<string>('');
+  const [selectedBuild, setSelectedBuild] = useState<string>('');
+  const [selectedHomeland, setSelectedHomeland] = useState<string>('');
+  
+  // Other state
   const [isJsonViewerOpen, setIsJsonViewerOpen] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState<StoredCharacter | null>(null);
   const [fullCharacter, setFullCharacter] = useState<Character | null>(null);
@@ -149,12 +162,22 @@ export default function CharacterLibraryPage() {
     setSelectedAlignment('');
     setSelectedGender('');
     setSelectedRelationship('');
+    setSelectedPersonality('');
+    setSelectedOccupation('');
+    setSelectedSpecies('');
+    setSelectedSocialClass('');
+    setSelectedHeight('');
+    setSelectedBuild('');
+    setSelectedHomeland('');
   };
   
-  // Extract unique values for filters
+  // Extract unique values for all trait filters using enhanced utilities
+  const traitValues = getUniqueTraitValues(characters);
+  
+  // Basic filter arrays (backwards compatibility)
   const genres = Array.from(new Set(characters.map(char => 
     char.character.selected_traits.genre || 'unknown'
-  )));
+  ).filter(g => g !== 'unknown')));
   
   const alignments = Array.from(new Set(characters
     .filter(char => char.character.selected_traits.moral_alignment)
@@ -171,34 +194,103 @@ export default function CharacterLibraryPage() {
     .map(char => char.character.selected_traits.relationship_to_player as string)
   ));
   
-  // Filter characters based on search and all filters
-  const filteredCharacters = characters.filter(char => {
-    // Search query filter
-    const matchesSearch = searchQuery === '' || 
-      char.character.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (char.character.selected_traits.genre && 
-       char.character.selected_traits.genre.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (char.character.appearance && 
-       char.character.appearance.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    // Genre filter
-    const matchesGenre = selectedGenre === '' || 
-      char.character.selected_traits.genre === selectedGenre;
-    
-    // Alignment filter
-    const matchesAlignment = selectedAlignment === '' || 
-      char.character.selected_traits.moral_alignment === selectedAlignment;
-    
-    // Gender filter
-    const matchesGender = selectedGender === '' || 
-      char.character.selected_traits.gender === selectedGender;
-    
-    // Relationship filter
-    const matchesRelationship = selectedRelationship === '' || 
-      char.character.selected_traits.relationship_to_player === selectedRelationship;
-    
-    return matchesSearch && matchesGenre && matchesAlignment && matchesGender && matchesRelationship;
-  });
+  // Extract comprehensive trait arrays
+  const personalityTraits = traitValues.personality || [];
+  const occupations = traitValues.occupation || [];
+  const species = traitValues.species || [];
+  const socialClasses = traitValues['social class'] || [];
+  const heights = traitValues.height || [];
+  const builds = traitValues.build || [];
+  const homelands = traitValues.homeland || [];
+  
+  // COMPREHENSIVE: Enhanced filtering logic combining all search types and trait filters
+  const filteredCharacters = (() => {
+    let filtered = characters;
+
+    // Apply basic dropdown filters
+    if (selectedGenre) {
+      filtered = filtered.filter(char => 
+        char.character.selected_traits.genre === selectedGenre
+      );
+    }
+
+    if (selectedAlignment) {
+      filtered = filtered.filter(char => 
+        char.character.selected_traits.moral_alignment === selectedAlignment
+      );
+    }
+
+    if (selectedGender) {
+      filtered = filtered.filter(char => 
+        char.character.selected_traits.gender === selectedGender
+      );
+    }
+
+    if (selectedRelationship) {
+      filtered = filtered.filter(char => 
+        char.character.selected_traits.relationship_to_player === selectedRelationship
+      );
+    }
+
+    // Apply comprehensive trait filters using trait search
+    if (selectedPersonality) {
+      filtered = filterCharactersByTraits(filtered, `personality: ${selectedPersonality}`);
+    }
+
+    if (selectedOccupation) {
+      filtered = filterCharactersByTraits(filtered, `occupation: ${selectedOccupation}`);
+    }
+
+    if (selectedSpecies) {
+      filtered = filterCharactersByTraits(filtered, `species: ${selectedSpecies}`);
+    }
+
+    if (selectedSocialClass) {
+      filtered = filterCharactersByTraits(filtered, `social class: ${selectedSocialClass}`);
+    }
+
+    if (selectedHeight) {
+      filtered = filterCharactersByTraits(filtered, `height: ${selectedHeight}`);
+    }
+
+    if (selectedBuild) {
+      filtered = filterCharactersByTraits(filtered, `build: ${selectedBuild}`);
+    }
+
+    if (selectedHomeland) {
+      filtered = filterCharactersByTraits(filtered, `homeland: ${selectedHomeland}`);
+    }
+
+    // Apply unified search - handles both basic and trait search intelligently
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      
+      // Check if it looks like a trait search (contains colon)
+      const isTraitSearch = query.includes(':');
+      
+      if (isTraitSearch) {
+        // Use comprehensive trait filtering
+        filtered = filterCharactersByTraits(filtered, searchQuery);
+      } else {
+        // Use combined basic + trait search
+        filtered = filtered.filter(char => {
+          // Basic search in name, genre, appearance
+          const basicMatch = char.character.name.toLowerCase().includes(query) ||
+            (char.character.selected_traits.genre && 
+             char.character.selected_traits.genre.toLowerCase().includes(query)) ||
+            (char.character.appearance && 
+             char.character.appearance.toLowerCase().includes(query));
+          
+          // Also search in comprehensive traits (without prefix requirement)
+          const traitMatch = filterCharactersByTraits([char], query).length > 0;
+          
+          return basicMatch || traitMatch;
+        });
+      }
+    }
+
+    return filtered;
+  })();
   
   // Format filter value for display
   const formatFilterValue = (value: string): string => {
@@ -374,12 +466,24 @@ export default function CharacterLibraryPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   
-  // Count of active filters
+  // Handle search input changes
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+  
+  // Count of active filters (including all trait filters)
   const activeFilterCount = [
     selectedGenre, 
     selectedAlignment, 
     selectedGender, 
-    selectedRelationship
+    selectedRelationship,
+    selectedPersonality,
+    selectedOccupation,
+    selectedSpecies,
+    selectedSocialClass,
+    selectedHeight,
+    selectedBuild,
+    selectedHomeland
   ].filter(Boolean).length;
 
   // If there's a database error, show a reset option
@@ -414,7 +518,7 @@ export default function CharacterLibraryPage() {
   
   return (
     <div className="container mx-auto px-4 py-6 md:py-8 pb-40 md:pb-32">
-      {/* Header and search UI */}
+      {/* Header */}
       <div className="mb-6 md:mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h1 className="text-2xl md:text-3xl font-bold flex items-center">
           <Library className="h-6 w-6 md:h-8 md:w-8 mr-2 text-indigo-600 dark:text-indigo-400" />
@@ -431,18 +535,18 @@ export default function CharacterLibraryPage() {
         />
       </div>
       
-      {/* Search bar - full width */}
-      <div className="mb-4">
+      {/* CLEAN SEARCH BAR */}
+      <div className="mb-4 relative">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <Search className="h-5 w-5 text-gray-400" />
           </div>
           <input
             type="text"
-            placeholder="Search by name, genre, or description..."
-            className="w-full pl-10 p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
+            placeholder="Search characters... Try: 'Kira', 'personality: brave', 'archer', 'female magic', 'quest: dragon'"
+            className="w-full pl-10 pr-12 p-3 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary text-base"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearchChange}
           />
           {searchQuery && (
             <button
@@ -456,31 +560,69 @@ export default function CharacterLibraryPage() {
         </div>
       </div>
       
-      {/* Filter Panel Component */}
-      <FilterPanel
-        genres={genres}
-        alignments={alignments}
-        genders={genders}
-        relationships={relationships}
-        selectedGenre={selectedGenre}
-        selectedAlignment={selectedAlignment}
-        selectedGender={selectedGender}
-        selectedRelationship={selectedRelationship}
-        setSelectedGenre={setSelectedGenre}
-        setSelectedAlignment={setSelectedAlignment}
-        setSelectedGender={setSelectedGender}
-        setSelectedRelationship={setSelectedRelationship}
-        resetFilters={resetFilters}
-        isFilterExpanded={isFilterExpanded}
-        setIsFilterExpanded={setIsFilterExpanded}
-        activeFilterCount={activeFilterCount}
-        formatFilterValue={formatFilterValue}
-      />
+      {/* COMPREHENSIVE Filter Panel with improved event handling */}
+      <div onClick={(e) => e.stopPropagation()}>
+        <FilterPanel
+          genres={genres}
+          alignments={alignments}
+          genders={genders}
+          relationships={relationships}
+          personalityTraits={personalityTraits}
+          occupations={occupations}
+          species={species}
+          socialClasses={socialClasses}
+          heights={heights}
+          builds={builds}
+          homelands={homelands}
+          selectedGenre={selectedGenre}
+          selectedAlignment={selectedAlignment}
+          selectedGender={selectedGender}
+          selectedRelationship={selectedRelationship}
+          selectedPersonality={selectedPersonality}
+          selectedOccupation={selectedOccupation}
+          selectedSpecies={selectedSpecies}
+          selectedSocialClass={selectedSocialClass}
+          selectedHeight={selectedHeight}
+          selectedBuild={selectedBuild}
+          selectedHomeland={selectedHomeland}
+          traitSearchQuery="" // Not used in this version
+          setSelectedGenre={setSelectedGenre}
+          setSelectedAlignment={setSelectedAlignment}
+          setSelectedGender={setSelectedGender}
+          setSelectedRelationship={setSelectedRelationship}
+          setSelectedPersonality={setSelectedPersonality}
+          setSelectedOccupation={setSelectedOccupation}
+          setSelectedSpecies={setSelectedSpecies}
+          setSelectedSocialClass={setSelectedSocialClass}
+          setSelectedHeight={setSelectedHeight}
+          setSelectedBuild={setSelectedBuild}
+          setSelectedHomeland={setSelectedHomeland}
+          setTraitSearchQuery={() => {}} // Not used in this version
+          resetFilters={resetFilters}
+          isFilterExpanded={isFilterExpanded}
+          setIsFilterExpanded={setIsFilterExpanded}
+          activeFilterCount={activeFilterCount}
+          formatFilterValue={formatFilterValue}
+        />
+      </div>
       
-      {/* Character count */}
-      <p className="mb-4 text-muted">
-        {filteredCharacters.length} {filteredCharacters.length === 1 ? 'character' : 'characters'} found
-      </p>
+      {/* Character count and results */}
+      <div className="mb-4 flex items-center justify-between">
+        <p className="text-muted">
+          {filteredCharacters.length} {filteredCharacters.length === 1 ? 'character' : 'characters'} found
+          {activeFilterCount > 0 || searchQuery.trim() ? (
+            <span className="ml-2">
+              <button
+                onClick={resetFilters}
+                className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm underline"
+                type="button"
+              >
+                Clear all filters
+              </button>
+            </span>
+          ) : null}
+        </p>
+      </div>
       
       {/* Character grid */}
       {filteredCharacters.length > 0 ? (
@@ -572,17 +714,28 @@ export default function CharacterLibraryPage() {
           <Library className="h-12 w-12 mx-auto text-gray-400 mb-4" />
           <h3 className="text-xl font-medium mb-2">No characters found</h3>
           <p className="text-muted mb-4">
-            {searchQuery || selectedGenre || selectedAlignment || selectedGender || selectedRelationship 
+            {searchQuery || activeFilterCount > 0
               ? "Try adjusting your search or filters" 
               : "Your character library is empty. Generate or import characters to get started."}
           </p>
-          <Button
-            variant="primary"
-            onClick={() => router.push('/')}
-            type="button"
-          >
-            Create a Character
-          </Button>
+          <div className="flex gap-2 justify-center">
+            <Button
+              variant="primary"
+              onClick={() => router.push('/')}
+              type="button"
+            >
+              Create a Character
+            </Button>
+            {(searchQuery || activeFilterCount > 0) && (
+              <Button
+                variant="secondary"
+                onClick={resetFilters}
+                type="button"
+              >
+                Clear Filters
+              </Button>
+            )}
+          </div>
         </div>
       )}
       
@@ -622,7 +775,7 @@ export default function CharacterLibraryPage() {
       {/* Sticky Footer */}
       <StickyFooter 
         pageType="library"
-        libraryFilterCount={activeFilterCount}
+        libraryFilterCount={activeFilterCount + (searchQuery.trim() ? 1 : 0)}
         onClearFilters={resetFilters}
         showImport={true}
         onImport={() => {
