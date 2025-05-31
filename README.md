@@ -37,7 +37,7 @@ Try NPC Forge live at: [https://npc-forge-ethan-perellos-projects.vercel.app/](h
 
 ## 🔄 New in v0.13.0: Wizard Interface
 
-![Character Creation Wizard](https://via.placeholder.com/800x400/6366f1/ffffff?text=Character+Creation+Wizard)
+![Character Creation Wizard](/public/images/concept-step.png)
 
 - **Step-by-Step Creation**: Concept → Options → Model → Generate
 - **Progress Tracking**: Sticky progress bar with clickable navigation
