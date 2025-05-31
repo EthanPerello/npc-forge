@@ -1,6 +1,6 @@
 import { Character, CharacterFormData } from './types';
 import { exampleCharacters } from './example-characters';
-import { compressImage, getBase64Size, isValidImageData } from './utils';
+import { compressImage, getBase64Size, isValidImageData, normalizeCharacterTraits } from './utils';
 
 const DB_NAME = 'npc-forge-db';
 const DB_VERSION = 1;
@@ -295,9 +295,8 @@ export async function deleteImage(characterId: string): Promise<void> {
 }
 
 /**
- * Save a single character to IndexedDB
- * CRITICAL CHANGE: This function now preserves the original character object completely
- * It creates a separate copy for storage without mutating the input
+ * Save a single character to IndexedDB with trait normalization
+ * CRITICAL CHANGE: This function now normalizes trait data before saving
  * @param character - The character to save (WILL NOT BE MODIFIED)
  * @param formData - Optional form data used to generate the character
  * @param isExample - Whether this is an example character
@@ -308,16 +307,17 @@ export async function saveCharacter(
   formData?: CharacterFormData, 
   isExample = false
 ): Promise<StoredCharacter> {
-  console.log("Starting character save process...");
+  console.log("Starting character save process with trait normalization...");
   
-  // CRITICAL: Create a deep copy immediately to avoid ANY mutation of the original
+  // CRITICAL: Create a deep copy and normalize traits immediately
   const originalCharacter = JSON.parse(JSON.stringify(character)) as Character;
+  const normalizedCharacter = normalizeCharacterTraits(originalCharacter);
   
   // Generate a unique ID for the character
-  const characterId = generateCharacterId(originalCharacter);
+  const characterId = generateCharacterId(normalizedCharacter);
   
   // Create a copy specifically for storage (this one we can modify)
-  const storageCharacter = JSON.parse(JSON.stringify(originalCharacter)) as Character;
+  const storageCharacter = JSON.parse(JSON.stringify(normalizedCharacter)) as Character;
   
   // Process image if available
   let hasStoredImage = false;
@@ -373,48 +373,57 @@ export async function saveCharacter(
     }
     
     // Save other traits if not already present
-    if (formData.gender && !storageCharacter.selected_traits.gender) {
-      storageCharacter.selected_traits.gender = formData.gender;
-    }
+    const traitMappings = [
+      { form: 'gender', storage: 'gender' },
+      { form: 'age_group', storage: 'age_group' },
+      { form: 'moral_alignment', storage: 'moral_alignment' },
+      { form: 'relationship_to_player', storage: 'relationship_to_player' }
+    ];
     
-    if (formData.age_group && !storageCharacter.selected_traits.age_group) {
-      storageCharacter.selected_traits.age_group = formData.age_group;
-    }
-    
-    if (formData.moral_alignment && !storageCharacter.selected_traits.moral_alignment) {
-      storageCharacter.selected_traits.moral_alignment = formData.moral_alignment;
-    }
-    
-    if (formData.relationship_to_player && !storageCharacter.selected_traits.relationship_to_player) {
-      storageCharacter.selected_traits.relationship_to_player = formData.relationship_to_player;
-    }
+    traitMappings.forEach(({ form, storage }) => {
+      if ((formData as any)[form] && !(storageCharacter.selected_traits as any)[storage]) {
+        (storageCharacter.selected_traits as any)[storage] = (formData as any)[form];
+      }
+    });
     
     // Advanced options
     if (formData.advanced_options) {
+      // Handle individual advanced options with proper type assertions
       if (formData.advanced_options.species && !storageCharacter.selected_traits.species) {
-        storageCharacter.selected_traits.species = formData.advanced_options.species;
+        (storageCharacter.selected_traits as any).species = formData.advanced_options.species;
       }
-      
       if (formData.advanced_options.occupation && !storageCharacter.selected_traits.occupation) {
-        storageCharacter.selected_traits.occupation = formData.advanced_options.occupation;
+        (storageCharacter.selected_traits as any).occupation = formData.advanced_options.occupation;
+      }
+      if (formData.advanced_options.social_class && !storageCharacter.selected_traits.social_class) {
+        (storageCharacter.selected_traits as any).social_class = formData.advanced_options.social_class;
+      }
+      if (formData.advanced_options.height && !storageCharacter.selected_traits.height) {
+        (storageCharacter.selected_traits as any).height = formData.advanced_options.height;
+      }
+      if (formData.advanced_options.build && !storageCharacter.selected_traits.build) {
+        (storageCharacter.selected_traits as any).build = formData.advanced_options.build;
+      }
+      if (formData.advanced_options.distinctive_features && !storageCharacter.selected_traits.distinctive_features) {
+        (storageCharacter.selected_traits as any).distinctive_features = formData.advanced_options.distinctive_features;
+      }
+      if (formData.advanced_options.homeland && !storageCharacter.selected_traits.homeland) {
+        (storageCharacter.selected_traits as any).homeland = formData.advanced_options.homeland;
       }
       
+      // Handle personality traits array
       if (formData.advanced_options.personality_traits && 
           formData.advanced_options.personality_traits.length > 0 && 
           !storageCharacter.selected_traits.personality_traits) {
         storageCharacter.selected_traits.personality_traits = [...formData.advanced_options.personality_traits];
       }
-      
-      if (formData.advanced_options.social_class && !storageCharacter.selected_traits.social_class) {
-        storageCharacter.selected_traits.social_class = formData.advanced_options.social_class;
-      }
     }
   }
   
-  // Create a new stored character object using the storage character
+  // Create a new stored character object using the normalized storage character
   const newStoredCharacter: StoredCharacter = {
     id: characterId,
-    character: storageCharacter,  // This is the copy without image_data
+    character: storageCharacter,  // This is the normalized copy without image_data
     createdAt: new Date().toISOString(),
     isExample,
     formData,
@@ -440,7 +449,7 @@ export async function saveCharacter(
         const request = store.put(newStoredCharacter);
         
         request.onsuccess = () => {
-          console.log(`Character ${characterId} saved to IndexedDB`);
+          console.log(`Character ${characterId} saved to IndexedDB with normalized traits`);
           resolve();
         };
         
@@ -458,14 +467,14 @@ export async function saveCharacter(
       }
     });
     
-    // CRITICAL: Return a stored character that references the ORIGINAL character
-    // This way the caller still has all the original data including image_data
+    // CRITICAL: Return a stored character that references the NORMALIZED original character
+    // This way the caller still has all the original data including image_data, but normalized
     const returnCharacter: StoredCharacter = {
       ...newStoredCharacter,
-      character: originalCharacter  // Return with the complete original character
+      character: normalizedCharacter  // Return with the complete normalized character
     };
     
-    console.log('Character save complete - returning character with image_data intact');
+    console.log('Character save complete - returning normalized character with image_data intact');
     return returnCharacter;
   } catch (error) {
     console.error('Error saving character:', error);
@@ -539,7 +548,7 @@ export async function deleteCharacter(id: string): Promise<boolean> {
 }
 
 /**
- * Update an existing character in IndexedDB
+ * Update an existing character in IndexedDB with trait normalization
  * @param id - ID of the character to update
  * @param updatedChar - Updated character data
  * @param updatedFormData - Optional updated form data
@@ -558,8 +567,9 @@ export async function updateCharacter(
       return false; // Character not found
     }
     
-    // Create a deep copy of the updated character
-    const characterCopy = JSON.parse(JSON.stringify(updatedChar)) as Character;
+    // Create a deep copy and normalize the updated character
+    const normalizedCharacter = normalizeCharacterTraits(updatedChar);
+    const characterCopy = JSON.parse(JSON.stringify(normalizedCharacter)) as Character;
     
     // Handle image updates
     let hasStoredImage = existingChar.hasStoredImage || false;
@@ -621,7 +631,7 @@ export async function updateCharacter(
         const request = store.put(updatedStoredChar);
         
         request.onsuccess = () => {
-          console.log(`Character ${id} updated in IndexedDB`);
+          console.log(`Character ${id} updated in IndexedDB with normalized traits`);
           resolve(true);
         };
         
