@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.0] - 2025-06-02
+
 ### Added
 - Automatic documentation content loading system that reads directly from markdown files in docs/ directory
 - Related Documentation cross-reference sections to contributing, credits, FAQ, license, and roadmap documentation pages
@@ -498,7 +500,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Export to JSON feature
 - Fully responsive UI for desktop and mobile
 
-[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.18.0...HEAD
+[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.19.0...HEAD
+[0.19.0]: https://github.com/EthanPerello/npc-forge/compare/v0.18.0...v0.19.0
 [0.18.0]: https://github.com/EthanPerello/npc-forge/compare/v0.17.0...v0.18.0
 [0.17.0]: https://github.com/EthanPerello/npc-forge/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/EthanPerello/npc-forge/compare/v0.15.1...v0.16.0
