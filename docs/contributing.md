@@ -4,19 +4,11 @@ Thank you for your interest in contributing to NPC Forge! This document provides
 
 ## Table of Contents
 
-- [Code of Conduct](#code-of-conduct)
 - [Getting Started](#getting-started)
 - [Development Workflow](#development-workflow)
 - [Pull Request Process](#pull-request-process)
 - [Coding Standards](#coding-standards)
-- [Documentation](#documentation)
-- [Testing](#testing)
-- [Release Process](#release-process)
 - [Communication](#communication)
-
-## Code of Conduct
-
-This project and everyone participating in it is governed by our Code of Conduct. By participating, you are expected to uphold this code. Please report unacceptable behavior to [ethanperello@gmail.com](mailto:ethanperello@gmail.com).
 
 ## Getting Started
 
@@ -102,7 +94,7 @@ We use a simplified GitFlow workflow:
    git commit -m "fix: resolve portrait generation error"
    ```
 
-   Prefix your commit messages with one of the following:
+   Prefix your commit messages with:
    - `feat:` for new features
    - `fix:` for bug fixes
    - `docs:` for documentation changes
@@ -179,6 +171,7 @@ When modifying library features:
 - Maintain IndexedDB integration patterns
 - Follow the established component structure in `src/components/edit-page/`
 - Ensure regeneration features work consistently
+- Support the enhanced filtering system (v0.18.0)
 
 ### CSS/Styling
 
@@ -189,89 +182,37 @@ When modifying library features:
 
 ### Code Formatting
 
-The project uses ESLint and Prettier for code formatting. Before submitting a PR:
+The project uses ESLint for code formatting. Before submitting a PR:
 
 ```bash
 npm run lint
 ```
 
-## Documentation
+## Key Development Areas
 
-Documentation is an essential part of the project.
+### Core Features
+- Wizard interface improvements
+- Character library enhancements with filtering
+- Regeneration system refinements
+- Model selection optimization
 
-### Code Documentation
+### UI/UX Improvements
+- Responsive design enhancements
+- Accessibility improvements
+- Performance optimizations
+- Dark mode refinements
 
-- Add JSDoc comments for functions and components
-- Document complex logic with inline comments
-- Update type definitions when making changes
+### API Integration
+- New model support
+- Enhanced error handling
+- Usage tracking improvements
+- Rate limiting enhancements
 
-### User Documentation
-
-Update the relevant Markdown files in the `/docs` directory:
-
-- Add new features to `features.md`
-- Update usage instructions in `how-to-use.md`
-- Add API changes to `api.md`
-- Update security information in `security.md`
-- Document new model features in `models.md`
-- Update library documentation in `library.md`
-
-### README
-
-Keep the README.md up to date with:
-
-- New features
-- Changed requirements
-- Updated screenshots when the UI changes
-
-## Testing
-
-We currently rely on manual testing. When implementing changes:
-
-1. Test your feature in multiple browsers
-2. Test on different screen sizes
-3. Test edge cases and failure modes
-4. Verify performance is acceptable
-5. Test wizard navigation thoroughly
-6. Test character library operations
-7. Test regeneration features if applicable
-
-### Key Testing Areas
-
-#### Wizard Interface
-- Test all step transitions
-- Verify data persistence across navigation
-- Test progress bar functionality
-
-#### Character Library
-- Test CRUD operations
-- Verify search and filtering
-- Test IndexedDB operations
-
-#### Regeneration Features
-- Test individual attribute regeneration
-- Test component-level regeneration
-- Verify model selection affects output
-
-#### Model Selection
-- Test usage limit tracking
-- Verify different model combinations
-- Test monthly reset functionality
-
-## Release Process
-
-The release process is handled by the project maintainers:
-
-1. Update the CHANGELOG.md with the new version
-2. Create a version tag
-3. Update the version in package.json
-4. Create a GitHub release with release notes
-
-## Communication
-
-- **Issues**: Use GitHub Issues for bug reports and feature requests
-- **Discussions**: Use GitHub Discussions for questions and ideas
-- **Email**: Contact the maintainer at [ethanperello@gmail.com](mailto:ethanperello@gmail.com) for private inquiries
+### Storage & Data
+- IndexedDB optimizations
+- Import/export enhancements
+- Search and filtering performance improvements
+- Data validation strengthening
 
 ## Feature Requests
 
@@ -292,45 +233,17 @@ When submitting a feature request:
 
 When submitting a bug report:
 
-1. Use the bug report template
+1. Use clear, descriptive titles
 2. Include clear steps to reproduce
 3. Describe the expected behavior
 4. Include screenshots if applicable
 5. List your browser, OS, and any relevant configuration
 
-## Development Areas
+## Communication
 
-### Core Features
-- Wizard interface improvements
-- Character library enhancements
-- Regeneration system refinements
-- Model selection optimization
-
-### UI/UX Improvements
-- Responsive design enhancements
-- Accessibility improvements
-- Performance optimizations
-- Dark mode refinements
-
-### API Integration
-- New model support
-- Enhanced error handling
-- Usage tracking improvements
-- Rate limiting enhancements
-
-### Storage & Data
-- IndexedDB optimizations
-- Import/export enhancements
-- Search performance improvements
-- Data validation strengthening
-
-## Resources
-
-- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
-- [React Documentation](https://react.dev/)
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [OpenAI API Documentation](https://platform.openai.com/docs/api-reference)
+- **Issues**: Use GitHub Issues for bug reports and feature requests
+- **Discussions**: Use GitHub Discussions for questions and ideas
+- **Email**: Contact the maintainer at [ethanperello@gmail.com](mailto:ethanperello@gmail.com) for private inquiries
 
 ## Development Tips
 
@@ -343,10 +256,19 @@ When submitting a bug report:
 - Understand IndexedDB patterns used
 - Follow established regeneration patterns
 - Test with large character collections
+- Support the enhanced filtering system
 
 ### Model Integration
-- Understand the tiered model system
+- Understand the tiered model system (50/30/10 text, 10/5/3 images per month)
 - Test usage limit functionality
 - Verify error handling across models
+
+## Resources
+
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+- [React Documentation](https://react.dev/)
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [OpenAI API Documentation](https://platform.openai.com/docs/api-reference)
 
 Thank you for contributing to NPC Forge! Your efforts help make the project better for everyone.

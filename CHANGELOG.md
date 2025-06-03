@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Automatic documentation content loading system that reads directly from markdown files in docs/ directory
+- Related Documentation cross-reference sections to contributing, credits, FAQ, license, and roadmap documentation pages
+
+### Changed
+- Documentation system now uses single-source markdown files for easier maintenance and updates
+- Documentation content automatically updates when markdown files are modified without requiring component changes
+- Roadmap documentation updated to remove emojis for cleaner, professional appearance
+- Enhanced markdown rendering with improved visual hierarchy, content grouping, and typography throughout documentation pages
+
 ## [0.18.0] - 2025-05-30
 
 ### Added

@@ -1,255 +1,135 @@
-# 🛠️ NPC Forge: Development Roadmap
+# Development Roadmap
 
-## 📌 Current Version: v0.13.0
+## Current Version: v0.18.0
 
-The current version includes a complete character creation wizard, character library system, regeneration capabilities, model selection, and comprehensive editing features.
+The current version includes a complete character creation wizard, advanced character library system with comprehensive trait filtering, regeneration capabilities, and model selection.
 
 ---
 
-## ✅ Completed Features
+## Completed Features
 
-### Character Creation Wizard (v0.13.0) ✓
-- Step-by-step character creation flow (Concept → Options → Model → Generate)
-- Sticky progress bar with clickable navigation
-- Welcome popup for first-time users
-- Generate Random Character button
-- Redesigned character display layout
-- Legacy tabbed interface removed
+### v0.18.0: Enhanced Filtering System (2025-05-30)
+- Comprehensive trait filtering system with dropdown filters for all character trait categories
+- Automatic trait discovery that creates filter dropdowns based on existing character data
+- Enhanced trait display system showing all traits with category prefixes
+- Organized filter panel with collapsible interface and categorized sections
+- Enhanced search functionality with "category: value" syntax support
+- Combined filtering logic supporting both dropdown filters and trait search simultaneously
 
-### Character Regeneration (v0.12.0) ✓
-- Individual character attribute regeneration (name, appearance, personality, backstory)
-- Portrait regeneration with model selection
-- Quest component regeneration (title, description, reward)
-- Dialogue line regeneration
-- Item regeneration
-- New `/api/regenerate` endpoint
+### v0.17.0: Reliability & Error Handling (2025-05-28)
+- Enhanced error handling with automatic retry logic for portrait generation failures
+- User-friendly error messages with specific guidance for different failure types
+- Comprehensive JSON parsing with multiple fallback strategies to handle malformed AI responses
+- Portrait generation timeout increased from 90 to 120 seconds with automatic retry
+- Character generation now includes timeout protection and enhanced error recovery
 
-### Enhanced Library & Storage (v0.11.0) ✓
-- Model selectors in edit page
-- Portrait upload and regeneration buttons
-- Direct delete buttons on character cards
-- Full IndexedDB migration for character storage
-- Resilient database recovery logic
-- Enhanced library filtering
+### v0.16.0: Portrait Management (2025-05-27)
+- Unsaved changes warning banner on character edit pages when portrait modifications haven't been saved
+- Enhanced error handling with retry logic for portrait generation failures
+- Model-specific tips and generation status indicators in portrait section
 
-### Library Editing Features (v0.10.0) ✓
-- Add/remove quests, dialogue lines, and items
-- Regeneration for newly added elements
-- Individual quest section regeneration
-- Portrait storage with IndexedDB
-- Unlimited trait selection
+### v0.15.0-0.15.1: Navigation & UX (2025-05-23/26)
+- Enhanced navigation layout with header consistency across Edit and Library pages
+- EditPageFooter component for consistent navigation on the Edit screen
+- Success notifications that keep users on current page instead of redirecting
+- Mobile-optimized layouts and responsive improvements
 
-### UI/UX Enhancements (v0.9.0) ✓
-- Sticky footer with quick actions
-- Auto-fill genre descriptions
-- Loading message notifications
-- Enhanced character editing capabilities
-- Improved mobile layout
+### v0.14.0: Portrait Controls (2025-05-22)
+- Include portrait toggle in concept step, allowing users to enable or disable portrait generation
+- Random character generation logic improvements
+- Updated generation limits: Text models: 50 (Standard), 30 (Enhanced), 10 (Premium); Portrait models: 10 (Standard), 5 (Enhanced), 3 (Premium)
+- Single-column layout when no portrait is generated
 
-### Character Library Foundation (v0.8.0) ✓
+### v0.13.0: Wizard Interface (2025-05-15)
+- Redesigned character creation flow with step-by-step wizard interface
+- Four steps: Concept, Options, Model, Generate
+- Sticky top progress bar with clickable navigation
+- Welcome popup for first-time users introducing the flow
+- Generate Random Character button that creates a default character and navigates directly to the final step
+
+### v0.12.0: Character Regeneration (2025-05-09)
+- Character regeneration capabilities in the edit page
+- Individual character attributes (name, appearance, personality, backstory)
+- Portrait images with selected model support
+- Quest regeneration with component-level control (title, description, reward)
+- Dialogue line regeneration with proper formatting
+- Item regeneration with character-appropriate descriptions
+- New API endpoint (/api/regenerate) for handling OpenAI regeneration requests
+
+### Earlier Versions (v0.1.0 - v0.11.1)
+- Core character generation wizard
+- AI-powered character creation with multiple models
 - Character library system with IndexedDB storage
-- Search and filtering functionality
-- Character editing and management
-- JSON import/export
-- Example characters integration
-
-### Model Selection & Dark Mode (v0.7.0) ✓
-- Tiered model system (Standard, Enhanced, Premium)
-- Text models: gpt-4o-mini, gpt-4.1-mini, gpt-4o
-- Image models: dall-e-2, dall-e-3, gpt-image-1
-- Complete dark mode toggle system
-- Per-model usage limits with tracking
-
-### Documentation System (v0.6.0) ✓
-- Comprehensive in-app documentation
-- Visual walkthroughs and examples
-- API documentation
-- Developer setup guides
-
-### Core Features (v0.1.0 - v0.5.0) ✓
-- AI-powered character generation with GPT-4o-mini
-- DALL-E 3 portrait generation
-- Genre and sub-genre system
-- Advanced character customization
+- Model selection system (Standard, Enhanced, Premium tiers)
+- Dark mode support and responsive design
+- Import/export functionality
+- Portrait generation and customization
 - Quest, dialogue, and item generation
-- Usage limits and tracking
-- PWA support and responsive design
 
 ---
 
-## 🚧 Active Development
+## Future Development
 
-### v0.14.0: "Talk to NPC" Chat Interface (In Progress)
-**Goal**: Interactive conversations with generated characters
+### Planned Features
 
-#### Planned Features
-- Chat interface for generated characters
-- AI responses based on character personality
-- Conversation history and persistence
-- Context-aware responses using character traits
-- Usage tracking for chat interactions
-- System prompt customization for character consistency
-- Chat export functionality
+Based on the project design document, future development may include:
 
-**Target Release**: Q2 2025
+**Chat Interface**: Interactive conversations with generated characters
 
----
+**User Accounts & Cloud Features**: Optional account system with cloud sync capabilities
 
-## 🔹 Short-Term Roadmap (Next 3-6 Months)
+**Game Integration**: Tools for integrating characters with game engines and platforms
 
-### v0.15.0: User Accounts & Cloud Features
-**Goal**: Optional account system with cloud sync
+**Advanced Character Features**: Enhanced relationship systems and character development tools
 
-#### Planned Features
-- Optional account creation and authentication
-- Cloud sync for character library
-- Cross-device character access
-- Public gallery of shared NPCs
-- Social features (likes, comments, follows)
-- Profile customization options
-- Enhanced privacy controls
+### Development Approach
 
-**Target Release**: Q3 2025
-
-### v0.16.0: Advanced Generation Features
-**Goal**: Enhanced character creation capabilities
-
-#### Planned Features
-- Character relationship systems
-- Connected character generation (families, groups)
-- Character progression tracking
-- Alternative versions ("what if" scenarios)
-- Batch character generation
-- Template creation and sharing
-
-**Target Release**: Q4 2025
+- **Community Input**: Feature priorities based on user feedback and requests
+- **Incremental Development**: Focus on stability and user experience
+- **Backward Compatibility**: Maintain compatibility with existing character data
 
 ---
 
-## 🔹 Medium-Term Roadmap (6-12 Months)
+## Community Input
 
-### v0.17.0: World Building Tools
-**Goal**: Expand beyond characters to settings
+### How to Influence Development
+- **GitHub Issues**: Report bugs and suggest improvements
+- **GitHub Discussions**: Share ideas and participate in feature discussions
+- **Email Feedback**: Contact [ethanperello@gmail.com](mailto:ethanperello@gmail.com)
 
-#### Planned Features
-- Setting and world generation
-- Location descriptions with AI images
-- Map creation tools
-- Cultural context generation
-- Historical timeline creation
-- Integration with character generation
-
-### v0.18.0: Game Integration Suite
-**Goal**: Direct integration with game engines
-
-#### Planned Features
-- Unity plugin with NPC import
-- Unreal Engine integration
-- Godot support
-- VTT integration (Foundry, Roll20)
-- TTRPG stat block generation (D&D 5e, Pathfinder)
-- Character sheet exports
-
-### v0.19.0: Advanced AI Features
-**Goal**: Next-generation character intelligence
-
-#### Planned Features
-- Advanced personality systems
-- Dynamic memory and decision patterns
-- Character behavior simulation
-- Inter-NPC relationship dynamics
-- Psychological profiling
-- Value system modeling
-
----
-
-## 🔮 Long-Term Vision (v1.0.0+)
-
-### v1.0.0: Stable Release
-**Goal**: Production-ready platform
-
-#### Features
-- Comprehensive testing and stability
-- Performance optimization
-- Accessibility compliance
-- Enhanced documentation
-- Tutorial system
-- Professional tiers
-- Developer API with authentication
-- Server-side usage validation
-
-### Post-1.0 Features
-- Voice generation for dialogue
-- 3D character model generation
-- AR/VR character visualization
-- Real-time collaboration features
-- Marketplace for templates and assets
-- AI narrator for game sessions
-- Advanced analytics and insights
-
----
-
-## 💡 Community Input & Contributing
-
-### How to Influence the Roadmap
-- **GitHub Discussions**: Share ideas and vote on features
-- **Issue Tracker**: Report bugs and suggest improvements
-- **Email Feedback**: Contact ethanperello@gmail.com
-- **Community Surveys**: Participate in periodic feature polls
-
-### For Developers
-- Check out [Contributing Guidelines](/docs/contributing) for development workflow
+### For Contributors
+- Check [Contributing Guidelines](/docs/contributing) for development workflow
 - See [Development Setup](/docs/dev-setup) for getting started
 - Review [Architecture Documentation](/docs/architecture) for system understanding
-- View [Open Issues](https://github.com/EthanPerello/npc-forge/issues) for contribution opportunities
-
-### Evaluation Criteria
-Development priorities are based on:
-1. **User Impact**: How many users will benefit
-2. **Technical Feasibility**: Implementation complexity
-3. **Strategic Alignment**: Fits project vision
-4. **Community Interest**: User votes and requests
-5. **Resource Availability**: Development capacity
 
 ---
 
-## 📊 Resource Allocation
+## Development Priorities
 
-### Current Focus (80% effort)
-- Chat interface development
-- Bug fixes and performance optimization
-- Documentation updates
-
-### Research & Planning (20% effort)
-- User account system architecture
-- Game integration prototypes
-- Advanced AI feature exploration
+Current development focuses on:
+1. **Stability**: Bug fixes and performance improvements
+2. **User Experience**: Interface refinements and usability enhancements
+3. **Core Features**: Enhancing existing functionality
+4. **Community Requests**: Features requested by users
 
 ---
 
-## 🔄 Version Strategy
+## Versioning Strategy
 
 - **Patch (0.x.y)**: Bug fixes and minor improvements
 - **Minor (0.x.0)**: New features and enhancements
-- **Major (1.0.0)**: Stable release with API guarantees
-- **Post-1.0**: Semantic versioning with backward compatibility
+- **Major (1.0.0)**: Stable release milestone
 
 ---
 
-## 📈 Success Metrics
+## Related Documentation
 
-### Development Goals
-- Feature completion on schedule
-- High user satisfaction scores
-- Active community engagement
-- Stable, bug-free releases
-
-### User Experience Goals
-- Intuitive interface design
-- Fast generation times
-- Reliable character storage
-- Positive user feedback
+- [Features Overview](/docs/features) - Current implemented features
+- [Contributing Guidelines](/docs/contributing) - How to contribute to development
+- [Development Setup](/docs/dev-setup) - For getting started with development
+- [Architecture Overview](/docs/architecture) - For understanding system design
+- [How to Use NPC Forge](/docs/how-to-use) - For understanding current capabilities
 
 ---
 
-*Roadmap last updated: May 2025 | Subject to change based on user feedback and development priorities*
+*Roadmap last updated: May 2025 | Plans subject to change based on development priorities and community feedback*

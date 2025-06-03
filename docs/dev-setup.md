@@ -1,10 +1,10 @@
 # Development Setup
 
-This guide will help you set up NPC Forge for local development. Follow these steps to get the project running on your machine.
+This guide will help you set up NPC Forge for local development.
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed:
+Before you begin, ensure you have:
 
 - **Node.js** (v18 or newer)
 - **npm** (v7 or newer)
@@ -26,7 +26,7 @@ cd npc-forge
 npm install
 ```
 
-This will install all the necessary dependencies defined in `package.json`, including:
+This installs all necessary dependencies including:
 - Next.js 14
 - React
 - TypeScript
@@ -36,13 +36,11 @@ This will install all the necessary dependencies defined in `package.json`, incl
 
 ### 3. Configure Environment Variables
 
-Create a `.env.local` file in the root directory with your OpenAI API key:
+Create a `.env.local` file in the root directory:
 
 ```
 OPENAI_API_KEY=your_api_key_here
 ```
-
-This key is required for local development as it allows the application to make requests to OpenAI's API for character generation and portrait creation.
 
 > **Note**: Never commit your `.env.local` file to version control! It's already included in `.gitignore`.
 
@@ -52,15 +50,13 @@ This key is required for local development as it allows the application to make 
 npm run dev
 ```
 
-This will start the development server, typically at [http://localhost:3000](http://localhost:3000).
+This starts the development server at [http://localhost:3000](http://localhost:3000).
 
 ## Understanding Development Mode
 
-NPC Forge includes special features for development:
-
 ### Usage Limit Bypass
 
-In development mode, the app bypasses the usage limits for Enhanced and Premium models. The `isDevMode()` function in `src/lib/usage-limits.ts` detects if you're in development and returns unlimited generations for all models.
+In development mode, the app may bypass usage limits for testing purposes.
 
 ### Character Library
 
@@ -69,18 +65,14 @@ The character library works fully in development mode:
 - All editing and regeneration features are available
 - Example characters are pre-loaded for testing
 
-### Welcome Guide
-
-The welcome guide will always appear in development mode regardless of localStorage, making it easier to test the onboarding flow.
-
 ## Project Structure
 
-Here's an overview of the key directories and files:
+Key directories and files:
 
 ```
 npc-forge/
 ├── public/                  # Static assets
-│   ├── images/              # Images used in the application
+│   ├── images/              # Application images
 │   └── icons/               # App icons and PWA assets
 ├── src/                     # Source code
 │   ├── app/                 # Next.js App Router 
@@ -90,13 +82,10 @@ npc-forge/
 │   │   │   └── proxy-image/ # Image proxy endpoint
 │   │   ├── docs/            # Documentation pages
 │   │   ├── library/         # Character library pages
-│   │   │   └── edit/[id]/   # Character editing pages
 │   │   └── page.tsx         # Homepage with wizard
 │   ├── components/          # React components
 │   │   ├── character-wizard.tsx      # Main wizard component
-│   │   ├── character-library.tsx     # Library interface
 │   │   ├── edit-page/       # Character editing components
-│   │   ├── tabs/            # Tab-based components
 │   │   ├── ui/              # Reusable UI components
 │   │   └── wizard-steps/    # Individual wizard steps
 │   ├── contexts/            # React contexts
@@ -104,21 +93,17 @@ npc-forge/
 │   │   └── theme-context.tsx         # Theme/dark mode state
 │   └── lib/                 # Utility functions and types
 │       ├── character-storage.ts      # IndexedDB operations
-│       ├── image-storage.ts          # Portrait storage
 │       ├── models.ts                 # Model configuration
 │       ├── openai.ts                 # OpenAI API integration
-│       ├── templates.ts              # Character templates
 │       ├── types.ts                  # TypeScript type definitions
-│       ├── usage-limits.ts           # Usage limit tracking
 │       └── utils.ts                  # General utilities
-├── docs/                    # Documentation (Markdown)
 ├── .env.local               # Environment variables (create this)
 ├── next.config.js           # Next.js configuration
 ├── tailwind.config.js       # Tailwind CSS configuration
 └── package.json             # Project dependencies and scripts
 ```
 
-## Workflow for Development
+## Development Workflow
 
 ### Creating New Features
 
@@ -128,12 +113,8 @@ npc-forge/
    ```
 
 2. Implement your changes
-3. Test your changes thoroughly (see [Testing Guide](/docs/testing))
+3. Test your changes thoroughly
 4. Submit a pull request
-
-### Running Tests
-
-Currently, the project relies on manual testing. See the [Testing Guide](/docs/testing) for comprehensive testing procedures.
 
 ### Creating a Production Build
 
@@ -142,22 +123,21 @@ npm run build
 npm run start
 ```
 
-This builds an optimized version of the application and starts it locally.
+This builds an optimized version and starts it locally.
 
 ## API Usage Considerations
 
 When developing locally, be mindful of your OpenAI API usage:
 
-- Character generation costs approximately $0.04-0.40 depending on the model
-- Portrait generation adds another $0.02-0.25 depending on the model
+- Character generation costs vary by model
+- Portrait generation adds additional costs
 - Consider using Standard models during development to minimize costs
-- The development mode bypass means you won't hit usage limits locally
 
-## Development Features
+## Key Development Areas
 
 ### Wizard Interface Development
 
-The wizard is the main interface for character creation, consisting of step components in `src/components/wizard-steps/`:
+The wizard consists of step components in `src/components/wizard-steps/`:
 - `concept-step.tsx`: Genre selection and description
 - `options-step.tsx`: Character traits and customization
 - `model-step.tsx`: AI model selection
@@ -165,7 +145,7 @@ The wizard is the main interface for character creation, consisting of step comp
 
 ### Character Library Development
 
-The library system provides comprehensive character management:
+The library system provides character management:
 - `src/components/character-library.tsx`: Main library interface
 - `src/lib/character-storage.ts`: IndexedDB operations
 - `src/app/library/edit/[id]/page.tsx`: Character editing page
@@ -176,30 +156,6 @@ The regeneration system allows updating specific character elements:
 - Individual attributes (name, appearance, personality, backstory)
 - Portrait images with different models
 - Quest components, dialogue lines, and items
-- Model selection for regeneration
-
-## Customizing the Application
-
-### Adding New Character Options
-
-1. Add the new option to the appropriate type in `src/lib/types.ts`
-2. Update the UI component in the relevant wizard step
-3. Modify the form handling in the character context
-4. Update the OpenAI prompt in `src/app/api/generate/route.ts`
-
-### Modifying the Character Library
-
-The library system consists of:
-- `src/components/character-library.tsx`: Main library interface
-- `src/lib/character-storage.ts`: IndexedDB operations
-- `src/app/library/edit/[id]/page.tsx`: Character editing page
-
-### Adding New AI Models
-
-1. Update model configurations in `src/lib/models.ts`
-2. Add model options to the model selection UI
-3. Update the API endpoints to handle new models
-4. Test with the new models
 
 ## Common Development Tasks
 
@@ -211,27 +167,12 @@ The library system consists of:
 4. Modify the generation prompts to include the trait
 5. Update the character display and editing components
 
-### Modifying the Generation Process
+### Adding New AI Models
 
-The generation flow involves:
-
-1. `src/contexts/character-context.tsx` - Manages wizard state and API calls
-2. `src/app/api/generate/route.ts` - Handles the generation API request
-3. `src/lib/openai.ts` - Contains the logic for interacting with OpenAI
-
-### Adding New Regeneration Options
-
-1. Update the regeneration types in `src/lib/types.ts`
-2. Add regeneration UI to the edit page components
-3. Update `src/app/api/regenerate/route.ts` to handle new types
-4. Test the regeneration flow thoroughly
-
-### Modifying the Character Storage
-
-The IndexedDB implementation is in `src/lib/character-storage.ts`:
-- Character data storage and retrieval
-- Search and filtering functionality
-- Portrait storage with compression
+1. Update model configurations in `src/lib/models.ts`
+2. Add model options to the model selection UI
+3. Update the API endpoints to handle new models
+4. Test with the new models
 
 ## Testing During Development
 
@@ -251,14 +192,6 @@ Test in multiple browsers:
 - Firefox
 - Safari
 - Edge
-
-### Performance Testing
-
-Monitor:
-- Character generation speed
-- Library loading performance
-- IndexedDB operations
-- Image loading and compression
 
 ## Troubleshooting
 
@@ -316,36 +249,8 @@ When contributing to NPC Forge:
 4. Update documentation for new features
 5. Follow the commit message format (see [Contributing Guide](/docs/contributing))
 
-## Key Development Considerations
-
-### Model Selection Integration
-
-The tiered model system affects various parts of the application:
-- Usage tracking per model type
-- Model selection UI components
-- API endpoint handling for different models
-- Regeneration with model switching
-
-### Character State Management
-
-The character context manages:
-- Wizard step state and navigation
-- Form data across all steps
-- Generated character data
-- Library operations and search state
-
-### IndexedDB Integration
-
-The storage system provides:
-- Reliable character persistence
-- Portrait compression and storage
-- Search indexing and retrieval
-- Error handling and recovery
-
 ## Related Documentation
 
 - [Architecture Overview](/docs/architecture) - System design and components
 - [Contributing Guidelines](/docs/contributing) - How to contribute
-- [Testing Guide](/docs/testing) - Testing procedures
 - [API Documentation](/docs/api) - API endpoint details
-- [Character Library Guide](/docs/library) - Library system details

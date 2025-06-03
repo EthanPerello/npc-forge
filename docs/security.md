@@ -4,7 +4,7 @@ This document outlines the security measures implemented in NPC Forge to protect
 
 ## Overview
 
-NPC Forge is designed with security in mind, implementing various measures to protect against common web application vulnerabilities while ensuring user data privacy. As a client-side application that interacts with the OpenAI API, it focuses on secure API communication, input validation, and content moderation.
+NPC Forge is designed with security in mind as a client-side application that interacts with the OpenAI API. It focuses on secure API communication, input validation, and content moderation.
 
 ## Key Security Measures
 
@@ -17,10 +17,8 @@ NPC Forge is designed with security in mind, implementing various measures to pr
 
 2. **Rate Limiting**
    - Usage limits help prevent abuse through client-side tracking
-   - Standard tier: Unlimited usage
-   - Enhanced tier: 30 generations per month
-   - Premium tier: 10 generations per month
-   - Future versions may implement server-side rate limiting
+   - Monthly limits per model tier: 50/30/10 text, 10/5/3 images
+   - Limits reset monthly and are tracked per device
 
 3. **Error Handling**
    - Detailed errors are logged server-side but not exposed to clients
@@ -32,7 +30,6 @@ NPC Forge is designed with security in mind, implementing various measures to pr
 1. **Input Validation**
    - All form inputs are validated before processing
    - Required fields are checked for presence
-   - Enumerations (like gender, age group, etc.) are validated against allowed values
    - Character descriptions are limited to reasonable lengths
 
 2. **Input Sanitization**
@@ -41,33 +38,11 @@ NPC Forge is designed with security in mind, implementing various measures to pr
    - Whitespace is normalized
    - Input length is limited where appropriate
 
-```typescript
-// Input sanitization function
-export function sanitizeUserInput(input: string): string {
-    if (!input) return '';
-    
-    // Remove any control characters
-    let sanitized = input.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
-    
-    // Normalize whitespace (but preserve paragraph breaks)
-    sanitized = sanitized.replace(/[ \t\v\f]+/g, ' ');
-    
-    // Trim leading/trailing whitespace
-    return sanitized.trim();
-}
-```
-
-3. **JSON Validation**
-   - Generated character data is validated against expected structure
-   - Required fields are checked for presence
-   - Error handling for malformed JSON responses
-
 ### Content Moderation
 
 1. **OpenAI Content Policy**
    - Character generation is subject to OpenAI's content policy
    - The API will reject requests for harmful, illegal, or explicit content
-   - Model parameters are tuned to generate appropriate content
 
 2. **Prompt Design**
    - System prompts are designed to generate appropriate content
@@ -88,7 +63,6 @@ export function sanitizeUserInput(input: string): string {
 2. **No User Tracking**
    - No user accounts or authentication required
    - No collection of personal information
-   - No tracking or analytics beyond basic usage counts
    - Usage statistics stored locally only
 
 3. **Data Portability**
@@ -101,13 +75,8 @@ export function sanitizeUserInput(input: string): string {
 1. **XSS Prevention**
    - React's built-in XSS protection for rendering user content
    - Input sanitization before processing
-   - Content Security Policy headers
 
-2. **Clickjacking Protection**
-   - X-Frame-Options headers to prevent clickjacking
-   - Frame-ancestors directive in Content Security Policy
-
-3. **CORS Configuration**
+2. **CORS Configuration**
    - Appropriate CORS settings to control access to resources
    - API routes secured against cross-origin attacks
 
@@ -121,19 +90,16 @@ export function sanitizeUserInput(input: string): string {
 2. **Controlled Regeneration**
    - Users can only regenerate their own locally stored characters
    - Regeneration respects usage limits
-   - No ability to regenerate system-generated examples
 
 ## Potential Vulnerabilities and Mitigations
 
 ### Prompt Injection
 
-**Vulnerability**: Users might attempt to manipulate the AI through carefully crafted inputs that override system instructions.
+**Vulnerability**: Users might attempt to manipulate the AI through carefully crafted inputs.
 
 **Mitigation**:
 - Clear separation between system prompts and user inputs
 - Input validation and sanitization
-- Model parameters tuned to resist injection
-- Prompt structure designed to maintain control
 - Character regeneration uses validated base character data
 
 ### Denial of Service
@@ -145,11 +111,10 @@ export function sanitizeUserInput(input: string): string {
 - Development mode bypass for testing only
 - Input length limitations
 - Graceful handling of API failures
-- Future implementation of server-side rate limiting
 
 ### Content Policy Violations
 
-**Vulnerability**: Users might attempt to generate inappropriate or harmful content.
+**Vulnerability**: Users might attempt to generate inappropriate content.
 
 **Mitigation**:
 - Input validation and sanitization
@@ -163,7 +128,6 @@ export function sanitizeUserInput(input: string): string {
 
 **Mitigation**:
 - Characters stored locally only affect the user's own data
-- No shared character galleries to protect
 - Character validation on import
 - No server-side dependencies on client storage
 
@@ -180,44 +144,6 @@ export function sanitizeUserInput(input: string): string {
 - Usage warnings before high-tier model use
 - No unauthorized access to model APIs
 
-## Security Roadmap
-
-Future security enhancements planned for NPC Forge include:
-
-### Server-Side Rate Limiting (v0.15.0+)
-- Implementation of robust rate limiting per IP
-- Abuse detection and prevention
-- Enhanced monitoring of API usage
-
-### Enhanced Input Validation
-- More comprehensive input validation rules
-- Advanced sanitization for complex inputs
-- Regex-based content filtering
-
-### Optional User Accounts (v0.15.0)
-- If implemented, will include:
-  - Secure authentication practices
-  - Password hashing and salting (bcrypt)
-  - Session management with JWT
-  - Optional multi-factor authentication
-
-### Content Moderation Improvements
-- Enhanced prompt injection detection
-- Community reporting mechanisms (if sharing features added)
-- Automated content review processes
-
-## Security Monitoring
-
-### Error Logging
-- Server-side error logging for security events
-- API failure tracking and analysis
-- No user data included in error logs
-
-### Usage Analytics
-- Basic usage statistics for performance monitoring
-- No personally identifiable information collected
-- Local storage for usage tracking only
-
 ## Security Contact
 
 If you discover a security vulnerability in NPC Forge, please report it by emailing [ethanperello@gmail.com](mailto:ethanperello@gmail.com). Please include:
@@ -226,8 +152,6 @@ If you discover a security vulnerability in NPC Forge, please report it by email
 2. Steps to reproduce
 3. Potential impact
 4. Suggested mitigations (if any)
-
-We take all security reports seriously and will respond as quickly as possible.
 
 ## Security Best Practices for Users
 
@@ -246,21 +170,8 @@ We take all security reports seriously and will respond as quickly as possible.
 - Use browsers with good security track records
 - Be cautious of browser extensions that access local storage
 
-## Compliance and Standards
-
-### Data Protection
-- GDPR compliance through local-only storage
-- No data retention policies needed (user-controlled)
-- Right to deletion through local storage management
-
-### API Usage
-- Compliance with OpenAI's Terms of Service
-- Responsible AI usage practices
-- Content policy adherence
-
 ## Related Documentation
 
 - [API Documentation](/docs/api) - For details on the API implementation
 - [Contributing Guidelines](/docs/contributing) - For contribution workflows
 - [Architecture Overview](/docs/architecture) - For high-level system design
-- [Character Library Guide](/docs/library) - For local storage management
