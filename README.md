@@ -1,6 +1,6 @@
 # NPC Forge
 
-![Site Header](/public/images/site-header.png)
+![Site Header](docs/images/site-header.png)
 
 NPC Forge is an AI-powered character generator for games, tabletop RPGs, and storytelling. Create detailed NPCs with personalities, quests, dialogue, items, and AI-generated portraits.
 
@@ -22,18 +22,19 @@ Try NPC Forge live at: [https://npc-forge-ethan-perellos-projects.vercel.app/](h
 - **Character Regeneration**: Regenerate individual character attributes and portraits
 - **AI Portraits**: Generate character portraits with customizable styles
 - **Complete Character Profiles**: Appearance, personality, backstory, quests, dialogue, and items
-- **Advanced Filtering**: Search and filter characters by traits (v0.18.0)
+- **Advanced Filtering**: Search and filter characters by traits
+- **Enhanced Documentation**: Comprehensive guides and examples with automatic content loading
 - **Import/Export**: JSON import/export for character data
 - **Dark Mode**: Full dark mode support
 - **Responsive Design**: Works on desktop and mobile
 
-## 🔄 New in v0.18.0: Enhanced Filtering System
+## 🔄 New in v0.19.0: Documentation System Overhaul
 
-- **Trait Filtering**: Dropdown filters for character trait categories
-- **Automatic Discovery**: Filters created from existing character data
-- **Enhanced Display**: Traits shown with category prefixes
-- **Smart Search**: Use "category: value" syntax for precise searches
-- **Organized Interface**: Collapsible filter sections
+- **Automatic Documentation Loading**: Content loads directly from markdown files for easier maintenance
+- **Enhanced Visual Hierarchy**: Improved styling and organization throughout all documentation
+- **Smart Content Grouping**: Related information automatically grouped for better readability
+- **Cross-Reference Navigation**: Added "Related Documentation" sections across all guides
+- **Professional Appearance**: Cleaner, more consistent styling across all pages
 
 ## 🛠️ Installation & Development
 
@@ -73,6 +74,21 @@ Try NPC Forge live at: [https://npc-forge-ethan-perellos-projects.vercel.app/](h
 | 🟡 Enhanced | gpt-4.1-mini | dall-e-3 | 30 text / 5 images |
 | 🔴 Premium | gpt-4o | gpt-image-1 | 10 text / 3 images |
 
+## 📖 Documentation
+
+Comprehensive documentation is available at `/docs` including:
+
+- **[How to Use](/docs/how-to-use)** - Complete user guide
+- **[Character Examples](/docs/character-examples)** - Sample characters and use cases  
+- **[Character Library](/docs/library)** - Library management and filtering
+- **[Model Selection](/docs/models)** - Understanding AI model tiers
+- **[Generation Options](/docs/generation-options)** - Detailed customization guide
+- **[Features Overview](/docs/features)** - Complete feature list
+- **[API Documentation](/docs/api)** - Technical API reference
+- **[Development Setup](/docs/dev-setup)** - Local development guide
+- **[Contributing](/docs/contributing)** - How to contribute
+- **[FAQ](/docs/faq)** - Frequently asked questions
+
 ## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -87,6 +103,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🤝 Contributing
 
 For bug reports, feature requests, or questions, please [open an issue](https://github.com/EthanPerello/npc-forge/issues).
+
+For development contributions, see our [Contributing Guide](/docs/contributing).
 
 ## 📞 Contact
 
