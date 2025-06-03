@@ -8,7 +8,6 @@ NPC Forge was created and is maintained by:
 
 - **Ethan Perello** - Design, Development, Documentation
   - GitHub: [EthanPerello](https://github.com/EthanPerello)
-  - Website: [ethanperello.github.io](https://ethanperello.github.io)
   - Email: [ethanperello@gmail.com](mailto:ethanperello@gmail.com)
 
 ## AI Assistance
@@ -42,26 +41,29 @@ NPC Forge is built on these primary technologies:
 
 Character generation is powered by:
 
-- [OpenAI GPT-4o-mini](https://openai.com/) - Text generation
-- [OpenAI DALL-E 3](https://openai.com/) - Portrait generation
-
-## Special Thanks
-
-Special thanks to:
-
-- The open-source community for creating and maintaining the libraries and tools that make this project possible
-- Early users who provided feedback and bug reports
-- The tabletop RPG and game development communities for inspiration
+- [OpenAI](https://openai.com/) - Multiple models for text and image generation including:
+  - Text models: gpt-4o-mini, gpt-4.1-mini, gpt-4o
+  - Image models: dall-e-2, dall-e-3, gpt-image-1
 
 ## Example Characters
 
 The example characters showcased in the documentation were created using NPC Forge:
 
 - **Elarion** - Fantasy High Wizard
-- **Kira-7** - Sci-Fi Cybernetic Antagonist
+- **Kira-7** - Sci-Fi Cybernetic Character
 - **Detective Miles Navarro** - Contemporary Mystery Character
 
-All character portraits were generated with DALL-E 3 using the NPC Forge portrait generation system.
+All character portraits were generated using NPC Forge's AI-powered portrait generation system.
+
+## Open Source Libraries
+
+NPC Forge relies on numerous open-source libraries and tools:
+
+- **Vercel** - Hosting and deployment platform
+- **IndexedDB** - Browser storage API for character library
+- **ESLint** - Code quality and formatting
+- **PostCSS** - CSS processing
+- Various npm packages and dependencies
 
 ## Learning Resources
 
@@ -76,6 +78,14 @@ Development of NPC Forge was informed by these resources:
 ## License
 
 NPC Forge is licensed under the MIT License - see the [LICENSE](license.md) file for details.
+
+## Special Thanks
+
+Special thanks to:
+
+- The open-source community for creating and maintaining the libraries and tools that make this project possible
+- The tabletop RPG and game development communities for inspiration
+- Users who provide feedback and bug reports
 
 ---
 

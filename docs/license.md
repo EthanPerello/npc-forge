@@ -46,11 +46,11 @@ NPC Forge uses several third-party libraries and resources, each with their own 
 
 ### Major Dependencies
 
-- **Next.js** - [MIT License](https://github.com/vercel/next.js/blob/canary/license.md)
-- **React** - [MIT License](https://github.com/facebook/react/blob/main/LICENSE)
-- **TypeScript** - [Apache License 2.0](https://github.com/microsoft/TypeScript/blob/main/LICENSE.txt)
-- **Tailwind CSS** - [MIT License](https://github.com/tailwindlabs/tailwindcss/blob/master/LICENSE)
-- **Lucide Icons** - [ISC License](https://github.com/lucide-icons/lucide/blob/main/LICENSE)
+- **Next.js** - MIT License
+- **React** - MIT License
+- **TypeScript** - Apache License 2.0
+- **Tailwind CSS** - MIT License
+- **Lucide Icons** - ISC License
 
 ### API Usage
 
@@ -64,12 +64,12 @@ The characters and content generated using NPC Forge belong to you, the user. Yo
 
 ### OpenAI Usage Rights
 
-According to OpenAI's policy at the time of writing, content created using their API services belongs to the entity that created it. However, please refer to the most current [OpenAI Terms of Service](https://openai.com/policies/terms-of-service) for any updates to this policy.
+According to OpenAI's policy, content created using their API services belongs to the entity that created it. However, please refer to the most current [OpenAI Terms of Service](https://openai.com/policies/terms-of-service) for any updates to this policy.
 
 ### Project Assets
 
-- The NPC Forge name, logo, and branding elements are proprietary to Ethan Perello.
-- Documentation, example characters, and other project-specific content are provided under the same MIT License as the code unless otherwise specified.
+- The NPC Forge name and branding elements are proprietary to Ethan Perello
+- Documentation and other project-specific content are provided under the same MIT License as the code
 
 ## Contributing
 
@@ -78,6 +78,12 @@ By contributing to NPC Forge, you agree that your contributions will be licensed
 ## Questions
 
 If you have questions about licensing or usage rights, please contact [ethanperello@gmail.com](mailto:ethanperello@gmail.com).
+
+## Related Documentation
+
+- [Credits and Acknowledgments](/docs/credits) - For attribution information
+- [Contributing Guidelines](/docs/contributing) - For contribution terms
+- [Security Documentation](/docs/security) - For security policies
 
 ---
 

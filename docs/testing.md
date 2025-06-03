@@ -1,6 +1,6 @@
 # Testing Guide
 
-This document outlines the testing approach for NPC Forge, including manual testing procedures, potential automated testing strategies, and best practices for ensuring quality.
+This document outlines the testing approach for NPC Forge, including manual testing procedures and best practices for ensuring quality.
 
 ## Current Testing Approach
 
@@ -22,19 +22,17 @@ NPC Forge currently relies on manual testing for quality assurance. This documen
 - [ ] **Options Step**
   - [ ] Basic traits (gender, age, alignment, relationship) can be selected
   - [ ] Advanced options expand/collapse correctly
-  - [ ] Personality traits allow multiple selection (unlimited)
+  - [ ] Personality traits allow multiple selection
   - [ ] Occupation search dropdown functions properly
   - [ ] Quest/dialogue/item toggles work
   - [ ] Randomize button generates random traits
   - [ ] Clear options resets fields but preserves description
-  - [ ] Progress bar navigation allows jumping to other steps
 
 - [ ] **Model Step**
   - [ ] Text model selection displays usage limits correctly
   - [ ] Image model selection displays usage limits correctly
   - [ ] Portrait customization options function
   - [ ] Usage warnings appear when approaching limits
-  - [ ] Progress bar shows step 3 as active
 
 - [ ] **Generate Step**
   - [ ] Character generation completes successfully
@@ -51,6 +49,13 @@ NPC Forge currently relies on manual testing for quality assurance. This documen
   - [ ] Filter by genre/sub-genre functions
   - [ ] Character viewer modal opens and displays data
   - [ ] Direct action buttons (edit, delete, download) work
+
+- [ ] **Enhanced Filtering (v0.18.0)**
+  - [ ] Trait filtering dropdowns appear and function
+  - [ ] Smart search with "category: value" syntax works
+  - [ ] Filter panels are organized and collapsible
+  - [ ] Automatic trait discovery creates appropriate filters
+  - [ ] Combined filtering and search work together
 
 - [ ] **Character Editing**
   - [ ] Edit page loads character data correctly
@@ -104,18 +109,10 @@ NPC Forge currently relies on manual testing for quality assurance. This documen
 - [ ] Multi-select functionality for personality traits
 - [ ] Searchable dropdowns filter correctly
 
-#### Character Display
-
-- [ ] Character information displays correctly
-- [ ] Tab system for character details works
-- [ ] Portrait displays properly
-- [ ] JSON data can be viewed
-- [ ] Download functionality works
-
 #### Model Selection Interface
 
 - [ ] Model tiers display correctly with indicators
-- [ ] Usage limits show current status
+- [ ] Usage limits show current status (50/30/10 text, 10/5/3 images)
 - [ ] Model descriptions are accurate
 - [ ] Selection persists across navigation
 
@@ -147,9 +144,9 @@ NPC Forge currently relies on manual testing for quality assurance. This documen
 
 ### Usage Limits
 
-- [ ] Standard tier shows unlimited correctly
-- [ ] Enhanced tier tracks 30/month limit
-- [ ] Premium tier tracks 10/month limit
+- [ ] Standard tier shows 50 text/10 images correctly
+- [ ] Enhanced tier tracks 30 text/5 images limit
+- [ ] Premium tier tracks 10 text/3 images limit
 - [ ] Usage persists across browser sessions
 - [ ] Monthly reset functionality works
 - [ ] Development mode bypasses limits
@@ -174,30 +171,34 @@ To properly test NPC Forge, you should have:
 
 ## Testing Specific Features
 
-### Testing the Wizard Interface
+### Testing the Enhanced Filtering System (v0.18.0)
 
-1. **Navigation Testing**:
-   - Complete the full wizard flow multiple times
-   - Navigate backwards and forwards between steps
-   - Test direct navigation via progress bar
-   - Verify data persistence across navigation
+1. **Filter Creation Testing**:
+   - Create characters with various traits
+   - Verify filters automatically appear for new traits
+   - Test filter categorization and organization
 
-2. **Step Completion Testing**:
-   - Test each step with minimal data
-   - Test each step with maximal data
-   - Test validation on required fields
+2. **Search Functionality Testing**:
+   - Test general text search
+   - Test trait-specific search syntax (`category: value`)
+   - Test combined filtering and search
+
+3. **Filter Panel Testing**:
+   - Test collapsible sections
+   - Verify filter organization by category
+   - Test filter clearing functionality
 
 ### Testing Model Selection
 
 1. **Usage Limit Testing**:
    - Generate characters with different model combinations
-   - Verify usage counts increment correctly
+   - Verify usage counts increment correctly (50/30/10 text, 10/5/3 images)
    - Test behavior when approaching limits
    - Verify monthly reset functionality
 
 2. **Model Quality Testing**:
    - Compare outputs between model tiers
-   - Test mixed model selections (e.g., Standard text + Enhanced image)
+   - Test mixed model selections
 
 ### Testing Character Regeneration
 
@@ -212,22 +213,7 @@ To properly test NPC Forge, you should have:
    - Verify dialogue and item regeneration
    - Test add/remove functionality with regeneration
 
-### Testing Library Management
-
-1. **CRUD Operations**:
-   - Create characters and save to library
-   - Read/view characters from library
-   - Update characters through editing
-   - Delete characters from library
-
-2. **Search and Filtering**:
-   - Test search with various queries
-   - Test filter combinations
-   - Verify results update in real-time
-
 ## Manual Testing Procedure
-
-Follow this procedure when testing new features or changes:
 
 1. **Preparation**
    - Start with a clean development environment
@@ -245,6 +231,7 @@ Follow this procedure when testing new features or changes:
    - Test model selection variations
    - Test character regeneration features
    - Test library management operations
+   - Test enhanced filtering system
    - Test edge cases and error conditions
 
 4. **Cross-browser Testing**
@@ -258,143 +245,6 @@ Follow this procedure when testing new features or changes:
    - Ensure text is readable and forms are usable
    - Test in both portrait and landscape orientations
 
-6. **Performance Testing**
-   - Monitor generation times across models
-   - Test library performance with many characters
-   - Verify IndexedDB operations are efficient
-
-## Testing Scenarios
-
-### Character Generation Scenarios
-
-1. **Minimal Input Character**
-   - Only description provided
-   - Default model selections
-   - Basic traits only
-
-2. **Fully Customized Character**
-   - Detailed description
-   - All advanced options filled
-   - Premium models selected
-   - All components enabled
-
-3. **Different Genre Characters**
-   - Test each main genre
-   - Test multiple sub-genres
-   - Verify genre-specific templates work
-
-### Regeneration Scenarios
-
-1. **Selective Regeneration**
-   - Regenerate only appearance
-   - Regenerate specific quest components
-   - Change models between regenerations
-
-2. **Bulk Regeneration**
-   - Regenerate multiple elements
-   - Test regeneration performance
-   - Verify data consistency
-
-### Library Scenarios
-
-1. **Small Library (< 10 characters)**
-   - Test basic operations
-   - Verify search and filtering
-
-2. **Large Library (50+ characters)**
-   - Test performance
-   - Test search efficiency
-   - Test scroll and pagination behavior
-
-## Future Automated Testing
-
-While NPC Forge currently relies on manual testing, future development should include automated testing. Here are recommendations for implementing automated tests:
-
-### Unit Tests
-
-Implement unit tests for:
-- Utility functions in `/src/lib/utils.ts`
-- Context providers and state management
-- API route handlers (mocking OpenAI responses)
-- Character storage operations
-
-Recommended tools:
-- Jest
-- React Testing Library
-
-### Integration Tests
-
-Implement integration tests for:
-- Wizard flow completion
-- Character library operations
-- Regeneration workflows
-- Model selection and usage tracking
-
-Recommended tools:
-- Cypress
-- Playwright
-
-### E2E Tests
-
-Implement end-to-end tests for:
-- Complete user journeys
-- Cross-browser compatibility
-- Mobile functionality
-
-Recommended tools:
-- Cypress
-- Playwright
-
-### Visual Regression Tests
-
-Consider visual regression tests for:
-- Wizard step interfaces
-- Character display layouts
-- Library grid layouts
-
-Recommended tools:
-- Percy
-- Chromatic
-
-## Testing Best Practices
-
-1. **Test Early and Often**
-   - Test changes as you implement them
-   - Don't wait until a feature is complete to test
-
-2. **Document Test Cases**
-   - Keep a record of tested scenarios
-   - Update test documentation when adding features
-
-3. **Isolate Issues**
-   - When finding a bug, create a minimal reproduction
-   - Document steps to reproduce issues
-
-4. **Cross-Browser Compatibility**
-   - Always test in multiple browsers
-   - Pay special attention to Safari and Edge
-
-5. **Accessibility Testing**
-   - Test keyboard navigation
-   - Check contrast ratios
-   - Verify screen reader compatibility
-
-## Reporting Issues
-
-When reporting issues found during testing:
-
-1. **Create a GitHub Issue**
-   - Use clear, descriptive titles
-   - Include detailed steps to reproduce
-   - Specify the expected vs. actual behavior
-   - Include screenshots or recordings when possible
-
-2. **Issue Severity**
-   - Critical: Application crash, data loss, security vulnerability
-   - Major: Feature not working, blocking functionality
-   - Minor: Cosmetic issues, non-blocking bugs
-   - Enhancement: Suggestions for improvement
-
 ## Performance Testing
 
 ### Generation Performance
@@ -406,7 +256,7 @@ When reporting issues found during testing:
 ### Library Performance
 
 - Test library loading with large numbers of characters
-- Monitor search performance with complex queries
+- Monitor search and filtering performance with complex queries
 - Verify IndexedDB operation efficiency
 
 ### UI Performance
@@ -415,29 +265,28 @@ When reporting issues found during testing:
 - Monitor rendering performance on different devices
 - Verify smooth animations and transitions
 
-## Release Testing
+## Troubleshooting
 
-Before each release, perform these additional tests:
+### Generation Issues
 
-1. **Regression Testing**
-   - Verify all existing features still work
-   - Check for unintended side effects
+- **Failed Generation**: Check internet connection, try simpler descriptions
+- **Portrait Issues**: Reduce portrait specifications or try different art style
+- **Unexpected Results**: Refine description or adjust trait selections
 
-2. **Integration Testing**
-   - Test the complete user workflow
-   - Verify all features work together correctly
+### Limit Issues
 
-3. **Documentation Review**
-   - Ensure documentation is up to date
-   - Update README and CHANGELOG
+- **Reached Limit**: Wait for monthly reset or switch to Standard tier
+- **Unexpected Usage**: Check which models are selected and their individual limits
 
-4. **Final Cross-Browser Check**
-   - Complete test suite in all supported browsers
-   - Verify mobile compatibility
+### Filtering Issues
+
+- **Missing Filters**: Ensure characters with those traits are saved to library
+- **Search Not Working**: Check trait-specific search syntax
+- **Slow Performance**: Test with smaller character collections
 
 ## Related Documentation
 
+- [How to Use NPC Forge](/docs/how-to-use) - Complete user guide
+- [Features Overview](/docs/features) - Complete feature list
+- [Character Library Guide](/docs/library) - Library management features
 - [Contributing Guidelines](/docs/contributing) - For contribution workflows
-- [Development Setup](/docs/dev-setup) - For development environment
-- [Architecture Overview](/docs/architecture) - For system understanding
-- [Character Library Guide](/docs/library) - For library feature testing

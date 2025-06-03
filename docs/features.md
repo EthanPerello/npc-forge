@@ -1,95 +1,75 @@
 # NPC Forge Features
 
-NPC Forge offers a comprehensive set of tools for creating rich, detailed non-player characters for your games, stories, and creative projects. This document outlines all available features.
+NPC Forge offers tools for creating detailed non-player characters for your games, stories, and creative projects.
 
 ## Core Features
 
 ### Wizard-Based Character Creation (v0.13.0)
 
-![Character Creation Steps](/public/images/concept-step.png)
-
-- **Step-by-Step Process**: Guided creation through four distinct steps
+- **Step-by-Step Process**: Four-step guided creation
   - **Concept Step**: Genre selection and character description
-  - **Options Step**: Detailed trait and attribute customization  
-  - **Model Step**: AI model selection for text and images
-  - **Generate Step**: Character generation and results display
-- **Progress Tracking**: Sticky progress bar with clickable navigation between steps
-- **Welcome Guide**: Introduction popup for first-time users
-- **Quick Generation**: "Generate Random Character" button for instant results
-- **Step-Aware Controls**: Context-sensitive footer with Continue, Back, and New Character buttons
+  - **Options Step**: Trait and attribute customization  
+  - **Model Step**: AI model selection
+  - **Generate Step**: Character generation and results
+- **Progress Tracking**: Progress bar with step navigation
+- **Welcome Guide**: Introduction popup for new users
+- **Quick Generation**: "Generate Random Character" button
 
-### Character Library System
+### Character Library System (v0.8.0+)
 
-![Character Library](/public/images/character-library.png)
-
-- **Complete CRUD Operations**: Create, Read, Update, Delete characters
-- **Local Storage**: Uses IndexedDB for reliable character storage
-- **Character Management**:
-  - Save generated characters to your library
-  - Edit existing characters with full customization
-  - Delete characters with direct action buttons
-  - Search and filter your collection
+- **CRUD Operations**: Create, Read, Update, Delete characters
+- **Local Storage**: IndexedDB for character storage
+- **Character Management**: Save, edit, and delete characters
 - **Import/Export**: JSON import/export for character data
-- **Example Characters**: Pre-loaded sample characters for inspiration
-- **Character Cards**: Visual cards with portraits and quick actions
+- **Example Characters**: Pre-loaded sample characters
+
+### Enhanced Filtering System (v0.18.0)
+
+- **Trait Filtering**: Dropdown filters for character trait categories
+- **Automatic Discovery**: Filters created from existing character data
+- **Enhanced Display**: Traits shown with category prefixes (e.g., "Personality: brave")
+- **Organized Interface**: Collapsible filter sections
+- **Smart Search**: "category: value" syntax for searches
+- **Combined Filtering**: Use multiple filters and search simultaneously
 
 ### Character Regeneration (v0.12.0)
 
-- **Individual Attribute Regeneration**: Regenerate specific character elements
-  - Name
-  - Appearance
-  - Personality
-  - Backstory
-- **Portrait Regeneration**: Update character portraits with different models
-- **Component-Level Regeneration**:
-  - Individual quest elements (title, description, reward)
-  - Dialogue lines
-  - Item descriptions
-- **Loading States**: Visual feedback during regeneration
-- **Success/Error Messages**: Clear feedback for regeneration operations
+- **Individual Attribute Regeneration**: Name, appearance, personality, backstory
+- **Portrait Regeneration**: Update portraits with different models
+- **Component-Level Regeneration**: Individual quest, dialogue, and item elements
+- **Model Selection**: Choose different AI models for regeneration
 
-### AI-Powered Character Generation
+### AI-Powered Generation
 
-- **Multiple AI Models**: Choose from different quality tiers
-- **Rich Text Descriptions**: Detailed paragraphs for appearance, personality, and backstory
-- **Backstory Hooks**: Concise hooks that set up character motivations
-- **Special Abilities**: Unique powers or skills that make each character distinctive
+- **Multiple AI Models**: Standard, Enhanced, and Premium tiers
+- **Character Profiles**: Appearance, personality, and backstory descriptions
+- **Backstory Hooks**: Character motivation setup
+- **Quest Generation**: Quests with title, description, and reward
+- **Dialogue Lines**: Character-specific dialogue
+- **Item Inventories**: Character items with descriptions
 
 ### AI Portrait Generation
 
 - **Multiple Image Models**: dall-e-2, dall-e-3, and gpt-image-1
-- **Portrait Customization**: Control art style, mood, framing, and background
-- **Visual Consistency**: Images match character descriptions and traits
-- **Portrait Storage**: Images saved locally with IndexedDB
-
-### Comprehensive Character Elements
-
-- **Quest Generation**: Create quests including title, description, reward, and type
-- **Dialogue Lines**: Generate character-specific dialogue with customizable tone and context
-- **Item Inventories**: Create lists of items with customizable categories and rarity
+- **Portrait Customization**: Art style, mood, framing, and background options
+- **Portrait Storage**: Images saved locally
 
 ## Customization Options
 
-### Genre & Template System
+### Genre System
 
 - **Core Genres**: Fantasy, Science Fiction, Historical, Contemporary
-- **Sub-Genres**: 16 specialized templates within each core genre:
-  - **Fantasy**: High Fantasy, Dark Fantasy, Urban Fantasy, Sword & Sorcery
-  - **Sci-Fi**: Space Opera, Cyberpunk, Post-Apocalyptic, Hard Sci-Fi
-  - **Historical**: Medieval, Ancient Civilizations, Renaissance, Age of Sail
-  - **Contemporary**: Urban Life, Mystery & Thriller, Supernatural, Slice of Life
+- **Sub-Genres**: 16 specialized templates within each genre
 
 ### Model Selection System (v0.7.0)
 
-![Model Selection](/public/images/model-step.png)
+| Tier | Text Model | Image Model | Monthly Limit |
+|------|------------|-------------|---------------|
+| 🟢 Standard | gpt-4o-mini | dall-e-2 | 50 text / 10 images |
+| 🟡 Enhanced | gpt-4.1-mini | dall-e-3 | 30 text / 5 images |
+| 🔴 Premium | gpt-4o | gpt-image-1 | 10 text / 3 images |
 
-| Tier | Text Model | Image Model | Monthly Limit | Best For |
-|------|------------|-------------|---------------|----------|
-| 🟢 Standard | gpt-4o-mini | dall-e-2 | Unlimited | Frequent generations |
-| 🟡 Enhanced | gpt-4.1-mini | dall-e-3 | 30/month | Higher quality |
-| 🔴 Premium | gpt-4o | gpt-image-1 | 10/month | Maximum detail |
-
-### Character Trait Customization
+### Character Trait Options
 
 #### Basic Traits
 - **Gender**: Male, Female, Nonbinary, Unknown
@@ -98,113 +78,73 @@ NPC Forge offers a comprehensive set of tools for creating rich, detailed non-pl
 - **Relationship to Player**: Ally, Enemy, Neutral, Mentor, Rival, Betrayer
 
 #### Advanced Options
-- **Physical Traits**
-  - Height (Very Short to Very Tall)
-  - Build (Thin/Slender to Heavy/Large)
-  - Distinctive Features (custom text input)
-- **Background Elements**
-  - Social Class (Lower Class to Upper Class/Nobility)
-  - Homeland/Origin (custom text input)
+- **Physical Traits**: Height, build, distinctive features
+- **Background Elements**: Social class, homeland/origin
 - **Occupation**: Searchable dropdown with genre-specific options
-- **Personality Traits**: Multi-select system (unlimited selection)
+- **Personality Traits**: Multi-select system
 
-### Quest Customization
+### Content Customization
 
-- **Number of Quests**: 1-3 quests per character
-- **Quest Types**: Fetch/Collect, Defeat/Combat, Rescue/Escort, Deliver/Courier, Investigate/Mystery, Exploration, Crafting/Building, Stealth/Heist, Diplomatic
-- **Reward Types**: Money/Currency, Item/Equipment, Information/Knowledge, Reputation/Standing, Skill/Training, Companion/Ally, Property/Land
+- **Quest Options**: Number, types, and reward types
+- **Dialogue Options**: Number of lines, tone, and context
+- **Item Options**: Number, rarity distribution, and categories
+- **Portrait Options**: Art style, expression, framing, and background
 
-### Dialogue Customization
-
-- **Number of Lines**: 3-10 dialogue lines
-- **Dialogue Tone**: Friendly, Formal, Mysterious, Aggressive, Cautious, Eccentric, Scholarly, Humorous, Melancholic
-- **Dialogue Context**: First Meeting, Giving a Quest, Discussing Quest Progress, Quest Completion, Bargaining/Trading, During Combat, Casual Conversation
-
-### Item Customization
-
-- **Number of Items**: 3-10 items
-- **Rarity Distribution**: Balanced, Mostly Common, Mostly Uncommon, Include Rare Items, Themed by Character
-- **Item Categories**: Weapons, Armor & Clothing, Potions & Consumables, Scrolls & Books, Tools & Utility Items, Jewelry & Accessories, Artifacts & Relics, Food & Drink, Currency & Valuables, Crafting Materials, Technology & Gadgets (Sci-Fi), Magical Items (Fantasy)
-
-### Portrait Customization
-
-- **Art Style**: Realistic, Fantasy Art, Anime/Manga, Comic Book, Pixel Art, Oil Painting, Watercolor, 3D Render
-- **Expression/Mood**: Neutral, Happy/Smiling, Serious, Angry, Sad, Determined, Mysterious, Heroic
-- **Framing**: Portrait (Head/Shoulders), Bust (Upper Body), Full Body, Action Pose
-- **Background**: Plain/Solid Color, Gradient, Themed (Based on Character), Environmental, Abstract
-
-## Utility Features
+## User Interface Features
 
 ### Character Editing (v0.10.0+)
 
-![Character Edit Page](/public/images/edit-page.png)
+- **Full Editing**: Modify all character attributes
+- **Add/Remove Elements**: Quests, dialogue, and items
+- **Regeneration Controls**: Regenerate specific elements
+- **Portrait Management**: Upload or regenerate portraits
 
-- **Full Character Editing**: Modify all character attributes
-- **Add/Remove Elements**: Dynamically add or remove quests, dialogue, and items
-- **Regeneration Controls**: Regenerate specific character elements
-- **Portrait Management**: Upload or regenerate character portraits
-- **Model Selection**: Choose different AI models for regeneration
+### UI Enhancements
 
-### User Interface Enhancements
+- **Dark Mode Support**: Theme toggle with persistence
+- **Responsive Design**: Works on desktop, tablet, and mobile
+- **Loading Feedback**: Progress indicators during generation
+- **Success Notifications**: Visual feedback after actions
 
-- **Dark Mode Support**: Complete dark mode toggle with theme persistence
-- **Responsive Design**: Optimized for desktop, tablet, and mobile
-- **Sticky Footer**: Quick access to generation controls
-- **Auto-fill Features**: Genre descriptions update automatically
-- **Loading Notifications**: Floating messages during character generation
-- **Success Animations**: Visual feedback after character creation
+### Library Management
 
-### Randomization & Management
-
-- **Randomize Options**: Quickly generate random traits for inspiration
-- **Clear Options**: Reset all character traits while preserving description and portrait settings
-
-### Usage Management
-
-- **Per-Model Usage Tracking**: Individual quotas for different AI models
-- **Visual Indicators**: Clear display of remaining generations
-- **Development Bypass**: Unlimited usage in development mode
-- **Monthly Reset**: Automatic limit reset at month start
+- **Search and Filtering**: Find characters by traits and attributes
+- **Character Cards**: Visual display with portraits and actions
+- **Direct Actions**: Edit, download, and delete buttons
+- **Collection Organization**: Use filtering to organize large collections
 
 ## Technical Features
 
-### API Integration
-
-- **Multiple OpenAI Models**: Support for various text and image generation models
-- **Regeneration API**: Dedicated `/api/regenerate` endpoint for character updates
-- **Error Handling**: Graceful fallbacks for API failures
-- **Content Filtering**: Through OpenAI's moderation system
-
 ### Storage & Performance
 
-- **IndexedDB Integration**: Reliable local storage for characters and portraits
-- **Database Recovery**: Resilient storage with validation and recovery logic
-- **Portrait Compression**: Automatic compression and storage of portrait images
-- **Efficient API Usage**: Optimized prompts to minimize token consumption
+- **IndexedDB Integration**: Reliable local storage
+- **Portrait Compression**: Automatic image compression
+- **Database Recovery**: Error handling and recovery
+- **Efficient Filtering**: Optimized search and filter performance
+
+### API Integration
+
+- **Multiple OpenAI Models**: Support for various text and image models
+- **Regeneration API**: Dedicated endpoint for character updates
+- **Error Handling**: Graceful API failure handling
+- **Usage Tracking**: Per-model usage limit tracking
 
 ### Security & Privacy
 
-- **No Server Storage**: Characters stored only locally
-- **Input Sanitization**: Prevents malicious inputs
-- **Client-Side Limits**: Usage tracking without external dependencies
-- **Privacy-First**: No personal data collection or tracking
+- **Local Storage Only**: No server storage of character data
+- **Input Sanitization**: Protection against malicious inputs
+- **Privacy-First**: No personal data collection
 
-## Upcoming Features
+## Usage Management
 
-These features are planned for future releases:
-
-- **"Talk to NPC" Chat Interface** (v0.14.0): Interactive conversations with your characters
-- **User Accounts & Cloud Features** (v0.15.0): Account creation and cloud sync
-- **Game Integration API** (v1.0.0): RESTful API for accessing characters
-- **Advanced Character Features**: Voice generation, 3D models, character relationships
-- **World Building Tools**: Setting generation, maps, and cultural context
-
-See the [Roadmap](/docs/roadmap) for more details on upcoming features.
+- **Per-Model Tracking**: Individual quotas for different AI models
+- **Visual Indicators**: Clear display of remaining generations
+- **Monthly Reset**: Automatic limit reset each month
+- **Development Bypass**: Testing mode for developers
 
 ## Related Documentation
 
 - [How to Use NPC Forge](/docs/how-to-use) - Step-by-step usage guide
-- [Character Library Guide](/docs/library) - Managing your character collection
-- [Generation Options](/docs/generation-options) - Detailed customization options
-- [Character Examples](/docs/character-examples) - Sample generated characters
+- [Character Library Guide](/docs/library) - Library management and filtering
+- [Generation Options](/docs/generation-options) - Detailed customization
 - [Model Selection Guide](/docs/models) - Understanding AI model tiers
