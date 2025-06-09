@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [Unreleased]
+
+### Added
+- Chat with Character page at `/chat/[characterId]` with real-time messaging
+- IndexedDB-based per-character conversation storage
+- Dynamic response lengths based on user input, with a configurable cap
+- Chat initiation button in character library modal and on character cards
+- Usage-limit tracking for chat generations, charged against the selected text-model tier
+
+### Changed
+- Character library and modal: portraits fill containers responsively; uniform card sizing with always-visible names; removed genre badges; simplified search bar placeholder to “Search characters…”; clicking cards opens the modal (portrait zoom removed)
+- Edit page: text- and image-model selectors moved to compact dropdowns at the top; portrait section redesigned for cleaner layout and fewer tips; “unsaved changes” warning expanded to cover all edits
+- Model selector UI redesigned as compact dropdowns with tier badges and improved light-mode contrast
+
+### Fixed
+- Character IDs containing quotes now generate and route correctly  
+- Unified image-loading logic resolves mismatches between library, modal, and edit screens  
+- Chat API route enforces per-model usage limits and prevents mid-message truncation
+
 ## [0.19.0] - 2025-06-02
 
 ### Added

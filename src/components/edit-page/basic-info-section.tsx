@@ -3,7 +3,6 @@
 import React from 'react';
 import { Character, OpenAIModel } from '@/lib/types';
 import Select from '@/components/ui/select';
-import ModelSelector from '@/components/model-selector';
 import { FormSection, RegenerateButton } from './shared';
 import { GENRE_TEMPLATES } from '@/lib/templates';
 
@@ -15,8 +14,6 @@ interface BasicInfoSectionProps {
   currentGenre: string;
   subGenres: {value: string, label: string}[];
   fieldLoadingStates: Record<string, boolean>;
-  selectedTextModel: OpenAIModel;
-  onModelChange: (model: OpenAIModel) => void;
 }
 
 export const BasicInfoSection = ({
@@ -26,9 +23,7 @@ export const BasicInfoSection = ({
   onGenreChange,
   currentGenre,
   subGenres,
-  fieldLoadingStates,
-  selectedTextModel,
-  onModelChange
+  fieldLoadingStates
 }: BasicInfoSectionProps) => {
   return (
     <FormSection title="Basic Information">
@@ -128,18 +123,6 @@ export const BasicInfoSection = ({
             isLoading={fieldLoadingStates['backstory_hook'] || false}
           />
         </div>
-      </div>
-
-      {/* Text Model Selector */}
-      <div className="mb-6 mt-6 p-4 bg-secondary rounded-lg border border-theme">
-        <h3 className="text-lg font-semibold mb-4">Text Generation Model</h3>
-        <p className="text-sm text-muted mb-4">
-          Select which model to use for regenerating any text content in this character.
-        </p>
-        <ModelSelector 
-          value={selectedTextModel}
-          onChange={onModelChange}
-        />
       </div>
     </FormSection>
   );

@@ -1,3 +1,4 @@
+// src/lib/character-storage.ts
 import { Character, CharacterFormData } from './types';
 import { exampleCharacters } from './example-characters';
 import { compressImage, getBase64Size, isValidImageData, normalizeCharacterTraits } from './utils';
@@ -198,51 +199,74 @@ export async function saveImage(characterId: string, imageData: string): Promise
 }
 
 /**
- * Get an image from IndexedDB
+ * FIXED: Get an image from IndexedDB with retry logic for consistency
  * @param characterId - ID of the character to get the image for
  * @returns Promise that resolves with the image data, or null if not found
  */
 export async function getImage(characterId: string): Promise<string | null> {
-  try {
-    const db = await initDB();
-    
-    return new Promise((resolve, reject) => {
-      try {
-        // Verify the object store exists
-        if (!db.objectStoreNames.contains(IMAGE_STORE)) {
-          console.error(`Object store ${IMAGE_STORE} not found. Available stores:`, 
-                     Array.from(db.objectStoreNames));
-          resolve(null); // Return null instead of failing
-          return;
+  // Try multiple times to handle temporary issues
+  const maxRetries = 3;
+  let lastError = null;
+  
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const db = await initDB();
+      
+      const result = await new Promise<string | null>((resolve, reject) => {
+        try {
+          // Verify the object store exists
+          if (!db.objectStoreNames.contains(IMAGE_STORE)) {
+            console.error(`Object store ${IMAGE_STORE} not found. Available stores:`, 
+                       Array.from(db.objectStoreNames));
+            resolve(null); // Return null instead of failing
+            return;
+          }
+          
+          const transaction = db.transaction([IMAGE_STORE], 'readonly');
+          const store = transaction.objectStore(IMAGE_STORE);
+          
+          const request = store.get(characterId);
+          
+          request.onsuccess = () => {
+            const imageData = request.result;
+            console.log(`Image retrieval attempt ${attempt + 1} for character ${characterId}: ${imageData ? 'found' : 'not found'}`);
+            resolve(imageData || null);
+          };
+          
+          request.onerror = (event) => {
+            console.error(`Error getting image from IndexedDB (attempt ${attempt + 1}):`, event);
+            reject('Failed to get image');
+          };
+          
+          transaction.oncomplete = () => {
+            // Don't close the database here to allow reuse
+          };
+          
+          // Add timeout to prevent hanging
+          setTimeout(() => {
+            reject('Image retrieval timeout');
+          }, 5000);
+        } catch (error) {
+          console.error(`Transaction error getting image (attempt ${attempt + 1}):`, error);
+          reject(error);
         }
-        
-        const transaction = db.transaction([IMAGE_STORE], 'readonly');
-        const store = transaction.objectStore(IMAGE_STORE);
-        
-        const request = store.get(characterId);
-        
-        request.onsuccess = () => {
-          const imageData = request.result;
-          resolve(imageData || null);
-        };
-        
-        request.onerror = (event) => {
-          console.error('Error getting image from IndexedDB:', event);
-          reject('Failed to get image');
-        };
-        
-        transaction.oncomplete = () => {
-          // Don't close the database here to allow reuse
-        };
-      } catch (error) {
-        console.error('Transaction error getting image:', error);
-        reject(error);
+      });
+      
+      // If we got a result (even null), return it
+      return result;
+    } catch (error) {
+      lastError = error;
+      console.warn(`Image retrieval attempt ${attempt + 1} failed for character ${characterId}:`, error);
+      
+      // Wait before retrying (with exponential backoff)
+      if (attempt < maxRetries - 1) {
+        await new Promise(resolve => setTimeout(resolve, 100 * Math.pow(2, attempt)));
       }
-    });
-  } catch (error) {
-    console.error('Error in getImage:', error);
-    return null;
+    }
   }
+  
+  console.error(`All ${maxRetries} image retrieval attempts failed for character ${characterId}:`, lastError);
+  return null;
 }
 
 /**
@@ -703,38 +727,76 @@ export async function getCharacterById(id: string): Promise<StoredCharacter | nu
 }
 
 /**
- * Load a character with its image from IndexedDB
+ * FIXED: Load a character with its image from IndexedDB - ensures image consistency with retry logic
  * @param id - ID of the character to load
  * @returns Promise with the complete character or null if not found
  */
 export async function loadCharacterWithImage(id: string): Promise<Character | null> {
-  try {
-    // Get the character from IndexedDB
-    const storedChar = await getCharacterById(id);
-    
-    if (!storedChar) return null;
-    
-    // Create a deep copy of the character
-    const character = JSON.parse(JSON.stringify(storedChar.character)) as Character;
-    
-    // Load the image from IndexedDB if it exists
-    if (storedChar.hasStoredImage) {
-      try {
-        const imageData = await getImage(id);
-        if (imageData) {
-          character.image_data = imageData;
+  const maxRetries = 3;
+  let lastError = null;
+  
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      console.log(`Loading character with image for ID: ${id} (attempt ${attempt + 1})`);
+      
+      // Get the character from IndexedDB
+      const storedChar = await getCharacterById(id);
+      
+      if (!storedChar) {
+        console.log(`No stored character found for ID: ${id}`);
+        return null;
+      }
+      
+      // Create a deep copy of the character
+      const character = JSON.parse(JSON.stringify(storedChar.character)) as Character;
+      
+      // Load the image from IndexedDB if it exists
+      if (storedChar.hasStoredImage) {
+        try {
+          console.log(`Loading image from IndexedDB for character: ${character.name} (attempt ${attempt + 1})`);
+          const imageData = await getImage(id);
+          if (imageData) {
+            character.image_data = imageData;
+            console.log(`Successfully loaded image for character: ${character.name} (${imageData.length} chars)`);
+          } else {
+            console.log(`No image data found in IndexedDB for character: ${character.name} on attempt ${attempt + 1}`);
+            
+            // If this isn't the last attempt, continue to retry
+            if (attempt < maxRetries - 1) {
+              lastError = new Error('Image not found');
+              continue;
+            }
+          }
+        } catch (error) {
+          console.error(`Error loading image from IndexedDB (attempt ${attempt + 1}):`, error);
+          lastError = error;
+          
+          // If this isn't the last attempt, continue to retry
+          if (attempt < maxRetries - 1) {
+            await new Promise(resolve => setTimeout(resolve, 100 * Math.pow(2, attempt)));
+            continue;
+          }
+          // Continue without image if loading fails on final attempt
         }
-      } catch (error) {
-        console.error('Error loading image from IndexedDB:', error);
-        // Continue without image if loading fails
+      } else {
+        console.log(`Character ${character.name} has no stored image flag`);
+      }
+      
+      console.log(`Returning character: ${character.name} with image: ${!!(character.image_data || character.image_url)}`);
+      return character;
+    } catch (error) {
+      lastError = error;
+      console.error(`Error in loadCharacterWithImage (attempt ${attempt + 1}):`, error);
+      
+      // If this isn't the last attempt, wait and retry
+      if (attempt < maxRetries - 1) {
+        await new Promise(resolve => setTimeout(resolve, 100 * Math.pow(2, attempt)));
       }
     }
-    
-    return character;
-  } catch (error) {
-    console.error('Error in loadCharacterWithImage:', error);
-    return null;
   }
+  
+  console.error(`All ${maxRetries} attempts to load character with image failed for ID: ${id}`, lastError);
+  return null;
 }
 
 /**

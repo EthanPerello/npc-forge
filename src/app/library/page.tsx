@@ -1,3 +1,4 @@
+// src/app/library/page.tsx
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -6,7 +7,7 @@ import { getStoredCharacters, deleteCharacter, initializeLibrary, StoredCharacte
 import { Character } from '@/lib/types';
 import CharacterCard from '@/components/character-card';
 import Button from '@/components/ui/button';
-import { Library, Search, Upload, X, RefreshCw, ArrowUp, Filter, ChevronDown } from 'lucide-react';
+import { Library, Search, Upload, X, RefreshCw, ArrowUp, Filter } from 'lucide-react';
 import { downloadJson, filterCharactersByTraits, getUniqueTraitValues } from '@/lib/utils';
 import StickyFooter from '@/components/sticky-footer';
 import FilterPanel from '@/components/library/filter-panel';
@@ -415,7 +416,7 @@ export default function CharacterLibraryPage() {
     
     // Use a small timeout to ensure state is updated before navigation
     setTimeout(() => {
-      router.push(`/library/edit/${id}`);
+      router.push(`/library/edit/${encodeURIComponent(id)}`);
     }, 100);
   };
   
@@ -425,7 +426,7 @@ export default function CharacterLibraryPage() {
     
     setIsNavigating(true);
     setTimeout(() => {
-      router.push(`/library/edit/${selectedCharacter.id}`);
+      router.push(`/library/edit/${encodeURIComponent(selectedCharacter.id)}`);
     }, 100);
   };
   
@@ -535,7 +536,7 @@ export default function CharacterLibraryPage() {
         />
       </div>
       
-      {/* CLEAN SEARCH BAR */}
+      {/* UPDATED SEARCH BAR - Simplified text */}
       <div className="mb-4 relative">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -543,7 +544,7 @@ export default function CharacterLibraryPage() {
           </div>
           <input
             type="text"
-            placeholder="Search characters... Try: 'Kira', 'personality: brave', 'archer', 'female magic', 'quest: dragon'"
+            placeholder="Search characters..."
             className="w-full pl-10 pr-12 p-3 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary text-base"
             value={searchQuery}
             onChange={handleSearchChange}
@@ -624,11 +625,11 @@ export default function CharacterLibraryPage() {
         </p>
       </div>
       
-      {/* Character grid */}
+      {/* Character grid - RESPONSIVE CARDS */}
       {filteredCharacters.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredCharacters.map((storedChar) => (
-            <div key={storedChar.id} className="relative">
+            <div key={storedChar.id} className="relative h-full">
               <CharacterCard 
                 character={storedChar.character}
                 id={storedChar.id}
