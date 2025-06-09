@@ -12,8 +12,6 @@ Generates a new character based on provided parameters.
 
 #### Request Body
 
-The request includes character creation parameters:
-
 ```typescript
 {
   description: string;                    // Character description
@@ -38,7 +36,7 @@ The request includes character creation parameters:
 
 #### Response
 
-Success response (200 OK):
+**Success response (200 OK):**
 
 ```typescript
 {
@@ -57,7 +55,7 @@ Success response (200 OK):
 }
 ```
 
-Error response (400/500):
+**Error response (400/500):**
 
 ```typescript
 {
@@ -84,7 +82,7 @@ Regenerates specific character attributes or elements.
 
 #### Response
 
-Success response (200 OK):
+**Success response (200 OK):**
 
 ```typescript
 {
@@ -92,6 +90,78 @@ Success response (200 OK):
   success: boolean;                   // Operation success status
 }
 ```
+
+### `POST /api/chat`
+
+Handles character conversations with AI-powered responses.
+
+#### Request Body
+
+```typescript
+{
+  characterId: string;                // ID of the character
+  character: Character;               // Complete character object
+  messages: ChatMessage[];            // Previous conversation messages
+  newMessage: string;                 // User's new message (max 1000 chars)
+  model: OpenAIModel;                 // Selected AI model for response
+}
+```
+
+#### Response
+
+**Success response (200 OK):**
+
+```typescript
+{
+  success: true;
+  message: {
+    id: string;                       // Unique message ID
+    role: 'assistant';                // Message role
+    content: string;                  // Character's response
+    timestamp: string;                // ISO timestamp
+    characterId: string;              // Character ID
+  }
+}
+```
+
+**Error response (400/403/500):**
+
+```typescript
+{
+  success: false;
+  error: string;                      // Error message
+  errorType: string;                  // Error category
+}
+```
+
+#### Error Types
+
+• `invalid_request`: Missing fields or invalid data
+• `rate_limit`: Temporary API rate limit reached
+• `quota_exceeded`: Monthly usage limit reached
+• `authentication`: API authentication error
+• `server_error`: Temporary server issues
+• `timeout`: Request timeout
+• `network`: Network connectivity issues
+
+#### Chat Features
+
+**Dynamic Response Lengths:**
+• Simple greetings (< 20 chars): 150 tokens (1-2 sentences)
+• Medium questions (20-100 chars): 200-350 tokens (2-4 sentences)
+• Detailed requests (> 100 chars): 600 tokens (1-2 paragraphs)
+• Maximum cap: 800 tokens to prevent cutoff
+
+**Character Consistency:**
+• System prompts include character traits, personality, and backstory
+• Recent conversation context (last 15 messages) provided
+• Temperature set to 0.8 for natural responses
+• Automatic retry for responses that appear cut off
+
+**Usage Integration:**
+• Checks usage limits before API calls
+• Increments usage count only after successful responses
+• Model switching supported mid-conversation
 
 ### `GET /api/proxy-image`
 
@@ -110,28 +180,28 @@ Proxies external image URLs for CORS compatibility.
 ### Supported Models
 
 **Text Models:**
-- gpt-4o-mini (Standard tier)
-- gpt-4.1-mini (Enhanced tier)  
-- gpt-4o (Premium tier)
+• gpt-4o-mini (Standard tier)
+• gpt-4.1-mini (Enhanced tier)
+• gpt-4o (Premium tier)
 
 **Image Models:**
-- dall-e-2 (Standard tier)
-- dall-e-3 (Enhanced tier)
-- gpt-image-1 (Premium tier)
+• dall-e-2 (Standard tier)
+• dall-e-3 (Enhanced tier)
+• gpt-image-1 (Premium tier)
 
 ### Usage Limits
 
-Based on v0.14.0 changelog:
-
-**Text Models:**
-- Standard: 50 generations per month
-- Enhanced: 30 generations per month
-- Premium: 10 generations per month
+**Text Models (including chat):**
+• Standard: 50 generations per month
+• Enhanced: 30 generations per month
+• Premium: 10 generations per month
 
 **Image Models:**
-- Standard: 10 generations per month
-- Enhanced: 5 generations per month
-- Premium: 3 generations per month
+• Standard: 10 generations per month
+• Enhanced: 5 generations per month
+• Premium: 3 generations per month
+
+> **Note**: Chat conversations count against text model limits
 
 ## Character Generation Flow
 
@@ -141,31 +211,68 @@ Based on v0.14.0 changelog:
 4. **Portrait Generation**: Create character portrait if requested
 5. **Response Formatting**: Return structured character data
 
+## Chat System Flow
+
+1. **Session Management**: Get or create chat session for character
+2. **Context Preparation**: Include character details and recent conversation history
+3. **Input Validation**: Check message length and usage limits
+4. **Response Generation**: Call OpenAI with dynamic token limits
+5. **Response Processing**: Handle cutoff detection and retry logic
+6. **Storage**: Save messages to IndexedDB
+7. **Usage Tracking**: Increment usage count after successful response
+
 ## Regeneration Features
 
 Supports regenerating:
-- Individual character attributes (name, appearance, personality, backstory)
-- Portrait images with different models
-- Quest components (title, description, reward)
-- Dialogue lines
-- Item descriptions
+• Individual character attributes (name, appearance, personality, backstory)
+• Portrait images with different models
+• Quest components (title, description, reward)
+• Dialogue lines
+• Item descriptions
 
 ## Error Handling
 
-- Input validation and sanitization
-- API error categorization and user-friendly messages
-- Timeout protection with retry logic
-- Graceful degradation for failed generations
+### Character Generation
+
+• Input validation and sanitization
+• API error categorization and user-friendly messages
+• Timeout protection with retry logic
+• Graceful degradation for failed generations
+
+### Chat System
+
+• Comprehensive error categorization (rate limits, quotas, network issues)
+• Automatic retry for cut-off responses
+• Usage limit enforcement before API calls
+• Message length validation (1000 character limit)
+• Network timeout handling with 60-second timeout
 
 ## Security Measures
 
-- Server-side API calls to OpenAI (API keys not exposed to client)
-- Input sanitization to prevent malicious content
-- Content filtering through OpenAI's moderation system
-- Rate limiting through client-side usage tracking
+• Server-side API calls to OpenAI (API keys not exposed to client)
+• Input sanitization to prevent malicious content
+• Content filtering through OpenAI's moderation system
+• Rate limiting through client-side usage tracking
+• Message length limits to prevent abuse
+
+## Data Storage
+
+### Character Data
+
+• IndexedDB for character library storage
+• Portrait compression for storage efficiency
+• JSON import/export capabilities
+
+### Chat Data
+
+• IndexedDB for conversation storage per character
+• System prompts with character context
+• Message history with automatic trimming (100 message limit)
+• Complete local storage - no server-side data retention
 
 ## Related Documentation
 
-- [Architecture Overview](architecture.md) - For system design
-- [Model Selection Guide](models.md) - For understanding model tiers
-- [Contributing Guidelines](contributing.md) - For development workflow
+• [Architecture Overview](/docs/architecture) - For system design
+• [Model Selection Guide](/docs/models) - For understanding model tiers
+• [Chat with Characters](/docs/chat) - For chat system usage
+• [Contributing Guidelines](/docs/contributing) - For development workflow

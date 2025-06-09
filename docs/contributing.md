@@ -2,60 +2,52 @@
 
 Thank you for your interest in contributing to NPC Forge! This document provides guidelines and instructions for contributing to the project.
 
-## Table of Contents
-
-- [Getting Started](#getting-started)
-- [Development Workflow](#development-workflow)
-- [Pull Request Process](#pull-request-process)
-- [Coding Standards](#coding-standards)
-- [Communication](#communication)
-
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js v18 or newer
-- npm v7 or newer
-- Git
-- An OpenAI API key for testing
-- A GitHub account
+• Node.js v18 or newer
+• npm v7 or newer
+• Git
+• An OpenAI API key for testing
+• A GitHub account
 
 ### Setting Up the Development Environment
 
-1. **Fork the repository**
+**Fork the repository**
 
-   Click the "Fork" button at the top right of the [NPC Forge repository](https://github.com/EthanPerello/npc-forge).
+Click the "Fork" button at the top right of the [NPC Forge repository](https://github.com/EthanPerello/npc-forge).
 
-2. **Clone your fork**
+**Clone your fork**
 
-   ```bash
-   git clone https://github.com/YOUR-USERNAME/npc-forge.git
-   cd npc-forge
-   ```
+```bash
+git clone https://github.com/YOUR-USERNAME/npc-forge.git
+cd npc-forge
+```
 
-3. **Add the upstream remote**
+**Add the upstream remote**
 
-   ```bash
-   git remote add upstream https://github.com/EthanPerello/npc-forge.git
-   ```
+```bash
+git remote add upstream https://github.com/EthanPerello/npc-forge.git
+```
 
-4. **Install dependencies**
+**Install dependencies**
 
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
-5. **Create a .env.local file**
+**Create a .env.local file**
 
-   ```bash
-   OPENAI_API_KEY=your_api_key_here
-   ```
+```bash
+OPENAI_API_KEY=your_api_key_here
+```
 
-6. **Start the development server**
+**Start the development server**
 
-   ```bash
-   npm run dev
-   ```
+```bash
+npm run dev
+```
 
 ## Development Workflow
 
@@ -63,212 +55,320 @@ Thank you for your interest in contributing to NPC Forge! This document provides
 
 We use a simplified GitFlow workflow:
 
-- `main`: The main branch that always reflects production-ready code
-- `feature/name`: Feature branches for new features and non-critical bugs
-- `fix/name`: Fix branches for critical bug fixes
+• `main`: The main branch that always reflects production-ready code
+• `feature/name`: Feature branches for new features and non-critical bugs
+• `fix/name`: Fix branches for critical bug fixes
 
 ### Working on a Feature or Bug Fix
 
-1. **Create a new branch from main**
+**Create a new branch from main**
 
-   ```bash
-   git checkout main
-   git pull upstream main
-   git checkout -b feature/your-feature-name
-   # or for fixes
-   git checkout -b fix/bug-description
-   ```
+```bash
+git checkout main
+git pull upstream main
+git checkout -b feature/your-feature-name
+# or for fixes
+git checkout -b fix/bug-description
+```
 
-2. **Make your changes**
+**Make your changes**
 
-   Implement your feature or bug fix.
+Implement your feature or bug fix following the coding standards below.
 
-3. **Commit your changes**
+**Test your changes**
 
-   Follow the commit message format:
+• Test character generation and editing functionality
+• Test chat features if your changes affect conversations
+• Verify library operations (save, load, filter, search)
+• Test on both desktop and mobile interfaces
+• Ensure dark mode compatibility
 
-   ```bash
-   git add .
-   git commit -m "feat: add character library feature"
-   # or for fixes
-   git commit -m "fix: resolve portrait generation error"
-   ```
+**Commit your changes**
 
-   Prefix your commit messages with:
-   - `feat:` for new features
-   - `fix:` for bug fixes
-   - `docs:` for documentation changes
-   - `style:` for formatting changes
-   - `refactor:` for code refactoring
-   - `test:` for adding tests
-   - `chore:` for maintenance tasks
+Follow the commit message format:
 
-4. **Keep your branch updated**
+```bash
+git add .
+git commit -m "feat: add character library feature"
+# or for fixes
+git commit -m "fix: resolve portrait generation error"
+```
 
-   ```bash
-   git fetch upstream
-   git rebase upstream/main
-   ```
+**Commit Message Prefixes:**
+• `feat:` for new features
+• `fix:` for bug fixes
+• `docs:` for documentation changes
+• `style:` for formatting changes
+• `refactor:` for code refactoring
+• `test:` for adding tests
+• `chore:` for maintenance tasks
 
-5. **Push your changes**
+**Keep your branch updated**
 
-   ```bash
-   git push origin feature/your-feature-name
-   ```
+```bash
+git fetch upstream
+git rebase upstream/main
+```
+
+**Push your changes**
+
+```bash
+git push origin feature/your-feature-name
+```
 
 ## Pull Request Process
 
-1. **Create a Pull Request**
+**Create a Pull Request**
 
-   Go to the [NPC Forge repository](https://github.com/EthanPerello/npc-forge) and click "New Pull Request".
+Go to the [NPC Forge repository](https://github.com/EthanPerello/npc-forge) and click "New Pull Request".
 
-2. **Fill in the Pull Request template**
+**Fill in the Pull Request template**
 
-   Provide:
-   - A clear and concise description of your changes
-   - The issue number(s) your PR addresses
-   - Screenshots or examples if applicable
-   - Any notes on testing or dependencies
+Provide:
+• A clear and concise description of your changes
+• The issue number(s) your PR addresses (if applicable)
+• Screenshots or examples if applicable
+• Notes on testing performed
+• Any breaking changes or dependencies
 
-3. **Wait for review**
+**Update documentation**
 
-   A maintainer will review your PR and provide feedback. Make any requested changes by adding new commits to your branch.
+• Add your changes to the "Unreleased" section of CHANGELOG.md
+• Update relevant documentation files if your changes affect user-facing features
+• Include code comments for complex logic
 
-4. **Update the CHANGELOG**
+**Wait for review**
 
-   Add your changes to the "Unreleased" section of CHANGELOG.md following the Keep a Changelog format.
+A maintainer will review your PR and provide feedback. Make any requested changes by adding new commits to your branch.
 
-5. **Merge**
+**Merge**
 
-   Once approved, a maintainer will merge your PR.
+Once approved, a maintainer will merge your PR.
 
 ## Coding Standards
 
 ### TypeScript
 
-- Use TypeScript for all new code
-- Define interfaces for all data structures
-- Use explicit typing instead of `any` where possible
-- Use optional chaining and nullish coalescing when appropriate
+• Use TypeScript for all new code
+• Define interfaces for all data structures
+• Use explicit typing instead of `any` where possible
+• Use optional chaining and nullish coalescing when appropriate
+• Follow existing type definitions in `src/lib/types.ts` and `src/lib/chat-types.ts`
 
 ### React
 
-- Use functional components with hooks
-- Keep components small and focused
-- Use React Context for state that needs to be shared across components
-- Follow the React file structure of the existing project
+• Use functional components with hooks
+• Keep components small and focused on a single responsibility
+• Use React Context for state that needs to be shared across components
+• Follow the established file structure and naming conventions
+• Use proper error boundaries for robust error handling
 
-### Wizard Interface Components
+### Component Development Guidelines
 
-When working with the wizard interface:
-- Follow the established step pattern in `src/components/wizard-steps/`
-- Maintain consistent navigation and progress tracking
-- Ensure responsive design across all steps
+**Wizard Interface Components:**
+• Follow the established step pattern in `src/components/wizard-steps/`
+• Maintain consistent navigation and progress tracking
+• Ensure responsive design across all steps
+• Test with various character configurations
 
-### Character Library Components
+**Chat System Components:**
+• Follow patterns established in chat page and context
+• Ensure character consistency in AI responses
+• Handle loading states and error conditions gracefully
+• Test conversation flow and message persistence
 
-When modifying library features:
-- Maintain IndexedDB integration patterns
-- Follow the established component structure in `src/components/edit-page/`
-- Ensure regeneration features work consistently
-- Support the enhanced filtering system (v0.18.0)
+**Character Library Components:**
+• Maintain IndexedDB integration patterns
+• Follow the established component structure in `src/components/edit-page/`
+• Ensure regeneration features work consistently
+• Support the enhanced filtering system
+• Test with large character collections
 
 ### CSS/Styling
 
-- Use Tailwind CSS for styling
-- Follow the existing color scheme and design patterns
-- Ensure responsive design works on mobile devices
-- Use semantic HTML elements
+• Use Tailwind CSS for styling
+• Follow the existing color scheme and design patterns
+• Ensure responsive design works on mobile devices
+• Use semantic HTML elements
+• Test in both light and dark modes
+• Maintain consistency with the established design system
 
 ### Code Formatting
 
-The project uses ESLint for code formatting. Before submitting a PR:
+The project uses ESLint for code quality. Before submitting a PR:
 
 ```bash
 npm run lint
 ```
 
+## Testing Guidelines
+
+### Manual Testing Requirements
+
+Before submitting a PR, test the following areas:
+
+**Core Functionality:**
+• Character generation wizard (all four steps)
+• Character library operations (save, load, edit, delete)
+• Character regeneration features
+• Import/export functionality
+
+**Chat System (if applicable):**
+• Starting conversations from character cards and library
+• Message sending and receiving
+• Character personality consistency
+• Conversation persistence
+• Model selection during chat
+
+**User Interface:**
+• Responsive design on different screen sizes
+• Dark mode functionality
+• Navigation between pages
+• Error handling and user feedback
+
+**Advanced Features:**
+• Enhanced filtering system with trait categories
+• Search functionality with smart syntax
+• Portrait generation and management
+• Usage limit tracking and enforcement
+
+### Chat System Testing
+
+When working on chat-related functionality:
+
+**Character Consistency Testing:**
+• Verify AI maintains character personality
+• Test with different character types and traits
+• Ensure backstory integration in responses
+
+**Conversation Flow Testing:**
+• Test message persistence across browser sessions
+• Verify loading states and error handling
+• Test conversation clearing functionality
+
+**Usage Integration Testing:**
+• Verify chat counts against model limits
+• Test model switching during conversations
+• Ensure usage warnings appear appropriately
+
 ## Key Development Areas
 
 ### Core Features
-- Wizard interface improvements
-- Character library enhancements with filtering
-- Regeneration system refinements
-- Model selection optimization
+
+• Wizard interface improvements and optimizations
+• Character library enhancements with filtering and search
+• Regeneration system refinements and new capabilities
+• Model selection optimization and new model support
+
+### Chat System
+
+• Conversation interface improvements
+• Character personality consistency enhancements
+• Message handling and storage optimizations
+• Integration with character library features
 
 ### UI/UX Improvements
-- Responsive design enhancements
-- Accessibility improvements
-- Performance optimizations
-- Dark mode refinements
+
+• Responsive design enhancements
+• Accessibility improvements and compliance
+• Performance optimizations
+• Dark mode refinements and consistency
 
 ### API Integration
-- New model support
-- Enhanced error handling
-- Usage tracking improvements
-- Rate limiting enhancements
+
+• New model support and integration
+• Enhanced error handling and user feedback
+• Usage tracking improvements and accuracy
+• Rate limiting enhancements
 
 ### Storage & Data
-- IndexedDB optimizations
-- Import/export enhancements
-- Search and filtering performance improvements
-- Data validation strengthening
 
-## Feature Requests
+• IndexedDB optimizations and reliability
+• Import/export enhancements
+• Search and filtering performance improvements
+• Data validation and error recovery
 
-Before submitting a feature request:
+## Feature Development Guidelines
 
-1. Check if the feature already exists
-2. Search existing issues and discussions
-3. Consider if the feature aligns with the project goals
+### Before Starting a Feature
 
-When submitting a feature request:
+1. **Check Existing Issues**: Search for related issues or feature requests
+2. **Discuss Approach**: Comment on issues or create a discussion for major features
+3. **Review Architecture**: Understand how your feature fits into the existing system
+4. **Plan Testing**: Consider how you'll test your feature thoroughly
 
-1. Clearly describe the problem the feature solves
-2. Suggest a solution if possible
-3. Provide examples or mockups if applicable
-4. Indicate if you're willing to implement it yourself
+### When Implementing Features
+
+1. **Follow Established Patterns**: Use existing component and data flow patterns
+2. **Consider Edge Cases**: Handle error conditions and unusual input
+3. **Maintain Consistency**: Follow established UI patterns and terminology
+4. **Document Changes**: Update relevant documentation files
 
 ## Bug Reports
 
 When submitting a bug report:
 
-1. Use clear, descriptive titles
-2. Include clear steps to reproduce
-3. Describe the expected behavior
-4. Include screenshots if applicable
-5. List your browser, OS, and any relevant configuration
+1. **Use Clear Titles**: Describe the issue concisely
+2. **Provide Steps to Reproduce**: Include clear, numbered steps
+3. **Describe Expected Behavior**: What should happen vs. what actually happens
+4. **Include Screenshots**: Visual aids help diagnose UI issues
+5. **List Environment Details**: Browser, OS, and relevant configuration
+6. **Check for Duplicates**: Search existing issues first
+
+## Feature Requests
+
+Before submitting a feature request:
+
+1. **Check Existing Issues**: See if the feature has been requested
+2. **Review the Roadmap**: Check if it's already planned
+3. **Consider Project Goals**: Ensure alignment with project vision
+
+When submitting a feature request:
+
+1. **Describe the Problem**: What user need does this address?
+2. **Suggest a Solution**: Provide implementation ideas if possible
+3. **Provide Examples**: Include mockups or detailed descriptions
+4. **Indicate Willingness**: State if you're willing to implement it
+
+## Documentation Contributions
+
+We welcome documentation improvements:
+
+• **Fix Typos**: Small corrections are always appreciated
+• **Improve Clarity**: Make instructions clearer and more comprehensive
+• **Add Examples**: Provide more examples and use cases
+• **Update Screenshots**: Keep visual guides current with the interface
+• **Translate**: Help make documentation accessible to more users
 
 ## Communication
 
-- **Issues**: Use GitHub Issues for bug reports and feature requests
-- **Discussions**: Use GitHub Discussions for questions and ideas
-- **Email**: Contact the maintainer at [ethanperello@gmail.com](mailto:ethanperello@gmail.com) for private inquiries
+### Channels
 
-## Development Tips
+• **Issues**: Use GitHub Issues for bug reports and feature requests
+• **Discussions**: Use GitHub Discussions for questions and ideas
+• **Email**: Contact the maintainer at [ethanperello@gmail.com](mailto:ethanperello@gmail.com) for private inquiries
 
-### Working with the Wizard
-- Maintain state consistency across steps
-- Follow the established navigation patterns
-- Test with various data combinations
+### Guidelines
 
-### Character Library Development
-- Understand IndexedDB patterns used
-- Follow established regeneration patterns
-- Test with large character collections
-- Support the enhanced filtering system
+• Be respectful and constructive in all communications
+• Provide context and background for your questions or suggestions
+• Search existing issues and discussions before creating new ones
+• Use clear, descriptive titles and descriptions
 
-### Model Integration
-- Understand the tiered model system (50/30/10 text, 10/5/3 images per month)
-- Test usage limit functionality
-- Verify error handling across models
+## Code of Conduct
 
-## Resources
+This project adheres to a code of conduct that ensures a welcoming environment for all contributors. By participating, you agree to:
 
-- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
-- [React Documentation](https://react.dev/)
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [OpenAI API Documentation](https://platform.openai.com/docs/api-reference)
+• Be respectful and inclusive
+• Focus on constructive feedback
+• Help create a positive community
+• Report any inappropriate behavior
 
 Thank you for contributing to NPC Forge! Your efforts help make the project better for everyone.
+
+## Related Documentation
+
+• [Development Setup](/docs/dev-setup) - Local environment configuration
+• [Architecture Overview](/docs/architecture) - System design and components
+• [Testing Guide](/docs/testing) - Comprehensive testing procedures
+• [Security Documentation](/docs/security) - Security considerations and practices
