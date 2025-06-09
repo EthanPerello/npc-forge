@@ -38,14 +38,6 @@ Try NPC Forge live at: [https://npc-forge-ethan-perellos-projects.vercel.app/](h
 - **Integrated Chat Access**: Start conversations directly from character cards and library
 - **Usage Tracking**: Chat generations count against your selected text model tier limits
 
-## 🔄 Recent Updates
-
-### Enhanced User Experience
-- **Improved Character Library**: Responsive portraits, uniform card sizing, simplified search
-- **Streamlined Edit Interface**: Compact model selectors, cleaner portrait management
-- **Enhanced Model Selection**: Redesigned dropdowns with tier badges and better contrast
-- **Comprehensive Trait Filtering**: Automatic filter generation with smart search capabilities
-
 ## 🛠️ Installation & Development
 
 ### Prerequisites
