@@ -1,193 +1,191 @@
+// src/components/character-card.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Character } from '@/lib/types';
 import { getCharacterTraitsArray } from '@/lib/utils';
-import { getImage } from '@/lib/character-storage';
-import { User, Download, Edit, Trash2, Image } from 'lucide-react';
-import Button from '@/components/ui/button';
+import PortraitDisplay from './portrait-display';
+import Button from './ui/button';
+import { 
+  Edit, 
+  Download, 
+  Trash2, 
+  MessageCircle,
+  Image as ImageIcon
+} from 'lucide-react';
 
 interface CharacterCardProps {
   character: Character;
-  id?: string; // Character ID for loading image from IndexedDB
-  onDownload: (e: React.MouseEvent) => void;
-  onEdit?: (e: React.MouseEvent) => void;
-  onDelete?: (e: React.MouseEvent) => void;
-  onDownloadImage?: (e: React.MouseEvent) => void;
+  id?: string;
   onClick?: () => void;
+  onEdit?: (e: React.MouseEvent) => void;
+  onDownload?: (e: React.MouseEvent) => void;
+  onDownloadImage?: (e: React.MouseEvent) => void;
+  onDelete?: (e: React.MouseEvent) => void;
 }
 
-export default function CharacterCard({ 
-  character, 
-  id, 
-  onDownload, 
-  onEdit, 
-  onDelete, 
+export default function CharacterCard({
+  character,
+  id,
+  onClick,
+  onEdit,
+  onDownload,
   onDownloadImage,
-  onClick 
+  onDelete
 }: CharacterCardProps) {
-  const [imageError, setImageError] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
-
-  if (!character) {
-    return null;
-  }
-
-  // Load image from IndexedDB if we have an ID and no direct image data
-  useEffect(() => {
-    const loadImage = async () => {
-      // Reset states
-      setImageError(false);
-      setImageLoaded(false);
-      
-      if (id) {
-        try {
-          const imageData = await getImage(id);
-          if (imageData) {
-            setImageSrc(imageData);
-            return;
-          }
-        } catch (error) {
-          console.error('Error loading image from IndexedDB:', error);
-        }
-      }
-      
-      // If no IndexedDB image or error, fall back to provided sources
-      if (character.image_data) {
-        setImageSrc(character.image_data);
-      } else if (character.image_url) {
-        setImageSrc(character.image_url);
-      } else {
-        setImageSrc(null);
-      }
-    };
-
-    loadImage();
-  }, [id, character.image_data, character.image_url]);
-
-  // Extract traits for display
+  const router = useRouter();
+  const [isChatNavigating, setIsChatNavigating] = useState(false);
+  
+  // Get character traits for display
   const traits = getCharacterTraitsArray(character);
   
-  // Handle image errors
-  const handleImageError = () => {
-    setImageError(true);
-    setImageLoaded(true);
+  // Handle chat navigation
+  const handleChatClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (isChatNavigating || !id) return;
+    
+    setIsChatNavigating(true);
+    
+    // Navigate to chat page with proper encoding
+    setTimeout(() => {
+      router.push(`/chat/${encodeURIComponent(id)}`);
+    }, 100);
   };
 
-  // Handle image load success
-  const handleImageLoad = () => {
-    setImageLoaded(true);
-  };
+  // Check if character has a portrait
+  const hasPortrait = !!(character.image_url || character.image_data);
 
   return (
     <div 
-      className="w-full rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-card border border-theme cursor-pointer"
+      className="character-card bg-card border border-theme rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col"
       onClick={onClick}
     >
-      {/* Portrait Section - Improved for consistent sizing and display */}
-      <div className="relative w-full aspect-square">
-        {imageSrc && !imageError ? (
-          <>
-            {/* Loading placeholder */}
-            {!imageLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-700 animate-pulse">
-                <span className="text-gray-500 dark:text-gray-400">Loading...</span>
-              </div>
-            )}
-            
-            {/* The image with object-contain to ensure full visibility */}
-            <img 
-              src={imageSrc} 
-              alt={`Portrait of ${character.name}`} 
-              className={`w-full h-full object-contain transition-opacity duration-300 ${
-                imageLoaded ? 'opacity-100' : 'opacity-0'
-              }`}
-              onError={handleImageError}
-              onLoad={handleImageLoad}
-            />
-          </>
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 flex items-center justify-center">
-            <User className="h-20 w-20 text-blue-300 dark:text-blue-700" />
-          </div>
-        )}
-        
-        {/* Action buttons in corners */}
-        {/* Delete button in the top right */}
-        {onDelete && (
-          <button 
-            onClick={onDelete}
-            className="absolute top-2 right-2 p-1.5 bg-red-100 text-red-600 rounded-full hover:bg-red-200 dark:bg-red-900/40 dark:text-red-400 dark:hover:bg-red-800/60 z-10"
-            title="Delete Character"
-            type="button"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
-        )}
-        
-        {/* Download image button in the top left */}
-        {onDownloadImage && (
-          <button 
-            onClick={onDownloadImage}
-            className="absolute top-2 left-2 p-1.5 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 dark:bg-blue-900/40 dark:text-blue-400 dark:hover:bg-blue-800/60 z-10"
-            title="Download Portrait"
-            type="button"
-          >
-            <Image className="h-4 w-4" />
-          </button>
-        )}
-      </div>
-      
-      {/* Character Info Section */}
-      <div className="p-4">
-        <h2 className="text-xl font-bold mb-2 truncate">{character.name}</h2>
-        
-        {/* Traits */}
-        <div className="flex flex-wrap gap-1 mb-3">
-          {traits.slice(0, 3).map((trait, index) => (
-            <span 
-              key={index} 
-              className="character-trait-tag px-2 py-1 rounded-full text-xs truncate max-w-[100px]"
-            >
-              {trait}
-            </span>
-          ))}
-          {traits.length > 3 && (
-            <span className="character-trait-tag px-2 py-1 rounded-full text-xs">
-              +{traits.length - 3}
-            </span>
+      {/* Header with portrait and basic info - RESPONSIVE LAYOUT */}
+      <div className="p-3 flex flex-col space-y-2 flex-1">
+        {/* Portrait - RESPONSIVE SIZE */}
+        <div className="flex justify-center mb-2">
+          {hasPortrait ? (
+            <div className="portrait-container w-full max-w-[200px] aspect-square">
+              <PortraitDisplay
+                imageUrl={character.image_url}
+                imageData={character.image_data}
+                characterId={id}
+                name={character.name}
+                size="large"
+                className="w-full h-full object-cover rounded-lg library-portrait"
+              />
+            </div>
+          ) : (
+            <div className="w-full max-w-[200px] aspect-square bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center">
+              <span className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+                {character.name.charAt(0).toUpperCase()}
+              </span>
+            </div>
           )}
         </div>
         
-        {/* Description snippet */}
-        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-          {character.appearance}
+        {/* Character name - COMPACT */}
+        <div className="text-center">
+          <h3 className="font-medium text-base mb-1 line-clamp-2">{character.name}</h3>
+        </div>
+
+        {/* Character Traits - COMPACT */}
+        {traits.length > 0 && (
+          <div className="mb-2">
+            <div className="flex flex-wrap gap-1 justify-center">
+              {traits.slice(0, 3).map((trait, index) => (
+                <span 
+                  key={index}
+                  className="character-trait-tag text-xs px-2 py-1"
+                >
+                  {trait}
+                </span>
+              ))}
+              {traits.length > 3 && (
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  +{traits.length - 3} more
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Character Description Preview - COMPACT */}
+        <p className="text-sm text-muted line-clamp-2 text-center flex-1">
+          {character.appearance?.substring(0, 80)}
+          {character.appearance && character.appearance.length > 80 ? '...' : ''}
         </p>
+      </div>
+
+      {/* Action Buttons - COMPACT AT BOTTOM */}
+      <div className="p-3 pt-1 space-y-2 mt-auto">
+        {/* Primary Action: Chat */}
+        <Button
+          variant="primary"
+          onClick={handleChatClick}
+          disabled={isChatNavigating || !id}
+          leftIcon={<MessageCircle className="h-4 w-4" />}
+          className="w-full"
+          size="sm"
+        >
+          {isChatNavigating ? 'Opening...' : 'Chat'}
+        </Button>
         
-        {/* Action buttons */}
-        <div className="mt-3 grid grid-cols-2 gap-2">
+        {/* Secondary Actions Row 1 */}
+        <div className="grid grid-cols-2 gap-2">
           {onEdit && (
             <Button
               variant="secondary"
               onClick={onEdit}
-              type="button"
+              leftIcon={<Edit className="h-3 w-3" />}
               size="sm"
-              leftIcon={<Edit size={16} />}
+              className="flex-1"
             >
               Edit
             </Button>
           )}
           
-          <Button
-            variant="primary"
-            onClick={onDownload}
-            type="button"
-            size="sm"
-            leftIcon={<Download size={16} />}
-          >
-            Download
-          </Button>
+          {onDownload && (
+            <Button
+              variant="secondary"
+              onClick={onDownload}
+              leftIcon={<Download className="h-3 w-3" />}
+              size="sm"
+              className="flex-1"
+            >
+              JSON
+            </Button>
+          )}
+        </div>
+        
+        {/* Secondary Actions Row 2 */}
+        <div className="grid grid-cols-2 gap-2">
+          {onDownloadImage && (
+            <Button
+              variant="secondary"
+              onClick={onDownloadImage}
+              leftIcon={<ImageIcon className="h-3 w-3" />}
+              size="sm"
+              className="flex-1"
+              disabled={!hasPortrait}
+            >
+              Portrait
+            </Button>
+          )}
+          
+          {onDelete && (
+            <Button
+              variant="danger"
+              onClick={onDelete}
+              leftIcon={<Trash2 className="h-3 w-3" />}
+              size="sm"
+              className="flex-1"
+            >
+              Delete
+            </Button>
+          )}
         </div>
       </div>
     </div>

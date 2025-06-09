@@ -1,13 +1,13 @@
-// Fixed character-viewer-modal.tsx with better traits layout and single column when no portrait
-
+// src/components/library/character-viewer-modal.tsx
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Character } from '@/lib/types';
 import { StoredCharacter } from '@/lib/character-storage';
 import Button from '@/components/ui/button';
 import PortraitDisplay from '@/components/portrait-display';
-import { X, Trash2, Edit, Download } from 'lucide-react';
+import { X, Trash2, Edit, Download, MessageCircle } from 'lucide-react';
 import { getCharacterTraitsArray } from '@/lib/utils';
 
 // Profile Component for Modal
@@ -69,11 +69,31 @@ export default function CharacterViewerModal({
   closeModal,
   handleDeleteCharacter
 }: CharacterViewerModalProps) {
+  const router = useRouter();
   const modalRef = useRef<HTMLDivElement>(null);
   const [contentTab, setContentTab] = useState<'profile' | 'quests' | 'dialogue' | 'items'>('profile');
+  const [isChatNavigating, setIsChatNavigating] = useState(false);
 
-  // Check if portrait exists
-  const hasPortrait = !!(fullCharacter?.image_url || fullCharacter?.image_data);
+  // Use consistent character data - prefer fullCharacter but fallback to selectedCharacter
+  const displayCharacter = fullCharacter || selectedCharacter.character;
+  
+  // Check if portrait exists - use the same logic as character card
+  const hasPortrait = !!(displayCharacter.image_url || displayCharacter.image_data);
+
+  // Handle chat navigation
+  const handleChatWithCharacter = () => {
+    if (isChatNavigating || isNavigating) return;
+    
+    setIsChatNavigating(true);
+    
+    // Close the modal first
+    closeModal();
+    
+    // Navigate to chat page after a short delay with proper encoding
+    setTimeout(() => {
+      router.push(`/chat/${encodeURIComponent(selectedCharacter.id)}`);
+    }, 100);
+  };
 
   // Ensure modal padding doesn't overlap with footer
   useEffect(() => {
@@ -97,7 +117,7 @@ export default function CharacterViewerModal({
   }, []);
 
   // Get character traits
-  const traits = getCharacterTraitsArray(selectedCharacter.character);
+  const traits = getCharacterTraitsArray(displayCharacter);
 
   // Render content based on selected tab
   const renderTabContent = () => {
@@ -105,7 +125,7 @@ export default function CharacterViewerModal({
       case 'profile':
         return (
           <div>
-            <ProfileSection character={selectedCharacter.character} />
+            <ProfileSection character={displayCharacter} />
             
             {/* Show traits below profile when no portrait */}
             {!hasPortrait && traits.length > 0 && (
@@ -125,11 +145,11 @@ export default function CharacterViewerModal({
           </div>
         );
       case 'quests':
-        return selectedCharacter.character.quests && selectedCharacter.character.quests.length > 0 && (
+        return displayCharacter.quests && displayCharacter.quests.length > 0 ? (
           <div>
             <h4 className="text-lg font-semibold mb-2 text-blue-800 dark:text-blue-300">Quests</h4>
             <div className="space-y-4">
-              {selectedCharacter.character.quests.map((quest, index) => (
+              {displayCharacter.quests.map((quest, index) => (
                 <div key={index} className="p-3 bg-secondary rounded-lg border border-theme">
                   <h5 className="font-medium mb-1">{quest.title}</h5>
                   <p className="text-sm mb-2">{quest.description}</p>
@@ -140,33 +160,33 @@ export default function CharacterViewerModal({
               ))}
             </div>
           </div>
-        );
+        ) : null;
       case 'dialogue':
-        return selectedCharacter.character.dialogue_lines && selectedCharacter.character.dialogue_lines.length > 0 && (
+        return displayCharacter.dialogue_lines && displayCharacter.dialogue_lines.length > 0 ? (
           <div>
             <h4 className="text-lg font-semibold mb-2 text-blue-800 dark:text-blue-300">Dialogue Lines</h4>
             <div className="space-y-2">
-              {selectedCharacter.character.dialogue_lines.map((line, index) => (
+              {displayCharacter.dialogue_lines.map((line, index) => (
                 <div key={index} className="p-2 bg-secondary rounded text-sm italic">"{line}"</div>
               ))}
             </div>
           </div>
-        );
+        ) : null;
       case 'items':
-        return selectedCharacter.character.items && selectedCharacter.character.items.length > 0 && (
+        return displayCharacter.items && displayCharacter.items.length > 0 ? (
           <div>
             <h4 className="text-lg font-semibold mb-2 text-blue-800 dark:text-blue-300">Items</h4>
             <ul className="list-disc list-inside text-sm space-y-1">
-              {selectedCharacter.character.items.map((item, index) => (
+              {displayCharacter.items.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
             </ul>
           </div>
-        );
+        ) : null;
       default:
         return (
           <div>
-            <ProfileSection character={selectedCharacter.character} />
+            <ProfileSection character={displayCharacter} />
             
             {/* Show traits below profile when no portrait */}
             {!hasPortrait && traits.length > 0 && (
@@ -188,16 +208,195 @@ export default function CharacterViewerModal({
     }
   };
 
+  const renderTwoColumnLayout = () => (
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      {/* Left Column - Portrait and Character Info - RESPONSIVE with LARGER portrait */}
+      <div className="xl:col-span-1 space-y-4">
+        {/* FIXED: Much larger character image */}
+        <div className="flex justify-center">
+          <div className="w-full max-w-md">
+            <PortraitDisplay
+              imageUrl={displayCharacter.image_url}
+              imageData={displayCharacter.image_data}
+              characterId={selectedCharacter.id}
+              name={displayCharacter.name}
+              size="large"
+              className="w-full h-auto aspect-square object-cover rounded-lg modal-portrait"
+              isLoading={imageLoading}
+            />
+          </div>
+        </div>
+        
+        {/* Character traits tags */}
+        {traits.length > 0 && (
+          <div>
+            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Traits
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {traits.map((trait, index) => (
+                <span key={index} className="character-trait-tag">
+                  {trait}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Right Column - Tabbed Content - RESPONSIVE */}
+      <div className="xl:col-span-2">
+        {/* Tab Navigation for Content */}
+        <div className="border-b border-theme mb-4">
+          <ul className="flex flex-wrap text-sm font-medium text-center">
+            <li className="mr-2">
+              <button 
+                onClick={() => setContentTab('profile')}
+                className={`inline-block p-3 border-b-2 rounded-t-lg ${
+                  contentTab === 'profile' 
+                    ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
+                    : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
+                }`}
+                type="button"
+              >
+                Profile
+              </button>
+            </li>
+            {displayCharacter.quests && displayCharacter.quests.length > 0 && (
+              <li className="mr-2">
+                <button 
+                  onClick={() => setContentTab('quests')}
+                  className={`inline-block p-3 border-b-2 rounded-t-lg ${
+                    contentTab === 'quests' 
+                      ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
+                      : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
+                  }`}
+                  type="button"
+                >
+                  Quests
+                </button>
+              </li>
+            )}
+            {displayCharacter.dialogue_lines && displayCharacter.dialogue_lines.length > 0 && (
+              <li className="mr-2">
+                <button 
+                  onClick={() => setContentTab('dialogue')}
+                  className={`inline-block p-3 border-b-2 rounded-t-lg ${
+                    contentTab === 'dialogue' 
+                      ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
+                      : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
+                  }`}
+                  type="button"
+                >
+                  Dialogue
+                </button>
+              </li>
+            )}
+            {displayCharacter.items && displayCharacter.items.length > 0 && (
+              <li className="mr-2">
+                <button 
+                  onClick={() => setContentTab('items')}
+                  className={`inline-block p-3 border-b-2 rounded-t-lg ${
+                    contentTab === 'items' 
+                      ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
+                      : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
+                  }`}
+                  type="button"
+                >
+                  Items
+                </button>
+              </li>
+            )}
+          </ul>
+        </div>
+
+        {/* Content based on active content tab */}
+        {renderTabContent()}
+      </div>
+    </div>
+  );
+
+  const renderSingleColumnLayout = () => (
+    <div className="max-w-4xl mx-auto">
+      {/* Tab Navigation for Content */}
+      <div className="border-b border-theme mb-4">
+        <ul className="flex flex-wrap text-sm font-medium text-center">
+          <li className="mr-2">
+            <button 
+              onClick={() => setContentTab('profile')}
+              className={`inline-block p-3 border-b-2 rounded-t-lg ${
+                contentTab === 'profile' 
+                  ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
+                  : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
+              }`}
+              type="button"
+            >
+              Profile
+            </button>
+          </li>
+          {displayCharacter.quests && displayCharacter.quests.length > 0 && (
+            <li className="mr-2">
+              <button 
+                onClick={() => setContentTab('quests')}
+                className={`inline-block p-3 border-b-2 rounded-t-lg ${
+                  contentTab === 'quests' 
+                    ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
+                    : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
+                }`}
+                type="button"
+              >
+                Quests
+              </button>
+            </li>
+          )}
+          {displayCharacter.dialogue_lines && displayCharacter.dialogue_lines.length > 0 && (
+            <li className="mr-2">
+              <button 
+                onClick={() => setContentTab('dialogue')}
+                className={`inline-block p-3 border-b-2 rounded-t-lg ${
+                  contentTab === 'dialogue' 
+                    ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
+                    : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
+                }`}
+                type="button"
+              >
+                Dialogue
+              </button>
+            </li>
+          )}
+          {displayCharacter.items && displayCharacter.items.length > 0 && (
+            <li className="mr-2">
+              <button 
+                onClick={() => setContentTab('items')}
+                className={`inline-block p-3 border-b-2 rounded-t-lg ${
+                  contentTab === 'items' 
+                    ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
+                    : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
+                }`}
+                type="button"
+              >
+                Items
+              </button>
+            </li>
+          )}
+        </ul>
+      </div>
+
+      {/* Content based on active content tab */}
+      {renderTabContent()}
+    </div>
+  );
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-1 sm:p-4">
       <div 
         ref={modalRef}
-        className="bg-card rounded-lg shadow-lg w-full max-w-5xl h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col"
+        className="bg-card rounded-lg shadow-lg w-full max-w-7xl h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col"
       >
         <div className="p-3 sm:p-4 border-b border-theme flex justify-between items-center">
           <div className="flex-1"></div>
           <h3 className="text-lg font-medium text-center flex-1">
-            {selectedCharacter.character.name}
+            {displayCharacter.name}
           </h3>
           <div className="flex-1 flex justify-end">
             <button 
@@ -214,187 +413,11 @@ export default function CharacterViewerModal({
         {/* Content area with scrolling */}
         <div className="flex-1 overflow-auto p-4">
           {activeTab === 'details' ? (
-            hasPortrait ? (
-              /* Two Column Layout - With Portrait */
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left Column - Portrait and Character Info */}
-                <div className="lg:col-span-1 space-y-4">
-                  {/* Character image */}
-                  <div className="flex justify-center">
-                    <PortraitDisplay
-                      imageUrl={fullCharacter?.image_url}
-                      imageData={fullCharacter?.image_data}
-                      characterId={selectedCharacter.id}
-                      name={selectedCharacter.character.name}
-                      size="large"
-                      className="mx-auto"
-                      isLoading={imageLoading}
-                      key={`portrait-${selectedCharacter.id}-${Date.now()}`}
-                    />
-                  </div>
-                  
-                  {/* Character traits tags */}
-                  {traits.length > 0 && (
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Traits
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {traits.map((trait, index) => (
-                          <span key={index} className="character-trait-tag">
-                            {trait}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Right Column - Tabbed Content */}
-                <div className="lg:col-span-2">
-                  {/* Tab Navigation for Content */}
-                  <div className="border-b border-theme mb-4">
-                    <ul className="flex flex-wrap text-sm font-medium text-center">
-                      <li className="mr-2">
-                        <button 
-                          onClick={() => setContentTab('profile')}
-                          className={`inline-block p-3 border-b-2 rounded-t-lg ${
-                            contentTab === 'profile' 
-                              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
-                              : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
-                          }`}
-                          type="button"
-                        >
-                          Profile
-                        </button>
-                      </li>
-                      {selectedCharacter.character.quests && selectedCharacter.character.quests.length > 0 && (
-                        <li className="mr-2">
-                          <button 
-                            onClick={() => setContentTab('quests')}
-                            className={`inline-block p-3 border-b-2 rounded-t-lg ${
-                              contentTab === 'quests' 
-                                ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
-                                : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
-                            }`}
-                            type="button"
-                          >
-                            Quests
-                          </button>
-                        </li>
-                      )}
-                      {selectedCharacter.character.dialogue_lines && selectedCharacter.character.dialogue_lines.length > 0 && (
-                        <li className="mr-2">
-                          <button 
-                            onClick={() => setContentTab('dialogue')}
-                            className={`inline-block p-3 border-b-2 rounded-t-lg ${
-                              contentTab === 'dialogue' 
-                                ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
-                                : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
-                            }`}
-                            type="button"
-                          >
-                            Dialogue
-                          </button>
-                        </li>
-                      )}
-                      {selectedCharacter.character.items && selectedCharacter.character.items.length > 0 && (
-                        <li className="mr-2">
-                          <button 
-                            onClick={() => setContentTab('items')}
-                            className={`inline-block p-3 border-b-2 rounded-t-lg ${
-                              contentTab === 'items' 
-                                ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
-                                : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
-                            }`}
-                            type="button"
-                          >
-                            Items
-                          </button>
-                        </li>
-                      )}
-                    </ul>
-                  </div>
-
-                  {/* Content based on active content tab */}
-                  {renderTabContent()}
-                </div>
-              </div>
-            ) : (
-              /* Single Column Layout - No Portrait */
-              <div className="max-w-4xl mx-auto">
-                {/* Tab Navigation for Content */}
-                <div className="border-b border-theme mb-4">
-                  <ul className="flex flex-wrap text-sm font-medium text-center">
-                    <li className="mr-2">
-                      <button 
-                        onClick={() => setContentTab('profile')}
-                        className={`inline-block p-3 border-b-2 rounded-t-lg ${
-                          contentTab === 'profile' 
-                            ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
-                            : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
-                        }`}
-                        type="button"
-                      >
-                        Profile
-                      </button>
-                    </li>
-                    {selectedCharacter.character.quests && selectedCharacter.character.quests.length > 0 && (
-                      <li className="mr-2">
-                        <button 
-                          onClick={() => setContentTab('quests')}
-                          className={`inline-block p-3 border-b-2 rounded-t-lg ${
-                            contentTab === 'quests' 
-                              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
-                              : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
-                          }`}
-                          type="button"
-                        >
-                          Quests
-                        </button>
-                      </li>
-                    )}
-                    {selectedCharacter.character.dialogue_lines && selectedCharacter.character.dialogue_lines.length > 0 && (
-                      <li className="mr-2">
-                        <button 
-                          onClick={() => setContentTab('dialogue')}
-                          className={`inline-block p-3 border-b-2 rounded-t-lg ${
-                            contentTab === 'dialogue' 
-                              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
-                              : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
-                          }`}
-                          type="button"
-                        >
-                          Dialogue
-                        </button>
-                      </li>
-                    )}
-                    {selectedCharacter.character.items && selectedCharacter.character.items.length > 0 && (
-                      <li className="mr-2">
-                        <button 
-                          onClick={() => setContentTab('items')}
-                          className={`inline-block p-3 border-b-2 rounded-t-lg ${
-                            contentTab === 'items' 
-                              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' 
-                              : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'
-                          }`}
-                          type="button"
-                        >
-                          Items
-                        </button>
-                      </li>
-                    )}
-                  </ul>
-                </div>
-
-                {/* Content based on active content tab */}
-                {renderTabContent()}
-              </div>
-            )
+            hasPortrait ? renderTwoColumnLayout() : renderSingleColumnLayout()
           ) : (
             // JSON View
             <pre className="text-xs whitespace-pre-wrap bg-gray-100 p-4 rounded dark:bg-gray-800 dark:text-gray-300 text-gray-800 overflow-auto h-full">
-              {JSON.stringify(fullCharacter || selectedCharacter.character, null, 2)}
+              {JSON.stringify(displayCharacter, null, 2)}
             </pre>
           )}
         </div>
@@ -435,52 +458,68 @@ export default function CharacterViewerModal({
             </ul>
           </div>
           
-          {/* Bottom action buttons */}
-          <div className="p-4 flex flex-wrap gap-2 justify-end modal-footer-buttons mt-auto">
-            <Button
-              variant="danger"
-              onClick={() => {
-                if (window.confirm(`Are you sure you want to delete ${selectedCharacter.character.name}? This action cannot be undone.`)) {
-                  handleDeleteCharacter(selectedCharacter.id);
-                }
-              }}
-              type="button"
-              leftIcon={<Trash2 className="h-4 w-4" />}
-              size="sm"
-            >
-              Delete
-            </Button>
+          {/* Bottom action buttons - COMPACT SINGLE ROW LAYOUT */}
+          <div className="p-3 modal-footer-buttons">
+            <div className="flex flex-wrap gap-2 justify-center items-center">
+              {/* Chat button (prominent) */}
+              <Button
+                variant="primary"
+                onClick={handleChatWithCharacter}
+                disabled={isChatNavigating || isNavigating}
+                leftIcon={<MessageCircle className="h-4 w-4" />}
+                size="sm"
+              >
+                {isChatNavigating ? 'Opening...' : 'Chat'}
+              </Button>
               
-            <Button
-              variant="secondary"
-              onClick={handleEditFromModal}
-              disabled={isNavigating}
-              type="button"
-              leftIcon={<Edit className="h-4 w-4" />}
-              size="sm"
-            >
-              Edit
-            </Button>
+              {/* Secondary actions */}
+              <Button
+                variant="secondary"
+                onClick={handleEditFromModal}
+                disabled={isNavigating}
+                type="button"
+                leftIcon={<Edit className="h-4 w-4" />}
+                size="sm"
+              >
+                Edit
+              </Button>
+                
+              <Button
+                variant="secondary"
+                onClick={handleDownloadFromModal}
+                type="button"
+                leftIcon={<Download className="h-4 w-4" />}
+                size="sm"
+              >
+                JSON
+              </Button>
+                
+              <Button
+                variant="secondary"
+                onClick={handleDownloadImage}
+                type="button"
+                leftIcon={<Download className="h-4 w-4" />}
+                size="sm"
+                disabled={!hasPortrait}
+              >
+                Portrait
+              </Button>
               
-            <Button
-              variant="primary"
-              onClick={handleDownloadFromModal}
-              type="button"
-              leftIcon={<Download className="h-4 w-4" />}
-              size="sm"
-            >
-              JSON
-            </Button>
-              
-            <Button
-              variant="secondary"
-              onClick={handleDownloadImage}
-              type="button"
-              leftIcon={<Download className="h-4 w-4" />}
-              size="sm"
-            >
-              Portrait
-            </Button>
+              {/* Delete */}
+              <Button
+                variant="danger"
+                onClick={() => {
+                  if (window.confirm(`Are you sure you want to delete ${displayCharacter.name}? This action cannot be undone.`)) {
+                    handleDeleteCharacter(selectedCharacter.id);
+                  }
+                }}
+                type="button"
+                leftIcon={<Trash2 className="h-4 w-4" />}
+                size="sm"
+              >
+                Delete
+              </Button>
+            </div>
           </div>
         </div>
       </div>

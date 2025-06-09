@@ -206,6 +206,29 @@ input::placeholder, textarea::placeholder {
   color: var(--text-muted);
 }
 
+/* Fix select dropdown styling in light mode */
+.light select {
+  color: #111827 !important;
+  background-color: #ffffff !important;
+  border-color: #d1d5db !important;
+}
+
+.light select option {
+  color: #111827 !important;
+  background-color: #ffffff !important;
+}
+
+.dark select {
+  color: #f3f4f6 !important;
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+.dark select option {
+  color: #f3f4f6 !important;
+  background-color: #1f2937 !important;
+}
+
 /*********************************************
  * Documentation Elements 
  *********************************************/
@@ -256,6 +279,166 @@ input::placeholder, textarea::placeholder {
 .example-box .example-content {
   color: var(--text-description);
   font-style: italic;
+}
+
+/*********************************************
+ * PORTRAIT DISPLAY FIXES - TARGETED ONLY
+ *********************************************/
+
+/* Chat page portraits - FIXED */
+.chat-portrait {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  flex-shrink: 0 !important;
+  border: 2px solid #e5e7eb !important;
+}
+
+.dark .chat-portrait {
+  border-color: #374151 !important;
+}
+
+.chat-portrait img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+}
+
+.chat-portrait .text-white {
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  color: white !important;
+}
+
+/* Chat header specific sizing - FIXED */
+.chat-header .portrait-container,
+.chat-header .chat-portrait {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  border-radius: 50% !important;
+}
+
+.chat-header .portrait-container img,
+.chat-header .chat-portrait img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+}
+
+/* Chat message portraits - FIXED */
+.chat-message .portrait-container,
+.message-container .portrait-container,
+[class*="chat"] .portrait-container,
+.chat-page .portrait-container,
+.chat-container .portrait-container {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+}
+
+[class*="chat"] .portrait-container img,
+.chat-page .portrait-container img,
+.chat-container .portrait-container img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+}
+
+/* Edit page portrait buttons - FIXED VISIBILITY */
+.portrait-section .flex.space-x-2 {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 0.75rem !important;
+  margin-top: 1rem !important;
+  margin-bottom: 1rem !important;
+  width: 100% !important;
+  flex-wrap: wrap !important;
+}
+
+.portrait-section .flex.space-x-2 button {
+  background: #f8fafc !important;
+  color: #1e293b !important;
+  border: 1px solid #cbd5e1 !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 0.375rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  min-height: 2.5rem !important;
+  min-width: 120px !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+.portrait-section .flex.space-x-2 button:hover {
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
+  border-color: #94a3b8 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.portrait-section .flex.space-x-2 button:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.portrait-section .flex.space-x-2 button:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.dark .portrait-section .flex.space-x-2 button {
+  background: #374151 !important;
+  color: #f3f4f6 !important;
+  border-color: #4b5563 !important;
+}
+
+.dark .portrait-section .flex.space-x-2 button:hover {
+  background: #4b5563 !important;
+  color: #ffffff !important;
+  border-color: #6b7280 !important;
+}
+
+.portrait-section button svg {
+  width: 1rem !important;
+  height: 1rem !important;
+  color: inherit !important;
+}
+
+/* Responsive button layout for portrait section */
+@media (max-width: 640px) {
+  .portrait-section .flex.space-x-2 {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    align-items: center !important;
+  }
+  
+  .portrait-section .flex.space-x-2 button {
+    width: 100% !important;
+    max-width: 200px !important;
+  }
 }
 
 /*********************************************
@@ -364,6 +547,40 @@ p.mt-2.text-lg.sm\:text-xl.lg\:text-2xl.font-medium,
 
 .light .welcome-guide {
   background-color: white !important;
+}
+
+/* Model selector fixes for light mode */
+.light .bg-green-100.text-green-800 {
+  background-color: #dcfce7 !important;
+  color: #166534 !important;
+  border: 1px solid #bbf7d0 !important;
+}
+
+.light .bg-yellow-100.text-yellow-800 {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+  border: 1px solid #fbbf24 !important;
+}
+
+.light .bg-red-100.text-red-800 {
+  background-color: #fee2e2 !important;
+  color: #b91c1c !important;
+  border: 1px solid #fecaca !important;
+}
+
+.light .bg-gray-100.text-gray-800 {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+  border: 1px solid #d1d5db !important;
+}
+
+/* Model selector label text in light mode */
+.light .text-gray-600.dark\:text-gray-400 {
+  color: #4b5563 !important;
+}
+
+.light .text-gray-900.dark\:text-gray-100 {
+  color: #111827 !important;
 }
 
 /* Fix various contrast issues in light mode */
@@ -1007,7 +1224,7 @@ button.bg-red-700 * {
 }
 
 /*********************************************
- * Additional Light Mode Fixes - DO NOT REPLACE EXISTING ONES
+ * ADDITIONAL LIGHT MODE FIXES - DO NOT REPLACE EXISTING ONES
  *********************************************/
 
 /* FIXED: Header title and subtitle visibility - white text on dark background */
@@ -1518,4 +1735,168 @@ footer {
 
 .markdown-content p:last-child {
   margin-bottom: 0;
+}
+
+/* Add this to your existing src/app/globals.css file */
+
+/* Line clamp utilities for text truncation */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* Chat-specific styles */
+.chat-message {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.chat-input {
+  resize: none;
+  min-height: 40px;
+  max-height: 120px;
+}
+
+/*********************************************
+ * RESPONSIVE CHARACTER CARD GRID
+ *********************************************/
+.character-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  align-items: stretch;
+}
+
+@media (min-width: 640px) {
+  .character-card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .character-card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .character-card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+/*********************************************
+ * RESPONSIVE CHARACTER CARDS
+ *********************************************/
+.character-card {
+  height: 100%;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 640px) {
+  .character-card {
+    min-height: 450px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .character-card {
+    min-height: 480px;
+  }
+}
+
+/* RESPONSIVE Portrait container sizing */
+.portrait-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.portrait-container img {
+  object-fit: cover !important;
+  width: 100%;
+  height: 100%;
+}
+
+/* Usage badge styling improvements */
+.usage-badge,
+span.text-xs.px-2.py-1.rounded-full.font-medium {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 1.5rem !important;
+  white-space: nowrap !important;
+}
+
+/* Chat header styling fix */
+.chat-header {
+  background: white !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.dark .chat-header {
+  background: #1f2937 !important;
+  border-bottom: 1px solid #374151 !important;
+}
+
+/* Chat input area styling */
+.chat-input-container {
+  border-top: 1px solid #e5e7eb !important;
+  background: white !important;
+  padding: 16px !important;
+}
+
+.dark .chat-input-container {
+  border-top: 1px solid #374151 !important;
+  background: #1f2937 !important;
+}
+
+/* Chat page specific model selector */
+.chat-header select {
+  background: white !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px !important;
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+  color: #374151 !important;
+}
+
+.dark .chat-header select {
+  background: #374151 !important;
+  border: 1px solid #4b5563 !important;
+  color: #f3f4f6 !important;
+}
+
+/* Disable portrait zoom in library */
+.library-portrait {
+  pointer-events: none;
+  cursor: default;
+}
+
+.library-portrait img {
+  pointer-events: none;
 }

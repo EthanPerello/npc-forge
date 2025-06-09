@@ -1,3 +1,4 @@
+// src/components/image-model-selector.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -32,51 +33,112 @@ export default function ImageModelSelector({ value, onChange }: ImageModelSelect
     return String(count);
   };
   
+  // Get tier color class
+  const getTierColorClass = (tier: string, isSelected: boolean) => {
+    if (isSelected) {
+      return 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 shadow-sm';
+    }
+    
+    switch (tier) {
+      case 'cheap':
+        return 'border-green-200 hover:border-green-300 dark:border-green-700 dark:hover:border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20';
+      case 'mid':
+        return 'border-yellow-200 hover:border-yellow-300 dark:border-yellow-700 dark:hover:border-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20';
+      case 'premium':
+        return 'border-purple-200 hover:border-purple-300 dark:border-purple-700 dark:hover:border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20';
+      default:
+        return 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900/20';
+    }
+  };
+  
+  // Get tier badge color
+  const getTierBadgeClass = (tier: string, isSelected: boolean) => {
+    if (isSelected) {
+      return 'bg-indigo-600 text-white';
+    }
+    
+    switch (tier) {
+      case 'cheap':
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+      case 'mid':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
+      case 'premium':
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
+    }
+  };
+  
   return (
-    <div className="mb-4">
-      <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+    <div className="space-y-3">
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
         Portrait Generation Model
       </label>
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-        {IMAGE_MODEL_CONFIGS.map((config) => (
-          <div 
-            key={config.id}
-            onClick={() => onChange(config.id as ImageModel)}
-            className={`
-              cursor-pointer border rounded-lg p-3 transition-colors
-              ${selectedModel === config.id 
-                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30' 
-                : 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600'}
-            `}
-          >
-            <div className="flex flex-wrap items-center justify-between mb-1 gap-2">
-              <div className="flex items-center">
-                <span className="mr-2 flex-shrink-0">{config.emoji}</span>
-                <h3 className="font-medium">{config.label}</h3>
+      <div className="grid grid-cols-1 gap-2">
+        {IMAGE_MODEL_CONFIGS.map((config) => {
+          const isSelected = selectedModel === config.id;
+          const tierColorClass = getTierColorClass(config.tier, isSelected);
+          const badgeClass = getTierBadgeClass(config.tier, isSelected);
+          
+          return (
+            <div 
+              key={config.id}
+              onClick={() => onChange(config.id)}
+              className={`
+                cursor-pointer border rounded-lg p-3 transition-all duration-200 
+                ${tierColorClass}
+              `}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2 flex-1 min-w-0">
+                  <span className="text-base flex-shrink-0">{config.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-gray-900 dark:text-gray-100 text-sm truncate">
+                      {config.label}
+                    </h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                      {config.description}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Usage Badge */}
+                <div className="ml-2 flex-shrink-0">
+                  <span className={`
+                    inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                    ${badgeClass}
+                  `}>
+                    {formatRemaining(remaining[config.id] || 0)} left
+                  </span>
+                </div>
               </div>
               
-              {/* Completely restructured badge styling with flex-end alignment */}
-              <div className="flex-shrink-0">
-                {selectedModel === config.id ? (
-                  <span className="text-xs px-2 py-1 rounded-full font-medium bg-indigo-600 text-white inline-flex items-center whitespace-nowrap">
-                    {formatRemaining(remaining[config.id])} left
-                  </span>
-                ) : (
-                  <span className="text-xs px-2 py-1 rounded-full font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 inline-flex items-center whitespace-nowrap">
-                    {formatRemaining(remaining[config.id])} left
-                  </span>
-                )}
+              {/* Model Details - More compact */}
+              <div className="flex items-center justify-between text-xs mt-1">
+                <span className="text-gray-500 dark:text-gray-400 font-mono">
+                  {config.id}
+                </span>
+                <span className={`
+                  px-1.5 py-0.5 rounded text-xs font-medium
+                  ${isSelected 
+                    ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-800 dark:text-indigo-200' 
+                    : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                  }
+                `}>
+                  {config.tier === 'cheap' && '🟢 Standard'}
+                  {config.tier === 'mid' && '🟡 Enhanced'}
+                  {config.tier === 'premium' && '🔴 Premium'}
+                </span>
               </div>
             </div>
-            <p className="text-xs text-gray-600 dark:text-gray-400">
-              {config.description}
-            </p>
-            <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 italic">
-              Powered by {config.id}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+      
+      {/* Help text */}
+      <p className="text-xs text-gray-500 dark:text-gray-400">
+        Higher tier models provide better image quality but have usage limits. Usage resets monthly.
+      </p>
     </div>
   );
 }

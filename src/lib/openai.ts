@@ -404,12 +404,12 @@ const getExampleCharacter = (description: string): Character => {
   // Create a copy to avoid modifying the original
   const character = JSON.parse(JSON.stringify(selectedExample)) as Character;
   
-  // Add a note about this being an example fallback
+  // Add a note about this being an example fallback - MADE MORE GENERAL
   if (!character.added_traits) {
     character.added_traits = {};
   }
   
-  character.added_traits.fallback_note = "Example character shown due to API issues. Try again later for a custom character.";
+  character.added_traits.fallback_note = "Example character shown due to generation issues. Please try again later for a custom character.";
   character.added_traits.original_request = description;
   
   return character;
@@ -546,7 +546,7 @@ export async function generateCharacter(
     console.log(`Character generation failed with error type: ${errorInfo.type}`);
     
     // For showcase purposes: provide an example character instead of failing completely
-    console.log("Using example character due to API error");
+    console.log("Using example character due to generation issues");
     const fallbackCharacter = getExampleCharacter(description);
     
     // Add error information to the fallback character

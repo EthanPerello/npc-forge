@@ -1,3 +1,4 @@
+// src/components/wizard-steps/concept-step.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -75,6 +76,30 @@ export default function ConceptStep({
         <p className="text-gray-600 dark:text-gray-400">
           Describe your character concept or choose a genre to get started
         </p>
+      </div>
+
+      {/* Generate Random Character - MOVED TO TOP */}
+      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-medium text-gray-900 dark:text-gray-100">
+              Generate Random Character
+            </h3>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+              Creates a complete character instantly using default settings
+            </p>
+          </div>
+          <Button
+            variant="primary"
+            onClick={handleGenerateRandomCharacter}
+            leftIcon={<Zap className="h-4 w-4" />}
+            isLoading={isRandomGenerating || isGenerating}
+            disabled={isRandomGenerating || isGenerating}
+            size="sm"
+          >
+            {isRandomGenerating || isGenerating ? 'Generating...' : 'Generate'}
+          </Button>
+        </div>
       </div>
 
       {/* Character Description - Full Width Row */}
@@ -188,30 +213,6 @@ export default function ConceptStep({
               Items
             </span>
           </label>
-        </div>
-      </div>
-
-      {/* Generate Random Character - Compact Row */}
-      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-base font-medium text-gray-900 dark:text-gray-100">
-              Generate Random Character
-            </h3>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-              Creates a complete character instantly using default settings
-            </p>
-          </div>
-          <Button
-            variant="primary"
-            onClick={handleGenerateRandomCharacter}
-            leftIcon={<Zap className="h-4 w-4" />}
-            isLoading={isRandomGenerating || isGenerating}
-            disabled={isRandomGenerating || isGenerating}
-            size="sm"
-          >
-            {isRandomGenerating || isGenerating ? 'Generating...' : 'Generate'}
-          </Button>
         </div>
       </div>
     </div>
