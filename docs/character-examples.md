@@ -6,14 +6,13 @@ This page showcases examples of NPCs created with NPC Forge, demonstrating diffe
 
 ### Elarion
 
-**Genre**: Fantasy (High Fantasy)  
-**Created with**: Enhanced text model, Standard image model  
-**Traits**: Male, Elder, Good, Mentor
+![Elarion Portrait](/images/elarion.png)
 
-**Character Description Used**:
-> "A wise elven wizard who serves as a mentor to young heroes, possessing ancient knowledge and powerful magic."
+**Genre**: Fantasy - High Fantasy  
+**Models Used**: Enhanced Text, Standard Image  
+**Traits**: Male • Elder • Good • Mentor
 
-**Generated Profile**:
+**Character Description**: "A wise elven wizard who serves as a mentor to young heroes, possessing ancient knowledge and powerful magic."
 
 **Appearance**: Elarion is a tall, thin figure with long silver hair and glowing violet eyes. His skin is smooth and fair, with luminescent runes along his arms that appear when he channels magic. He wears flowing robes with intricate patterns.
 
@@ -25,14 +24,13 @@ This page showcases examples of NPCs created with NPC Forge, demonstrating diffe
 
 ### Kira-7
 
-**Genre**: Sci-Fi (Cyberpunk)  
-**Created with**: Enhanced text model, Enhanced image model  
-**Traits**: Nonbinary, Evil, Enemy
+![Kira-7 Portrait](/images/kira-7.png)
 
-**Character Description Used**:
-> "A rogue AI with a physical android body, rebelling against their creators with dangerous cybernetic abilities."
+**Genre**: Sci-Fi - Cyberpunk  
+**Models Used**: Enhanced Text, Enhanced Image  
+**Traits**: Nonbinary • Evil • Enemy
 
-**Generated Profile**:
+**Character Description**: "A rogue AI with a physical android body, rebelling against their creators with dangerous cybernetic abilities."
 
 **Appearance**: Kira-7 has an athletic build with glowing circuitry weaving through their skin. Their eyes flicker erratically like broken neon signs, and one side of their face is partially open, revealing synthetic components.
 
@@ -44,14 +42,13 @@ This page showcases examples of NPCs created with NPC Forge, demonstrating diffe
 
 ### Detective Miles Navarro
 
-**Genre**: Contemporary (Mystery & Thriller)  
-**Created with**: Standard text model, Enhanced image model  
-**Traits**: Male, Adult, Neutral, Ally
+![Detective Miles Navarro Portrait](/images/detective-miles-navarro.png)
 
-**Character Description Used**:
-> "A weathered private investigator with a stubborn streak, who left the police force after a corruption scandal."
+**Genre**: Contemporary - Mystery & Thriller  
+**Models Used**: Standard Text, Enhanced Image  
+**Traits**: Male • Adult • Neutral • Ally
 
-**Generated Profile**:
+**Character Description**: "A weathered private investigator with a stubborn streak, who left the police force after a corruption scandal."
 
 **Appearance**: Miles stands at average height with a sturdy build, wearing a weathered trench coat. A permanent five-o'clock shadow and a faded scar under his right eye hint at a tumultuous past. His deep-set eyes can pierce through facades.
 
@@ -72,59 +69,79 @@ These characters were created using NPC Forge's wizard interface:
 
 ### Model Selection Strategy
 
-- **Elarion**: Enhanced text for detailed fantasy descriptions, Standard image for efficiency
-- **Kira-7**: Enhanced models for both text and image to capture cyberpunk aesthetic
-- **Detective Miles**: Standard text for straightforward description, Enhanced image for detailed portrait
+• **Elarion**: Enhanced text for detailed fantasy descriptions, Standard image for efficiency
+• **Kira-7**: Enhanced models for both text and image to capture cyberpunk aesthetic
+• **Detective Miles**: Standard text for straightforward description, Enhanced image for detailed portrait
 
 ### Character Editing
 
 All examples showcase editing capabilities:
-- **Elarion** had personality regenerated for scholarly depth
-- **Kira-7** had appearance enhanced through regeneration
-- **Detective Miles** had backstory refined in editing
+
+• **Elarion** had personality regenerated for scholarly depth
+• **Kira-7** had appearance enhanced through regeneration
+• **Detective Miles** had backstory refined in editing
+
+### Chat Conversations
+
+Each character offers unique conversation experiences:
+
+• **Elarion** provides wise counsel and magical knowledge in a scholarly tone
+• **Kira-7** engages with suspicious, sarcastic responses reflecting their AI nature
+• **Detective Miles** offers investigative insights with dry humor and street wisdom
 
 ## Using These Examples
 
 ### Study the Structure
 
 These examples demonstrate:
-- How character data is organized
-- The relationship between input traits and generated content
-- Different approaches to character descriptions
+
+• How character data is organized
+• The relationship between input traits and generated content
+• Different approaches to character descriptions
+• How portraits enhance character identity
 
 ### Learn from Different Approaches
 
 #### Fantasy (Elarion)
-- **Rich descriptions**: Detailed magical elements
-- **Personality depth**: Complex motivations
-- **World integration**: References to specific locations
+
+• **Rich descriptions**: Detailed magical elements
+• **Personality depth**: Complex motivations
+• **World integration**: References to specific locations
+• **Chat style**: Scholarly, wise, mentoring tone
 
 #### Sci-Fi (Kira-7)
-- **Technical details**: Specific cybernetic descriptions
-- **Conflict-driven**: Personality tied to central conflict
-- **Visual coherence**: Appearance matches personality
+
+• **Technical details**: Specific cybernetic descriptions
+• **Conflict-driven**: Personality tied to central conflict
+• **Visual coherence**: Appearance matches personality
+• **Chat style**: Sarcastic, suspicious, technologically aware
 
 #### Contemporary (Detective Miles)
-- **Grounded realism**: Believable occupation and background
-- **Character flaws**: Realistic imperfections
-- **Professional focus**: Skills tied to occupation
+
+• **Grounded realism**: Believable occupation and background
+• **Character flaws**: Realistic imperfections
+• **Professional focus**: Skills tied to occupation
+• **Chat style**: Dry humor, investigative insights, street-smart
 
 ### Genre-Specific Tips
 
 **Fantasy Characters**:
-- Include magical elements in descriptions
-- Reference fantasy locations or concepts
-- Consider long lifespans and their effects
+• Include magical elements in descriptions
+• Reference fantasy locations or concepts
+• Consider long lifespans and their effects
+• Use archaic or formal speech patterns in chat
 
 **Sci-Fi Characters**:
-- Integrate technology into descriptions
-- Consider human-machine relationships
-- Reference future societies or conflicts
+• Integrate technology into descriptions
+• Consider human-machine relationships
+• Reference future societies or conflicts
+• Incorporate technical terminology in conversations
 
 **Contemporary Characters**:
-- Focus on realistic professions and backgrounds
-- Include modern social contexts
-- Ground abilities in reality
+• Focus on realistic professions and backgrounds
+• Include modern social contexts
+• Ground abilities in reality
+• Use contemporary language and references
 
 ## Creating Similar Characters
 
@@ -145,8 +162,20 @@ These examples demonstrate:
 ### Model Selection
 
 **Match Importance**: Use higher tiers for characters central to your story
+
 **Iterate**: Start with Standard models and regenerate important elements with higher tiers
+
 **Balance Budget**: Use Enhanced/Premium strategically for maximum impact
+
+### Chat Development
+
+**Start Conversations Early**: Begin chatting immediately after character creation
+
+**Explore Backstory**: Ask about character history and motivations
+
+**Test Personality**: See how characters respond to different situations
+
+**Refine Through Chat**: Use conversations to identify areas for character editing
 
 ## Advanced Techniques
 
@@ -156,18 +185,32 @@ These examples demonstrate:
 2. **Identify Key Elements**: Determine which aspects are most important
 3. **Selective Enhancement**: Regenerate critical elements with higher-tier models
 4. **Fine-Tune Details**: Use manual editing for perfect customization
+5. **Test in Chat**: Verify personality consistency through conversations
 
 ### Character Evolution
 
-Use the library to track character development:
-- Save multiple versions as characters evolve
-- Regenerate elements to reflect character growth
-- Export snapshots at different story points
+Use the library and chat system to track character development:
+
+• Save multiple versions as characters evolve
+• Regenerate elements to reflect character growth
+• Export snapshots at different story points
+• Document character development through chat conversations
+
+### Collection Building
+
+**Character Relationships**: Create connected characters with shared backgrounds
+
+**Consistent World**: Use similar locations and references across characters
+
+**Varied Personalities**: Ensure diverse character voices and motivations
+
+**Chat Networks**: Develop characters that reference each other in conversations
 
 ## Related Documentation
 
-- [How to Use NPC Forge](/docs/how-to-use) - Complete wizard guide
-- [Generation Options](/docs/generation-options) - Detailed customization options
-- [Character Library](/docs/library) - Managing and editing characters
-- [Model Selection Guide](/docs/models) - Understanding model tiers
-- [Features Overview](/docs/features) - Complete feature list
+• [How to Use NPC Forge](/docs/how-to-use) - Complete wizard guide
+• [Chat with Characters](/docs/chat) - Interactive conversation guide
+• [Generation Options](/docs/generation-options) - Detailed customization options
+• [Character Library](/docs/library) - Managing and editing characters
+• [Model Selection Guide](/docs/models) - Understanding model tiers
+• [Features Overview](/docs/features) - Complete feature list

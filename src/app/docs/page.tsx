@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { Book, Code, User, FileText, Settings, HelpCircle, Calendar, Map, ShieldCheck, CodeSquare, Bell, Layers, Server, FileJson, Award, Database } from 'lucide-react';
+import { Book, Code, User, FileText, Settings, HelpCircle, Calendar, Map, ShieldCheck, CodeSquare, Bell, Layers, Server, FileJson, Award, Database, MessageCircle } from 'lucide-react';
 
 export const metadata = {
   title: 'NPC Forge Documentation',
-  description: 'Official NPC Forge documentation hub: guides, examples, and developer references.',
+  description: 'Official NPC Forge documentation hub: guides, examples, and developer references for AI-powered character creation and interactive conversations.',
 };
 
 export default function DocsIndexPage() {
@@ -12,7 +12,7 @@ export default function DocsIndexPage() {
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">NPC Forge Documentation</h1>
       
       <p className="lead mb-8 text-gray-700 dark:text-gray-300 text-lg">
-        Welcome to the NPC Forge documentation. Here you'll find comprehensive guides, examples, and developer references to help you get the most out of this AI-powered character generator.
+        Welcome to the NPC Forge documentation. Here you'll find comprehensive guides, examples, and developer references to help you get the most out of this AI-powered character generator with interactive chat capabilities.
       </p>
       
       <div className="mb-10">
@@ -30,7 +30,19 @@ export default function DocsIndexPage() {
               </Link>
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              Step-by-step guide to creating detailed NPCs using the wizard interface.
+              Step-by-step guide to creating detailed NPCs and chatting with them using the wizard interface.
+            </p>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <MessageCircle className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/chat" className="hover:text-indigo-800 dark:hover:text-indigo-300">
+                Chat with Characters
+              </Link>
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              Interactive conversation guide for real-time character conversations with AI-powered responses.
             </p>
           </div>
           
@@ -42,31 +54,7 @@ export default function DocsIndexPage() {
               </Link>
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              Sample NPCs across different genres with downloadable JSON files.
-            </p>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-              <Settings className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-              <Link href="/docs/generation-options" className="hover:text-indigo-800 dark:hover:text-indigo-300">
-                Generation Options
-              </Link>
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Detailed breakdown of all character customization settings and options.
-            </p>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-              <Layers className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-              <Link href="/docs/features" className="hover:text-indigo-800 dark:hover:text-indigo-300">
-                Features Overview
-              </Link>
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Comprehensive guide to all available features and capabilities.
+              Sample NPCs across different genres with portraits and conversation examples.
             </p>
           </div>
           
@@ -78,7 +66,31 @@ export default function DocsIndexPage() {
               </Link>
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              Managing, editing, and organizing your character collection.
+              Managing, editing, chatting with, and organizing your character collection with advanced filtering.
+            </p>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <Settings className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/generation-options" className="hover:text-indigo-800 dark:hover:text-indigo-300">
+                Generation Options
+              </Link>
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              Detailed breakdown of all character customization settings and chat-optimized options.
+            </p>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
+              <Layers className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
+              <Link href="/docs/features" className="hover:text-indigo-800 dark:hover:text-indigo-300">
+                Features Overview
+              </Link>
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              Comprehensive guide to all features including interactive chat and enhanced library system.
             </p>
           </div>
           
@@ -90,7 +102,7 @@ export default function DocsIndexPage() {
               </Link>
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              Understanding the tier system and choosing the right AI models.
+              Understanding AI model tiers for character generation and chat conversations.
             </p>
           </div>
           
@@ -102,7 +114,7 @@ export default function DocsIndexPage() {
               </Link>
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              Answers to common questions about usage, limits, and features.
+              Answers to common questions about character creation, chat features, usage limits, and troubleshooting.
             </p>
           </div>
         </div>
@@ -123,7 +135,7 @@ export default function DocsIndexPage() {
               </Link>
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              Local environment setup, prerequisites, and project configuration.
+              Local environment setup, prerequisites, and project configuration for development.
             </p>
           </div>
           
@@ -135,7 +147,7 @@ export default function DocsIndexPage() {
               </Link>
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              High-level system structure, component organization, and data flow.
+              System structure, chat system architecture, component organization, and data flow.
             </p>
           </div>
           
@@ -147,7 +159,7 @@ export default function DocsIndexPage() {
               </Link>
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              Endpoints, request formats, responses, and OpenAI integration details.
+              Complete API documentation including chat endpoints, generation, and OpenAI integration.
             </p>
           </div>
           
@@ -159,7 +171,7 @@ export default function DocsIndexPage() {
               </Link>
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              Input validation, data privacy practices, and security considerations.
+              Input validation, data privacy practices, and security considerations for chat and storage.
             </p>
           </div>
           
@@ -171,7 +183,7 @@ export default function DocsIndexPage() {
               </Link>
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              How to contribute code, documentation, and report issues.
+              How to contribute code, documentation, and report issues for the project.
             </p>
           </div>
           
@@ -183,7 +195,7 @@ export default function DocsIndexPage() {
               </Link>
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              Manual and automated test procedures and best practices.
+              Manual testing procedures, chat testing workflows, and quality assurance practices.
             </p>
           </div>
         </div>
@@ -204,7 +216,7 @@ export default function DocsIndexPage() {
               </Link>
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              Upcoming features, release plans, and long-term vision.
+              Completed features, upcoming releases, and long-term vision for the project.
             </p>
           </div>
           
@@ -216,7 +228,7 @@ export default function DocsIndexPage() {
               </Link>
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              Acknowledgments and contributors to the project.
+              Acknowledgments, contributors, and technology credits for the project.
             </p>
           </div>
           
@@ -228,7 +240,7 @@ export default function DocsIndexPage() {
               </Link>
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              MIT License details and third-party attributions.
+              MIT License details, usage rights, and third-party library attributions.
             </p>
           </div>
         </div>
@@ -244,25 +256,31 @@ export default function DocsIndexPage() {
             <Link href="/docs/how-to-use" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               How to Use NPC Forge
             </Link>
-            {" "}for getting started quickly
+            {" "}for getting started with character creation
+          </li>
+          <li>
+            <Link href="/docs/chat" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Chat with Characters
+            </Link>
+            {" "}to learn about interactive conversations
+          </li>
+          <li>
+            <Link href="/docs/character-examples" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Character Examples
+            </Link>
+            {" "}to see what's possible across different genres
+          </li>
+          <li>
+            <Link href="/docs/models" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
+              Model Selection Guide
+            </Link>
+            {" "}to understand AI tiers and usage limits
           </li>
           <li>
             <Link href="/docs/features" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
               Features Overview
             </Link>
             {" "}to explore all available capabilities
-          </li>
-          <li>
-            <Link href="/docs/character-examples" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
-              Character Examples
-            </Link>
-            {" "}to see what's possible
-          </li>
-          <li>
-            <Link href="/docs/models" className="underline hover:text-indigo-800 dark:hover:text-indigo-300">
-              Model Selection Guide
-            </Link>
-            {" "}to understand the tier system
           </li>
         </ul>
       </div>

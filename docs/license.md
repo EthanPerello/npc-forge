@@ -32,11 +32,11 @@ SOFTWARE.
 
 The MIT License is a permissive license that allows you to:
 
-- Use NPC Forge commercially
-- Modify the code
-- Distribute your own versions
-- Use it privately
-- Use it as part of larger works
+• Use NPC Forge commercially
+• Modify the code
+• Distribute your own versions
+• Use it privately
+• Use it as part of larger works
 
 The only requirement is that you include the original copyright notice and license text in any copy of the software/source.
 
@@ -46,21 +46,21 @@ NPC Forge uses several third-party libraries and resources, each with their own 
 
 ### Major Dependencies
 
-- **Next.js** - MIT License
-- **React** - MIT License
-- **TypeScript** - Apache License 2.0
-- **Tailwind CSS** - MIT License
-- **Lucide Icons** - ISC License
+• **Next.js** - MIT License
+• **React** - MIT License
+• **TypeScript** - Apache License 2.0
+• **Tailwind CSS** - MIT License
+• **Lucide Icons** - ISC License
 
 ### API Usage
 
-- **OpenAI API** - When using NPC Forge, you are indirectly using OpenAI's API services, which are subject to [OpenAI's Terms of Use](https://openai.com/policies/terms-of-use).
+• **OpenAI API** - When using NPC Forge, you are indirectly using OpenAI's API services, which are subject to [OpenAI's Terms of Use](https://openai.com/policies/terms-of-use).
 
 ## Content Ownership
 
-### Generated Characters
+### Generated Characters and Conversations
 
-The characters and content generated using NPC Forge belong to you, the user. You are free to use them in any way you see fit, including in commercial projects.
+The characters, content, and conversations generated using NPC Forge belong to you, the user. You are free to use them in any way you see fit, including in commercial projects.
 
 ### OpenAI Usage Rights
 
@@ -68,8 +68,8 @@ According to OpenAI's policy, content created using their API services belongs t
 
 ### Project Assets
 
-- The NPC Forge name and branding elements are proprietary to Ethan Perello
-- Documentation and other project-specific content are provided under the same MIT License as the code
+• The NPC Forge name and branding elements are proprietary to Ethan Perello
+• Documentation and other project-specific content are provided under the same MIT License as the code
 
 ## Contributing
 
@@ -81,9 +81,9 @@ If you have questions about licensing or usage rights, please contact [ethanpere
 
 ## Related Documentation
 
-- [Credits and Acknowledgments](/docs/credits) - For attribution information
-- [Contributing Guidelines](/docs/contributing) - For contribution terms
-- [Security Documentation](/docs/security) - For security policies
+• [Credits and Acknowledgments](/docs/credits) - For attribution information
+• [Contributing Guidelines](/docs/contributing) - For contribution terms
+• [Security Documentation](/docs/security) - For security policies
 
 ---
 

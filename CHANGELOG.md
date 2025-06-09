@@ -7,19 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [Unreleased]
-
 ### Added
 - Chat with Character page at `/chat/[characterId]` with real-time messaging
 - IndexedDB-based per-character conversation storage
 - Dynamic response lengths based on user input, with a configurable cap
 - Chat initiation button in character library modal and on character cards
 - Usage-limit tracking for chat generations, charged against the selected text-model tier
+- Chat documentation page at `/docs/chat`, covering new interactive chat features
+- Support for embedded images in markdown documentation
 
 ### Changed
-- Character library and modal: portraits fill containers responsively; uniform card sizing with always-visible names; removed genre badges; simplified search bar placeholder to “Search characters…”; clicking cards opens the modal (portrait zoom removed)
-- Edit page: text- and image-model selectors moved to compact dropdowns at the top; portrait section redesigned for cleaner layout and fewer tips; “unsaved changes” warning expanded to cover all edits
-- Model selector UI redesigned as compact dropdowns with tier badges and improved light-mode contrast
+- Character library and modal:
+  - Portraits fill containers responsively
+  - Uniform card sizing with always-visible names
+  - Genre badges removed
+  - Search bar placeholder simplified to “Search characters…”
+  - Clicking cards opens the modal (portrait zoom removed)
+- Edit page:
+  - Text and image model selectors moved to compact dropdowns at the top
+  - Portrait section redesigned for cleaner layout and fewer tips
+  - “Unsaved changes” warning expanded to cover all edits
+- Model selector UI:
+  - Redesigned as compact dropdowns with tier badges
+  - Improved contrast in light mode
+- Documentation system:
+  - Improved layout, typography, and list styling for better readability
+  - Enabled full-width display and responsive image support
+  - Fixed duplicate descriptions and formatting inconsistencies
 
 ### Fixed
 - Character IDs containing quotes now generate and route correctly  

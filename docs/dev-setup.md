@@ -6,10 +6,10 @@ This guide will help you set up NPC Forge for local development.
 
 Before you begin, ensure you have:
 
-- **Node.js** (v18 or newer)
-- **npm** (v7 or newer)
-- **Git**
-- **OpenAI API key** (for development)
+• **Node.js** (v18 or newer)
+• **npm** (v7 or newer)
+• **Git**
+• **OpenAI API key** (for development)
 
 ## Setting Up the Development Environment
 
@@ -27,12 +27,12 @@ npm install
 ```
 
 This installs all necessary dependencies including:
-- Next.js 14
-- React
-- TypeScript
-- TailwindCSS
-- Lucide React (for icons)
-- OpenAI SDK
+• Next.js 14
+• React
+• TypeScript
+• TailwindCSS
+• Lucide React (for icons)
+• OpenAI SDK
 
 ### 3. Configure Environment Variables
 
@@ -61,9 +61,10 @@ In development mode, the app may bypass usage limits for testing purposes.
 ### Character Library
 
 The character library works fully in development mode:
-- Characters are saved to IndexedDB in your browser
-- All editing and regeneration features are available
-- Example characters are pre-loaded for testing
+• Characters are saved to IndexedDB in your browser
+• All editing and regeneration features are available
+• Example characters are pre-loaded for testing
+• Chat conversations are fully functional and persistent
 
 ## Project Structure
 
@@ -77,9 +78,12 @@ npc-forge/
 ├── src/                     # Source code
 │   ├── app/                 # Next.js App Router 
 │   │   ├── api/             # API routes
+│   │   │   ├── chat/        # Character conversation endpoint
 │   │   │   ├── generate/    # Character generation endpoint
 │   │   │   ├── regenerate/  # Character regeneration endpoint
 │   │   │   └── proxy-image/ # Image proxy endpoint
+│   │   ├── chat/            # Chat interface pages
+│   │   │   └── [characterId]/  # Dynamic chat page
 │   │   ├── docs/            # Documentation pages
 │   │   ├── library/         # Character library pages
 │   │   └── page.tsx         # Homepage with wizard
@@ -90,9 +94,12 @@ npc-forge/
 │   │   └── wizard-steps/    # Individual wizard steps
 │   ├── contexts/            # React contexts
 │   │   ├── character-context.tsx     # Character state management
+│   │   ├── chat-context.tsx         # Chat state management
 │   │   └── theme-context.tsx         # Theme/dark mode state
 │   └── lib/                 # Utility functions and types
 │       ├── character-storage.ts      # IndexedDB operations
+│       ├── chat-storage.ts          # IndexedDB chat operations
+│       ├── chat-types.ts            # Chat type definitions
 │       ├── models.ts                 # Model configuration
 │       ├── openai.ts                 # OpenAI API integration
 │       ├── types.ts                  # TypeScript type definitions
@@ -129,33 +136,42 @@ This builds an optimized version and starts it locally.
 
 When developing locally, be mindful of your OpenAI API usage:
 
-- Character generation costs vary by model
-- Portrait generation adds additional costs
-- Consider using Standard models during development to minimize costs
+• Character generation costs vary by model
+• Portrait generation adds additional costs
+• Chat conversations count against text model limits
+• Consider using Standard models during development to minimize costs
 
 ## Key Development Areas
 
 ### Wizard Interface Development
 
 The wizard consists of step components in `src/components/wizard-steps/`:
-- `concept-step.tsx`: Genre selection and description
-- `options-step.tsx`: Character traits and customization
-- `model-step.tsx`: AI model selection
-- `results-step.tsx`: Generation results and library saving
+• `concept-step.tsx`: Genre selection and description
+• `options-step.tsx`: Character traits and customization
+• `model-step.tsx`: AI model selection
+• `results-step.tsx`: Generation results and library saving
 
 ### Character Library Development
 
 The library system provides character management:
-- `src/components/character-library.tsx`: Main library interface
-- `src/lib/character-storage.ts`: IndexedDB operations
-- `src/app/library/edit/[id]/page.tsx`: Character editing page
+• `src/components/character-library.tsx`: Main library interface
+• `src/lib/character-storage.ts`: IndexedDB operations
+• `src/app/library/edit/[id]/page.tsx`: Character editing page
+
+### Chat System Development
+
+The chat system includes:
+• Chat interface at `/chat/[characterId]`
+• Chat API endpoint at `/api/chat`
+• IndexedDB conversation storage
+• Character-aware AI responses
 
 ### Regeneration System
 
 The regeneration system allows updating specific character elements:
-- Individual attributes (name, appearance, personality, backstory)
-- Portrait images with different models
-- Quest components, dialogue lines, and items
+• Individual attributes (name, appearance, personality, backstory)
+• Portrait images with different models
+• Quest components, dialogue lines, and items
 
 ## Common Development Tasks
 
@@ -180,18 +196,19 @@ The regeneration system allows updating specific character elements:
 
 1. **Wizard Flow**: Test each step of the character creation wizard
 2. **Character Library**: Verify saving, loading, editing, and deleting
-3. **Model Selection**: Test different model combinations
-4. **Regeneration**: Verify all regeneration options work correctly
-5. **Responsive Design**: Test on different screen sizes
-6. **Dark Mode**: Verify theme switching works properly
+3. **Chat System**: Test conversation flow, persistence, and character consistency
+4. **Model Selection**: Test different model combinations
+5. **Regeneration**: Verify all regeneration options work correctly
+6. **Responsive Design**: Test on different screen sizes
+7. **Dark Mode**: Verify theme switching works properly
 
 ### Browser Testing
 
 Test in multiple browsers:
-- Chrome
-- Firefox
-- Safari
-- Edge
+• Chrome
+• Firefox
+• Safari
+• Edge
 
 ## Troubleshooting
 
@@ -213,6 +230,14 @@ Common library issues:
 2. **Slow loading**: Verify browser performance and clear cache if needed
 3. **Search not working**: Check for JavaScript errors in console
 
+### Chat System Issues
+
+Common chat issues:
+
+1. **Chat not loading**: Verify character exists in library and IndexedDB is working
+2. **Messages not sending**: Check usage limits and network connection
+3. **Character responses inconsistent**: Verify character has detailed personality data
+
 ### Build Issues
 
 If you encounter build problems:
@@ -226,18 +251,18 @@ If you encounter build problems:
 
 ### Recommended Extensions (VS Code)
 
-- ES7+ React/Redux/React-Native snippets
-- Tailwind CSS IntelliSense
-- TypeScript Importer
-- Prettier - Code formatter
-- ESLint
+• ES7+ React/Redux/React-Native snippets
+• Tailwind CSS IntelliSense
+• TypeScript Importer
+• Prettier - Code formatter
+• ESLint
 
 ### Debugging Tools
 
-- React Developer Tools (browser extension)
-- IndexedDB viewer in browser dev tools
-- Network tab for API call inspection
-- Console for error tracking
+• React Developer Tools (browser extension)
+• IndexedDB viewer in browser dev tools
+• Network tab for API call inspection
+• Console for error tracking
 
 ## Contributing Guidelines
 
@@ -251,6 +276,6 @@ When contributing to NPC Forge:
 
 ## Related Documentation
 
-- [Architecture Overview](/docs/architecture) - System design and components
-- [Contributing Guidelines](/docs/contributing) - How to contribute
-- [API Documentation](/docs/api) - API endpoint details
+• [Architecture Overview](/docs/architecture) - System design and components
+• [Contributing Guidelines](/docs/contributing) - How to contribute
+• [API Documentation](/docs/api) - API endpoint details

@@ -14,29 +14,16 @@ export function loadMarkdownContent(filename: string): MarkdownContent {
     const fileContent = fs.readFileSync(filePath, 'utf8');
     
     // Extract title from first heading
-    const titleMatch = fileContent.match(/^# (.+)$/m);
-    const title = titleMatch ? titleMatch[1] : '';
+    const titleMatch = fileContent.match(/^#\s+(.+)$/m);
+    const title = titleMatch ? titleMatch[1].trim() : '';
     
-    // Extract description from first paragraph after title
-    const lines = fileContent.split('\n');
-    let description = '';
-    let foundTitle = false;
-    
-    for (const line of lines) {
-      if (line.startsWith('# ') && !foundTitle) {
-        foundTitle = true;
-        continue;
-      }
-      if (foundTitle && line.trim() && !line.startsWith('#') && !line.startsWith('**') && !line.startsWith('-')) {
-        description = line.trim();
-        break;
-      }
-    }
+    // Don't extract description to avoid duplication
+    // Let the component handle showing the content naturally
     
     return {
       content: fileContent,
       title,
-      description
+      description: undefined // Remove description to prevent duplication
     };
   } catch (error) {
     console.error(`Error loading markdown file ${filename}:`, error);
