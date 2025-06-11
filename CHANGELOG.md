@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Enhanced error handling across chat, regeneration, and storage systems with more specific user-friendly error messages
+- Improved IndexedDB image loading with automatic retry logic for better reliability
+- Enhanced PortraitDisplay component to automatically load images from IndexedDB when direct image data is unavailable
+- Updated character regeneration API to preserve all character data including portraits when regenerating individual fields
+
+### Fixed
+- Portrait regeneration failures returning "Invalid response format" errors on character edit pages
+- Character portraits disappearing from library when regenerating character names or other fields
+- Character portraits not appearing consistently in library character cards despite being stored correctly
+- Character IDs containing special characters (quotes, spaces) causing routing and storage issues
+- Large request payloads (413 errors) during character and portrait regeneration by implementing data cleaning
+- JSON parsing failures from malformed AI responses with enhanced fallback parsing strategies
+- Usage limit checking errors when localStorage is unavailable or corrupted with graceful fallbacks
+- Portrait display cropping issues in library cards that cut off important parts of character images
+- Network timeout and connectivity issues during portrait generation with improved retry mechanisms
+
 ## [0.20.0] - 2025-06-09
 
 ### Added

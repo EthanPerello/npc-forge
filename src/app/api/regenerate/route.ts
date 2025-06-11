@@ -10,7 +10,10 @@ const openai = new OpenAI({
   timeout: 90000, // 90 seconds timeout
 });
 
-// Helper function to categorize errors
+// Maximum request size (10MB)
+const MAX_REQUEST_SIZE = 10 * 1024 * 1024;
+
+// Helper function to categorize errors with improved JSON formatting
 const categorizeError = (error: any): { type: string; message: string; status: number } => {
   if (error?.status || error?.code) {
     const status = error.status;
@@ -41,6 +44,12 @@ const categorizeError = (error: any): { type: string; message: string; status: n
           type: 'quota_exceeded',
           message: 'Monthly quota exceeded for this model tier.',
           status: 403
+        };
+      case 413:
+        return {
+          type: 'payload_too_large',
+          message: 'Request too large. Please reduce character data size.',
+          status: 413
         };
       case 500:
       case 502:
@@ -85,43 +94,101 @@ const categorizeError = (error: any): { type: string; message: string; status: n
   };
 };
 
+// Helper function to clean character data for API requests
+function cleanCharacterForAPI(character: any): any {
+  const cleaned = { ...character };
+  
+  // Remove large base64 image data to reduce payload size
+  delete cleaned.image_data;
+  delete cleaned.image_url;
+  
+  // Limit the size of trait objects
+  if (cleaned.selected_traits) {
+    Object.keys(cleaned.selected_traits).forEach(key => {
+      if (typeof cleaned.selected_traits[key] === 'string' && cleaned.selected_traits[key].length > 500) {
+        cleaned.selected_traits[key] = cleaned.selected_traits[key].substring(0, 500) + '...';
+      }
+    });
+  }
+  
+  if (cleaned.added_traits) {
+    Object.keys(cleaned.added_traits).forEach(key => {
+      if (typeof cleaned.added_traits[key] === 'string' && cleaned.added_traits[key].length > 500) {
+        cleaned.added_traits[key] = cleaned.added_traits[key].substring(0, 500) + '...';
+      }
+    });
+  }
+  
+  return cleaned;
+}
+
+// Helper function to validate request data
+function validateRequest(body: any): { isValid: boolean; error?: string } {
+  if (!body) {
+    return { isValid: false, error: 'Request body is required' };
+  }
+  
+  if (!body.character) {
+    return { isValid: false, error: 'Character data is required' };
+  }
+  
+  if (!body.field) {
+    return { isValid: false, error: 'Field parameter is required' };
+  }
+  
+  // Validate character has required properties
+  if (!body.character.name || typeof body.character.name !== 'string') {
+    return { isValid: false, error: 'Character must have a valid name' };
+  }
+  
+  return { isValid: true };
+}
+
 export async function POST(request: NextRequest) {
   try {
+    // Check request size
+    const contentLength = request.headers.get('content-length');
+    if (contentLength && parseInt(contentLength) > MAX_REQUEST_SIZE) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Request too large. Please reduce character data size.',
+          type: 'payload_too_large'
+        },
+        { status: 413 }
+      );
+    }
+
     const body = await request.json();
+    
+    // Validate request
+    const validation = validateRequest(body);
+    if (!validation.isValid) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: validation.error,
+          type: 'invalid_request'
+        },
+        { status: 400 }
+      );
+    }
+
     const { character, field, model, portraitOptions } = body;
+    
+    // Clean character object to reduce payload size
+    const cleanedCharacter = cleanCharacterForAPI(character);
 
-    if (!character) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Character data is required',
-          type: 'invalid_request'
-        },
-        { status: 400 }
-      );
-    }
-
-    if (!field) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Field parameter is required',
-          type: 'invalid_request'
-        },
-        { status: 400 }
-      );
-    }
-
-    console.log(`Regenerating ${field} for character: ${character.name}`);
+    console.log(`Regenerating ${field} for character: ${cleanedCharacter.name}`);
 
     // Handle portrait regeneration
     if (field === 'portrait') {
       try {
         // Create a character object with the portrait options
         const characterWithOptions = {
-          ...character,
+          ...cleanedCharacter,
           portrait_options: {
-            ...character.portrait_options,
+            ...cleanedCharacter.portrait_options,
             ...portraitOptions
           }
         };
@@ -134,9 +201,20 @@ export async function POST(request: NextRequest) {
           throw new Error('No image data returned from portrait generation');
         }
 
+        // Create updated character object for consistent response format
+        // Use original character as base to preserve all data
+        const updatedCharacter = {
+          ...character,
+          image_data: imageData,
+          portrait_options: {
+            ...character.portrait_options,
+            ...portraitOptions
+          }
+        };
+
         return NextResponse.json({
           success: true,
-          imageData,
+          character: updatedCharacter,
           field: 'portrait'
         });
       } catch (error) {
@@ -166,23 +244,23 @@ export async function POST(request: NextRequest) {
       // Generate appropriate prompts based on the field
       if (field === 'name') {
         systemPrompt = `Generate a single character name that fits this character's appearance and background. Return only the name, no additional text or formatting.`;
-        prompt = `Character: ${character.appearance || 'A character'}\nBackground: ${character.backstory_hook || 'Unknown background'}\nGenre: ${character.selected_traits?.genre || 'fantasy'}`;
+        prompt = `Character: ${cleanedCharacter.appearance || 'A character'}\nBackground: ${cleanedCharacter.backstory_hook || 'Unknown background'}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
       } else if (field === 'appearance') {
         systemPrompt = `Generate a detailed physical appearance description for this character. Include facial features, build, clothing, and distinguishing characteristics. Return only the description, no additional text or formatting.`;
-        prompt = `Character Name: ${character.name}\nPersonality: ${character.personality}\nGenre: ${character.selected_traits?.genre || 'fantasy'}`;
+        prompt = `Character Name: ${cleanedCharacter.name}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
       } else if (field === 'personality') {
         systemPrompt = `Generate a detailed personality description for this character. Include traits, mannerisms, motivations, and behavioral patterns. Return only the description, no additional text or formatting.`;
-        prompt = `Character Name: ${character.name}\nAppearance: ${character.appearance}\nBackground: ${character.backstory_hook}\nGenre: ${character.selected_traits?.genre || 'fantasy'}`;
+        prompt = `Character Name: ${cleanedCharacter.name}\nAppearance: ${cleanedCharacter.appearance}\nBackground: ${cleanedCharacter.backstory_hook}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
       } else if (field === 'backstory_hook') {
         systemPrompt = `Generate an engaging backstory hook for this character. Include their origin, key life events, and what drives them. Return only the backstory, no additional text or formatting.`;
-        prompt = `Character Name: ${character.name}\nAppearance: ${character.appearance}\nPersonality: ${character.personality}\nGenre: ${character.selected_traits?.genre || 'fantasy'}`;
+        prompt = `Character Name: ${cleanedCharacter.name}\nAppearance: ${cleanedCharacter.appearance}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
       } else if (field.startsWith('quest_')) {
         // Handle quest regeneration
         const parts = field.split('_');
         const questIndex = parseInt(parts[1], 10);
         const questPart = parts[2] || 'whole';
 
-        if (isNaN(questIndex) || !character.quests || questIndex >= character.quests.length) {
+        if (isNaN(questIndex) || !cleanedCharacter.quests || questIndex >= cleanedCharacter.quests.length) {
           return NextResponse.json(
             { 
               success: false, 
@@ -193,27 +271,27 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        const quest = character.quests[questIndex];
+        const quest = cleanedCharacter.quests[questIndex];
 
         if (questPart === 'title') {
           systemPrompt = `Generate a compelling quest title. Return only the title, no additional text or formatting.`;
-          prompt = `Quest Description: ${quest.description}\nCharacter: ${character.name}\nGenre: ${character.selected_traits?.genre || 'fantasy'}`;
+          prompt = `Quest Description: ${quest.description}\nCharacter: ${cleanedCharacter.name}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
         } else if (questPart === 'description') {
           systemPrompt = `Generate a detailed quest description. Include the objective, stakes, and any relevant context. Return only the description, no additional text or formatting.`;
-          prompt = `Quest Title: ${quest.title}\nCharacter: ${character.name}\nGenre: ${character.selected_traits?.genre || 'fantasy'}`;
+          prompt = `Quest Title: ${quest.title}\nCharacter: ${cleanedCharacter.name}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
         } else if (questPart === 'reward') {
           systemPrompt = `Generate an appropriate quest reward. Include both tangible and intangible benefits. Return only the reward description, no additional text or formatting.`;
-          prompt = `Quest: ${quest.title} - ${quest.description}\nCharacter: ${character.name}\nGenre: ${character.selected_traits?.genre || 'fantasy'}`;
+          prompt = `Quest: ${quest.title} - ${quest.description}\nCharacter: ${cleanedCharacter.name}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
         } else {
           // Regenerate entire quest
           systemPrompt = `Generate a complete quest object with title, description, and reward. Return as JSON object with fields: title, description, reward.`;
-          prompt = `Character: ${character.name}\nAppearance: ${character.appearance}\nPersonality: ${character.personality}\nGenre: ${character.selected_traits?.genre || 'fantasy'}`;
+          prompt = `Character: ${cleanedCharacter.name}\nAppearance: ${cleanedCharacter.appearance}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
         }
       } else if (field.startsWith('dialogue_')) {
         const parts = field.split('_');
         const index = parseInt(parts[1], 10);
 
-        if (isNaN(index) || !character.dialogue_lines || index >= character.dialogue_lines.length) {
+        if (isNaN(index) || !cleanedCharacter.dialogue_lines || index >= cleanedCharacter.dialogue_lines.length) {
           return NextResponse.json(
             { 
               success: false, 
@@ -225,12 +303,12 @@ export async function POST(request: NextRequest) {
         }
 
         systemPrompt = `Generate a dialogue line that this character would say. Make it consistent with their personality and background. Return only the dialogue, no quotes or additional formatting.`;
-        prompt = `Character: ${character.name}\nPersonality: ${character.personality}\nBackground: ${character.backstory_hook}\nExisting dialogue style: ${character.dialogue_lines[0] || 'Unknown'}`;
+        prompt = `Character: ${cleanedCharacter.name}\nPersonality: ${cleanedCharacter.personality}\nBackground: ${cleanedCharacter.backstory_hook}\nExisting dialogue style: ${cleanedCharacter.dialogue_lines[0] || 'Unknown'}`;
       } else if (field.startsWith('item_')) {
         const parts = field.split('_');
         const index = parseInt(parts[1], 10);
 
-        if (isNaN(index) || !character.items || index >= character.items.length) {
+        if (isNaN(index) || !cleanedCharacter.items || index >= cleanedCharacter.items.length) {
           return NextResponse.json(
             { 
               success: false, 
@@ -242,7 +320,7 @@ export async function POST(request: NextRequest) {
         }
 
         systemPrompt = `Generate an item that this character would own or carry. Include its name, description, and significance. Return only the item description, no additional text or formatting.`;
-        prompt = `Character: ${character.name}\nOccupation: ${character.selected_traits?.occupation || 'Unknown'}\nPersonality: ${character.personality}\nGenre: ${character.selected_traits?.genre || 'fantasy'}`;
+        prompt = `Character: ${cleanedCharacter.name}\nOccupation: ${cleanedCharacter.selected_traits?.occupation || 'Unknown'}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
       } else {
         return NextResponse.json(
           { 
@@ -254,7 +332,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Call OpenAI API with retry logic
+      // Call OpenAI API with enhanced error handling
       const response = await openai.chat.completions.create({
         model: textModel,
         messages: [
@@ -291,9 +369,79 @@ export async function POST(request: NextRequest) {
 
       console.log(`Successfully regenerated ${field}`);
 
+      // Create updated character object with the regenerated content
+      // IMPORTANT: Use the original character as base to preserve image_data
+      const updatedCharacter = { ...character };
+      
+      // Log to help debug image preservation
+      console.log(`Original character has image_data: ${!!(character.image_data || character.image_url)}`);
+      
+      // Update the appropriate field in the character object
+      if (field.startsWith('quest_')) {
+        // Handle quest regeneration
+        const parts = field.split('_');
+        const questIndex = parseInt(parts[1], 10);
+        const questPart = parts[2] || 'whole';
+        
+        // Ensure quests array exists and has the quest at the index
+        if (!updatedCharacter.quests || !updatedCharacter.quests[questIndex]) {
+          throw new Error(`Quest at index ${questIndex} not found`);
+        }
+        
+        if (questPart === 'whole') {
+          // Replace entire quest
+          if (typeof regeneratedContent === 'object') {
+            updatedCharacter.quests[questIndex] = regeneratedContent;
+          } else {
+            throw new Error('Invalid quest data format');
+          }
+        } else {
+          // Update specific quest field
+          updatedCharacter.quests[questIndex] = {
+            ...updatedCharacter.quests[questIndex],
+            [questPart]: regeneratedContent
+          };
+        }
+      } else if (field.startsWith('dialogue_')) {
+        const parts = field.split('_');
+        const index = parseInt(parts[1], 10);
+        
+        // Ensure dialogue_lines array exists and has enough elements
+        if (!updatedCharacter.dialogue_lines) {
+          updatedCharacter.dialogue_lines = [];
+        }
+        if (index >= 0 && index < updatedCharacter.dialogue_lines.length) {
+          updatedCharacter.dialogue_lines[index] = regeneratedContent;
+        } else {
+          throw new Error(`Dialogue line at index ${index} not found`);
+        }
+      } else if (field.startsWith('item_')) {
+        const parts = field.split('_');
+        const index = parseInt(parts[1], 10);
+        
+        // Ensure items array exists and has enough elements
+        if (!updatedCharacter.items) {
+          updatedCharacter.items = [];
+        }
+        if (index >= 0 && index < updatedCharacter.items.length) {
+          updatedCharacter.items[index] = regeneratedContent;
+        } else {
+          throw new Error(`Item at index ${index} not found`);
+        }
+      } else {
+        // Simple field update (name, appearance, personality, backstory_hook)
+        if (field in updatedCharacter) {
+          (updatedCharacter as any)[field] = regeneratedContent;
+        } else {
+          throw new Error(`Unknown field: ${field}`);
+        }
+      }
+
+      console.log(`Updated character still has image_data: ${!!(updatedCharacter.image_data || updatedCharacter.image_url)}`);
+
       return NextResponse.json({
         success: true,
-        regeneratedContent,
+        character: updatedCharacter,
         field
       });
 
@@ -316,6 +464,8 @@ export async function POST(request: NextRequest) {
     console.error('Request processing error:', error);
     
     const errorInfo = categorizeError(error);
+    
+    // Ensure we always return valid JSON
     return NextResponse.json(
       {
         success: false,
