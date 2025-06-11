@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { Image as ImageIcon, AlertCircle, RefreshCw, User, Upload } from 'lucide-react';
 import Button from '@/components/ui/button';
+import { getImage } from '@/lib/image-storage';
 
 interface PortraitDisplayProps {
   imageUrl?: string;
@@ -38,19 +39,21 @@ export default function PortraitDisplay({
   const [loaded, setLoaded] = useState<boolean>(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [forceRefresh, setForceRefresh] = useState<number>(0);
+  const [loadingFromDB, setLoadingFromDB] = useState<boolean>(false);
 
-  // Simplified image loading logic - prioritize image_data over everything else
+  // Enhanced image loading logic - includes IndexedDB fallback
   useEffect(() => {
     const loadImage = async () => {
-      console.log('Loading image - imageData:', !!imageData, 'imageUrl:', !!imageUrl);
+      console.log(`Loading image for ${name} - imageData:`, !!imageData, 'imageUrl:', !!imageUrl, 'characterId:', !!characterId);
       
       setError(false);
       setLoaded(false);
       setImageSrc(null);
+      setLoadingFromDB(false);
 
       // First priority: direct imageData (base64)
       if (imageData) {
-        console.log('Using imageData directly');
+        console.log(`Using imageData directly for ${name}`);
         if (imageData.startsWith('data:')) {
           setImageSrc(imageData);
         } else {
@@ -62,19 +65,48 @@ export default function PortraitDisplay({
 
       // Second priority: imageUrl
       if (imageUrl) {
-        console.log('Using imageUrl:', imageUrl);
+        console.log(`Using imageUrl for ${name}:`, imageUrl);
         setImageSrc(imageUrl);
         setLoaded(true);
         return;
       }
 
-      // No image available
-      console.log('No image available');
+      // Third priority: Load from IndexedDB if characterId is available
+      if (characterId) {
+        console.log(`No direct image data, attempting to load from IndexedDB for ${name} (ID: ${characterId})`);
+        setLoadingFromDB(true);
+        
+        try {
+          const storedImage = await getImage(characterId);
+          if (storedImage) {
+            console.log(`Successfully loaded image from IndexedDB for ${name}`);
+            
+            // Ensure the image data is properly formatted
+            if (storedImage.startsWith('data:')) {
+              setImageSrc(storedImage);
+            } else {
+              setImageSrc(`data:image/png;base64,${storedImage}`);
+            }
+            setLoaded(true);
+            setLoadingFromDB(false);
+            return;
+          } else {
+            console.log(`No image found in IndexedDB for ${name} (ID: ${characterId})`);
+          }
+        } catch (error) {
+          console.error(`Error loading image from IndexedDB for ${name}:`, error);
+        }
+        
+        setLoadingFromDB(false);
+      }
+
+      // No image available from any source
+      console.log(`No image available for ${name} from any source`);
       setLoaded(true);
     };
 
     loadImage();
-  }, [imageData, imageUrl, forceRefresh]);
+  }, [imageData, imageUrl, characterId, name, forceRefresh]);
 
   // Size configurations
   const sizeConfig = {
@@ -89,7 +121,7 @@ export default function PortraitDisplay({
       fallback: 'text-2xl font-semibold'
     },
     large: {
-      container: 'w-64 h-64',
+      container: 'w-full h-full', // Changed to be flexible for library cards
       text: 'text-4xl',
       fallback: 'text-4xl font-bold'
     }
@@ -98,13 +130,13 @@ export default function PortraitDisplay({
   const config = sizeConfig[size];
 
   const handleImageError = () => {
-    console.log('Image failed to load');
+    console.log(`Image failed to load for ${name}`);
     setError(true);
     setLoaded(true);
   };
 
   const handleImageLoad = () => {
-    console.log('Image loaded successfully');
+    console.log(`Image loaded successfully for ${name}`);
     setError(false);
     setLoaded(true);
   };
@@ -112,7 +144,7 @@ export default function PortraitDisplay({
   const handleRegenerate = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('Regenerating portrait...');
+    console.log(`Regenerating portrait for ${name}...`);
     setForceRefresh(prev => prev + 1);
     onRegenerate?.(e);
   };
@@ -120,28 +152,33 @@ export default function PortraitDisplay({
   const handleUpload = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('Uploading portrait...');
+    console.log(`Uploading portrait for ${name}...`);
     onUpload?.(e);
   };
 
   const firstInitial = name.charAt(0).toUpperCase();
 
+  // Determine if we should show loading state
+  const showLoading = isLoading || loadingFromDB;
+
   return (
     <div className={`portrait-container relative flex flex-col items-center space-y-2 ${className}`}>
       {/* Portrait Container with consistent sizing */}
-      <div className={`portrait-container relative ${config.container} rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 flex items-center justify-center`}>
-        {isLoading ? (
-          // Loading state
+      <div className={`portrait-container relative ${config.container} rounded-lg bg-gray-100 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 flex items-center justify-center ${size === 'large' ? '' : 'overflow-hidden'}`}>
+        {showLoading ? (
+          // Loading state (includes both API loading and IndexedDB loading)
           <div className="flex flex-col items-center justify-center space-y-2 text-gray-400 dark:text-gray-500">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
-            <span className="text-xs">Generating...</span>
+            <span className="text-xs">
+              {isLoading ? 'Generating...' : 'Loading...'}
+            </span>
           </div>
         ) : imageSrc && !error ? (
           // Image display
           <img
             src={imageSrc}
             alt={`Portrait of ${name}`}
-            className="w-full h-full object-cover"
+            className={`${size === 'large' ? 'max-w-full max-h-full object-contain' : 'w-full h-full object-contain'}`}
             onLoad={handleImageLoad}
             onError={handleImageError}
           />
@@ -153,10 +190,22 @@ export default function PortraitDisplay({
         )}
 
         {/* Error overlay */}
-        {error && !isLoading && (
+        {error && !showLoading && (
           <div className="absolute inset-0 bg-red-50 dark:bg-red-900/20 flex flex-col items-center justify-center text-red-600 dark:text-red-400">
             <AlertCircle className="h-6 w-6 mb-1" />
             <span className="text-xs text-center px-1">Failed to load</span>
+            {onRetry && (
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setForceRefresh(prev => prev + 1);
+                  onRetry();
+                }}
+                className="mt-1 text-xs underline hover:no-underline"
+              >
+                Retry
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -169,15 +218,15 @@ export default function PortraitDisplay({
               variant="secondary"
               onClick={handleRegenerate}
               size="sm"
-              leftIcon={isLoading ? (
+              leftIcon={showLoading ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600 dark:border-indigo-700 dark:border-t-indigo-300"></div>
               ) : (
                 <RefreshCw className="h-4 w-4" />
               )}
-              disabled={isLoading}
+              disabled={showLoading}
               type="button"
             >
-              {isLoading ? "Regenerating..." : "Regenerate"}
+              {showLoading ? "Regenerating..." : "Regenerate"}
             </Button>
           )}
           
@@ -187,7 +236,7 @@ export default function PortraitDisplay({
               onClick={handleUpload}
               size="sm"
               leftIcon={<Upload className="h-4 w-4" />}
-              disabled={isLoading}
+              disabled={showLoading}
               type="button"
             >
               Upload

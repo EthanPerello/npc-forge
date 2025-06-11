@@ -9,6 +9,9 @@ const openai = new OpenAI({
   timeout: 60000, // 60 seconds timeout for chat responses
 });
 
+// Maximum request size (10MB)
+const MAX_REQUEST_SIZE = 10 * 1024 * 1024;
+
 // Helper function to create system message
 function createSystemMessage(character: any): ChatMessage {
   const name = character.name;
@@ -107,7 +110,7 @@ function getMaxTokensForInput(userMessage: string): number {
   return 200; // Brief to moderate response without cutoff
 }
 
-// Helper function to categorize errors
+// Helper function to categorize errors with proper JSON formatting
 function categorizeError(error: any): { type: string; message: string; shouldRetry: boolean } {
   if (error?.status || error?.code) {
     const status = error.status;
@@ -143,6 +146,12 @@ function categorizeError(error: any): { type: string; message: string; shouldRet
         return {
           type: 'quota_exceeded',
           message: 'Monthly usage limit reached.',
+          shouldRetry: false
+        };
+      case 413:
+        return {
+          type: 'payload_too_large',
+          message: 'Request too large. Please try with shorter message.',
           shouldRetry: false
         };
       case 500:
@@ -187,8 +196,54 @@ function categorizeError(error: any): { type: string; message: string; shouldRet
   };
 }
 
+// Helper function to sanitize character ID
+function sanitizeCharacterId(id: string): string {
+  return id.replace(/[^a-zA-Z0-9-_]/g, '_');
+}
+
+// Helper function to create a clean character object for API (remove large data)
+function cleanCharacterForAPI(character: any): any {
+  const cleaned = { ...character };
+  
+  // Remove large base64 image data to reduce payload size
+  delete cleaned.image_data;
+  delete cleaned.image_url;
+  
+  // Limit the size of trait objects
+  if (cleaned.selected_traits) {
+    Object.keys(cleaned.selected_traits).forEach(key => {
+      if (typeof cleaned.selected_traits[key] === 'string' && cleaned.selected_traits[key].length > 500) {
+        cleaned.selected_traits[key] = cleaned.selected_traits[key].substring(0, 500) + '...';
+      }
+    });
+  }
+  
+  if (cleaned.added_traits) {
+    Object.keys(cleaned.added_traits).forEach(key => {
+      if (typeof cleaned.added_traits[key] === 'string' && cleaned.added_traits[key].length > 500) {
+        cleaned.added_traits[key] = cleaned.added_traits[key].substring(0, 500) + '...';
+      }
+    });
+  }
+  
+  return cleaned;
+}
+
 export async function POST(req: NextRequest) {
   try {
+    // Check request size
+    const contentLength = req.headers.get('content-length');
+    if (contentLength && parseInt(contentLength) > MAX_REQUEST_SIZE) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Request too large. Please try with shorter message.',
+          errorType: 'payload_too_large'
+        } as ChatAPIResponse,
+        { status: 413 }
+      );
+    }
+
     const body: ChatAPIRequest = await req.json();
     const { characterId, character, messages, newMessage, model } = body;
     
@@ -204,6 +259,9 @@ export async function POST(req: NextRequest) {
       );
     }
     
+    // Sanitize character ID
+    const sanitizedCharacterId = sanitizeCharacterId(characterId);
+    
     // Check message length
     if (newMessage.length > 1000) {
       return NextResponse.json(
@@ -216,23 +274,31 @@ export async function POST(req: NextRequest) {
       );
     }
     
-    // FIXED: Check usage limits using the existing system BEFORE making API call
-    if (hasReachedLimit(model)) {
-      const usageData = getUsageData(model);
-      const monthlyLimit = getMonthlyLimit(model);
-      
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: `Monthly limit reached for ${model}. You have used ${usageData.count} of ${monthlyLimit} generations.`,
-          errorType: 'quota_exceeded'
-        } as ChatAPIResponse,
-        { status: 403 }
-      );
+    // Clean character object to reduce payload size
+    const cleanedCharacter = cleanCharacterForAPI(character);
+    
+    // Check usage limits using the existing system BEFORE making API call
+    try {
+      if (hasReachedLimit(model)) {
+        const usageData = getUsageData(model);
+        const monthlyLimit = getMonthlyLimit(model);
+        
+        return NextResponse.json(
+          { 
+            success: false, 
+            error: `Monthly limit reached for ${model}. You have used ${usageData.count} of ${monthlyLimit} generations.`,
+            errorType: 'quota_exceeded'
+          } as ChatAPIResponse,
+          { status: 403 }
+        );
+      }
+    } catch (limitError) {
+      console.warn('Error checking usage limits:', limitError);
+      // Continue with request if limit checking fails (fail open)
     }
     
     // Prepare messages for OpenAI
-    const systemMessage = createSystemMessage(character);
+    const systemMessage = createSystemMessage(cleanedCharacter);
     
     // Convert our chat messages to OpenAI format with proper typing
     const openaiMessages: Array<{role: 'system' | 'user' | 'assistant', content: string}> = [
@@ -247,11 +313,11 @@ export async function POST(req: NextRequest) {
       { role: 'user', content: newMessage }
     ];
     
-    console.log(`Generating chat response for ${character.name} using ${model}`);
+    console.log(`Generating chat response for ${cleanedCharacter.name} using ${model}`);
     console.log(`Message context: ${openaiMessages.length - 2} previous messages`);
     console.log(`User message: "${newMessage.substring(0, 50)}..."`);
     
-    // Determine appropriate response length based on user input - INCREASED LIMITS
+    // Determine appropriate response length based on user input
     const maxTokens = getMaxTokensForInput(newMessage);
     console.log(`Setting max tokens to ${maxTokens} for user input length ${newMessage.length}`);
     
@@ -296,9 +362,14 @@ export async function POST(req: NextRequest) {
           // Use the retry response instead
           const finalResponse = retryResponse.trim();
           
-          // FIXED: Increment usage count using the existing system AFTER successful API call
-          incrementUsage(model);
-          console.log(`Usage incremented for model ${model}`);
+          // Increment usage count using the existing system AFTER successful API call
+          try {
+            incrementUsage(model);
+            console.log(`Usage incremented for model ${model}`);
+          } catch (usageError) {
+            console.warn('Error incrementing usage:', usageError);
+            // Continue anyway since the API call was successful
+          }
           
           // Create the response message
           const responseMessage: ChatMessage = {
@@ -306,10 +377,10 @@ export async function POST(req: NextRequest) {
             role: 'assistant',
             content: finalResponse,
             timestamp: new Date().toISOString(),
-            characterId: characterId,
+            characterId: sanitizedCharacterId,
           };
           
-          console.log(`Chat response generated successfully for ${character.name} (${finalResponse.length} chars)`);
+          console.log(`Chat response generated successfully for ${cleanedCharacter.name} (${finalResponse.length} chars)`);
           
           return NextResponse.json({
             success: true,
@@ -322,9 +393,14 @@ export async function POST(req: NextRequest) {
       }
     }
     
-    // FIXED: Increment usage count using the existing system AFTER successful API call
-    incrementUsage(model);
-    console.log(`Usage incremented for model ${model}`);
+    // Increment usage count using the existing system AFTER successful API call
+    try {
+      incrementUsage(model);
+      console.log(`Usage incremented for model ${model}`);
+    } catch (usageError) {
+      console.warn('Error incrementing usage:', usageError);
+      // Continue anyway since the API call was successful
+    }
     
     // Create the response message
     const responseMessage: ChatMessage = {
@@ -332,10 +408,10 @@ export async function POST(req: NextRequest) {
       role: 'assistant',
       content: trimmedResponse,
       timestamp: new Date().toISOString(),
-      characterId: characterId,
+      characterId: sanitizedCharacterId,
     };
     
-    console.log(`Chat response generated successfully for ${character.name} (${trimmedResponse.length} chars)`);
+    console.log(`Chat response generated successfully for ${cleanedCharacter.name} (${trimmedResponse.length} chars)`);
     
     return NextResponse.json({
       success: true,
@@ -347,13 +423,13 @@ export async function POST(req: NextRequest) {
     
     const errorInfo = categorizeError(error);
     
-    return NextResponse.json(
-      {
-        success: false,
-        error: errorInfo.message,
-        errorType: errorInfo.type
-      } as ChatAPIResponse,
-      { status: 500 }
-    );
+    // Ensure we always return valid JSON
+    const errorResponse: ChatAPIResponse = {
+      success: false,
+      error: errorInfo.message,
+      errorType: errorInfo.type
+    };
+    
+    return NextResponse.json(errorResponse, { status: 500 });
   }
 }

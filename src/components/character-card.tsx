@@ -54,8 +54,9 @@ export default function CharacterCard({
     }, 100);
   };
 
-  // Check if character has a portrait
-  const hasPortrait = !!(character.image_url || character.image_data);
+  // FIXED: Always use PortraitDisplay - it can handle all image sources including IndexedDB
+  // Don't check hasPortrait here since PortraitDisplay handles fallbacks
+  const shouldShowDownloadImage = !!(character.image_url || character.image_data || id);
 
   return (
     <div 
@@ -64,26 +65,18 @@ export default function CharacterCard({
     >
       {/* Header with portrait and basic info - RESPONSIVE LAYOUT */}
       <div className="p-3 flex flex-col space-y-2 flex-1">
-        {/* Portrait - RESPONSIVE SIZE */}
+        {/* Portrait - ALWAYS use PortraitDisplay (FIXED) */}
         <div className="flex justify-center mb-2">
-          {hasPortrait ? (
-            <div className="portrait-container w-full max-w-[200px] aspect-square">
-              <PortraitDisplay
-                imageUrl={character.image_url}
-                imageData={character.image_data}
-                characterId={id}
-                name={character.name}
-                size="large"
-                className="w-full h-full object-cover rounded-lg library-portrait"
-              />
-            </div>
-          ) : (
-            <div className="w-full max-w-[200px] aspect-square bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center">
-              <span className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
-                {character.name.charAt(0).toUpperCase()}
-              </span>
-            </div>
-          )}
+          <div className="portrait-container w-full max-w-[200px] aspect-square">
+            <PortraitDisplay
+              imageUrl={character.image_url}
+              imageData={character.image_data}
+              characterId={id}
+              name={character.name}
+              size="large"
+              className="w-full h-full rounded-lg library-portrait"
+            />
+          </div>
         </div>
         
         {/* Character name - COMPACT */}
@@ -169,7 +162,7 @@ export default function CharacterCard({
               leftIcon={<ImageIcon className="h-3 w-3" />}
               size="sm"
               className="flex-1"
-              disabled={!hasPortrait}
+              disabled={!shouldShowDownloadImage}
             >
               Portrait
             </Button>

@@ -42,19 +42,21 @@ interface ExtendedCharacter extends Character {
 
 // Enhanced JSON parsing utilities
 class JSONParser {
-  // Clean and normalize JSON string
+  // Clean and normalize JSON string with more robust handling
   static cleanJSONString(jsonStr: string): string {
+    if (!jsonStr || typeof jsonStr !== 'string') {
+      throw new Error('Invalid input: jsonStr must be a non-empty string');
+    }
+    
     return jsonStr
-      // Remove control characters
-      .replace(/[\u0000-\u001F]+/g, " ")
+      // Remove control characters except newlines and tabs
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, " ")
       // Fix common formatting issues
       .replace(/\n\s*\n/g, "\n")
       // Remove trailing commas before closing braces/brackets (more comprehensive)
       .replace(/,(\s*[}\]])/g, "$1")
       // Fix trailing commas after quoted strings
       .replace(/("(?:[^"\\]|\\.)*"),(\s*[}\]])/g, '$1$2')
-      // Fix unescaped quotes in strings (basic attempt)
-      .replace(/([^\\])"([^"]*)"([^,}\]\s])/g, '$1\\"$2\\"$3')
       // Remove any text before the first {
       .replace(/^[^{]*/, "")
       // Remove any text after the last }
@@ -64,32 +66,44 @@ class JSONParser {
       .trim();
   }
 
-  // Extract JSON from various formats
+  // Extract JSON from various formats with better error handling
   static extractJSON(content: string): string[] {
+    if (!content || typeof content !== 'string') {
+      return [];
+    }
+    
     const candidates: string[] = [];
 
-    // Try to find JSON in markdown code blocks
-    const codeBlockMatch = content.match(/```json\s*([\s\S]*?)\s*```/i);
-    if (codeBlockMatch) {
-      candidates.push(codeBlockMatch[1]);
-    }
+    try {
+      // Try to find JSON in markdown code blocks
+      const codeBlockMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+      if (codeBlockMatch && codeBlockMatch[1]) {
+        candidates.push(codeBlockMatch[1]);
+      }
 
-    // Find all potential JSON objects
-    const jsonMatches = content.match(/\{[\s\S]*?\}/g);
-    if (jsonMatches) {
-      candidates.push(...jsonMatches);
-    }
+      // Find all potential JSON objects
+      const jsonMatches = content.match(/\{[\s\S]*?\}/g);
+      if (jsonMatches) {
+        candidates.push(...jsonMatches);
+      }
 
-    // Try the whole content if it looks like it might be JSON
-    if (content.trim().startsWith('{') && content.trim().endsWith('}')) {
-      candidates.push(content);
+      // Try the whole content if it looks like it might be JSON
+      if (content.trim().startsWith('{') && content.trim().endsWith('}')) {
+        candidates.push(content);
+      }
+    } catch (error) {
+      console.warn('Error extracting JSON candidates:', error);
     }
 
     return candidates;
   }
 
-  // Attempt to fix common JSON issues
+  // Attempt to fix common JSON issues with better validation
   static fixCommonIssues(jsonStr: string): string {
+    if (!jsonStr || typeof jsonStr !== 'string') {
+      return jsonStr;
+    }
+    
     let fixed = jsonStr;
 
     try {
@@ -133,8 +147,12 @@ class JSONParser {
     }
   }
 
-  // Validate and fix character object
+  // Validate and fix character object with better error handling
   static validateAndFixCharacter(obj: any): Character {
+    if (!obj || typeof obj !== 'object') {
+      throw new Error('Invalid character object: must be an object');
+    }
+    
     const character = obj as Character;
 
     // Ensure required fields exist - only set defaults if they're truly missing
@@ -198,14 +216,23 @@ class JSONParser {
     return character;
   }
 
-  // Main parsing function with multiple strategies
+  // Main parsing function with multiple strategies and better error reporting
   static parseCharacterJSON(content: string): Character {
     console.log('=== Starting JSON parsing process ===');
+    
+    if (!content || typeof content !== 'string') {
+      throw new Error('Invalid content: must be a non-empty string');
+    }
+    
     console.log('Raw content length:', content.length);
     console.log('Content preview:', content.substring(0, 300) + '...');
     
     const candidates = this.extractJSON(content);
     console.log(`Found ${candidates.length} JSON candidates`);
+    
+    if (candidates.length === 0) {
+      throw new Error('No JSON candidates found in response');
+    }
     
     for (let i = 0; i < candidates.length; i++) {
       const candidate = candidates[i];
@@ -226,6 +253,11 @@ class JSONParser {
         const jsonStr = strategies[j];
         try {
           console.log(`Trying strategy ${j + 1} for candidate ${i + 1}`);
+          
+          if (!jsonStr || jsonStr.trim().length === 0) {
+            continue;
+          }
+          
           const parsed = JSON.parse(jsonStr);
           console.log('Parsed JSON successfully, raw parsed object:', {
             name: parsed.name,
@@ -301,6 +333,13 @@ const categorizeError = (error: any): { type: string; message: string; shouldRet
           message: 'Monthly quota exceeded for this model tier.',
           shouldRetry: false,
           userMessage: 'Monthly usage limit reached. Try a lower tier model or wait until next month.'
+        };
+      case 413:
+        return {
+          type: 'payload_too_large',
+          message: 'Request payload too large.',
+          shouldRetry: false,
+          userMessage: 'Request too large. Please try with shorter description or fewer options.'
         };
       case 500:
       case 502:
@@ -627,11 +666,11 @@ export async function generatePortrait(character: Character): Promise<string> {
     const framing = portraitOptions.framing ? `${portraitOptions.framing} shot,` : '';
     const background = portraitOptions.background ? `with a ${portraitOptions.background} background,` : '';
     
-    // Create a prompt for the image generation
-    const imagePrompt = `Portrait of ${name}: ${appearanceText.substring(0, 250)}
-    ${visualTraits.length > 0 ? `Important visual characteristics: ${visualTraits.join(', ')}.` : ''}
+    // Create a prompt for the image generation (limit size to avoid 413 errors)
+    const imagePrompt = `Portrait of ${name}: ${appearanceText.substring(0, 200)}
+    ${visualTraits.length > 0 ? `Important visual characteristics: ${visualTraits.join(', ').substring(0, 200)}.` : ''}
     ${artStyle} ${mood} ${framing} ${background}
-    High quality, detailed character portrait, professional digital art.`;
+    High quality, detailed character portrait, professional digital art.`.substring(0, 400);
 
     console.log(`Generating portrait with prompt: "${imagePrompt.substring(0, 100)}..."`);
 

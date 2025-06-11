@@ -20,8 +20,10 @@ const STEPS = [
 export default function CharacterWizard() {
   const [currentStep, setCurrentStep] = useState(0);
   const [forceStep, setForceStep] = useState<number | null>(null);
+  const [localError, setLocalError] = useState<string | null>(null);
   const manualNavRef = useRef<boolean>(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   
   const { 
     formData, 
@@ -32,6 +34,13 @@ export default function CharacterWizard() {
     error, 
     generateRandomCharacter 
   } = useCharacter();
+
+  // Clear local error when context error changes
+  useEffect(() => {
+    if (error) {
+      setLocalError(null);
+    }
+  }, [error]);
 
   // Listen for sidebar state changes
   useEffect(() => {
@@ -50,76 +59,123 @@ export default function CharacterWizard() {
   }, []);
 
   // Handle step navigation - allow navigation to any step if description exists
-  const goToStep = (stepIndex: number) => {
-    if (stepIndex < 0 || stepIndex >= STEPS.length) return;
-    
-    // Only require description for steps beyond the first step
-    if (stepIndex > 0 && !formData.description) {
-      return;
-    }
-    
-    // Mark that this is a manual navigation
-    manualNavRef.current = true;
-    setCurrentStep(stepIndex);
-  };
-
-  const goToNext = async () => {
-    if (currentStep === STEPS.length - 1) {
-      // On last step, create new character
-      handleNewCharacter();
-    } else if (currentStep === STEPS.length - 2) {
-      // On model step, generate character
-      try {
-        manualNavRef.current = true;
-        await generateCharacter();
-        setCurrentStep(currentStep + 1);
-      } catch (error) {
-        console.error("Error generating character:", error);
-      } finally {
-        manualNavRef.current = false;
+  const goToStep = useCallback((stepIndex: number) => {
+    try {
+      if (stepIndex < 0 || stepIndex >= STEPS.length) return;
+      
+      // Only require description for steps beyond the first step
+      if (stepIndex > 0 && !formData.description) {
+        setLocalError('Please provide a character description before proceeding.');
+        return;
       }
-    } else {
+      
+      // Clear any local errors
+      setLocalError(null);
+      
+      // Mark that this is a manual navigation
       manualNavRef.current = true;
-      setCurrentStep(currentStep + 1);
+      setCurrentStep(stepIndex);
+    } catch (error) {
+      console.error('Error navigating to step:', error);
+      setLocalError('Error navigating to step. Please try again.');
     }
-  };
+  }, [formData.description]);
 
-  const goToPrevious = () => {
-    if (currentStep > 0) {
+  const goToNext = useCallback(async () => {
+    try {
+      setLocalError(null);
+      
+      if (currentStep === STEPS.length - 1) {
+        // On last step, create new character
+        handleNewCharacter();
+      } else if (currentStep === STEPS.length - 2) {
+        // On model step, generate character
+        if (!formData.description) {
+          setLocalError('Please provide a character description before generating.');
+          return;
+        }
+        
+        setIsGenerating(true);
+        manualNavRef.current = true;
+        
+        try {
+          await generateCharacter();
+          setCurrentStep(currentStep + 1);
+        } catch (error) {
+          console.error("Error generating character:", error);
+          setLocalError('Failed to generate character. Please try again.');
+        } finally {
+          setIsGenerating(false);
+          manualNavRef.current = false;
+        }
+      } else {
+        // Navigate to next step
+        if (currentStep === 0 && !formData.description) {
+          setLocalError('Please provide a character description before proceeding.');
+          return;
+        }
+        
+        manualNavRef.current = true;
+        setCurrentStep(currentStep + 1);
+      }
+    } catch (error) {
+      console.error('Error in goToNext:', error);
+      setLocalError('Error proceeding to next step. Please try again.');
+      setIsGenerating(false);
+    }
+  }, [currentStep, formData.description, generateCharacter]);
+
+  const goToPrevious = useCallback(() => {
+    try {
+      if (currentStep > 0) {
+        setLocalError(null);
+        manualNavRef.current = true;
+        setCurrentStep(currentStep - 1);
+      }
+    } catch (error) {
+      console.error('Error going to previous step:', error);
+      setLocalError('Error going to previous step. Please try again.');
+    }
+  }, [currentStep]);
+
+  const handleNewCharacter = useCallback(() => {
+    try {
+      setLocalError(null);
       manualNavRef.current = true;
-      setCurrentStep(currentStep - 1);
+      resetFormData();
+      setCurrentStep(0);
+    } catch (error) {
+      console.error('Error creating new character:', error);
+      setLocalError('Error resetting form. Please refresh the page.');
     }
-  };
-
-  const handleNewCharacter = () => {
-    manualNavRef.current = true;
-    resetFormData();
-    setCurrentStep(0);
-  };
+  }, [resetFormData]);
 
   // Check if a step should be disabled
-  const isStepDisabled = (stepIndex: number) => {
+  const isStepDisabled = useCallback((stepIndex: number) => {
     // The first step (concept) is never disabled
     if (stepIndex === 0) return false;
     
     // Other steps require description
     return !formData.description;
-  };
+  }, [formData.description]);
 
   // Check if step is accessible (can be clicked)
-  const isStepAccessible = (stepIndex: number) => {
+  const isStepAccessible = useCallback((stepIndex: number) => {
     // Concept step is always accessible
     if (stepIndex === 0) return true;
     
     // Other steps require description
     return !!formData.description;
-  };
+  }, [formData.description]);
 
-  // FIXED: Random character generation that respects user content selections
+  // Enhanced random character generation with better error handling
   const handleRandomGeneration = useCallback(async () => {
-    if (isLoading) return;
+    if (isLoading || isGenerating) return;
     
     try {
+      setLocalError(null);
+      setIsGenerating(true);
+      
       console.log('Starting random character generation with user content preferences');
       
       // 1. Generate random data while preserving user content type selections
@@ -157,26 +213,36 @@ export default function CharacterWizard() {
       setCurrentStep(3);
     } catch (error) {
       console.error('Error in random generation:', error);
+      setLocalError('Failed to generate random character. Please try again.');
+    } finally {
+      setIsGenerating(false);
     }
-  }, [generateRandomCharacter, generateCharacter, isLoading, formData]);
+  }, [generateRandomCharacter, generateCharacter, isLoading, isGenerating, formData]);
 
   // Direct navigation to results
   const goToResults = useCallback(() => {
-    manualNavRef.current = true;
-    setCurrentStep(3);
+    try {
+      manualNavRef.current = true;
+      setCurrentStep(3);
+    } catch (error) {
+      console.error('Error navigating to results:', error);
+      setLocalError('Error navigating to results. Please try again.');
+    }
   }, []);
 
-  // FIXED: Add navigation prevention for non-manual changes
+  // Auto-navigation to results after character generation
   useEffect(() => {
     // Only auto-navigate if NOT a manual navigation AND there's a character
-    // and we're on the model step
-    if (!manualNavRef.current && character && currentStep === 2) {
+    // and we're on the model step and not currently generating
+    if (!manualNavRef.current && character && currentStep === 2 && !isGenerating) {
       setCurrentStep(3);
     }
     
     // Reset the manual nav flag after use
-    manualNavRef.current = false;
-  }, [character, currentStep]);
+    if (manualNavRef.current) {
+      manualNavRef.current = false;
+    }
+  }, [character, currentStep, isGenerating]);
 
   // Handle forced step navigation
   useEffect(() => {
@@ -186,65 +252,128 @@ export default function CharacterWizard() {
     }
   }, [forceStep]);
 
-  // Render the current step component
+  // Render the current step component with error boundaries
   const renderStepContent = () => {
-    switch (currentStep) {
-      case 0: return <ConceptStep 
-                onNext={goToNext} 
-                onNavigateToResults={goToResults} 
-                isGenerating={isLoading}
-                onRandomGenerate={handleRandomGeneration} />;
-      case 1: return <OptionsStep onNext={goToNext} isGenerating={isLoading} />;
-      case 2: return <ModelStep onNext={goToNext} isGenerating={isLoading} />;
-      case 3: return <ResultsStep onNext={goToNext} isGenerating={isLoading} />;
-      default: return null;
+    try {
+      const commonProps = {
+        isGenerating: isLoading || isGenerating
+      };
+
+      switch (currentStep) {
+        case 0: 
+          return (
+            <ConceptStep 
+              {...commonProps}
+              onNext={goToNext} 
+              onNavigateToResults={goToResults} 
+              onRandomGenerate={handleRandomGeneration} 
+            />
+          );
+        case 1: 
+          return (
+            <OptionsStep 
+              {...commonProps}
+              onNext={goToNext} 
+            />
+          );
+        case 2: 
+          return (
+            <ModelStep 
+              {...commonProps}
+              onNext={goToNext} 
+            />
+          );
+        case 3: 
+          return (
+            <ResultsStep 
+              {...commonProps}
+              onNext={goToNext} 
+            />
+          );
+        default: 
+          return (
+            <div className="p-8 text-center">
+              <p className="text-gray-600 dark:text-gray-400">Invalid step</p>
+            </div>
+          );
+      }
+    } catch (error) {
+      console.error('Error rendering step content:', error);
+      return (
+        <div className="p-8 text-center">
+          <p className="text-red-600 dark:text-red-400">Error loading step content. Please refresh the page.</p>
+        </div>
+      );
     }
   };
 
-  // Determine sticky footer props
+  // Determine sticky footer props with error handling
   const getStickyFooterProps = () => {
-    if (currentStep === STEPS.length - 1) {
-      return {
-        pageType: 'wizard-results' as const,
-        currentStep,
-        totalSteps: STEPS.length,
-        onStepClick: goToStep,
-        onPrevious: goToPrevious,
-        onNext: handleNewCharacter,
-        nextLabel: 'New Character',
-        nextDisabled: false
-      };
-    } else if (currentStep === STEPS.length - 2) {
-      return {
-        pageType: 'wizard' as const,
-        currentStep,
-        totalSteps: STEPS.length,
-        onStepClick: goToStep,
-        onPrevious: goToPrevious,
-        onNext: goToNext,
-        nextLabel: isLoading ? 'Generating...' : 'Generate',
-        nextDisabled: !formData.description || isLoading,
-        isLoading: isLoading
-      };
-    } else {
+    try {
+      const isLastStep = currentStep === STEPS.length - 1;
+      const isModelStep = currentStep === STEPS.length - 2;
       const isFirstStep = currentStep === 0;
+      const currentlyGenerating = isLoading || isGenerating;
+
+      if (isLastStep) {
+        return {
+          pageType: 'wizard-results' as const,
+          currentStep,
+          totalSteps: STEPS.length,
+          onStepClick: goToStep,
+          onPrevious: goToPrevious,
+          onNext: handleNewCharacter,
+          nextLabel: 'New Character',
+          nextDisabled: false
+        };
+      } else if (isModelStep) {
+        return {
+          pageType: 'wizard' as const,
+          currentStep,
+          totalSteps: STEPS.length,
+          onStepClick: goToStep,
+          onPrevious: goToPrevious,
+          onNext: goToNext,
+          nextLabel: currentlyGenerating ? 'Generating...' : 'Generate',
+          nextDisabled: !formData.description || currentlyGenerating,
+          isLoading: currentlyGenerating
+        };
+      } else {
+        return {
+          pageType: 'wizard' as const,
+          currentStep,
+          totalSteps: STEPS.length,
+          onStepClick: goToStep,
+          onPrevious: goToPrevious,
+          onNext: goToNext,
+          nextLabel: 'Continue',
+          nextDisabled: isFirstStep && !formData.description,
+          prevDisabled: isFirstStep
+        };
+      }
+    } catch (error) {
+      console.error('Error getting sticky footer props:', error);
+      // Return safe defaults
       return {
         pageType: 'wizard' as const,
-        currentStep,
+        currentStep: 0,
         totalSteps: STEPS.length,
-        onStepClick: goToStep,
-        onPrevious: goToPrevious,
-        onNext: goToNext,
+        onStepClick: () => {},
+        onPrevious: () => {},
+        onNext: () => {},
         nextLabel: 'Continue',
-        nextDisabled: isFirstStep && !formData.description,
-        prevDisabled: isFirstStep
+        nextDisabled: true,
+        prevDisabled: true
       };
     }
   };
+
+  // Get the active error message (prioritize local errors)
+  const activeError = localError || error;
 
   return (
     <div className="max-w-full">
-      {/* FIXED: Mobile-Responsive Sticky Progress Header */}
+      {/* Mobile-Responsive Sticky Progress Header */}
       {!isMobileSidebarOpen && (
         <div className="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 mb-8">
           <div className="max-w-full px-4 py-4">
@@ -262,6 +391,7 @@ export default function CharacterWizard() {
                           : 'bg-gray-200 text-gray-500 cursor-not-allowed dark:bg-gray-700 dark:text-gray-400'}
                     `}
                     disabled={!isStepAccessible(index)}
+                    title={!isStepAccessible(index) ? 'Complete previous steps first' : `Go to ${step.label}`}
                   >
                     {index + 1}
                   </button>
@@ -287,12 +417,12 @@ export default function CharacterWizard() {
       </div>
 
       {/* Display error message if there is one */}
-      {error && (
+      {activeError && (
         <div className="fixed bottom-24 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
           <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm font-bold dark:bg-red-900/30 dark:text-red-200 shadow-lg border border-red-200 dark:border-red-800 w-full max-w-5xl mx-4">
             <p className="flex items-center justify-center">
-              <AlertTriangle className="w-4 h-4 mr-2" />
-              {error}
+              <AlertTriangle className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="text-center">{activeError}</span>
             </p>
           </div>
         </div>
@@ -300,8 +430,8 @@ export default function CharacterWizard() {
 
       {/* Loading message for generation */}
       <DelayedLoadingMessage 
-        isLoading={isLoading} 
-        message="Character generation may take a second... Creating your unique NPC with AI."
+        isLoading={isLoading || isGenerating} 
+        message="Character generation may take a moment... Creating your unique NPC with AI."
         delay={1000}
       />
 

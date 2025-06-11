@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { OpenAIModel, ImageModel } from '@/lib/types';
 import { MODEL_CONFIGS, DEFAULT_MODEL, getModelConfig } from '@/lib/models';
 import { IMAGE_MODEL_CONFIGS, DEFAULT_IMAGE_MODEL, getImageModelConfig } from '@/lib/image-models';
@@ -23,29 +23,51 @@ export default function ModelSelectorsSection({
   const [textDropdownOpen, setTextDropdownOpen] = useState(false);
   const [imageDropdownOpen, setImageDropdownOpen] = useState(false);
   const [remaining, setRemaining] = useState<Record<string, string | number>>({});
+  const [isLoading, setIsLoading] = useState(true);
 
   // Initialize with default models if none selected
   const selectedTextModel = textModel || DEFAULT_MODEL;
   const selectedImageModel = imageModel || DEFAULT_IMAGE_MODEL;
 
-  // Get remaining generations for all models
-  useEffect(() => {
-    const remainingCounts: Record<string, string | number> = {};
-    
-    // Text models
-    MODEL_CONFIGS.forEach(config => {
-      const value = getRemainingGenerations(config.id);
-      remainingCounts[config.id] = value;
-    });
-    
-    // Image models
-    IMAGE_MODEL_CONFIGS.forEach(config => {
-      const value = getRemainingGenerations(config.id);
-      remainingCounts[config.id] = value;
-    });
-    
-    setRemaining(remainingCounts);
+  // Get remaining generations for all models with error handling
+  const updateRemainingCounts = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const remainingCounts: Record<string, string | number> = {};
+      
+      // Text models
+      for (const config of MODEL_CONFIGS) {
+        try {
+          const value = getRemainingGenerations(config.id);
+          remainingCounts[config.id] = value;
+        } catch (error) {
+          console.warn(`Error getting remaining count for text model ${config.id}:`, error);
+          remainingCounts[config.id] = 0;
+        }
+      }
+      
+      // Image models
+      for (const config of IMAGE_MODEL_CONFIGS) {
+        try {
+          const value = getRemainingGenerations(config.id);
+          remainingCounts[config.id] = value;
+        } catch (error) {
+          console.warn(`Error getting remaining count for image model ${config.id}:`, error);
+          remainingCounts[config.id] = 0;
+        }
+      }
+      
+      setRemaining(remainingCounts);
+    } catch (error) {
+      console.error('Error updating remaining counts:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    updateRemainingCounts();
+  }, [updateRemainingCounts]);
 
   // Format the remaining count for display
   const formatRemaining = (count: string | number): string => {
@@ -87,9 +109,16 @@ export default function ModelSelectorsSection({
 
   // Close dropdowns when clicking outside
   useEffect(() => {
-    const handleClickOutside = () => {
-      setTextDropdownOpen(false);
-      setImageDropdownOpen(false);
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      
+      // Check if the click is outside any dropdown
+      const isClickInsideDropdown = target.closest('[data-dropdown]');
+      
+      if (!isClickInsideDropdown) {
+        setTextDropdownOpen(false);
+        setImageDropdownOpen(false);
+      }
     };
 
     if (textDropdownOpen || imageDropdownOpen) {
@@ -98,8 +127,45 @@ export default function ModelSelectorsSection({
     }
   }, [textDropdownOpen, imageDropdownOpen]);
 
-  const selectedTextConfig = getModelConfig(selectedTextModel);
-  const selectedImageConfig = getImageModelConfig(selectedImageModel);
+  // Handle model selection with error handling
+  const handleTextModelSelect = (modelId: OpenAIModel) => {
+    try {
+      onTextModelChange(modelId);
+      setTextDropdownOpen(false);
+      updateRemainingCounts(); // Refresh counts after selection
+    } catch (error) {
+      console.error('Error selecting text model:', error);
+    }
+  };
+
+  const handleImageModelSelect = (modelId: ImageModel) => {
+    try {
+      onImageModelChange(modelId);
+      setImageDropdownOpen(false);
+      updateRemainingCounts(); // Refresh counts after selection
+    } catch (error) {
+      console.error('Error selecting image model:', error);
+    }
+  };
+
+  // Get model configurations with fallbacks
+  const selectedTextConfig = (() => {
+    try {
+      return getModelConfig(selectedTextModel);
+    } catch (error) {
+      console.warn('Error getting text model config:', error);
+      return MODEL_CONFIGS[0]; // Fallback to first config
+    }
+  })();
+
+  const selectedImageConfig = (() => {
+    try {
+      return getImageModelConfig(selectedImageModel);
+    } catch (error) {
+      console.warn('Error getting image model config:', error);
+      return IMAGE_MODEL_CONFIGS[0]; // Fallback to first config
+    }
+  })();
 
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-6">
@@ -109,7 +175,7 @@ export default function ModelSelectorsSection({
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Text Model Dropdown */}
-        <div className="relative">
+        <div className="relative" data-dropdown="text">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Text Generation Model
           </label>
@@ -142,7 +208,7 @@ export default function ModelSelectorsSection({
                     inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
                     ${getTierBadgeClass(selectedTextConfig.tier)}
                   `}>
-                    {formatRemaining(remaining[selectedTextModel] || 0)} left
+                    {isLoading ? '...' : formatRemaining(remaining[selectedTextModel] || 0)} left
                   </span>
                   <ChevronDown className={`w-4 h-4 transition-transform ${textDropdownOpen ? 'rotate-180' : ''}`} />
                 </div>
@@ -159,8 +225,7 @@ export default function ModelSelectorsSection({
                       key={config.id}
                       onClick={(e) => {
                         e.stopPropagation();
-                        onTextModelChange(config.id);
-                        setTextDropdownOpen(false);
+                        handleTextModelSelect(config.id);
                       }}
                       className={`
                         cursor-pointer p-3 transition-all duration-200 first:rounded-t-lg last:rounded-b-lg
@@ -186,7 +251,7 @@ export default function ModelSelectorsSection({
                           inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
                           ${getTierBadgeClass(config.tier)}
                         `}>
-                          {formatRemaining(remaining[config.id] || 0)} left
+                          {isLoading ? '...' : formatRemaining(remaining[config.id] || 0)} left
                         </span>
                       </div>
                     </div>
@@ -198,7 +263,7 @@ export default function ModelSelectorsSection({
         </div>
 
         {/* Image Model Dropdown */}
-        <div className="relative">
+        <div className="relative" data-dropdown="image">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Portrait Generation Model
           </label>
@@ -231,7 +296,7 @@ export default function ModelSelectorsSection({
                     inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
                     ${getTierBadgeClass(selectedImageConfig.tier)}
                   `}>
-                    {formatRemaining(remaining[selectedImageModel] || 0)} left
+                    {isLoading ? '...' : formatRemaining(remaining[selectedImageModel] || 0)} left
                   </span>
                   <ChevronDown className={`w-4 h-4 transition-transform ${imageDropdownOpen ? 'rotate-180' : ''}`} />
                 </div>
@@ -248,8 +313,7 @@ export default function ModelSelectorsSection({
                       key={config.id}
                       onClick={(e) => {
                         e.stopPropagation();
-                        onImageModelChange(config.id);
-                        setImageDropdownOpen(false);
+                        handleImageModelSelect(config.id);
                       }}
                       className={`
                         cursor-pointer p-3 transition-all duration-200 first:rounded-t-lg last:rounded-b-lg
@@ -275,7 +339,7 @@ export default function ModelSelectorsSection({
                           inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
                           ${getTierBadgeClass(config.tier)}
                         `}>
-                          {formatRemaining(remaining[config.id] || 0)} left
+                          {isLoading ? '...' : formatRemaining(remaining[config.id] || 0)} left
                         </span>
                       </div>
                     </div>
