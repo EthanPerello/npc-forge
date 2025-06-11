@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.20.1] - 2025-06-10
+
 ### Added
 - Enhanced JSON parsing with multiple fallback strategies to handle malformed AI responses
 - Automatic retry logic for IndexedDB image loading with exponential backoff
@@ -559,7 +561,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Export to JSON feature
 - Fully responsive UI for desktop and mobile
 
-[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.20.0...HEAD
+[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.20.1...HEAD
+[0.20.1]: https://github.com/EthanPerello/npc-forge/compare/v0.20.0...v0.20.1
 [0.20.0]: https://github.com/EthanPerello/npc-forge/compare/v0.19.0...v0.20.0
 [0.19.0]: https://github.com/EthanPerello/npc-forge/compare/v0.18.0...v0.19.0
 [0.18.0]: https://github.com/EthanPerello/npc-forge/compare/v0.17.0...v0.18.0
