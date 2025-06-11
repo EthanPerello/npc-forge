@@ -7,22 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Enhanced JSON parsing with multiple fallback strategies to handle malformed AI responses
+- Automatic retry logic for IndexedDB image loading with exponential backoff
+- Request size validation and payload cleaning to prevent oversized API calls
+
 ### Changed
-- Enhanced error handling across chat, regeneration, and storage systems with more specific user-friendly error messages
-- Improved IndexedDB image loading with automatic retry logic for better reliability
-- Enhanced PortraitDisplay component to automatically load images from IndexedDB when direct image data is unavailable
-- Updated character regeneration API to preserve all character data including portraits when regenerating individual fields
+- Character regeneration API response format to match frontend expectations for all field types
+- PortraitDisplay component to automatically load images from IndexedDB when image data unavailable
+- Character card logic to always use PortraitDisplay instead of showing fallback initials
+- Error categorization system with more specific user-friendly messages across all APIs
+- Usage limit checking with graceful fallbacks when localStorage is unavailable
 
 ### Fixed
-- Portrait regeneration failures returning "Invalid response format" errors on character edit pages
-- Character portraits disappearing from library when regenerating character names or other fields
-- Character portraits not appearing consistently in library character cards despite being stored correctly
-- Character IDs containing special characters (quotes, spaces) causing routing and storage issues
-- Large request payloads (413 errors) during character and portrait regeneration by implementing data cleaning
-- JSON parsing failures from malformed AI responses with enhanced fallback parsing strategies
-- Usage limit checking errors when localStorage is unavailable or corrupted with graceful fallbacks
-- Portrait display cropping issues in library cards that cut off important parts of character images
-- Network timeout and connectivity issues during portrait generation with improved retry mechanisms
+- Portrait regeneration returning "Invalid response format" errors on character edit pages
+- Character portraits disappearing from library when regenerating character names or other text fields
+- Character portraits not appearing in library character cards despite being stored correctly in IndexedDB
+- 413 "Payload Too Large" errors during character and portrait regeneration by implementing data cleaning
+- Character IDs containing quotes and special characters breaking URL routing and storage operations
+- Chat API failures caused by oversized character data being sent to OpenAI endpoints
+- JSON parsing failures from malformed AI responses with trailing commas or incomplete formatting
+- Network timeout errors during portrait generation not properly triggering retry logic
+- Usage limit system errors when localStorage access is restricted or corrupted
+- Portrait display cropping issues in library cards cutting off important parts of character images
 
 ## [0.20.0] - 2025-06-09
 
