@@ -1,7 +1,7 @@
 // src/lib/character-storage.ts
 import { Character, CharacterFormData } from './types';
 import { exampleCharacters } from './example-characters';
-import { compressImage, getBase64Size, isValidImageData, normalizeCharacterTraits } from './utils';
+import { compressImage, getBase64Size, isValidImageData, normalizeCharacterTraits, sanitizeUserInput } from './utils';
 
 const DB_NAME = 'npc-forge-db';
 const DB_VERSION = 1;
@@ -98,7 +98,22 @@ export async function getStoredCharacters(): Promise<StoredCharacter[]> {
         
         request.onsuccess = () => {
           const characters = request.result || [];
-          resolve(characters);
+          
+          // Filter out corrupted characters and normalize their data
+          const validCharacters = characters.filter(stored => {
+            if (!stored || !stored.character || !stored.character.name) {
+              console.warn('Filtering out corrupted character:', stored);
+              return false;
+            }
+            
+            // Normalize character data
+            stored.character = normalizeCharacterTraits(stored.character);
+            
+            return true;
+          });
+          
+          console.log(`Loaded ${validCharacters.length} valid characters from IndexedDB`);
+          resolve(validCharacters);
         };
         
         request.onerror = (event) => {
@@ -337,7 +352,12 @@ export async function saveCharacter(
   const originalCharacter = JSON.parse(JSON.stringify(character)) as Character;
   const normalizedCharacter = normalizeCharacterTraits(originalCharacter);
   
-  // Generate a unique ID for the character
+  // Clean the character name to prevent ID issues
+  if (normalizedCharacter.name) {
+    normalizedCharacter.name = sanitizeUserInput(normalizedCharacter.name);
+  }
+  
+  // Generate a unique ID for the character with special character handling
   const characterId = generateCharacterId(normalizedCharacter);
   
   // Create a copy specifically for storage (this one we can modify)
@@ -502,6 +522,16 @@ export async function saveCharacter(
     return returnCharacter;
   } catch (error) {
     console.error('Error saving character:', error);
+    
+    // Provide more helpful error messages
+    if (error instanceof Error) {
+      if (error.message.includes('quota')) {
+        throw new Error('Storage quota exceeded. Please delete some characters or clear browser data.');
+      } else if (error.message.includes('character ID')) {
+        throw new Error('Character name contains invalid characters. Please use only letters, numbers, and basic punctuation.');
+      }
+    }
+    
     throw error;
   }
 }
@@ -594,6 +624,11 @@ export async function updateCharacter(
     // Create a deep copy and normalize the updated character
     const normalizedCharacter = normalizeCharacterTraits(updatedChar);
     const characterCopy = JSON.parse(JSON.stringify(normalizedCharacter)) as Character;
+    
+    // Clean the character name
+    if (characterCopy.name) {
+      characterCopy.name = sanitizeUserInput(characterCopy.name);
+    }
     
     // Handle image updates
     let hasStoredImage = existingChar.hasStoredImage || false;
@@ -704,6 +739,10 @@ export async function getCharacterById(id: string): Promise<StoredCharacter | nu
         
         request.onsuccess = () => {
           const character = request.result;
+          if (character) {
+            // Normalize character data when loading
+            character.character = normalizeCharacterTraits(character.character);
+          }
           resolve(character || null);
         };
         
@@ -800,12 +839,30 @@ export async function loadCharacterWithImage(id: string): Promise<Character | nu
 }
 
 /**
- * Generate a unique ID for a character
+ * FIXED: Generate a unique ID for a character with special character handling
  * @param character - The character to generate an ID for
- * @returns A unique ID string
+ * @returns A unique ID string safe for URLs and storage
  */
 function generateCharacterId(character: Character): string {
-  return `${character.name.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}`;
+  // Clean the character name of problematic characters
+  const baseName = character.name || 'character';
+  
+  const cleanName = baseName
+    .replace(/["""'']/g, '"') // Normalize quotes
+    .replace(/—/g, '-') // Replace em dashes
+    .replace(/[^\w\s-]/g, '') // Remove other special characters
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .toLowerCase()
+    .trim()
+    .substring(0, 50); // Limit length
+  
+  // Ensure we have at least some valid characters
+  const finalName = cleanName || 'character';
+  
+  // Add timestamp to ensure uniqueness
+  const timestamp = Date.now();
+  
+  return `${finalName}-${timestamp}`;
 }
 
 /**

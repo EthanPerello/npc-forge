@@ -127,6 +127,41 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generatio
     console.log(`Using text model: ${model} for generation`);
     console.log(`Portrait generation: ${data.include_portrait ? 'ENABLED' : 'DISABLED'}`);
     
+    // Check usage limits BEFORE making API calls
+    try {
+      if (hasReachedLimit(model)) {
+        console.log(`Usage limit reached for model: ${model}`);
+        return NextResponse.json(
+          { 
+            error: `Monthly limit reached for ${model}. Please try a different model or wait until next month.`, 
+            character: null as any,
+            errorType: 'quota_exceeded',
+            userMessage: `Monthly usage limit reached for ${model}. Try a different model or wait until next month.`
+          },
+          { status: 403 }
+        );
+      }
+      
+      // Also check image model limits if portrait is requested
+      if (data.include_portrait && data.portrait_options?.image_model) {
+        if (hasReachedLimit(data.portrait_options.image_model)) {
+          console.log(`Image model usage limit reached for: ${data.portrait_options.image_model}`);
+          return NextResponse.json(
+            { 
+              error: `Monthly limit reached for ${data.portrait_options.image_model}. Please try a different image model or wait until next month.`, 
+              character: null as any,
+              errorType: 'quota_exceeded',
+              userMessage: `Monthly usage limit reached for image model ${data.portrait_options.image_model}. Try a different model.`
+            },
+            { status: 403 }
+          );
+        }
+      }
+    } catch (limitError) {
+      console.warn('Error checking usage limits (continuing anyway):', limitError);
+      // Continue with request if limit checking fails (fail open)
+    }
+    
     // Sanitize the character description
     const originalDescription = data.description;
     data.description = sanitizeUserInput(data.description);
@@ -156,14 +191,18 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generatio
       includePortrait: cleanedData.include_portrait
     });
     
-    // Build system prompt
+    // Build system prompt with improved trait instructions
     const systemPrompt = buildSystemPrompt(cleanedData);
+    
+    let character: Character;
+    let usageIncremented = false;
+    let imageUsageIncremented = false;
     
     try {
       console.log('=== Starting Character Generation ===');
       
       // Generate character with the selected model
-      const character = await generateCharacter(systemPrompt, data.description, model);
+      character = await generateCharacter(systemPrompt, data.description, model);
       
       console.log(`Generated character: ${character.name}`);
       
@@ -172,6 +211,20 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generatio
       
       if (isFallback) {
         console.log('Using fallback example character');
+      }
+      
+      // Increment usage AFTER successful character generation (not for fallbacks)
+      if (!isFallback) {
+        try {
+          console.log('Incrementing text model usage counter');
+          incrementUsage(model);
+          usageIncremented = true;
+          console.log(`Successfully incremented usage for model ${model}`);
+        } catch (usageError) {
+          console.warn('Error incrementing text model usage (continuing anyway):', usageError);
+        }
+      } else {
+        console.log('Skipping usage increment for fallback character');
       }
       
       // Generate portrait if needed and if portrait generation is enabled
@@ -190,6 +243,18 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generatio
           if (imageUrl) {
             character.image_url = imageUrl;
             console.log('Portrait generation successful');
+            
+            // Increment image model usage AFTER successful portrait generation
+            if (!isFallback && data.portrait_options?.image_model) {
+              try {
+                console.log('Incrementing image model usage counter');
+                incrementUsage(data.portrait_options.image_model);
+                imageUsageIncremented = true;
+                console.log(`Successfully incremented usage for image model ${data.portrait_options.image_model}`);
+              } catch (usageError) {
+                console.warn('Error incrementing image model usage (continuing anyway):', usageError);
+              }
+            }
           } else {
             console.log('Portrait generation returned empty result');
           }
@@ -216,17 +281,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generatio
         } else {
           console.log('Portrait generation skipped - example character already has portrait');
         }
-      }
-      
-      // Only increment usage counter for real API calls (not fallbacks)
-      if (!isFallback) {
-        console.log('Incrementing usage counters');
-        incrementUsage(model);
-        if (data.include_portrait && data.portrait_options?.image_model) {
-          incrementUsage(data.portrait_options.image_model);
-        }
-      } else {
-        console.log('Skipping usage increment for fallback character');
       }
       
       console.log('=== Character Generation Complete ===');
@@ -276,9 +330,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<Generatio
   }
 }
 
-// Build a system prompt based on the form data
+// Build a system prompt based on the form data with improved trait instructions
 function buildSystemPrompt(data: Partial<CharacterFormData>): string {
-  // Base prompt
+  // Base prompt with enhanced trait instructions
   let prompt = `
 You are an expert RPG character generator. Generate a detailed NPC profile based on the description and parameters provided.
 
@@ -289,6 +343,16 @@ CRITICAL INSTRUCTIONS:
 - Do not use unescaped quotes within string values
 - End all arrays and objects properly with closing brackets/braces
 - Do not include trailing commas before closing brackets/braces
+- Do not use em dashes (—), smart quotes, or special Unicode characters
+- Use only standard ASCII characters and proper JSON escaping
+
+TRAIT GUIDELINES:
+- For added_traits, use only SHORT keywords or phrases (1-3 words maximum)
+- Examples: "brave", "silver hair", "merchant", "tall", "scarred"
+- Do NOT use full sentences or long descriptions in traits
+- Keep trait values simple and clear
+- Capitalize trait values properly (e.g., "Green Eyes" not "green eyes")
+- Do not include punctuation in trait values
 
 Return ONLY valid JSON with the following structure:
 {
@@ -297,7 +361,8 @@ Return ONLY valid JSON with the following structure:
     // Copy of the traits that were selected by the user
   },
   "added_traits": {
-    // Additional traits you've added that weren't specified
+    // Additional SHORT traits you've added (1-3 words each)
+    // Examples: "eye_color": "green", "demeanor": "stern", "skill": "archery"
   },
   "appearance": "Detailed physical description as a paragraph",
   "personality": "Detailed personality description as a paragraph",
@@ -437,7 +502,7 @@ Return ONLY valid JSON with the following structure:
   prompt += `\n\nBe creative, detailed, and ensure the character feels cohesive and interesting. The character should feel realistic and well-rounded, with a distinct personality and appearance that matches their background and traits.`;
   
   // Add reminder to only return JSON with enhanced instructions
-  prompt += `\n\nCRITICAL: Your response must be ONLY the JSON object. No explanatory text before or after. No markdown formatting. Just pure, valid JSON that can be parsed directly.`;
+  prompt += `\n\nCRITICAL: Your response must be ONLY the JSON object. No explanatory text before or after. No markdown formatting. Just pure, valid JSON that can be parsed directly. Use simple ASCII characters only - no em dashes, smart quotes, or Unicode characters.`;
   
   return prompt;
 }

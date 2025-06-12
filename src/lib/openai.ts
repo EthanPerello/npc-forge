@@ -51,6 +51,13 @@ class JSONParser {
     return jsonStr
       // Remove control characters except newlines and tabs
       .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, " ")
+      // Fix em dashes and special characters that break JSON
+      .replace(/—/g, "-")
+      .replace(/"/g, '"')
+      .replace(/"/g, '"')
+      .replace(/'/g, "'")
+      .replace(/'/g, "'")
+      .replace(/…/g, "...")
       // Fix common formatting issues
       .replace(/\n\s*\n/g, "\n")
       // Remove trailing commas before closing braces/brackets (more comprehensive)
@@ -147,6 +154,38 @@ class JSONParser {
     }
   }
 
+  // Clean trait values to be short and simple - EXCLUDE long traits entirely
+  static cleanTraitValue(value: string): string {
+    if (!value || typeof value !== 'string') {
+      return '';
+    }
+    
+    // Remove quotes and special characters
+    let cleaned = value
+      .replace(/["""'']/g, '"')
+      .replace(/—/g, '-')
+      .replace(/…/g, '...')
+      .trim();
+    
+    // EXCLUDE traits that are too long - don't try to shorten them, just exclude them
+    if (cleaned.length > 25 || 
+        cleaned.includes('.') || 
+        cleaned.includes(',') || 
+        cleaned.split(' ').length > 4) {
+      console.log(`Excluding long trait value: "${cleaned}"`);
+      return ''; // Return empty string to exclude this trait
+    }
+    
+    // For proper short traits, clean and capitalize
+    return cleaned
+      .replace(/[^a-zA-Z0-9\s-]/g, '') // Remove special chars except spaces and hyphens
+      .replace(/\s+/g, ' ') // Normalize spaces
+      .trim()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
+
   // Validate and fix character object with better error handling
   static validateAndFixCharacter(obj: any): Character {
     if (!obj || typeof obj !== 'object') {
@@ -159,6 +198,13 @@ class JSONParser {
     if (!character.name || typeof character.name !== 'string' || character.name.trim() === '') {
       character.name = 'Unknown Character';
     }
+
+    // Clean the name of special characters that break URLs
+    character.name = character.name
+      .replace(/["""'']/g, '"')
+      .replace(/—/g, '-')
+      .replace(/[^\w\s-]/g, '')
+      .trim();
 
     if (!character.appearance || typeof character.appearance !== 'string' || character.appearance.trim() === '') {
       character.appearance = 'A mysterious figure with no clear description.';
@@ -179,6 +225,22 @@ class JSONParser {
 
     if (!character.added_traits || typeof character.added_traits !== 'object') {
       character.added_traits = {};
+    }
+
+    // Clean added traits to be short and simple - exclude long ones entirely
+    if (character.added_traits) {
+      const cleanedTraits: Record<string, string> = {};
+      Object.keys(character.added_traits).forEach(key => {
+        const value = character.added_traits[key];
+        if (typeof value === 'string') {
+          const cleanedValue = this.cleanTraitValue(value);
+          // Only include if the cleaned value is not empty (wasn't excluded for being too long)
+          if (cleanedValue && cleanedValue.length > 0) {
+            cleanedTraits[key] = cleanedValue;
+          }
+        }
+      });
+      character.added_traits = cleanedTraits;
     }
 
     // Fix array fields
@@ -550,7 +612,7 @@ export async function generateCharacter(
           messages: [
             { 
               role: "system", 
-              content: systemPrompt + "\n\nIMPORTANT: Respond only with valid JSON. Do not include any text before or after the JSON object. Ensure all strings are properly escaped and the JSON is complete." 
+              content: systemPrompt + "\n\nIMPORTANT: Respond only with valid JSON. Do not include any text before or after the JSON object. Ensure all strings are properly escaped and the JSON is complete. For added_traits, use only SHORT keywords or phrases (1-3 words max) - no full sentences or long descriptions." 
             },
             { role: "user", content: description }
           ],

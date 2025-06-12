@@ -196,9 +196,15 @@ function categorizeError(error: any): { type: string; message: string; shouldRet
   };
 }
 
-// Helper function to sanitize character ID
+// Helper function to sanitize character ID (more robust)
 function sanitizeCharacterId(id: string): string {
-  return id.replace(/[^a-zA-Z0-9-_]/g, '_');
+  // Remove or replace problematic characters that could break routing/storage
+  return id
+    .replace(/["""'']/g, '"') // Normalize quotes
+    .replace(/—/g, '-') // Replace em dashes
+    .replace(/[^\w\s-]/g, '_') // Replace other special chars with underscores
+    .replace(/\s+/g, '_') // Replace spaces with underscores
+    .toLowerCase();
 }
 
 // Helper function to create a clean character object for API (remove large data)
@@ -208,6 +214,15 @@ function cleanCharacterForAPI(character: any): any {
   // Remove large base64 image data to reduce payload size
   delete cleaned.image_data;
   delete cleaned.image_url;
+  
+  // Clean the character name to prevent ID issues
+  if (cleaned.name) {
+    cleaned.name = cleaned.name
+      .replace(/["""'']/g, '"')
+      .replace(/—/g, '-')
+      .replace(/[^\w\s-]/g, '')
+      .trim();
+  }
   
   // Limit the size of trait objects
   if (cleaned.selected_traits) {
@@ -220,8 +235,13 @@ function cleanCharacterForAPI(character: any): any {
   
   if (cleaned.added_traits) {
     Object.keys(cleaned.added_traits).forEach(key => {
-      if (typeof cleaned.added_traits[key] === 'string' && cleaned.added_traits[key].length > 500) {
-        cleaned.added_traits[key] = cleaned.added_traits[key].substring(0, 500) + '...';
+      const value = cleaned.added_traits[key];
+      if (typeof value === 'string') {
+        // Clean special characters from trait values
+        cleaned.added_traits[key] = value
+          .replace(/["""'']/g, '"')
+          .replace(/—/g, '-')
+          .substring(0, 500);
       }
     });
   }
@@ -259,8 +279,9 @@ export async function POST(req: NextRequest) {
       );
     }
     
-    // Sanitize character ID
+    // Sanitize character ID to prevent routing/storage issues
     const sanitizedCharacterId = sanitizeCharacterId(characterId);
+    console.log(`Chat request for character: ${character.name} (ID: ${sanitizedCharacterId})`);
     
     // Check message length
     if (newMessage.length > 1000) {
@@ -274,7 +295,7 @@ export async function POST(req: NextRequest) {
       );
     }
     
-    // Clean character object to reduce payload size
+    // Clean character object to reduce payload size and fix special characters
     const cleanedCharacter = cleanCharacterForAPI(character);
     
     // Check usage limits using the existing system BEFORE making API call
@@ -282,6 +303,8 @@ export async function POST(req: NextRequest) {
       if (hasReachedLimit(model)) {
         const usageData = getUsageData(model);
         const monthlyLimit = getMonthlyLimit(model);
+        
+        console.log(`Chat blocked: Usage limit reached for ${model}. Used: ${usageData.count}, Limit: ${monthlyLimit}`);
         
         return NextResponse.json(
           { 
@@ -293,7 +316,7 @@ export async function POST(req: NextRequest) {
         );
       }
     } catch (limitError) {
-      console.warn('Error checking usage limits:', limitError);
+      console.warn('Error checking usage limits (continuing anyway):', limitError);
       // Continue with request if limit checking fails (fail open)
     }
     
@@ -321,20 +344,39 @@ export async function POST(req: NextRequest) {
     const maxTokens = getMaxTokensForInput(newMessage);
     console.log(`Setting max tokens to ${maxTokens} for user input length ${newMessage.length}`);
     
-    // Call OpenAI API
-    const completion = await openai.chat.completions.create({
-      model: model,
-      messages: openaiMessages,
-      temperature: 0.8,
-      max_tokens: maxTokens, // Dynamic token limit based on user input
-      presence_penalty: 0.1, // Slight penalty to encourage varied responses
-      frequency_penalty: 0.1, // Slight penalty to reduce repetition
-    });
+    let responseContent: string;
+    let usageIncremented = false;
     
-    const responseContent = completion.choices[0]?.message?.content;
-    
-    if (!responseContent) {
-      throw new Error('No response content from OpenAI');
+    try {
+      // Call OpenAI API
+      const completion = await openai.chat.completions.create({
+        model: model,
+        messages: openaiMessages,
+        temperature: 0.8,
+        max_tokens: maxTokens, // Dynamic token limit based on user input
+        presence_penalty: 0.1, // Slight penalty to encourage varied responses
+        frequency_penalty: 0.1, // Slight penalty to reduce repetition
+      });
+      
+      responseContent = completion.choices[0]?.message?.content || '';
+      
+      if (!responseContent) {
+        throw new Error('No response content from OpenAI');
+      }
+      
+      // Increment usage count AFTER successful API call
+      try {
+        incrementUsage(model);
+        usageIncremented = true;
+        console.log(`Usage incremented for model ${model}`);
+      } catch (usageError) {
+        console.warn('Error incrementing usage (continuing anyway):', usageError);
+        // Continue anyway since the API call was successful
+      }
+      
+    } catch (apiError) {
+      console.error('OpenAI API call failed:', apiError);
+      throw apiError; // Re-throw to be handled by outer catch
     }
     
     // Check if response was likely cut off and handle it
@@ -343,7 +385,7 @@ export async function POST(req: NextRequest) {
     const endsWithPunctuation = ['.', '!', '?', '"', "'"].includes(lastChar);
     
     // If response doesn't end with punctuation and seems cut off, try again with higher token limit
-    if (!endsWithPunctuation && trimmedResponse.length > 50 && completion.choices[0]?.finish_reason === 'length') {
+    if (!endsWithPunctuation && trimmedResponse.length > 50) {
       console.log('Response appears to be cut off, retrying with higher token limit');
       
       try {
@@ -359,59 +401,44 @@ export async function POST(req: NextRequest) {
         const retryResponse = retryCompletion.choices[0]?.message?.content;
         if (retryResponse && retryResponse.trim().length > trimmedResponse.length) {
           console.log('Retry successful, using longer response');
-          // Use the retry response instead
-          const finalResponse = retryResponse.trim();
+          responseContent = retryResponse.trim();
           
-          // Increment usage count using the existing system AFTER successful API call
-          try {
-            incrementUsage(model);
-            console.log(`Usage incremented for model ${model}`);
-          } catch (usageError) {
-            console.warn('Error incrementing usage:', usageError);
-            // Continue anyway since the API call was successful
+          // Only increment usage once more if the first increment failed
+          if (!usageIncremented) {
+            try {
+              incrementUsage(model);
+              usageIncremented = true;
+              console.log(`Usage incremented for model ${model} on retry`);
+            } catch (usageError) {
+              console.warn('Error incrementing usage on retry:', usageError);
+            }
           }
-          
-          // Create the response message
-          const responseMessage: ChatMessage = {
-            id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            role: 'assistant',
-            content: finalResponse,
-            timestamp: new Date().toISOString(),
-            characterId: sanitizedCharacterId,
-          };
-          
-          console.log(`Chat response generated successfully for ${cleanedCharacter.name} (${finalResponse.length} chars)`);
-          
-          return NextResponse.json({
-            success: true,
-            message: responseMessage
-          } as ChatAPIResponse);
         }
       } catch (retryError) {
         console.warn('Retry failed, using original response:', retryError);
         // Continue with original response
+        responseContent = trimmedResponse;
       }
+    } else {
+      responseContent = trimmedResponse;
     }
     
-    // Increment usage count using the existing system AFTER successful API call
-    try {
-      incrementUsage(model);
-      console.log(`Usage incremented for model ${model}`);
-    } catch (usageError) {
-      console.warn('Error incrementing usage:', usageError);
-      // Continue anyway since the API call was successful
-    }
+    // Clean the response content of special characters that might cause issues
+    responseContent = responseContent
+      .replace(/["""'']/g, '"')
+      .replace(/—/g, '-')
+      .replace(/…/g, '...');
     
     // Create the response message
     const responseMessage: ChatMessage = {
       id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       role: 'assistant',
-      content: trimmedResponse,
+      content: responseContent,
       timestamp: new Date().toISOString(),
       characterId: sanitizedCharacterId,
     };
     
-    console.log(`Chat response generated successfully for ${cleanedCharacter.name} (${trimmedResponse.length} chars)`);
+    console.log(`Chat response generated successfully for ${cleanedCharacter.name} (${responseContent.length} chars)`);
     
     return NextResponse.json({
       success: true,
