@@ -9,6 +9,7 @@ import { getImageModelConfig, DEFAULT_IMAGE_MODEL, IMAGE_MODEL_CONFIGS } from '.
 
 // Constants
 const STORAGE_KEY_PREFIX = 'npc-forge-usage';
+const LOCK_TIMEOUT = 5000; // 5 seconds timeout for locks
 
 // Define usage data structure
 interface UsageData {
@@ -21,6 +22,9 @@ interface UsageData {
 interface AllUsageData {
   [modelId: string]: UsageData;
 }
+
+// Simple lock mechanism to prevent race conditions
+const usageLocks = new Map<string, number>();
 
 /**
  * Check if the app is running in development mode
@@ -62,6 +66,32 @@ function isLocalStorageAvailable(): boolean {
     console.warn('localStorage is not accessible:', error);
     return false;
   }
+}
+
+/**
+ * Acquire a lock for a specific model to prevent race conditions
+ */
+function acquireLock(model: string): boolean {
+  const now = Date.now();
+  const lockKey = `lock-${model}`;
+  const existingLock = usageLocks.get(lockKey);
+  
+  // Check if lock exists and is still valid
+  if (existingLock && (now - existingLock) < LOCK_TIMEOUT) {
+    return false; // Lock is held
+  }
+  
+  // Acquire lock
+  usageLocks.set(lockKey, now);
+  return true;
+}
+
+/**
+ * Release a lock for a specific model
+ */
+function releaseLock(model: string): void {
+  const lockKey = `lock-${model}`;
+  usageLocks.delete(lockKey);
 }
 
 /**
@@ -178,7 +208,7 @@ export function getAllUsageData(): AllUsageData {
 }
 
 /**
- * Increment the usage count for a specific model
+ * Increment the usage count for a specific model with proper locking
  */
 export function incrementUsage(model: OpenAIModel | ImageModel = DEFAULT_MODEL): UsageData {
   // In development mode, don't actually increment the count
@@ -187,23 +217,41 @@ export function incrementUsage(model: OpenAIModel | ImageModel = DEFAULT_MODEL):
     return getUsageData(model);
   }
   
-  const currentData = getUsageData(model);
-  const updatedData: UsageData = {
-    ...currentData,
-    count: currentData.count + 1,
-    lastUpdated: new Date().toISOString()
-  };
+  console.log(`Attempting to increment usage for model: ${model}`);
   
-  // Save to localStorage if available
-  if (isLocalStorageAvailable()) {
-    const storageKey = getStorageKey(model);
-    const success = safeLocalStorage.setItem(storageKey, JSON.stringify(updatedData));
-    if (!success) {
-      console.warn(`Failed to save usage data for model ${model}`);
-    }
+  // Try to acquire lock
+  if (!acquireLock(model)) {
+    console.warn(`Could not acquire lock for model ${model}, skipping increment`);
+    return getUsageData(model);
   }
   
-  return updatedData;
+  try {
+    const currentData = getUsageData(model);
+    const updatedData: UsageData = {
+      ...currentData,
+      count: currentData.count + 1,
+      lastUpdated: new Date().toISOString()
+    };
+    
+    // Save to localStorage if available
+    if (isLocalStorageAvailable()) {
+      const storageKey = getStorageKey(model);
+      const success = safeLocalStorage.setItem(storageKey, JSON.stringify(updatedData));
+      if (success) {
+        console.log(`Successfully incremented usage for model ${model}: ${currentData.count} -> ${updatedData.count}`);
+      } else {
+        console.warn(`Failed to save usage data for model ${model}`);
+        return currentData; // Return unchanged data if save failed
+      }
+    }
+    
+    return updatedData;
+  } catch (error) {
+    console.error(`Error incrementing usage for model ${model}:`, error);
+    return getUsageData(model); // Return current data on error
+  } finally {
+    releaseLock(model);
+  }
 }
 
 /**
@@ -232,10 +280,19 @@ export function hasReachedLimit(model: OpenAIModel | ImageModel = DEFAULT_MODEL)
     } else {
       // Default to a reasonable limit if model not found
       monthlyLimit = 15;
+      console.warn(`Unknown model ${model}, using default limit of ${monthlyLimit}`);
     }
     
     const { count } = getUsageData(model);
-    return count >= monthlyLimit;
+    const hasReached = count >= monthlyLimit;
+    
+    if (hasReached) {
+      console.log(`Usage limit reached for model ${model}: ${count}/${monthlyLimit}`);
+    } else {
+      console.log(`Usage check for model ${model}: ${count}/${monthlyLimit}`);
+    }
+    
+    return hasReached;
   } catch (error) {
     console.error(`Error checking usage limit for model ${model}:`, error);
     // Fail open - allow usage if we can't check limits
@@ -325,6 +382,7 @@ export function clearUsageData(model?: OpenAIModel | ImageModel): void {
     if (model) {
       // Clear for specific model
       safeLocalStorage.removeItem(getStorageKey(model));
+      console.log(`Cleared usage data for model: ${model}`);
     } else {
       // Clear for all models
       MODEL_CONFIGS.forEach(config => {
@@ -333,8 +391,71 @@ export function clearUsageData(model?: OpenAIModel | ImageModel): void {
       IMAGE_MODEL_CONFIGS.forEach(config => {
         safeLocalStorage.removeItem(getStorageKey(config.id));
       });
+      console.log('Cleared usage data for all models');
     }
   } catch (error) {
     console.error('Error clearing usage data:', error);
   }
+}
+
+/**
+ * Reset usage data for a specific model (useful for testing)
+ */
+export function resetUsageData(model: OpenAIModel | ImageModel): void {
+  if (!isLocalStorageAvailable()) {
+    console.warn('Cannot reset usage data: localStorage not available');
+    return;
+  }
+  
+  try {
+    const resetData: UsageData = {
+      count: 0,
+      monthKey: getCurrentMonthKey(),
+      lastUpdated: new Date().toISOString()
+    };
+    
+    const storageKey = getStorageKey(model);
+    const success = safeLocalStorage.setItem(storageKey, JSON.stringify(resetData));
+    
+    if (success) {
+      console.log(`Reset usage data for model: ${model}`);
+    } else {
+      console.warn(`Failed to reset usage data for model: ${model}`);
+    }
+  } catch (error) {
+    console.error(`Error resetting usage data for model ${model}:`, error);
+  }
+}
+
+/**
+ * Get detailed usage statistics for debugging
+ */
+export function getUsageStats(): { [model: string]: UsageData & { limit: number | string; remaining: number | string } } {
+  const stats: any = {};
+  
+  try {
+    // Get stats for text models
+    MODEL_CONFIGS.forEach(config => {
+      const data = getUsageData(config.id);
+      stats[config.id] = {
+        ...data,
+        limit: getMonthlyLimit(config.id),
+        remaining: getRemainingGenerations(config.id)
+      };
+    });
+    
+    // Get stats for image models
+    IMAGE_MODEL_CONFIGS.forEach(config => {
+      const data = getUsageData(config.id);
+      stats[config.id] = {
+        ...data,
+        limit: getMonthlyLimit(config.id),
+        remaining: getRemainingGenerations(config.id)
+      };
+    });
+  } catch (error) {
+    console.error('Error getting usage stats:', error);
+  }
+  
+  return stats;
 }

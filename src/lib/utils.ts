@@ -21,9 +21,12 @@ export function generateId(prefix = 'id'): string {
  */
 export function formatNameForUrl(name: string): string {
   return name
-    .replace(/\s+/g, '-')
-    .replace(/[^a-zA-Z0-9-]/g, '')
-    .toLowerCase();
+    .replace(/["""'']/g, '"') // Normalize quotes
+    .replace(/—/g, '-') // Replace em dashes
+    .replace(/[^\w\s-]/g, '') // Remove other special characters
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .toLowerCase()
+    .trim();
 }
 
 /**
@@ -104,11 +107,30 @@ export function formatTraitKey(key: string): string {
 }
 
 /**
- * Format a trait value to be properly capitalized and without underscores
+ * Format a trait value to be properly capitalized and clean
+ * Returns empty string if the value is too long to be a proper trait
  */
 export function formatTraitValue(value: string): string {
-  return value
-    .replace(/_/g, ' ')
+  if (!value || typeof value !== 'string') {
+    return '';
+  }
+  
+  // Clean special characters first
+  const cleaned = value
+    .replace(/["""'']/g, '"') // Normalize quotes
+    .replace(/—/g, '-') // Replace em dashes
+    .replace(/…/g, '...') // Replace ellipsis
+    .replace(/[^\w\s-.,!?]/g, '') // Remove other special characters
+    .trim();
+  
+  // EXCLUDE long traits entirely - don't truncate, just return empty string
+  if (cleaned.length > 25 || cleaned.includes('.') || cleaned.includes(',') || cleaned.split(' ').length > 4) {
+    console.log(`Excluding long trait: "${cleaned}" (${cleaned.length} chars)`);
+    return '';
+  }
+  
+  // For proper short traits, capitalize properly
+  return cleaned
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
@@ -116,7 +138,7 @@ export function formatTraitValue(value: string): string {
 
 /**
  * Get all character traits as a flat array of strings with consistent prefixes
- * This ensures all traits are displayed with their category prefix
+ * This ensures all traits are displayed with their category prefix and filters out problematic entries
  */
 export function getCharacterTraitsArray(character: Character): string[] {
   const traits: string[] = [];
@@ -162,19 +184,28 @@ export function getCharacterTraitsArray(character: Character): string[] {
         if (key === 'personality_traits' && Array.isArray(value)) {
           // Handle personality_traits array - add each trait with Personality prefix
           value.forEach(trait => {
-            if (trait) {
-              traits.push(`Personality: ${formatTraitValue(trait)}`);
+            if (trait && typeof trait === 'string') {
+              const formattedValue = formatTraitValue(trait);
+              if (formattedValue) {
+                traits.push(`Personality: ${formattedValue}`);
+              }
             }
           });
         } else if (Array.isArray(value)) {
           // Handle other array values
           value.forEach(item => {
             if (item && typeof item === 'string') {
-              traits.push(`${label}: ${formatTraitValue(item)}`);
+              const formattedValue = formatTraitValue(item);
+              if (formattedValue) {
+                traits.push(`${label}: ${formattedValue}`);
+              }
             }
           });
         } else if (typeof value === 'string') {
-          traits.push(`${label}: ${formatTraitValue(value)}`);
+          const formattedValue = formatTraitValue(value);
+          if (formattedValue) {
+            traits.push(`${label}: ${formattedValue}`);
+          }
         }
       }
     });
@@ -188,26 +219,38 @@ export function getCharacterTraitsArray(character: Character): string[] {
         return;
       }
       
+      // Skip error and fallback traits
+      if (key.includes('error') || key.includes('fallback') || key.includes('api')) {
+        return;
+      }
+      
       // Skip if this trait was already added from selected_traits
       if (character.selected_traits && (character.selected_traits as any)[key]) {
         return;
       }
       
-      const label = traitCategoryLabels[key] || formatTraitKey(key);
-      
-      if (Array.isArray(value)) {
+      if (value && typeof value === 'string') {
+        const label = traitCategoryLabels[key] || formatTraitKey(key);
+        const formattedValue = formatTraitValue(value);
+        if (formattedValue && formattedValue.length > 0) {
+          traits.push(`${label}: ${formattedValue}`);
+        }
+      } else if (Array.isArray(value)) {
+        const label = traitCategoryLabels[key] || formatTraitKey(key);
         value.forEach(item => {
           if (item && typeof item === 'string') {
-            traits.push(`${label}: ${formatTraitValue(item)}`);
+            const formattedValue = formatTraitValue(item);
+            if (formattedValue) {
+              traits.push(`${label}: ${formattedValue}`);
+            }
           }
         });
-      } else if (typeof value === 'string') {
-        traits.push(`${label}: ${formatTraitValue(value)}`);
       }
     });
   }
   
-  return traits;
+  // Remove duplicates and empty values
+  return [...new Set(traits)].filter(trait => trait && trait.length > 0);
 }
 
 /**
@@ -341,11 +384,19 @@ export function getUniqueTraitValues<T extends { character: Character }>(charact
 }
 
 /**
- * Normalize trait data to ensure consistent prefix format
- * This should be called when saving or updating character data
+ * Normalize trait data to ensure consistent format and clean special characters
  */
 export function normalizeCharacterTraits(character: Character): Character {
   const normalized = JSON.parse(JSON.stringify(character)) as Character;
+  
+  // Clean the character name
+  if (normalized.name) {
+    normalized.name = normalized.name
+      .replace(/["""'']/g, '"')
+      .replace(/—/g, '-')
+      .replace(/[^\w\s-]/g, '')
+      .trim();
+  }
   
   // Ensure selected_traits are properly formatted
   if (normalized.selected_traits) {
@@ -353,33 +404,56 @@ export function normalizeCharacterTraits(character: Character): Character {
     if (normalized.selected_traits.personality_traits && Array.isArray(normalized.selected_traits.personality_traits)) {
       normalized.selected_traits.personality_traits = normalized.selected_traits.personality_traits.map(trait => {
         if (typeof trait === 'string') {
-          // Remove existing "Personality: " prefix if present
-          return trait.replace(/^personality:\s*/i, '');
+          // Remove existing "Personality: " prefix if present and clean
+          return formatTraitValue(trait.replace(/^personality:\s*/i, ''));
         }
         return trait;
-      });
+      }).filter(trait => trait && trait.length > 0);
     }
   }
   
-  // Ensure added_traits are properly formatted
+  // Ensure added_traits are properly formatted and cleaned
   if (normalized.added_traits) {
+    const cleanedTraits: Record<string, any> = {};
+    
     Object.entries(normalized.added_traits).forEach(([key, value]) => {
+      // Skip error and fallback traits
+      if (key.includes('error') || key.includes('fallback') || key.includes('api')) {
+        return;
+      }
+      
       if (Array.isArray(value)) {
-        // Remove any existing prefixes from array values
-        (normalized.added_traits as any)[key] = value.map(item => {
+        // Clean array values
+        const cleanedArray = value.map(item => {
           if (typeof item === 'string') {
-            // Remove category prefix if it exists (e.g., "Skills: archery" -> "archery")
+            // Remove category prefix if it exists and clean
             const colonIndex = item.indexOf(':');
-            return colonIndex !== -1 ? item.substring(colonIndex + 1).trim() : item;
+            const rawValue = colonIndex !== -1 ? item.substring(colonIndex + 1).trim() : item;
+            return formatTraitValue(rawValue);
           }
           return item;
-        });
+        }).filter(item => item && typeof item === 'string' && item.length > 0);
+        
+        if (cleanedArray.length > 0) {
+          cleanedTraits[key] = cleanedArray;
+        }
       } else if (typeof value === 'string') {
-        // Remove category prefix if it exists
+        // Clean string values
         const colonIndex = value.indexOf(':');
-        (normalized.added_traits as any)[key] = colonIndex !== -1 ? value.substring(colonIndex + 1).trim() : value;
+        const rawValue = colonIndex !== -1 ? value.substring(colonIndex + 1).trim() : value;
+        const cleanedValue = formatTraitValue(rawValue);
+        
+        // Only include if the cleaned value is not empty (wasn't excluded for being too long)
+        if (cleanedValue && cleanedValue.length > 0) {
+          cleanedTraits[key] = cleanedValue;
+        }
+      } else {
+        // Keep other types as-is
+        cleanedTraits[key] = value;
       }
     });
+    
+    normalized.added_traits = cleanedTraits;
   }
   
   return normalized;
@@ -408,13 +482,19 @@ export function debounce<T extends (...args: any[]) => any>(
 }
 
 /**
- * Sanitizes user input to remove potential control characters and normalize whitespace
+ * Enhanced sanitization function for user input
  */
 export function sanitizeUserInput(input: string): string {
     if (!input) return '';
     
     // Remove any control characters
     let sanitized = input.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+    
+    // Normalize Unicode quotes and dashes to ASCII equivalents
+    sanitized = sanitized
+      .replace(/["""'']/g, '"')
+      .replace(/—/g, '-')
+      .replace(/…/g, '...');
     
     // Normalize whitespace (but preserve paragraph breaks)
     sanitized = sanitized.replace(/[ \t\v\f]+/g, ' ');

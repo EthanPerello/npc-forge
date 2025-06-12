@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generatePortrait } from '@/lib/openai';
 import { Character, OpenAIModel, ImageModel } from '@/lib/types';
+import { incrementUsage, hasReachedLimit } from '@/lib/usage-limits';
 import OpenAI from 'openai';
 
 // Initialize OpenAI client
@@ -102,6 +103,15 @@ function cleanCharacterForAPI(character: any): any {
   delete cleaned.image_data;
   delete cleaned.image_url;
   
+  // Clean the character name of special characters
+  if (cleaned.name) {
+    cleaned.name = cleaned.name
+      .replace(/["""'']/g, '"')
+      .replace(/—/g, '-')
+      .replace(/[^\w\s-]/g, '')
+      .trim();
+  }
+  
   // Limit the size of trait objects
   if (cleaned.selected_traits) {
     Object.keys(cleaned.selected_traits).forEach(key => {
@@ -113,8 +123,12 @@ function cleanCharacterForAPI(character: any): any {
   
   if (cleaned.added_traits) {
     Object.keys(cleaned.added_traits).forEach(key => {
-      if (typeof cleaned.added_traits[key] === 'string' && cleaned.added_traits[key].length > 500) {
-        cleaned.added_traits[key] = cleaned.added_traits[key].substring(0, 500) + '...';
+      if (typeof cleaned.added_traits[key] === 'string') {
+        // Clean special characters and limit length
+        cleaned.added_traits[key] = cleaned.added_traits[key]
+          .replace(/["""'']/g, '"')
+          .replace(/—/g, '-')
+          .substring(0, 500);
       }
     });
   }
@@ -176,7 +190,7 @@ export async function POST(request: NextRequest) {
 
     const { character, field, model, portraitOptions } = body;
     
-    // Clean character object to reduce payload size
+    // Clean character object to reduce payload size and fix special characters
     const cleanedCharacter = cleanCharacterForAPI(character);
 
     console.log(`Regenerating ${field} for character: ${cleanedCharacter.name}`);
@@ -184,6 +198,26 @@ export async function POST(request: NextRequest) {
     // Handle portrait regeneration
     if (field === 'portrait') {
       try {
+        // Check usage limits BEFORE making API call
+        const imageModel = portraitOptions?.image_model || 'dall-e-2';
+        
+        try {
+          if (hasReachedLimit(imageModel)) {
+            console.log(`Portrait regeneration blocked: Usage limit reached for ${imageModel}`);
+            return NextResponse.json(
+              { 
+                success: false, 
+                error: `Monthly limit reached for ${imageModel}. Please try a different image model or wait until next month.`,
+                type: 'quota_exceeded',
+                field: 'portrait'
+              },
+              { status: 403 }
+            );
+          }
+        } catch (limitError) {
+          console.warn('Error checking image model usage limits (continuing anyway):', limitError);
+        }
+        
         // Create a character object with the portrait options
         const characterWithOptions = {
           ...cleanedCharacter,
@@ -199,6 +233,14 @@ export async function POST(request: NextRequest) {
         
         if (!imageData) {
           throw new Error('No image data returned from portrait generation');
+        }
+
+        // Increment usage count AFTER successful portrait generation
+        try {
+          incrementUsage(imageModel);
+          console.log(`Successfully incremented usage for image model ${imageModel}`);
+        } catch (usageError) {
+          console.warn('Error incrementing image model usage (continuing anyway):', usageError);
         }
 
         // Create updated character object for consistent response format
@@ -237,22 +279,40 @@ export async function POST(request: NextRequest) {
     const textModel: OpenAIModel = model || 'gpt-4o-mini';
     console.log(`Using text model: ${textModel} for field: ${field}`);
 
+    // Check usage limits BEFORE making API call
+    try {
+      if (hasReachedLimit(textModel)) {
+        console.log(`Text regeneration blocked: Usage limit reached for ${textModel}`);
+        return NextResponse.json(
+          { 
+            success: false, 
+            error: `Monthly limit reached for ${textModel}. Please try a different model or wait until next month.`,
+            type: 'quota_exceeded',
+            field
+          },
+          { status: 403 }
+        );
+      }
+    } catch (limitError) {
+      console.warn('Error checking text model usage limits (continuing anyway):', limitError);
+    }
+
     try {
       let prompt: string;
       let systemPrompt: string;
 
-      // Generate appropriate prompts based on the field
+      // Generate appropriate prompts based on the field with improved trait instructions
       if (field === 'name') {
-        systemPrompt = `Generate a single character name that fits this character's appearance and background. Return only the name, no additional text or formatting.`;
+        systemPrompt = `Generate a single character name that fits this character's appearance and background. Return only the name, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
         prompt = `Character: ${cleanedCharacter.appearance || 'A character'}\nBackground: ${cleanedCharacter.backstory_hook || 'Unknown background'}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
       } else if (field === 'appearance') {
-        systemPrompt = `Generate a detailed physical appearance description for this character. Include facial features, build, clothing, and distinguishing characteristics. Return only the description, no additional text or formatting.`;
+        systemPrompt = `Generate a detailed physical appearance description for this character. Include facial features, build, clothing, and distinguishing characteristics. Return only the description, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
         prompt = `Character Name: ${cleanedCharacter.name}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
       } else if (field === 'personality') {
-        systemPrompt = `Generate a detailed personality description for this character. Include traits, mannerisms, motivations, and behavioral patterns. Return only the description, no additional text or formatting.`;
+        systemPrompt = `Generate a detailed personality description for this character. Include traits, mannerisms, motivations, and behavioral patterns. Return only the description, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
         prompt = `Character Name: ${cleanedCharacter.name}\nAppearance: ${cleanedCharacter.appearance}\nBackground: ${cleanedCharacter.backstory_hook}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
       } else if (field === 'backstory_hook') {
-        systemPrompt = `Generate an engaging backstory hook for this character. Include their origin, key life events, and what drives them. Return only the backstory, no additional text or formatting.`;
+        systemPrompt = `Generate an engaging backstory hook for this character. Include their origin, key life events, and what drives them. Return only the backstory, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
         prompt = `Character Name: ${cleanedCharacter.name}\nAppearance: ${cleanedCharacter.appearance}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
       } else if (field.startsWith('quest_')) {
         // Handle quest regeneration
@@ -274,19 +334,29 @@ export async function POST(request: NextRequest) {
         const quest = cleanedCharacter.quests[questIndex];
 
         if (questPart === 'title') {
-          systemPrompt = `Generate a compelling quest title. Return only the title, no additional text or formatting.`;
+          systemPrompt = `Generate a compelling quest title. Return only the title, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
           prompt = `Quest Description: ${quest.description}\nCharacter: ${cleanedCharacter.name}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
         } else if (questPart === 'description') {
-          systemPrompt = `Generate a detailed quest description. Include the objective, stakes, and any relevant context. Return only the description, no additional text or formatting.`;
+          systemPrompt = `Generate a detailed quest description. Include the objective, stakes, and any relevant context. Return only the description, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
           prompt = `Quest Title: ${quest.title}\nCharacter: ${cleanedCharacter.name}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
         } else if (questPart === 'reward') {
-          systemPrompt = `Generate an appropriate quest reward. Include both tangible and intangible benefits. Return only the reward description, no additional text or formatting.`;
+          systemPrompt = `Generate an appropriate quest reward. Include both tangible and intangible benefits. Return only the reward description, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
           prompt = `Quest: ${quest.title} - ${quest.description}\nCharacter: ${cleanedCharacter.name}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
         } else {
           // Regenerate entire quest
-          systemPrompt = `Generate a complete quest object with title, description, and reward. Return as JSON object with fields: title, description, reward.`;
+          systemPrompt = `Generate a complete quest object with title, description, and reward. Return as JSON object with fields: title, description, reward. Do not use special characters like em dashes or smart quotes.`;
           prompt = `Character: ${cleanedCharacter.name}\nAppearance: ${cleanedCharacter.appearance}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
         }
+      } else if (field === 'additional_traits') {
+        systemPrompt = `Generate 3-5 additional character traits as short keywords or phrases (1-3 words each). Return as JSON object with trait names as keys and short descriptions as values. Do not use special characters like em dashes or smart quotes. Examples: {"eye_color": "Green", "demeanor": "Stern", "skill": "Archery", "quirk": "Whistles"}`;
+        prompt = `Character: ${cleanedCharacter.name}\nAppearance: ${cleanedCharacter.appearance}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
+      } else if (field === 'add_single_trait') {
+        systemPrompt = `Generate 1 additional character trait as a short keyword or phrase (1-3 words). Return as JSON object with one trait name as key and short description as value. Do not use special characters like em dashes or smart quotes. Example: {"hobby": "Reading"}`;
+        prompt = `Character: ${cleanedCharacter.name}\nAppearance: ${cleanedCharacter.appearance}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
+      } else if (field.startsWith('regenerate_trait_')) {
+        const traitKey = field.replace('regenerate_trait_', '');
+        systemPrompt = `Generate a new value for the trait "${traitKey.replace(/_/g, ' ')}" as a short keyword or phrase (1-3 words). Return only the trait value, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
+        prompt = `Character: ${cleanedCharacter.name}\nAppearance: ${cleanedCharacter.appearance}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}\nTrait to regenerate: ${traitKey.replace(/_/g, ' ')}`;
       } else if (field.startsWith('dialogue_')) {
         const parts = field.split('_');
         const index = parseInt(parts[1], 10);
@@ -302,7 +372,7 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        systemPrompt = `Generate a dialogue line that this character would say. Make it consistent with their personality and background. Return only the dialogue, no quotes or additional formatting.`;
+        systemPrompt = `Generate a dialogue line that this character would say. Make it consistent with their personality and background. Return only the dialogue, no quotes or additional formatting. Do not use special characters like em dashes or smart quotes.`;
         prompt = `Character: ${cleanedCharacter.name}\nPersonality: ${cleanedCharacter.personality}\nBackground: ${cleanedCharacter.backstory_hook}\nExisting dialogue style: ${cleanedCharacter.dialogue_lines[0] || 'Unknown'}`;
       } else if (field.startsWith('item_')) {
         const parts = field.split('_');
@@ -319,7 +389,7 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        systemPrompt = `Generate an item that this character would own or carry. Include its name, description, and significance. Return only the item description, no additional text or formatting.`;
+        systemPrompt = `Generate an item that this character would own or carry. Include its name, description, and significance. Return only the item description, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
         prompt = `Character: ${cleanedCharacter.name}\nOccupation: ${cleanedCharacter.selected_traits?.occupation || 'Unknown'}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
       } else {
         return NextResponse.json(
@@ -348,22 +418,84 @@ export async function POST(request: NextRequest) {
         throw new Error("No content returned from OpenAI");
       }
 
-      // Clean up the response
-      let regeneratedContent = content.trim();
+      // Clean up the response and remove special characters
+      let regeneratedContent: string | Record<string, string> = content.trim()
+        .replace(/["""'']/g, '"') // Normalize quotes
+        .replace(/—/g, '-') // Replace em dashes
+        .replace(/…/g, '...') // Replace ellipsis
+        .replace(/^["'`]|["'`]$/g, '') // Remove surrounding quotes
+        .replace(/^\*\*|\*\*$/g, '') // Remove bold markers
+        .replace(/^#+\s*/, ''); // Remove markdown headers
 
-      // Remove common formatting artifacts
-      regeneratedContent = regeneratedContent.replace(/^["'`]|["'`]$/g, ''); // Remove surrounding quotes
-      regeneratedContent = regeneratedContent.replace(/^\*\*|\*\*$/g, ''); // Remove bold markers
-      regeneratedContent = regeneratedContent.replace(/^#+\s*/, ''); // Remove markdown headers
+      // Increment usage count AFTER successful API call
+      try {
+        incrementUsage(textModel);
+        console.log(`Successfully incremented usage for text model ${textModel}`);
+      } catch (usageError) {
+        console.warn('Error incrementing text model usage (continuing anyway):', usageError);
+      }
 
       // For quest whole regeneration, try to parse as JSON
       if (field.includes('quest_') && field.endsWith('_whole')) {
         try {
-          const questData = JSON.parse(regeneratedContent);
+          const questData = JSON.parse(regeneratedContent as string);
           regeneratedContent = questData;
         } catch (e) {
           // If parsing fails, return as-is
           console.warn('Failed to parse quest JSON, using as text');
+        }
+      }
+
+      // For additional traits regeneration, parse as JSON
+      if (field === 'additional_traits' || field === 'add_single_trait') {
+        try {
+          const traitsData = JSON.parse(regeneratedContent as string);
+          if (typeof traitsData === 'object' && traitsData !== null) {
+            // Clean the trait values
+            const cleanedTraits: Record<string, string> = {};
+            Object.entries(traitsData).forEach(([key, value]) => {
+              if (typeof value === 'string') {
+                const cleanedValue = value
+                  .replace(/["""'']/g, '"')
+                  .replace(/—/g, '-')
+                  .replace(/…/g, '...')
+                  .trim();
+                
+                // Only include if it's short enough to be a proper trait
+                if (cleanedValue.length <= 25 && 
+                    !cleanedValue.includes('.') && 
+                    !cleanedValue.includes(',') && 
+                    cleanedValue.split(' ').length <= 4) {
+                  cleanedTraits[key] = cleanedValue;
+                }
+              }
+            });
+            regeneratedContent = cleanedTraits;
+          } else {
+            throw new Error('Invalid traits data format');
+          }
+        } catch (e) {
+          console.warn('Failed to parse traits JSON, using empty object');
+          regeneratedContent = {};
+        }
+      }
+
+      // For individual trait regeneration, just clean the value
+      if (field.startsWith('regenerate_trait_')) {
+        const cleanedValue = (regeneratedContent as string)
+          .replace(/["""'']/g, '"')
+          .replace(/—/g, '-')
+          .replace(/…/g, '...')
+          .trim();
+        
+        // Only proceed if it's short enough to be a proper trait
+        if (cleanedValue.length <= 25 && 
+            !cleanedValue.includes('.') && 
+            !cleanedValue.includes(',') && 
+            cleanedValue.split(' ').length <= 4) {
+          regeneratedContent = cleanedValue;
+        } else {
+          throw new Error('Generated trait value is too long or complex');
         }
       }
 
@@ -399,7 +531,7 @@ export async function POST(request: NextRequest) {
           // Update specific quest field
           updatedCharacter.quests[questIndex] = {
             ...updatedCharacter.quests[questIndex],
-            [questPart]: regeneratedContent
+            [questPart]: regeneratedContent as string
           };
         }
       } else if (field.startsWith('dialogue_')) {
@@ -411,7 +543,7 @@ export async function POST(request: NextRequest) {
           updatedCharacter.dialogue_lines = [];
         }
         if (index >= 0 && index < updatedCharacter.dialogue_lines.length) {
-          updatedCharacter.dialogue_lines[index] = regeneratedContent;
+          updatedCharacter.dialogue_lines[index] = regeneratedContent as string;
         } else {
           throw new Error(`Dialogue line at index ${index} not found`);
         }
@@ -424,9 +556,42 @@ export async function POST(request: NextRequest) {
           updatedCharacter.items = [];
         }
         if (index >= 0 && index < updatedCharacter.items.length) {
-          updatedCharacter.items[index] = regeneratedContent;
+          updatedCharacter.items[index] = regeneratedContent as string;
         } else {
           throw new Error(`Item at index ${index} not found`);
+        }
+      } else if (field === 'additional_traits') {
+        // Replace additional traits entirely with the new ones
+        if (typeof regeneratedContent === 'object' && regeneratedContent !== null) {
+          // Merge with existing added_traits, replacing only the regenerated ones
+          updatedCharacter.added_traits = {
+            ...(updatedCharacter.added_traits || {}),
+            ...regeneratedContent
+          };
+        } else {
+          throw new Error('Invalid additional traits data format');
+        }
+      } else if (field === 'add_single_trait') {
+        // Add new trait(s) to existing traits
+        if (typeof regeneratedContent === 'object' && regeneratedContent !== null) {
+          // Merge the new trait(s) with existing ones
+          updatedCharacter.added_traits = {
+            ...(updatedCharacter.added_traits || {}),
+            ...regeneratedContent
+          };
+        } else {
+          throw new Error('Invalid single trait data format');
+        }
+      } else if (field.startsWith('regenerate_trait_')) {
+        // Update specific trait
+        const traitKey = field.replace('regenerate_trait_', '');
+        if (typeof regeneratedContent === 'string') {
+          updatedCharacter.added_traits = {
+            ...(updatedCharacter.added_traits || {}),
+            [traitKey]: regeneratedContent
+          };
+        } else {
+          throw new Error('Invalid trait value format');
         }
       } else {
         // Simple field update (name, appearance, personality, backstory_hook)

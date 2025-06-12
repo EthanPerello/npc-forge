@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- AI-powered portrait editing via text prompts using OpenAI’s `/v1/images/edits` endpoint (supports `gpt-image-1`)
+- "Add Generated Trait" button in Additional Traits section to generate a new short trait via AI
+- Individual regenerate buttons for each trait in the Additional Traits section
+
+### Changed
+- Trait filtering now excludes long or sentence-like traits entirely (instead of truncating them)
+- Trait formatting standardized to Title Case throughout the UI
+- Additional Traits display logic now matches exactly between the character modal and edit page
+- Navigation back to the Library after saving changes is now immediate with no artificial delay
+
+### Fixed
+- Traits missing from the edit page but visible in the modal due to inconsistent filtering logic
+
 ## [0.20.1] - 2025-06-10
 
 ### Added

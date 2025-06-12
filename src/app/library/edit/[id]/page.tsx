@@ -42,8 +42,9 @@ export default function CharacterEditorPage() {
   const [currentGenre, setCurrentGenre] = useState<string>('');
   const [subGenres, setSubGenres] = useState<{value: string, label: string}[]>([]);
   
-  // Regeneration state
+  // Regeneration state - updated to track individual fields
   const [isRegeneratingPortrait, setIsRegeneratingPortrait] = useState(false);
+  const [isRegeneratingField, setIsRegeneratingField] = useState<string | null>(null);
   const [fieldLoadingStates, setFieldLoadingStates] = useState<Record<string, boolean>>({});
   const [feedbackMessage, setFeedbackMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
   
@@ -128,12 +129,24 @@ export default function CharacterEditorPage() {
     }
   }, [character, originalCharacter]);
   
-  // Navigate back to library after a short delay
+  // Wrapper function for setCharacter to handle the portrait section's requirements
+  const handleSetCharacter = (newCharacter: Character | ((prev: Character) => Character)) => {
+    if (typeof newCharacter === 'function') {
+      setCharacter((prevCharacter) => {
+        if (prevCharacter === null) {
+          console.error('Cannot update null character');
+          return prevCharacter;
+        }
+        return newCharacter(prevCharacter);
+      });
+    } else {
+      setCharacter(newCharacter);
+    }
+  };
+
+  // Navigate back to library immediately
   const navigateToLibrary = () => {
-    // Use a timeout to allow any state updates to complete first
-    setTimeout(() => {
-      router.push('/library');
-    }, 50);
+    router.push('/library');
   };
   
   // Handle character deletion
@@ -154,10 +167,8 @@ export default function CharacterEditorPage() {
           text: 'Character deleted successfully'
         });
         
-        // Clear message after 1.5 seconds and navigate
-        setTimeout(() => {
-          navigateToLibrary();
-        }, 1500);
+        // Navigate immediately
+        navigateToLibrary();
       } else {
         setError('Failed to delete character');
       }
@@ -213,11 +224,8 @@ export default function CharacterEditorPage() {
           text: 'Changes saved successfully!'
         });
         
-        // Clear message after 1.5 seconds and navigate
-        setTimeout(() => {
-          setFeedbackMessage(null);
-          navigateToLibrary();
-        }, 1500);
+        // Navigate immediately
+        navigateToLibrary();
       } else {
         setError('Failed to update character');
       }
@@ -388,52 +396,102 @@ export default function CharacterEditorPage() {
     }
   };
 
-  // Handle field regeneration using your existing pattern
-  const handleRegenerateField = async (field: string, e?: React.MouseEvent<HTMLButtonElement>) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    
+  // UPDATED: Enhanced field regeneration handler that supports individual trait regeneration
+  const handleRegenerate = async (field: string, subField?: string, index?: number) => {
     if (!character) return;
     
-    setFieldLoadingStates(prev => ({ ...prev, [field]: true }));
+    setIsRegeneratingField(field);
     
     try {
+      let fieldToRegenerate = field;
+      
+      // Handle specific field formats for traits
+      if (field === 'add_single_trait') {
+        fieldToRegenerate = 'add_single_trait';
+      } else if (field.startsWith('regenerate_trait_')) {
+        fieldToRegenerate = field; // Keep the full field name with trait key
+      } else if (subField && typeof index === 'number') {
+        fieldToRegenerate = `${field}_${index}_${subField}`;
+      } else if (typeof index === 'number') {
+        fieldToRegenerate = `${field}_${index}`;
+      }
+      
+      console.log(`Regenerating field: ${fieldToRegenerate}`);
+      
       const response = await fetch('/api/regenerate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          character: character,
-          field: field,
-          model: selectedTextModel
+          character,
+          field: fieldToRegenerate,
+          model: selectedTextModel,
+          portraitOptions: field === 'portrait' ? {
+            image_model: selectedImageModel,
+            ...character.portrait_options
+          } : undefined
         }),
       });
-
-      if (!response.ok) {
-        throw new Error(`Failed to regenerate ${field}`);
-      }
-
-      const result = await response.json();
       
-      if (result.character) {
-        setCharacter(result.character);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Failed to regenerate ${field}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setCharacter(data.character);
+        setHasUnsavedChanges(true);
+        
+        // Set appropriate success message
+        let successMessage = '';
+        if (field === 'add_single_trait') {
+          successMessage = 'New trait added successfully!';
+        } else if (field.startsWith('regenerate_trait_')) {
+          const traitName = field.replace('regenerate_trait_', '').replace(/_/g, ' ');
+          successMessage = `Trait "${traitName}" regenerated successfully!`;
+        } else {
+          successMessage = `${field.charAt(0).toUpperCase() + field.slice(1)} regenerated successfully!`;
+        }
+        
         setFeedbackMessage({
           type: 'success',
-          text: `${field.charAt(0).toUpperCase() + field.slice(1)} regenerated successfully!`
+          text: successMessage
+        });
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          setFeedbackMessage(null);
+        }, 3000);
+      } else {
+        console.error('Regeneration failed:', data.error);
+        setFeedbackMessage({
+          type: 'error',
+          text: data.error || `Failed to regenerate ${field}`
         });
       }
-    } catch (err) {
-      console.error(`Error regenerating ${field}:`, err);
+    } catch (error) {
+      console.error('Error during regeneration:', error);
       setFeedbackMessage({
         type: 'error',
-        text: `Failed to regenerate ${field}. Please try again.`
+        text: error instanceof Error ? error.message : `Failed to regenerate ${field}. Please try again.`
       });
     } finally {
-      setFieldLoadingStates(prev => ({ ...prev, [field]: false }));
+      setIsRegeneratingField(null);
     }
+  };
+
+  // Legacy handler for backwards compatibility with existing components
+  const handleRegenerateField = async (field: string, e?: React.MouseEvent<HTMLButtonElement>) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    // Use the new handler
+    await handleRegenerate(field);
   };
 
   // Handle array input changes
@@ -571,6 +629,8 @@ export default function CharacterEditorPage() {
           portraitGenerationFailed={portraitGenerationFailed}
           portraitShouldRetry={portraitShouldRetry}
           portraitErrorType={portraitErrorType}
+          selectedImageModel={selectedImageModel}
+          setCharacter={handleSetCharacter}
         />
         
         {/* Character Traits Section */}
@@ -579,10 +639,12 @@ export default function CharacterEditorPage() {
           onNestedChange={handleNestedChange}
         />
         
-        {/* Additional Traits Section */}
+        {/* Additional Traits Section - NOW WITH INDIVIDUAL REGENERATION SUPPORT */}
         <AdditionalTraitsSection
           character={character}
           setCharacter={setCharacter}
+          onRegenerate={handleRegenerate}
+          isRegenerating={!!isRegeneratingField}
         />
         
         {/* Quests Section */}
