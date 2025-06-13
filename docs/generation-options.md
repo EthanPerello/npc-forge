@@ -1,6 +1,6 @@
 # Character Generation Options
 
-NPC Forge offers extensive customization options through its wizard-based interface. This guide provides a breakdown of all available settings across the four-step creation process.
+NPC Forge offers extensive customization options through its wizard-based interface. This guide provides a breakdown of all available settings across the four-step creation process, plus the new portrait editing and trait management features.
 
 ## Overview
 
@@ -27,65 +27,43 @@ Choose from four main genres with specialized sub-genres:
 
 ### Character Description
 
-Free-text description field for character details. More detailed descriptions typically result in more tailored characters that will have richer personalities for chat conversations.
+Free-text description field for character details. More detailed descriptions typically result in more tailored characters that will have richer personalities for chat conversations and better portraits for editing.
 
-> **Chat Consideration**: Well-developed character descriptions create more engaging and consistent conversational AI personalities.
+> **Chat & Portrait Consideration**: Well-developed character descriptions create more engaging conversational AI personalities and provide better context for portrait generation and editing.
 
 ## Step 2: Options
 
-### Basic Traits
+### Character Trait Options
+
+#### Basic Traits
 
 • **Gender**: Male, Female, Nonbinary, Unknown
 • **Age Group**: Child, Teen, Adult, Elder
 • **Moral Alignment**: Good, Neutral, Evil
 • **Relationship to Player**: Ally, Enemy, Neutral, Mentor, Rival, Betrayer
 
-### Advanced Options
+#### Advanced Options
 
-#### Physical Traits
+• **Physical Traits**: Height, build, distinctive features
+• **Background Elements**: Social class, homeland/origin
+• **Occupation**: Searchable dropdown with genre-specific options
+• **Personality Traits**: Multi-select system
+• **Additional Traits**: AI-generated or custom traits with individual management
 
-• **Height**: Very Short, Short, Average Height, Tall, Very Tall
-• **Build**: Thin/Slender, Athletic/Toned, Average Build, Sturdy/Solid, Muscular, Heavy/Large
-• **Distinctive Features**: Free text field for unique characteristics
+### Content Generation Options
 
-#### Background Elements
+#### Quest Options (if enabled)
 
-• **Social Class**: Lower Class, Working Class, Middle Class, Upper-middle Class, Upper Class/Nobility, Outcast/Outsider
-• **Homeland/Origin**: Free text field for character's place of origin
+• **Number of Quests**: 3-7 quests
+• **Quest Types**: Main Quest, Side Quest, Fetch Quest, Combat Quest, Social Quest, Exploration Quest, Puzzle/Riddle, Escort Quest, Collection Quest, Mystery Quest
+• **Reward Types**: Balanced, Gold & Currency, Items & Equipment, Information & Clues, Relationships & Favors, Experience & Skills
 
-#### Occupation
+#### Dialogue Options (if enabled)
 
-Searchable dropdown with genre-specific options
+• **Number of Lines**: 5-15 lines
+• **Dialogue Context**: Introduction, Casual Conversation, Giving Quests, Combat/Conflict, Emotional Scenes, Information/Exposition, Bartering/Trading, Farewell/Parting
 
-#### Personality Traits
-
-Multi-select system with unlimited selection from available options
-
-> **Chat Impact**: Personality traits directly influence how characters respond in conversations, their dialogue tone, and decision-making patterns.
-
-### Additional Elements
-
-Enable or disable specific character components:
-
-• **Quests**: Include character-related quests
-• **Dialogue**: Generate character-specific dialogue lines
-• **Items**: Create character inventory items
-
-### Quest Options (if enabled)
-
-• **Number of Quests**: 1-3 quests
-• **Quest Types**: Fetch/Collect, Defeat/Combat, Rescue/Escort, Deliver/Courier, Investigate/Mystery, Exploration, Crafting/Building, Stealth/Heist, Diplomatic
-• **Reward Types**: Money/Currency, Item/Equipment, Information/Knowledge, Reputation/Standing, Skill/Training, Companion/Ally, Property/Land
-
-### Dialogue Options (if enabled)
-
-• **Number of Lines**: 3-10 dialogue lines
-• **Dialogue Tone**: Friendly, Formal, Mysterious, Aggressive, Cautious, Eccentric, Scholarly, Humorous, Melancholic
-• **Dialogue Context**: First Meeting, Giving a Quest, Discussing Quest Progress, Quest Completion, Bargaining/Trading, During Combat, Casual Conversation
-
-> **Chat Integration**: Generated dialogue examples help establish the character's speaking patterns for chat conversations.
-
-### Item Options (if enabled)
+#### Item Options (if enabled)
 
 • **Number of Items**: 3-10 items
 • **Rarity Distribution**: Balanced, Mostly Common, Mostly Uncommon, Include Rare Items, Themed by Character
@@ -105,11 +83,13 @@ Enable or disable specific character components:
 
 ### Image Generation Models
 
-| Tier | Model | Monthly Limit | Best For |
-|------|-------|---------------|----------|
-| 🟢 Standard | dall-e-2 | 10/month | Basic portraits |
-| 🟡 Enhanced | dall-e-3 | 5/month | Better quality |
-| 🔴 Premium | gpt-image-1 | 3/month | Highest quality |
+| Tier | Model | Monthly Limit | Best For | Portrait Editing |
+|------|-------|---------------|----------|------------------|
+| 🟢 Standard | dall-e-2 | 10/month | Basic portraits | Limited editing support |
+| 🟡 Enhanced | dall-e-3 | 5/month | Better quality | Not supported for editing |
+| 🔴 Premium | gpt-image-1 | 3/month | Highest quality | Full editing support |
+
+> **Portrait Editing Note**: Only gpt-image-1 provides reliable portrait editing capabilities with consistent results.
 
 ### Portrait Customization
 
@@ -137,7 +117,7 @@ Plain/Solid Color, Gradient, Themed (Based on Character), Environmental, Abstrac
 2. AI processes inputs using selected models
 3. Character text is generated first, followed by portrait
 4. Results are displayed with tabs for different sections
-5. **Save to Library** to enable chat functionality
+5. **Save to Library** to enable chat functionality and editing features
 
 ### Alternative Options
 
@@ -148,102 +128,212 @@ Plain/Solid Color, Gradient, Themed (Based on Character), Environmental, Abstrac
 
 After generating a character, you can:
 
-• **Save to Library**: Store character for editing and chat
+• **Save to Library**: Store character for editing, chat, and portrait editing
 • **Start Chatting**: Begin conversations immediately after saving
 • **Download JSON**: Export character data
 • **Download Portrait**: Save character image
 
-## Utility Features
+## Portrait Editing Features (NEW in v0.21.0)
 
-### Randomize Options
+### Accessing Portrait Editing
 
-Generates random values for character traits while preserving your description and portrait settings.
+Portrait editing is available after saving characters to your library:
 
-### Clear Options
+1. Open any character with an existing portrait in edit mode
+2. Navigate to the Portrait section
+3. Click **Edit Portrait** button
+4. Ensure compatible model is selected (gpt-image-1 recommended)
 
-Resets all character traits while preserving:
+### Portrait Editing Interface
 
-• Character description
-• Selected genre and sub-genre
-• Portrait customization options
+**Edit Prompt Field:**
+• Text area for describing desired changes
+• Character counter shows remaining characters (varies by model)
+• Maximum length: 32,000 characters for gpt-image-1, 1,000 for others
 
-### Navigation
+**Model Compatibility:**
+• Warning displays for unsupported models
+• gpt-image-1 provides best editing results
+• dall-e-2 has limited editing capabilities
+• dall-e-3 does not support editing
 
-• **Progress Bar**: Click any step to jump directly to it
-• **Step Controls**: Use Continue/Back buttons
-• **Sticky Footer**: Controls remain visible during scroll
+### Writing Effective Edit Prompts
 
-## Usage Limits and Tracking
+**Color Changes:**
+```
+"change hair color to blonde"
+"make the eyes green"
+"change shirt to red"
+```
 
-### Per-Model Limits
+**Adding Accessories:**
+```
+"add a red hat"
+"add glasses"
+"add a beard"
+"add armor"
+```
 
-Each model tier has individual monthly limits that reset at the beginning of each month.
+**Removing Elements:**
+```
+"remove glasses"
+"remove the hat"
+"remove facial hair"
+```
 
-> **Important**: Chat conversations count against your text model limits. Plan your usage accordingly if you intend to have many conversations with your characters.
+**Expression Changes:**
+```
+"make them smile"
+"give them a serious expression"
+"make them look angry"
+```
 
-### Limit Display
+**Clothing Modifications:**
+```
+"change shirt to blue"
+"add a cloak"
+"remove the jacket"
+"add medieval armor"
+```
 
-The interface shows:
+### Portrait Editing Best Practices
 
-• Remaining generations for each model
-• Most constrained model when multiple are selected
-• Warning when approaching limits
+**Effective Prompts:**
+• Be specific about what you want to change
+• Use simple, clear language
+• Focus on one major change per edit
+• Reference colors, objects, and expressions directly
 
-## Tips for Best Results
+**Model Selection:**
+• Use gpt-image-1 for best results
+• Test with different models to understand capabilities
+• Consider usage limits when choosing models
 
-### Writing Effective Descriptions
+**Workflow Tips:**
+• Start with small changes to test results
+• Make incremental edits rather than major overhauls
+• Save edited portraits before making additional changes
+• Keep original portraits as backup
 
-1. **Be Specific**: Include concrete details about appearance, personality, and background
-2. **Add Unique Elements**: Mention special abilities, quirks, or distinctive features
-3. **Consider Context**: Think about how the character fits into your story or game
-4. **Plan for Chat**: Include personality details that will make conversations engaging
+### Portrait Editing Usage
 
-### Choosing Options
+**Usage Limits:**
+• Standard (dall-e-2): 10 edits per month
+• Enhanced (dall-e-3): 5 edits per month (not recommended for editing)
+• Premium (gpt-image-1): 3 edits per month
 
-1. **Start Broad**: Begin with genre/sub-genre, then add specific traits
-2. **Balance Traits**: Choose complementary personality traits
-3. **Use Advanced Options**: Physical traits and background add authenticity
-4. **Enable Dialogue**: Generated dialogue examples help establish chat personality
+**Cost Considerations:**
+• Portrait editing counts against image model limits
+• Plan edits carefully to maximize monthly usage
+• Consider which characters need editing most
 
-### Model Selection Strategy
+## Advanced Trait Management (NEW in v0.21.0)
 
-1. **Match Importance**: Use higher tiers for characters you'll interact with frequently
-2. **Plan Your Budget**: Track usage to make the most of monthly limits
-3. **Consider Chat Usage**: Higher-tier models provide better conversational experiences
-4. **Experiment**: Try different models to see quality differences
+### Additional Traits System
 
-### Chat-Focused Generation
+The Additional Traits section in character editing provides comprehensive trait management:
 
-If you plan to chat with your character:
+**Viewing Traits:**
+• All additional character traits displayed in organized layout
+• Traits shown with consistent Title Case formatting
+• Long or sentence-like traits automatically excluded from display
+• Category prefixes help organize trait types
 
-1. **Detailed Personality**: Include rich personality descriptions and traits
-2. **Background Depth**: Provide comprehensive backstory information
-3. **Dialogue Examples**: Enable dialogue generation to establish speaking patterns
-4. **Model Selection**: Consider Enhanced or Premium models for main characters you'll chat with frequently
+**Adding Generated Traits:**
+• **"Add Generated Trait"** button generates new AI-powered traits
+• Traits generated based on existing character personality and background
+• Generated traits automatically formatted and integrated
+• Uses selected text model for trait generation
 
-## Character Development Workflow
+**Individual Trait Regeneration:**
+• **Regenerate buttons** next to each trait for individual updates
+• Regenerate specific traits without affecting others
+• Maintains character consistency while refreshing specific aspects
+• Each regeneration counts against text model usage limits
 
-### Basic Workflow
+### Trait Management Best Practices
 
-1. Generate character with detailed description
-2. Save to library
-3. Start chatting to develop personality
-4. Edit character based on chat insights
-5. Continue conversations to build relationships
+**Generating New Traits:**
+• Use higher-tier models for more creative and fitting traits
+• Generate traits that complement existing character personality
+• Review generated traits and remove any that don't fit
+• Balance trait quantity with character focus
 
-### Advanced Workflow
+**Regenerating Traits:**
+• Regenerate traits that seem out of character or repetitive
+• Use regeneration to refresh stale or overused traits
+• Consider character development when updating traits
+• Maintain consistency with core character concept
 
-1. Create initial character with Standard model
-2. Save to library and begin conversations
-3. Identify key character traits through chat
-4. Use character editing to regenerate important elements with higher-tier models
-5. Continue developing character through ongoing conversations
+**Trait Organization:**
+• Use trait categories to understand character aspects
+• Remove traits that are too long or sentence-like
+• Keep trait lists focused and relevant
+• Balance different trait types (personality, skills, background)
+
+## Chat Integration
+
+### How Chat Uses Models
+
+When chatting with characters, the **text models** are used to generate responses:
+• Each chat response counts as **one generation** against your monthly text model limit
+• You can switch between models during conversations
+• Higher-tier models provide more consistent character personalities
+• Response quality and character voice depth improve with higher tiers
+
+### Chat-Specific Model Considerations
+
+**Standard (gpt-4o-mini):**
+• Good for casual conversation and exploration
+• Basic character personality consistency
+• Suitable for frequent, low-stakes interactions
+
+**Enhanced (gpt-4.1-mini):**
+• Better character voice consistency
+• More nuanced responses and personality depth
+• Good balance of quality and usage limits
+
+**Premium (gpt-4o):**
+• Superior character personality depth and consistency
+• Complex conversation handling and emotional nuance
+• Best for important story moments and character development
+
+## Usage Optimization Strategies
+
+### Efficient Model Usage
+
+**Start Low, Upgrade High:**
+• Generate characters with Standard tier
+• Use Enhanced/Premium for important regenerations
+• Chat with Standard, upgrade for key conversations
+
+**Strategic Feature Usage:**
+• Reserve portrait editing for most important characters
+• Use trait generation/regeneration judiciously
+• Plan character conversations around monthly limits
+
+**Batch Operations:**
+• Generate multiple characters when actively creating
+• Edit multiple character aspects in single sessions
+• Plan character development sessions around usage limits
+
+### Monthly Limit Management
+
+**Track Usage:**
+• Monitor usage indicators regularly
+• Plan character creation around monthly cycles
+• Balance different feature types (text vs. image)
+
+**Prioritize Features:**
+• Character generation: High priority
+• Chat conversations: Medium priority
+• Portrait editing: Use for key characters
+• Trait management: Use for character refinement
 
 ## Related Documentation
 
-• [How to Use NPC Forge](/docs/how-to-use) - Complete wizard walkthrough
+• [How to Use NPC Forge](/docs/how-to-use) - Complete creation and editing guide
 • [Chat with Characters](/docs/chat) - Interactive conversation guide
-• [Model Selection Guide](/docs/models) - Detailed model comparison
-• [Character Examples](/docs/character-examples) - See generation results
-• [Features Overview](/docs/features) - Complete feature list
-• [Character Library](/docs/library) - Managing your characters
+• [Character Library](/docs/library) - Library management and trait systems
+• [Model Selection](/docs/models) - Understanding AI model tiers and capabilities
+• [Features Overview](/docs/features) - Complete feature list including latest additions

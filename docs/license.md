@@ -58,9 +58,15 @@ NPC Forge uses several third-party libraries and resources, each with their own 
 
 ## Content Ownership
 
-### Generated Characters and Conversations
+### Generated Characters, Conversations, and Edited Content
 
-The characters, content, and conversations generated using NPC Forge belong to you, the user. You are free to use them in any way you see fit, including in commercial projects.
+The characters, content, conversations, and portrait modifications generated using NPC Forge belong to you, the user. You are free to use them in any way you see fit, including in commercial projects. This includes:
+
+• Character profiles and attributes
+• AI-generated portraits and edited portraits
+• Character conversations and chat history
+• Generated traits and character enhancements
+• Quest, dialogue, and item content
 
 ### OpenAI Usage Rights
 

@@ -79,6 +79,8 @@ Implement your feature or bug fix following the coding standards below.
 
 • Test character generation and editing functionality
 • Test chat features if your changes affect conversations
+• Test portrait editing features if your changes affect image handling
+• Test trait management features if your changes affect trait operations
 • Verify library operations (save, load, filter, search)
 • Test on both desktop and mobile interfaces
 • Ensure dark mode compatibility
@@ -177,6 +179,20 @@ Once approved, a maintainer will merge your PR.
 • Handle loading states and error conditions gracefully
 • Test conversation flow and message persistence
 
+**Portrait Editing Components:**
+• Follow patterns established in portrait section component
+• Ensure proper model compatibility validation
+• Handle image processing states and error conditions
+• Test with various edit prompts and image sizes
+• Validate edit prompt input and provide appropriate feedback
+
+**Trait Management Components:**
+• Follow patterns established in additional traits section
+• Ensure consistent trait display and formatting
+• Handle AI generation states and error conditions
+• Test trait addition, editing, and removal functionality
+• Validate trait data and format appropriately
+
 **Character Library Components:**
 • Maintain IndexedDB integration patterns
 • Follow the established component structure in `src/components/edit-page/`
@@ -220,6 +236,22 @@ Before submitting a PR, test the following areas:
 • Conversation persistence
 • Model selection during chat
 
+**Portrait Editing System (NEW - if applicable):**
+• Portrait editing interface access and functionality
+• Edit prompt input and validation
+• Model compatibility checking
+• Edit processing and result display
+• Usage limit integration
+• Error handling for various failure scenarios
+
+**Trait Management System (NEW - if applicable):**
+• Additional traits display and editing
+• Custom trait addition and removal
+• AI trait generation functionality
+• Individual trait regeneration
+• Trait formatting and validation
+• Integration with existing trait display
+
 **User Interface:**
 • Responsive design on different screen sizes
 • Dark mode functionality
@@ -251,6 +283,44 @@ When working on chat-related functionality:
 • Test model switching during conversations
 • Ensure usage warnings appear appropriately
 
+### Portrait Editing Testing
+
+When working on portrait editing functionality:
+
+**Interface Testing:**
+• Verify edit interface appears for characters with portraits
+• Test model compatibility warnings
+• Verify edit prompt input and validation
+
+**Processing Testing:**
+• Test successful edits with various prompt types
+• Test error handling for failed edits
+• Verify usage limit integration
+
+**Result Testing:**
+• Test edited portrait display and saving
+• Verify original portrait preservation
+• Test unsaved changes warnings
+
+### Trait Management Testing
+
+When working on trait management functionality:
+
+**Display Testing:**
+• Verify trait display consistency across interfaces
+• Test trait formatting and organization
+• Verify empty state handling
+
+**Generation Testing:**
+• Test AI trait generation functionality
+• Verify generated traits match character context
+• Test individual trait regeneration
+
+**Editing Testing:**
+• Test custom trait addition and editing
+• Verify trait validation and formatting
+• Test trait removal functionality
+
 ## Key Development Areas
 
 ### Core Features
@@ -259,6 +329,21 @@ When working on chat-related functionality:
 • Character library enhancements with filtering and search
 • Regeneration system refinements and new capabilities
 • Model selection optimization and new model support
+
+### Portrait Editing System (NEW)
+
+• Portrait editing interface improvements and optimization
+• Edit prompt validation and processing enhancements
+• Model compatibility and error handling improvements
+• Integration with existing portrait management system
+• Performance optimizations for image processing
+
+### Trait Management System (NEW)
+
+• Trait generation and regeneration improvements
+• Trait display and formatting enhancements
+• Custom trait management interface improvements
+• Integration with existing character data structures
 
 ### Chat System
 
@@ -280,6 +365,7 @@ When working on chat-related functionality:
 • Enhanced error handling and user feedback
 • Usage tracking improvements and accuracy
 • Rate limiting enhancements
+• Portrait editing API optimization
 
 ### Storage & Data
 
@@ -303,6 +389,20 @@ When working on chat-related functionality:
 2. **Consider Edge Cases**: Handle error conditions and unusual input
 3. **Maintain Consistency**: Follow established UI patterns and terminology
 4. **Document Changes**: Update relevant documentation files
+
+### Portrait Editing Implementation Guidelines
+
+1. **Model Compatibility**: Ensure proper validation of model support for editing
+2. **Error Handling**: Implement comprehensive error handling for various failure modes
+3. **User Feedback**: Provide clear feedback during edit processing
+4. **Integration**: Ensure seamless integration with existing portrait management
+
+### Trait Management Implementation Guidelines
+
+1. **Data Consistency**: Maintain consistent trait formatting and display
+2. **AI Integration**: Ensure proper integration with AI generation endpoints
+3. **Validation**: Implement appropriate validation for trait data
+4. **User Experience**: Provide intuitive interfaces for trait management
 
 ## Bug Reports
 
@@ -338,6 +438,7 @@ We welcome documentation improvements:
 • **Improve Clarity**: Make instructions clearer and more comprehensive
 • **Add Examples**: Provide more examples and use cases
 • **Update Screenshots**: Keep visual guides current with the interface
+• **Document New Features**: Add documentation for portrait editing and trait management features
 • **Translate**: Help make documentation accessible to more users
 
 ## Communication
@@ -369,6 +470,6 @@ Thank you for contributing to NPC Forge! Your efforts help make the project bett
 ## Related Documentation
 
 • [Development Setup](/docs/dev-setup) - Local environment configuration
-• [Architecture Overview](/docs/architecture) - System design and components
-• [Testing Guide](/docs/testing) - Comprehensive testing procedures
+• [Architecture Overview](/docs/architecture) - System design and components including new APIs
+• [Testing Guide](/docs/testing) - Comprehensive testing procedures including new features
 • [Security Documentation](/docs/security) - Security considerations and practices

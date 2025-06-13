@@ -2,50 +2,24 @@
 
 ![Site Header](public/images/site-header.png)
 
-NPC Forge is an AI-powered character generator for games, tabletop RPGs, and storytelling. Create detailed NPCs with personalities, quests, dialogue, items, and AI-generated portraits. Now featuring interactive conversations with your characters!
+NPC Forge is an AI-powered character generator for games, tabletop RPGs, and storytelling. Create detailed NPCs with personalities, quests, dialogue, items, and AI-generated portraits. Features interactive conversations with your characters and advanced portrait editing capabilities!
 
-[![Version](https://img.shields.io/badge/version-0.20.1-blue.svg)](https://github.com/EthanPerello/npc-forge/releases)
+[![Version](https://img.shields.io/badge/version-0.21.0-blue.svg)](https://github.com/EthanPerello/npc-forge/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/built%20with-Next.js%2014-black)](https://nextjs.org/)
-[![OpenAI](https://img.shields.io/badge/powered%20by-OpenAI-lightgrey)](https://openai.com/)
-
-## 🚀 Live Demo
-
-Try NPC Forge live at: [https://npc-forge-ethan-perellos-projects.vercel.app/](https://npc-forge-ethan-perellos-projects.vercel.app/)
 
 ## ✨ Features
 
-- **Wizard-Based Character Creation**: Step-by-step guided process with progress tracking
-- **Character Library**: Save, manage, edit, and organize your NPCs with enhanced filtering
-- **Interactive Chat**: Have real-time conversations with your generated characters
-- **AI-Powered Generation**: Create detailed NPCs from descriptions
-- **Multiple AI Models**: Choose from Standard, Enhanced, and Premium tiers
-- **Character Regeneration**: Regenerate individual character attributes and portraits
-- **AI Portraits**: Generate character portraits with customizable styles
-- **Complete Character Profiles**: Appearance, personality, backstory, quests, dialogue, and items
-- **Advanced Filtering**: Search and filter characters by traits with automatic trait discovery
-- **Enhanced Documentation**: Comprehensive guides and examples with automatic content loading
-- **Import/Export**: JSON import/export for character data
-- **Dark Mode**: Full dark mode support
-- **Responsive Design**: Works on desktop and mobile
+- **AI-Powered Character Generation**: Create detailed NPCs with unique personalities, backgrounds, and traits
+- **Interactive Chat System**: Have conversations with your generated characters
+- **Portrait Editing**: Edit character portraits with AI-powered text prompts
+- **Advanced Trait Management**: Generate and customize character traits with AI assistance
+- **Comprehensive Library**: Store, organize, and filter your character collection
+- **Multiple AI Models**: Choose from different AI model tiers for optimal quality and usage
+- **Export & Import**: Save characters as JSON for external use
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
 
-## 🆕 New in v0.20.0: Interactive Chat with Characters
-
-- **Real-Time Conversations**: Chat directly with your generated characters
-- **Character-Aware Responses**: AI maintains character personality and backstory during conversations
-- **Persistent Chat History**: Conversations automatically saved per character using IndexedDB
-- **Dynamic Response Lengths**: AI adjusts response length based on conversation context
-- **Integrated Chat Access**: Start conversations directly from character cards and library
-- **Usage Tracking**: Chat generations count against your selected text model tier limits
-
-## 🛠️ Installation & Development
-
-### Prerequisites
-
-- Node.js 18+
-- OpenAI API key
-
-### Setup
+## 🚀 Quick Start
 
 1. Clone the repository:
    ```bash
@@ -76,19 +50,19 @@ Try NPC Forge live at: [https://npc-forge-ethan-perellos-projects.vercel.app/](h
 | 🟡 Enhanced | gpt-4.1-mini | dall-e-3 | 30 text / 5 images |
 | 🔴 Premium | gpt-4o | gpt-image-1 | 10 text / 3 images |
 
-*Note: Chat conversations count against your selected text model limits*
+*Note: Chat conversations and portrait editing count against your selected model limits*
 
 ## 📖 Documentation
 
 Comprehensive documentation is available at `/docs` including:
 
-- **[How to Use](/docs/how-to-use)** - Complete user guide with chat features
+- **[How to Use](/docs/how-to-use)** - Complete user guide with chat and editing features
 - **[Character Examples](/docs/character-examples)** - Sample characters and use cases  
 - **[Character Library](/docs/library)** - Library management and advanced filtering
 - **[Chat with Characters](/docs/chat)** - Interactive conversation guide
 - **[Model Selection](/docs/models)** - Understanding AI model tiers
 - **[Generation Options](/docs/generation-options)** - Detailed customization guide
-- **[Features Overview](/docs/features)** - Complete feature list including chat
+- **[Features Overview](/docs/features)** - Complete feature list including latest additions
 - **[API Documentation](/docs/api)** - Technical API reference
 - **[Development Setup](/docs/dev-setup)** - Local development guide
 - **[Contributing](/docs/contributing)** - How to contribute

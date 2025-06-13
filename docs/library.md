@@ -1,6 +1,6 @@
 # Character Library Guide
 
-The Character Library is NPC Forge's system for saving, managing, and editing your generated characters, including the enhanced filtering system and interactive chat features.
+The Character Library is NPC Forge's system for saving, managing, and editing your generated characters, including the enhanced filtering system, interactive chat features, and the new portrait editing and trait management capabilities.
 
 ## Overview
 
@@ -9,6 +9,8 @@ The Character Library allows you to:
 • Edit and modify existing characters
 • Start conversations with your characters
 • Regenerate specific character elements
+• Edit portraits using AI-powered text prompts
+• Generate and manage character traits
 • Search and filter your collection with advanced trait filtering
 • Import and export characters as JSON
 • Manage character portraits and data
@@ -34,6 +36,7 @@ When editing a character:
 1. Make your desired changes
 2. Click "Save Changes"
 3. Updates are saved to your local storage
+4. Navigation back to Library is now immediate
 
 ## Library Interface
 
@@ -86,6 +89,7 @@ The library seamlessly integrates with the chat system:
 • Filter dropdowns are automatically created from your character data
 • New traits appear in filters as you save more characters
 • Traits are organized into logical categories
+• Long or sentence-like traits are automatically excluded for cleaner organization
 
 ### Filter Categories
 
@@ -115,21 +119,78 @@ Use the simplified search with trait-specific syntax:
 
 ### Edit Interface
 
-The edit interface provides character modification:
+The edit interface provides comprehensive character modification:
 • Edit character name and basic information
 • Modify all character attributes
 • Regenerate individual elements
-• Manage portraits
+• Manage portraits with editing capabilities
+• Generate and manage additional traits
 • Add/remove quests, dialogue, and items
+
+### Portrait Management and Editing (NEW in v0.21.0)
+
+**Portrait Options:**
+• **Upload**: Add custom portrait images
+• **Regenerate**: Create new portraits with different models
+• **Edit**: Modify existing portraits using text prompts
+
+**Portrait Editing Features:**
+• AI-powered editing using OpenAI's image editing API
+• Text-based prompts for describing desired changes
+• Support for color changes, accessories, clothing, and expressions
+• Model compatibility (gpt-image-1 recommended for best results)
+• Real-time preview of edited portraits
+
+**Portrait Editing Workflow:**
+1. Open character in edit mode
+2. Navigate to Portrait section
+3. Click "Edit Portrait" button (requires existing portrait)
+4. Enter text description of desired changes
+5. Click "Edit Portrait" to process changes
+6. Review results and save if satisfied
+
+**Edit Prompt Examples:**
+```
+"change hair color to blonde"
+"add a red hat"
+"remove glasses"
+"make them smile"
+"change shirt to blue"
+"add armor"
+```
+
+### Advanced Trait Management (NEW in v0.21.0)
+
+**Additional Traits Section:**
+• View all additional character traits in organized layout
+• Traits displayed with editable names and values
+• Standardized Title Case formatting throughout
+• Consistent display matching character modal
+
+**Trait Management Features:**
+• **Add Custom Trait**: Manually create traits with custom names and values
+• **Add Generated Trait**: AI generates new traits automatically
+• **Individual Regeneration**: Regenerate specific traits with dedicated buttons
+• **Edit Trait Names**: Modify trait categories and names
+• **Edit Trait Values**: Update trait descriptions and values
+• **Remove Traits**: Delete unwanted traits from character
+
+**Trait Generation:**
+• AI-generated traits match character personality and background
+• Automatic formatting and validation
+• Smart filtering excludes overly long traits
+• Integration with existing trait display system
 
 ### Regeneration Features
 
 Regenerate specific character elements:
 • Individual attributes (name, appearance, personality, backstory)
 • Portraits with different models
+• Portrait editing with text prompts
 • Quest components (title, description, reward)
 • Dialogue lines
 • Item descriptions
+• Individual character traits
 
 Choose different AI models for regeneration based on your monthly limits:
 • Standard: 50 text/10 images per month
@@ -195,6 +256,7 @@ The library uses IndexedDB for storage:
 3. **Regular Backups**: Export important characters as JSON files
 4. **Descriptive Names**: Use clear, searchable character names
 5. **Chat Documentation**: Use conversations to develop character relationships
+6. **Portrait Consistency**: Use portrait editing to maintain visual consistency
 
 ### Using Filtering Effectively
 
@@ -203,6 +265,23 @@ The library uses IndexedDB for storage:
 3. **Combine Methods**: Mix dropdown filters with text search
 4. **Organize Collections**: Use consistent traits for related characters
 
+### Portrait Editing Workflow
+
+1. **Create Characters**: Generate characters with initial portraits
+2. **Save to Library**: Add characters to your collection
+3. **Review Portraits**: Identify portraits that need refinement
+4. **Edit Portraits**: Use text prompts to modify specific aspects
+5. **Maintain Consistency**: Ensure portraits match your campaign aesthetic
+
+### Trait Management Workflow
+
+1. **Generate Characters**: Create characters with basic traits
+2. **Review Traits**: Examine additional traits in edit mode
+3. **Add Custom Traits**: Include story-specific traits manually
+4. **Generate AI Traits**: Use AI to suggest relevant traits
+5. **Organize Traits**: Edit and format traits for consistency
+6. **Filter and Search**: Use traits to organize your collection
+
 ### Chat Integration Workflow
 
 1. **Create Characters**: Generate characters using the wizard
@@ -210,6 +289,28 @@ The library uses IndexedDB for storage:
 3. **Start Conversations**: Use chat buttons to begin interactions
 4. **Develop Characters**: Use conversations to explore character depth
 5. **Edit and Refine**: Update character details based on chat insights
+6. **Maintain Relationships**: Use chat history to track character development
+
+## Advanced Features
+
+### Bulk Operations
+
+• Export multiple characters by selecting and downloading JSON files
+• Use consistent trait values across character collections
+• Organize related characters using similar trait structures
+
+### Character Development
+
+• Use chat conversations to discover new character traits
+• Edit portraits to reflect character development over time
+• Generate additional traits based on character growth
+• Maintain character consistency across long campaigns
+
+### Collection Management
+
+• Use trait filtering to organize character types (allies, enemies, NPCs)
+• Create character groups using consistent homeland or faction traits
+• Manage campaign-specific characters with custom traits
 
 ## Troubleshooting
 
@@ -222,13 +323,25 @@ The library uses IndexedDB for storage:
 
 **Missing portraits**:
 • Portraits may fail to generate due to network issues
-• Try regenerating the portrait
+• Try regenerating the portrait with different models
+• Use portrait editing to fix minor issues
 • Upload a custom image as backup
+
+**Portrait editing not working**:
+• Ensure character has existing portrait
+• Check that gpt-image-1 model is selected for best results
+• Verify monthly image model limits haven't been exceeded
+• Try simpler edit prompts
 
 **Chat not working**:
 • Verify the character exists in your library
 • Check that you haven't reached monthly usage limits
 • Try refreshing the browser
+
+**Trait management issues**:
+• Traits may not appear in filters if they're too long
+• Check that trait names and values are properly formatted
+• Regenerate traits if they don't match character personality
 
 **Filtering issues**:
 • Traits only appear after characters with those traits are saved
@@ -240,11 +353,41 @@ The library uses IndexedDB for storage:
 • Try using trait-specific syntax
 • Use dropdown filters first, then add search
 
+## Best Practices
+
+### Character Organization
+
+• Use consistent naming conventions for related characters
+• Apply similar trait structures to character groups
+• Regular maintenance of trait values for better filtering
+• Export character collections for backup and sharing
+
+### Portrait Management
+
+• Generate initial portraits with appropriate art styles
+• Use portrait editing for minor adjustments rather than complete redesigns
+• Maintain consistent art style across character collections
+• Test different edit prompts to understand model capabilities
+
+### Trait Development
+
+• Balance AI-generated traits with custom traits for character depth
+• Use trait regeneration to improve inconsistent traits
+• Organize traits by importance and relevance to your story
+• Regular review and cleanup of unnecessary traits
+
+### Chat Integration
+
+• Start conversations immediately after character creation
+• Use chat to explore character background and motivations
+• Reference character traits in conversations for consistency
+• Document character development through ongoing conversations
+
 ## Related Documentation
 
-• [How to Use NPC Forge](/docs/how-to-use) - Complete creation and chat guide
+• [How to Use NPC Forge](/docs/how-to-use) - Complete creation, chat, and editing guide
 • [Chat with Characters](/docs/chat) - Detailed conversation guide
 • [Character Examples](/docs/character-examples) - Sample library characters
-• [Generation Options](/docs/generation-options) - Customization settings
-• [Model Selection Guide](/docs/models) - Understanding AI models
-• [Features Overview](/docs/features) - Complete feature list
+• [Generation Options](/docs/generation-options) - Customization settings including portrait editing
+• [Model Selection Guide](/docs/models) - Understanding AI models for editing and generation
+• [Features Overview](/docs/features) - Complete feature list including trait management

@@ -44,7 +44,7 @@ Add the following environment variable in the Vercel dashboard:
 OPENAI_API_KEY=your_api_key_here
 ```
 
-> **Important**: Ensure your OpenAI API key has sufficient credits for both character generation and chat functionality.
+> **Important**: Ensure your OpenAI API key has sufficient credits for character generation, chat functionality, and portrait editing features.
 
 **Deploy**
 
@@ -56,7 +56,8 @@ Once deployed, Vercel will provide a URL where you can access your application. 
 • Character generation wizard
 • Chat functionality with generated characters
 • Character library operations
-• Portrait generation
+• Portrait generation and editing
+• Trait management features
 • Import/export features
 
 ### Vercel Configuration
@@ -74,10 +75,15 @@ For optimal performance, consider these Vercel settings:
     },
     "app/api/regenerate/route.ts": {
       "maxDuration": 120
+    },
+    "app/api/edit-portrait/route.ts": {
+      "maxDuration": 120
     }
   }
 }
 ```
+
+> **Note**: The portrait editing endpoint has a 120-second timeout to accommodate image processing operations.
 
 ## Deployment to Netlify
 
@@ -140,6 +146,23 @@ In your repository, create a `netlify.toml` file:
   for = "/api/*"
   [headers.values]
     Cache-Control = "no-cache"
+
+# Specific timeout settings for resource-intensive endpoints
+[[functions]]
+  path = "/api/chat"
+  timeout = 60
+
+[[functions]]
+  path = "/api/generate"
+  timeout = 120
+
+[[functions]]
+  path = "/api/regenerate"
+  timeout = 120
+
+[[functions]]
+  path = "/api/edit-portrait"
+  timeout = 120
 ```
 
 **Deploy**
@@ -224,6 +247,9 @@ server {
         proxy_read_timeout 300;
         proxy_connect_timeout 300;
         proxy_send_timeout 300;
+        
+        # Increased timeouts for portrait editing
+        proxy_timeout 300;
     }
 
     # Optional: serve static files directly
@@ -231,6 +257,19 @@ server {
         alias /path/to/npc-forge/.next/static/;
         expires 1y;
         add_header Cache-Control "public, immutable";
+    }
+    
+    # Specific timeout handling for API endpoints
+    location /api/edit-portrait {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 300;
+        proxy_connect_timeout 300;
+        proxy_send_timeout 300;
+        client_max_body_size 50M;  # Allow larger image uploads
     }
 }
 ```
@@ -245,8 +284,11 @@ server {
     ProxyPassReverse / http://localhost:3000/
     ProxyPreserveHost On
     
-    # Increase timeout for API calls
+    # Increase timeout for API calls including portrait editing
     ProxyTimeout 300
+    
+    # Allow larger request bodies for portrait editing
+    LimitRequestBody 52428800  # 50MB
 </VirtualHost>
 ```
 
@@ -291,7 +333,8 @@ NEXT_PUBLIC_APP_URL=https://your-domain.com  # For absolute URLs if needed
 • Ensure your API key has sufficient credits for expected usage
 • Monitor API usage through the OpenAI dashboard
 • Consider setting up usage alerts in your OpenAI account
-• Be aware that chat functionality will increase API usage
+• Be aware that chat functionality and portrait editing will increase API usage
+• **Portrait editing operations may consume more credits due to image processing**
 
 ## Performance Optimization
 
@@ -333,10 +376,11 @@ location /api/ {
 ### Application Monitoring
 
 Consider implementing monitoring for:
-• API response times (especially for chat and generation endpoints)
+• API response times (especially for chat, generation, and portrait editing endpoints)
 • Error rates and types
 • Resource usage (memory, CPU)
 • OpenAI API usage and costs
+• **Portrait editing processing times and success rates**
 
 ### Log Management
 
@@ -361,6 +405,18 @@ After deploying, perform these verification steps:
 • Verify all model tiers work correctly
 • Test portrait generation with different models
 
+**Portrait Editing (NEW)**
+• Test portrait editing interface with existing characters
+• Verify model compatibility warnings work correctly
+• Test various edit prompts and processing
+• Confirm usage limit integration
+
+**Trait Management (NEW)**
+• Test AI trait generation functionality
+• Verify individual trait regeneration
+• Test custom trait addition and editing
+• Confirm trait display consistency
+
 **Chat System**
 • Start conversations with different character types
 • Test message persistence across browser sessions
@@ -381,7 +437,7 @@ After deploying, perform these verification steps:
 ### Performance Verification
 
 • Check application load times
-• Monitor API response times
+• Monitor API response times including portrait editing
 • Verify IndexedDB operations are performant
 • Test with multiple concurrent users (if applicable)
 
@@ -392,7 +448,7 @@ After deploying, perform these verification steps:
 **API Connection Problems:**
 • Verify OpenAI API key is correctly set and has credits
 • Check network connectivity to OpenAI services
-• Ensure API key has necessary permissions
+• Ensure API key has necessary permissions for all endpoints including image editing
 
 **Build Failures:**
 • Check Node.js version compatibility (18+)
@@ -403,8 +459,14 @@ After deploying, perform these verification steps:
 **Runtime Errors:**
 • Check server logs for detailed error messages
 • Verify all environment variables are available at runtime
-• Test API endpoints individually
+• Test API endpoints individually including portrait editing
 • Monitor memory usage and resource constraints
+
+**Portrait Editing Issues:**
+• Verify OpenAI API key has access to image editing endpoints
+• Check request size limits and timeouts
+• Monitor image processing performance
+• Test with various image sizes and formats
 
 **Chat System Issues:**
 • Verify chat API endpoints are accessible
@@ -418,6 +480,7 @@ After deploying, perform these verification steps:
 • Optimize images and reduce bundle sizes
 • Implement proper caching strategies
 • Monitor and optimize API call patterns
+• **Consider CDN for image assets if using portrait editing extensively**
 
 ## Deployment Checklist
 
@@ -426,8 +489,10 @@ Use this checklist for each deployment:
 • Environment variables are correctly configured
 • OpenAI API key is valid and has sufficient credits
 • Production build completes successfully
-• All API endpoints respond correctly
+• All API endpoints respond correctly including portrait editing
 • Character generation wizard works end-to-end
+• Portrait editing functionality operates properly
+• Trait management features work correctly
 • Chat functionality operates properly
 • Character library saves and loads correctly
 • Portrait generation functions with all model tiers
@@ -441,9 +506,10 @@ Use this checklist for each deployment:
 
 • API keys are properly secured and not exposed to clients
 • HTTPS is enabled for all production deployments
-• Input validation is working correctly
+• Input validation is working correctly for all endpoints
 • Rate limiting is properly configured
 • CORS settings are appropriate for your domain
+• **Image upload validation is working for portrait editing**
 
 ## Cost Management
 
@@ -454,16 +520,18 @@ Monitor and manage API costs:
 • Track usage patterns through the OpenAI dashboard
 • Consider implementing additional rate limiting if needed
 • Monitor chat usage as it can increase API consumption
+• **Monitor portrait editing usage as image operations have different cost structures**
 
 ### Hosting Costs
 
 • Vercel and Netlify offer generous free tiers
 • Self-hosting costs depend on server resources and traffic
 • Consider CDN usage for static assets in high-traffic scenarios
+• **Monitor bandwidth usage if portrait editing is heavily used**
 
 ## Related Documentation
 
-• [Architecture Overview](/docs/architecture) - For system understanding
+• [Architecture Overview](/docs/architecture) - For system understanding including new APIs
 • [Development Setup](/docs/dev-setup) - For local development
 • [Security Documentation](/docs/security) - For security considerations
 • [Contributing Guidelines](/docs/contributing) - For development workflow

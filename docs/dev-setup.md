@@ -9,7 +9,7 @@ Before you begin, ensure you have:
 • **Node.js** (v18 or newer)
 • **npm** (v7 or newer)
 • **Git**
-• **OpenAI API key** (for development)
+• **OpenAI API key** (for development including portrait editing features)
 
 ## Setting Up the Development Environment
 
@@ -66,6 +66,22 @@ The character library works fully in development mode:
 • Example characters are pre-loaded for testing
 • Chat conversations are fully functional and persistent
 
+### Portrait Editing Features
+
+Portrait editing functionality is available in development mode:
+• Edit existing character portraits using text prompts
+• Test with different AI models (gpt-image-1 recommended)
+• Validate edit prompt processing and error handling
+• Test usage limit integration
+
+### Trait Management Features
+
+Trait management features are available in development mode:
+• Generate new character traits using AI
+• Test individual trait regeneration
+• Validate trait formatting and display consistency
+• Test integration with existing character data
+
 ## Project Structure
 
 Key directories and files:
@@ -79,6 +95,7 @@ npc-forge/
 │   ├── app/                 # Next.js App Router 
 │   │   ├── api/             # API routes
 │   │   │   ├── chat/        # Character conversation endpoint
+│   │   │   ├── edit-portrait/ # Portrait editing endpoint (NEW)
 │   │   │   ├── generate/    # Character generation endpoint
 │   │   │   ├── regenerate/  # Character regeneration endpoint
 │   │   │   └── proxy-image/ # Image proxy endpoint
@@ -90,6 +107,8 @@ npc-forge/
 │   ├── components/          # React components
 │   │   ├── character-wizard.tsx      # Main wizard component
 │   │   ├── edit-page/       # Character editing components
+│   │   │   ├── portrait-section.tsx     # Portrait editing interface
+│   │   │   └── additional-traits-section.tsx # Trait management interface
 │   │   ├── ui/              # Reusable UI components
 │   │   └── wizard-steps/    # Individual wizard steps
 │   ├── contexts/            # React contexts
@@ -138,8 +157,24 @@ When developing locally, be mindful of your OpenAI API usage:
 
 • Character generation costs vary by model
 • Portrait generation adds additional costs
+• **Portrait editing** adds costs for image modification operations
 • Chat conversations count against text model limits
+• **Trait generation** adds costs for AI-powered trait creation
 • Consider using Standard models during development to minimize costs
+
+### Portrait Editing Development Notes
+
+• Portrait editing uses OpenAI's image editing API (`/v1/images/edits`)
+• Only `gpt-image-1` provides reliable editing capabilities
+• Image size limits: up to 50MB for `gpt-image-1`
+• Edit prompt limits: up to 32,000 characters for `gpt-image-1`
+
+### Trait Management Development Notes
+
+• Trait generation uses text generation API with specialized prompts
+• Generated traits are validated for format and appropriateness
+• Individual trait regeneration allows fine-grained character customization
+• Trait operations count against text model usage limits
 
 ## Key Development Areas
 
@@ -166,12 +201,30 @@ The chat system includes:
 • IndexedDB conversation storage
 • Character-aware AI responses
 
+### Portrait Editing Development (NEW)
+
+The portrait editing system includes:
+• Portrait editing interface in `src/components/edit-page/portrait-section.tsx`
+• Portrait editing API endpoint at `/api/edit-portrait`
+• Model compatibility validation
+• Edit prompt processing and validation
+
+### Trait Management Development (NEW)
+
+The trait management system includes:
+• Trait management interface in `src/components/edit-page/additional-traits-section.tsx`
+• Enhanced regeneration API support for trait operations
+• Trait generation and formatting logic
+• Integration with existing character data structures
+
 ### Regeneration System
 
 The regeneration system allows updating specific character elements:
 • Individual attributes (name, appearance, personality, backstory)
 • Portrait images with different models
+• **Portrait editing** with text prompts
 • Quest components, dialogue lines, and items
+• **Individual trait generation and regeneration**
 
 ## Common Development Tasks
 
@@ -190,6 +243,20 @@ The regeneration system allows updating specific character elements:
 3. Update the API endpoints to handle new models
 4. Test with the new models
 
+### Working with Portrait Editing
+
+1. Understand the image editing API integration in `/api/edit-portrait`
+2. Test with various edit prompts and image types
+3. Validate model compatibility (gpt-image-1 recommended)
+4. Handle error cases and user feedback appropriately
+
+### Working with Trait Management
+
+1. Understand the trait generation API integration in `/api/regenerate`
+2. Test trait generation with different character contexts
+3. Validate trait formatting and display consistency
+4. Handle AI generation failures gracefully
+
 ## Testing During Development
 
 ### Manual Testing Checklist
@@ -197,10 +264,12 @@ The regeneration system allows updating specific character elements:
 1. **Wizard Flow**: Test each step of the character creation wizard
 2. **Character Library**: Verify saving, loading, editing, and deleting
 3. **Chat System**: Test conversation flow, persistence, and character consistency
-4. **Model Selection**: Test different model combinations
-5. **Regeneration**: Verify all regeneration options work correctly
-6. **Responsive Design**: Test on different screen sizes
-7. **Dark Mode**: Verify theme switching works properly
+4. **Portrait Editing**: Test edit interface, processing, and error handling
+5. **Trait Management**: Test trait generation, editing, and regeneration
+6. **Model Selection**: Test different model combinations
+7. **Regeneration**: Verify all regeneration options work correctly
+8. **Responsive Design**: Test on different screen sizes
+9. **Dark Mode**: Verify theme switching works properly
 
 ### Browser Testing
 
@@ -209,6 +278,20 @@ Test in multiple browsers:
 • Firefox
 • Safari
 • Edge
+
+### Feature-Specific Testing
+
+**Portrait Editing Testing:**
+• Test with characters that have existing portraits
+• Verify model compatibility warnings
+• Test various edit prompt types
+• Validate error handling for failed edits
+
+**Trait Management Testing:**
+• Test AI trait generation functionality
+• Verify trait display consistency
+• Test individual trait regeneration
+• Validate trait formatting and validation
 
 ## Troubleshooting
 
@@ -229,6 +312,22 @@ Common library issues:
 1. **Characters not saving**: Check IndexedDB permissions and storage space
 2. **Slow loading**: Verify browser performance and clear cache if needed
 3. **Search not working**: Check for JavaScript errors in console
+
+### Portrait Editing Issues
+
+Common portrait editing issues:
+
+1. **Edit button disabled**: Verify character has existing portrait and compatible model selected
+2. **Editing failed**: Check API key permissions, usage limits, and network connectivity
+3. **Poor edit results**: Try using gpt-image-1 model and more specific edit prompts
+
+### Trait Management Issues
+
+Common trait management issues:
+
+1. **Traits not generating**: Check text model usage limits and API connectivity
+2. **Traits not displaying**: Verify trait formatting meets display requirements
+3. **Regeneration not working**: Check usage limits and network connectivity
 
 ### Chat System Issues
 
@@ -270,12 +369,46 @@ When contributing to NPC Forge:
 
 1. Follow the existing code style and patterns
 2. Write TypeScript for all new code
-3. Test your changes thoroughly
+3. Test your changes thoroughly including new features
 4. Update documentation for new features
 5. Follow the commit message format (see [Contributing Guide](/docs/contributing))
 
+### Testing New Features
+
+**Portrait Editing Contributions:**
+• Test with various character types and portrait styles
+• Validate edit prompt processing and error handling
+• Ensure model compatibility validation works correctly
+• Test usage limit integration
+
+**Trait Management Contributions:**
+• Test trait generation with different character contexts
+• Validate trait formatting and display consistency
+• Ensure individual trait regeneration works properly
+• Test integration with existing character data
+
+## Performance Considerations
+
+### API Call Optimization
+
+• Batch operations where possible to reduce API calls
+• Use appropriate model tiers for different operations
+• Implement proper caching for frequently accessed data
+
+### Image Processing Optimization
+
+• Validate image sizes before processing
+• Use appropriate image formats and compression
+• Handle large images gracefully
+
+### Trait Processing Optimization
+
+• Validate trait data before API calls
+• Cache trait generation results when appropriate
+• Optimize trait display and filtering operations
+
 ## Related Documentation
 
-• [Architecture Overview](/docs/architecture) - System design and components
-• [Contributing Guidelines](/docs/contributing) - How to contribute
-• [API Documentation](/docs/api) - API endpoint details
+• [Architecture Overview](/docs/architecture) - System design and components including new APIs
+• [Contributing Guidelines](/docs/contributing) - How to contribute including new feature areas
+• [API Documentation](/docs/api) - API endpoint details including portrait editing
