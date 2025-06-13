@@ -1,270 +1,215 @@
 # Frequently Asked Questions
 
-## General Questions
+## Getting Started
 
 ### What is NPC Forge?
 
-NPC Forge is an AI-powered tool for creating detailed non-player characters (NPCs) for games, storytelling, and creative projects. It features a step-by-step wizard interface, character library management, interactive chat with characters, and support for multiple AI models to generate character profiles including names, appearance, personality, backstory, quests, dialogue, items, and AI-created portraits.
+NPC Forge is an AI-powered character generator that creates detailed non-player characters for games, tabletop RPGs, and storytelling. It uses OpenAI's models to generate comprehensive character profiles including personalities, backstories, quests, dialogue, items, and portraits. You can also chat with your characters and edit their portraits using AI.
 
-### Is NPC Forge free to use?
+### Do I need an OpenAI API key?
 
-Yes, NPC Forge is free to use with a tiered model system:
-• **Standard models**: 50 text generations, 10 image generations per month
-• **Enhanced models**: 30 text generations, 5 image generations per month
-• **Premium models**: 10 text generations, 3 image generations per month
+Yes, NPC Forge requires an OpenAI API key to function. You can get one from [OpenAI's website](https://platform.openai.com/). The key is stored locally in your browser and never sent to external servers.
 
-> **Note**: Chat conversations count against your text model limits
+### Is my data safe?
 
-### Do I need to create an account?
+Yes, all your character data is stored locally in your browser using IndexedDB. Your API key and characters never leave your device. NPC Forge doesn't collect or store any personal information on external servers.
 
-No, NPC Forge does not require an account or login. It works immediately in your browser without any signup process. All characters and conversations are stored locally in your browser.
+### How much does it cost to use?
 
-### What happens to my characters and chat conversations?
+NPC Forge itself is free, but you pay for OpenAI API usage according to their pricing. The app tracks your monthly usage to help you stay within reasonable limits. Typical usage costs a few dollars per month for casual use.
 
-Your characters and conversations are stored locally in your browser's IndexedDB storage. You can save characters to your personal library, edit them, chat with them, and organize them. We have no access to your generated characters or conversations.
+## Character Creation
 
-### Which browsers are supported?
+### How do I create a character?
 
-NPC Forge works on modern browsers like Chrome, Firefox, Safari, and Edge. The character library and chat features require IndexedDB support, which is available in all modern browsers.
-
-## Chat Features
-
-### How do I start chatting with a character?
-
-There are several ways to begin a conversation:
-1. Click the "Chat" button on any character card in your library
-2. Open a character's details modal and click "Start Chat"
-3. Navigate directly to `/chat/[characterId]` for any saved character
-
-### Do chat conversations count against my usage limits?
-
-Yes, each chat response from your character counts as one generation against your selected text model's monthly limit:
-• Standard (gpt-4o-mini): 50 generations per month
-• Enhanced (gpt-4.1-mini): 30 generations per month
-• Premium (gpt-4o): 10 generations per month
-
-### How does the AI maintain character consistency in chat?
-
-The AI maintains character consistency through:
-• System prompts that include character personality, backstory, and all traits
-• Recent conversation context (last 15 messages)
-• Instructions to stay in character and respond naturally
-• Character-specific dialogue tone and background elements
-
-### Can I switch AI models during a conversation?
-
-Yes! You can change the model selection at any time during a conversation. Different models offer different quality levels and count against their respective monthly limits.
-
-### How long are character responses in chat?
-
-Response lengths automatically adjust based on your input:
-• Simple greetings ("Hi"): Brief responses (1-2 sentences)
-• Casual questions: Moderate responses (2-4 sentences)
-• Detailed requests: Fuller responses (1-2 paragraphs)
-• Maximum limit: Never exceeds 3 paragraphs
-
-### Are my conversations private?
-
-Yes, completely private. All conversations are stored locally in your browser using IndexedDB. No conversation data is transmitted to or stored on external servers.
-
-### Can I clear chat history?
-
-Yes, you can clear conversation history per character using the "Clear Chat" button in the chat interface. This action cannot be undone.
-
-### What's the message character limit for chat?
-
-You can send messages up to 1000 characters long. The interface shows a character counter to help you stay within the limit.
-
-## Usage & Features
-
-### How does the wizard interface work?
-
-The wizard guides you through four steps:
-1. **Concept**: Choose genre and write character description
-2. **Options**: Set traits, enable quests/dialogue/items
-3. **Model**: Select AI models for text and image generation
-4. **Generate**: Create your character and review results
+1. **Start the wizard**: Click "Generate Character" on the main page
+2. **Choose concept**: Select a genre and add a character description  
+3. **Set options**: Customize traits, quests, dialogue, and items
+4. **Select models**: Choose your AI model tier (Standard/Enhanced/Premium)
+5. **Generate**: Click generate and wait for your character to be created
+6. **Save**: Add your character to the library for future use
 
 ### What's the difference between the model tiers?
 
-• **🟢 Standard**: Good quality, 50 text/10 image generations per month
-• **🟡 Enhanced**: Better quality, 30 text/5 image generations per month
-• **🔴 Premium**: Highest quality, 10 text/3 image generations per month
+• **Standard (🟢)**: Good quality, higher monthly limits (50 text/10 images)
+• **Enhanced (🟡)**: Better quality, medium limits (30 text/5 images)  
+• **Premium (🔴)**: Best quality, lower limits (10 text/3 images)
 
-### Can I edit characters after creating them?
+Higher tiers produce more detailed and consistent characters but have lower monthly usage limits.
 
-Yes! The character library includes an editing system where you can:
-• Modify any character attribute
-• Regenerate specific elements (name, appearance, quests, etc.)
-• Add or remove quests, dialogue lines, and items
-• Upload or regenerate portraits
-• Choose different AI models for regeneration
+### Can I customize the generation options?
 
-### How many characters can I save?
+Yes! You can control:
+• **Character traits**: Age, gender, personality, occupation, species, and more
+• **Content types**: Enable/disable quests, dialogue, items, and portraits
+• **Genre settings**: Fantasy, sci-fi, modern, historical, and custom descriptions
+• **Portrait options**: Art style, mood, framing, and background
+• **AI models**: Choose different models for text and image generation
 
-You can save characters to your library limited by your browser's storage capacity. They're stored locally using IndexedDB, which can handle thousands of characters.
+### What if I don't like the generated character?
 
-### Can I export my characters?
+You can:
+• **Regenerate completely**: Create a new character with the same or different options
+• **Edit individual parts**: Regenerate specific traits, quests, dialogue, or portraits
+• **Modify manually**: Edit any character field directly in the character editor
+• **Try different models**: Use higher-tier models for better quality
 
-Yes, you can export characters as JSON files for backup or transfer between devices.
+## Portrait Features
 
-### What's character regeneration?
+### How does portrait editing work?
 
-Regeneration allows you to update specific parts of existing characters:
-• Regenerate individual attributes (name, appearance, personality, backstory)
-• Regenerate portraits with different models or styles
-• Regenerate specific quest components, dialogue lines, or items
-• Choose different AI models for regeneration
+Portrait editing uses AI to modify existing character portraits based on text prompts. You can:
+• **Make adjustments**: Change clothing, expressions, backgrounds, or other visual elements
+• **Use natural language**: Describe what you want changed in simple terms
+• **Preview changes**: See the edited portrait before saving
+• **Revert if needed**: Keep the original if you don't like the edit
 
-### What's the new filtering system?
+### Which models support portrait editing?
 
-The enhanced filtering system includes:
-• Dropdown filters for character trait categories
-• Automatic filter creation based on your character data
-• Smart search using "category: value" syntax
-• Collapsible filter sections
-• Combined filtering and search
+Portrait editing is currently available with the **gpt-image-1** model (Premium tier only). This model provides the highest quality results for both generation and editing.
 
-## Technical Questions
+### What makes a good edit prompt?
 
-### How does NPC Forge work?
+1. **Be specific**: "Add a blue cloak" rather than "change clothing"
+2. **Keep it simple**: One or two changes per edit work best
+3. **Use clear language**: Avoid complex or ambiguous descriptions
+4. **Consider the character**: Make edits that fit the character's style and setting
 
-NPC Forge uses OpenAI's AI models to generate character content. You select from multiple models (gpt-4o-mini, gpt-4o, dall-e-3, etc.) that create text and images based on your inputs.
+### Why did my portrait edit fail?
 
-### Can I use NPC Forge offline?
+Common reasons include:
+• **Model compatibility**: Portrait editing requires gpt-image-1 (Premium tier)
+• **Usage limits**: You may have reached your monthly image generation limit
+• **Prompt issues**: The edit prompt may be too complex or unclear
+• **Technical issues**: Network problems or API temporary issues
 
-No, NPC Forge requires an internet connection for character generation and chat. However, once characters are saved to your library, you can view them offline.
+## Trait Management
 
-### What happens to my data?
+### How do I add new traits to a character?
 
-Your inputs are sent to OpenAI's API to generate content but are not stored on our servers. Generated characters and conversations exist only in your browser's local storage. We do not collect, store, or have access to your character data or conversations.
+1. **Open character editor**: Click the edit button on any character
+2. **Find Additional Traits**: Scroll to the Additional Traits section
+3. **Add Generated Trait**: Click the "Add Generated Trait" button for AI suggestions
+4. **Manual addition**: Or add custom traits manually
+5. **Save changes**: Don't forget to save your edits
 
-### Why does character generation sometimes fail?
+### Can I regenerate individual traits?
 
-Generation might fail due to:
-• Network connectivity issues
-• OpenAI API temporary limitations or downtime
-• Content policy violations in your inputs
-• Browser storage issues (rare)
+Yes! In the character editor, you'll find regenerate buttons next to each trait in the Additional Traits section. This lets you refresh specific traits without affecting the rest of the character.
 
-### Are there any content restrictions?
+### Why don't some traits appear in filters?
 
-Yes, NPC Forge follows OpenAI's content policy, which prohibits generating explicit sexual content, hateful content, or content that promotes illegal activities.
+The filtering system automatically excludes traits that are:
+• **Too long**: Sentence-like traits that are more like descriptions
+• **Duplicate**: Traits that are very similar to existing filter options
+• **Inappropriate**: Traits that don't make good filter categories
 
-### Why do I have usage limits?
-
-Usage limits help manage API costs while keeping NPC Forge free for everyone. Standard models have the highest limits, while Enhanced and Premium models have lower monthly limits due to higher costs.
+This keeps the filter system clean and useful while preserving all trait data.
 
 ## Character Library
 
-### How do I save characters to my library?
+### How do I organize my characters?
 
-After generating a character, click "Save to Library" in the results step. The character will be saved with all its data and portrait.
+The library offers several organization tools:
+• **Search**: Find characters by name, description, or traits
+• **Trait filters**: Filter by specific traits like personality, occupation, or species
+• **Advanced search**: Use "category: value" syntax (e.g., "personality: brave")
+• **Visual browsing**: Browse character portraits and summaries
+• **Export/import**: Create backups or share character collections
 
-### Can I organize my characters?
+### Can I edit characters after creation?
 
-Yes, you can:
-• Search characters by name or traits
-• Filter by genre and character attributes
-• Use the new trait filtering system
-• Sort and organize your collection
-• Start conversations with any character
+Yes! Click the "Edit" button on any character to:
+• **Modify basic info**: Name, description, and core traits
+• **Regenerate content**: Update portraits, quests, dialogue, or items individually
+• **Add new traits**: Generate additional traits or add custom ones
+• **Edit portraits**: Use AI to modify character portraits
+• **Manage relationships**: Update character connections and backstory
 
-### What if I lose my characters?
+### How do I export my characters?
 
-Characters are stored in your browser's local storage. They can be lost if:
-• You clear your browser data
-• You use a different browser or device
-• Browser storage is corrupted
+1. **Open character details**: Click on any character in your library
+2. **Find export option**: Look for the "Export JSON" button
+3. **Save the file**: The character data downloads as a JSON file
+4. **Import elsewhere**: Use the JSON file to import the character later or share with others
 
-**Prevention**: Regularly export important characters as JSON backup files.
+## Chat System
 
-### Can I transfer characters between devices?
+### How do I chat with characters?
 
-Currently, characters are stored locally per browser. To transfer:
-1. Export characters as JSON from the original device
-2. Import the JSON files on the new device
+1. **From character card**: Click the chat bubble icon on any character
+2. **From library modal**: Open character details and click "Start Conversation"
+3. **Type your message**: Enter your message in the chat input (max 1,000 characters)
+4. **Select model**: Choose which AI model to use for the conversation
+5. **Send and wait**: The character will respond maintaining their personality
 
-## Model Selection
+### Do characters remember previous conversations?
 
-### Which models should I use?
+Yes! Each character maintains their own conversation history stored locally in your browser. The AI uses recent conversation context to provide consistent, character-appropriate responses.
 
-**For most users:**
-• Use Standard models for regular character creation and casual chat
-• Use Enhanced models for important NPCs and meaningful conversations
-• Save Premium models for main characters and crucial interactions
+### Can I change AI models during a conversation?
 
-### Can I mix different model tiers?
+Yes, you can switch between Standard, Enhanced, and Premium models at any time during a conversation. This is useful for using Standard models for casual chat and Premium models for important story moments.
 
-Yes! You can use different tiers for text and image generation, and switch models during chat conversations.
-
-### How do monthly limits work?
-
-Each model has its own monthly limit that resets on the 1st of each month. Limits are tracked per device/browser. Chat responses count against text model limits.
-
-## Troubleshooting
-
-### Character generation failed but my character was created. What happened?
-
-This can happen when:
-• The portrait request times out
-• The character description contains elements filtered by image models
-• There's a temporary issue with the image generation service
-
-You can regenerate the portrait later with different settings or models.
-
-### Characters aren't saving to my library
+### Why are my chat messages not sending?
 
 Check these common issues:
-• Make sure you're clicking "Save to Library" after generation
-• Verify your browser allows local storage for the site
-• Try clearing browser cache and reloading
-• Check if you have sufficient browser storage space
+• **Usage limits**: You may have reached your monthly limit for the selected model
+• **Message length**: Messages must be under 1,000 characters
+• **Network connection**: Ensure you have a stable internet connection
+• **API key**: Verify your OpenAI API key is valid and has sufficient credits
 
-### I can't see my saved characters
+## Technical Issues
 
-Try these solutions:
-1. Refresh the library page
-2. Clear search filters
-3. Check if you're using the same browser and device
-4. Verify browser storage permissions
-
-### Chat not loading or working
+### Characters aren't loading in my library
 
 Try these solutions:
-1. Verify the character exists in your library
-2. Check your monthly usage limits for the selected model
-3. Refresh the browser
-4. Clear browser cache and try again
+• **Refresh the page**: Sometimes a simple refresh resolves loading issues
+• **Check browser storage**: Ensure your browser supports IndexedDB and has sufficient storage
+• **Clear browser cache**: If problems persist, try clearing your browser's cache
+• **Check console**: Open browser developer tools to see if there are any error messages
 
-### My usage count seems wrong
+### Portrait generation is very slow
 
-Usage tracking is per device/browser. If you use multiple browsers or clear browser data, usage counts may appear different.
+Portrait generation can take 30-120 seconds depending on:
+• **Selected model**: Premium models may take longer but produce better results
+• **Server load**: OpenAI's servers may be busy during peak times
+• **Network speed**: Slower internet connections will increase wait times
+• **Image complexity**: More detailed portraits may take longer to generate
 
-### Character responses seem inconsistent in chat
+### I'm getting "Invalid API key" errors
 
-Try these solutions:
-1. Use higher-tier models (Enhanced or Premium) for more consistent responses
-2. Provide more context in your messages
-3. Reference character traits and background in your questions
-4. Check that the character has detailed personality and backstory information
+This usually means:
+• **Incorrect key**: Double-check your API key is entered correctly
+• **Expired key**: Your OpenAI API key may have expired
+• **Insufficient credits**: Your OpenAI account may need additional credits
+• **Revoked access**: The API key may have been revoked from your OpenAI account
 
 ## Best Practices
 
-### How can I get better character results?
+### How should I manage my monthly usage limits?
 
-1. **Write detailed descriptions**: Include specific appearance, personality, and background details
-2. **Use appropriate model tiers**: Match quality needs with model selection
-3. **Be specific with traits**: Choose personality traits that complement each other
-4. **Experiment with regeneration**: Try regenerating specific elements for improvement
+1. **Monitor usage**: Check the usage indicator regularly
+2. **Use appropriate tiers**: Start with Standard, upgrade for important characters
+3. **Batch operations**: Generate multiple characters when you're actively creating
+4. **Strategic editing**: Use portrait editing and trait regeneration judiciously
+5. **Chat efficiently**: Use lower tiers for casual conversations, higher tiers for key moments
 
-### How can I have better conversations with characters?
+### What makes a good character description?
 
-1. **Start simple**: Begin with greetings to establish the character's voice
-2. **Ask about their background**: Reference character traits and backstory
-3. **Be specific**: Ask detailed questions to get more comprehensive responses
-4. **Stay in character context**: Reference previous conversations and character relationships
-5. **Use appropriate models**: Higher-tier models provide more consistent character voices
+1. **Include visual details**: Describe appearance for better portraits
+2. **Add personality hints**: Mention key traits or quirks
+3. **Provide context**: Include role, background, or setting information
+4. **Keep it focused**: 2-3 sentences work better than long paragraphs
+5. **Be specific**: "Gruff dwarf blacksmith" is better than "fantasy character"
+
+### How should I use portrait editing effectively?
+
+1. **Start with good generation**: Create the best possible initial portrait
+2. **Make incremental changes**: Small edits work better than major overhauls
+3. **Be specific**: Clear, simple prompts get better results
+4. **Consider the setting**: Make edits that fit the character's world
+5. **Save originals**: Keep backups before making significant edits
 
 ### How should I manage my character library?
 
@@ -272,7 +217,8 @@ Try these solutions:
 2. **Export important characters**: Create JSON backups regularly
 3. **Use the filtering system**: Take advantage of trait filters for organization
 4. **Regular conversations**: Chat with characters to develop their personalities
-5. **Regular maintenance**: Delete characters you no longer need
+5. **Maintain consistency**: Use portrait editing and trait management for cohesive collections
+6. **Regular maintenance**: Delete characters you no longer need and update existing ones
 
 ## Future Features
 
@@ -282,6 +228,7 @@ Yes! Based on the roadmap, planned features may include:
 • User accounts with cloud sync (future consideration)
 • Game integration tools and APIs
 • Advanced relationship systems between characters
+• Enhanced collaboration features
 
 ### Can I request features?
 
@@ -302,10 +249,11 @@ For additional support, contact [ethanperello@gmail.com](mailto:ethanperello@gma
 
 ## Related Documentation
 
-• [How to Use NPC Forge](/docs/how-to-use) - Step-by-step usage guide including chat
+• [How to Use NPC Forge](/docs/how-to-use) - Step-by-step usage guide including portrait editing and trait management
 • [Chat with Characters](/docs/chat) - Detailed conversation guide
-• [Features Overview](/docs/features) - Complete feature list
-• [Character Library Guide](/docs/library) - Library management and filtering
+• [Features Overview](/docs/features) - Complete feature list including latest additions
+• [Character Library Guide](/docs/library) - Library management, filtering, and trait management
 • [Model Selection Guide](/docs/models) - Understanding AI model tiers
+• [Generation Options](/docs/generation-options) - Detailed customization including portrait editing
 • [Testing Guide](/docs/testing) - Testing and troubleshooting guide
 • [Contributing Guidelines](/docs/contributing) - For reporting issues

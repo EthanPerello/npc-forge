@@ -1,12 +1,20 @@
 # Development Roadmap
 
-## Current Version: v0.20.0
+## Current Version: v0.21.0
 
-The current version includes a complete character creation wizard, interactive chat system with characters, advanced character library system with comprehensive trait filtering, regeneration capabilities, and model selection.
+The current version includes comprehensive character creation wizard, interactive chat system, advanced character library with trait filtering, portrait editing capabilities, and enhanced trait management tools.
 
 ## Completed Features
 
-### v0.20.0: Interactive Chat with Characters (2025-06-08)
+### v0.21.0: Portrait Editing & Trait Management (COMPLETED) ✓
+
+• **AI-Powered Portrait Editing**: Edit character portraits using text prompts with OpenAI's image editing API
+• **Enhanced Trait Management**: Generate new traits and regenerate individual traits using AI assistance
+• **Improved Trait Filtering**: Enhanced filtering system that excludes overly long or sentence-like traits
+• **Consistent Trait Formatting**: Standardized Title Case formatting throughout the application
+• **UI/UX Improvements**: Better organization and visual consistency across character editing interfaces
+
+### v0.20.0: Interactive Chat System (COMPLETED) ✓
 
 • **Real-Time Character Conversations**: Chat directly with generated characters using AI
 • **Character-Aware Responses**: AI maintains personality, backstory, and traits during conversations
@@ -18,7 +26,7 @@ The current version includes a complete character creation wizard, interactive c
 • **Compact Model Selectors**: Redesigned dropdowns with tier badges in edit interface
 • **Character ID Fixes**: Resolved routing issues with special characters in character names
 
-### v0.19.0: Documentation System Overhaul (2025-06-02)
+### v0.19.0: Documentation System Overhaul (COMPLETED) ✓
 
 • **Automatic Documentation Loading**: Content loads directly from markdown files for easier maintenance
 • **Enhanced Visual Hierarchy**: Improved styling and organization throughout all documentation
@@ -26,7 +34,7 @@ The current version includes a complete character creation wizard, interactive c
 • **Cross-Reference Navigation**: Added "Related Documentation" sections across all guides
 • **Professional Appearance**: Cleaner, more consistent styling across all pages
 
-### v0.18.0: Enhanced Filtering System (2025-05-30)
+### v0.18.0: Enhanced Filtering System (COMPLETED) ✓
 
 • **Comprehensive Trait Filtering**: Dropdown filters for all character trait categories
 • **Automatic Trait Discovery**: Filter creation based on existing character data
@@ -34,60 +42,63 @@ The current version includes a complete character creation wizard, interactive c
 • **Organized Filter Panel**: Collapsible interface with categorized sections
 • **Smart Search**: "category: value" syntax support for precise filtering
 
-### v0.17.0: Reliability & Error Handling (2025-05-28)
+### v0.17.0: Reliability & Error Handling (COMPLETED) ✓
 
 • **Enhanced Error Handling**: Automatic retry logic for portrait generation failures
 • **User-Friendly Error Messages**: Specific guidance for different failure types
 • **Comprehensive JSON Parsing**: Multiple fallback strategies for malformed AI responses
-• **Improved Timeout Handling**: Increased timeouts and enhanced connectivity recovery
+• **Improved Timeout Handling**: Better connectivity recovery and user feedback
 
-### v0.16.0: Portrait Management (2025-05-27)
+### v0.16.0: Portrait Management (COMPLETED) ✓
 
-• **Unsaved Changes Warning**: Banner notification for portrait modifications
-• **Enhanced Error Handling**: Retry logic for portrait generation failures
-• **Model-Specific Tips**: Generation status indicators in portrait section
+• **Unsaved Changes Warning**: Clear indication when portrait modifications haven't been saved
+• **Enhanced Portrait Generation**: Improved reliability with automatic retry mechanisms
+• **Model-Specific Tips**: Generation status indicators and guidance in portrait section
+• **Explicit Save Actions**: Portrait changes require user confirmation to persist
 
-### v0.15.0-0.15.1: Navigation & UX (2025-05-23/26)
+### v0.15.0: Navigation & Layout (COMPLETED) ✓
 
-• **Enhanced Navigation**: Header consistency across Edit and Library pages
-• **EditPageFooter Component**: Consistent navigation on the Edit screen
-• **Success Notifications**: Keep users on current page instead of redirecting
-• **Mobile Optimization**: Responsive improvements across all interfaces
+• **Consistent Navigation**: Header across all pages for unified experience
+• **Mobile Optimizations**: Improved responsive design and touch interactions
+• **Sticky Footer Support**: Enhanced navigation on character edit screens
+• **Improved User Flow**: Better post-generation navigation and user guidance
 
-### v0.14.0: Portrait Controls (2025-05-22)
+### v0.14.0: Portrait Toggle & Generation Logic (COMPLETED) ✓
 
-• **Include Portrait Toggle**: Option to enable/disable portrait generation in concept step
-• **Random Character Generation**: Improved logic and updated generation limits
-• **Updated Usage Limits**: 50/30/10 text generations, 10/5/3 image generations per month
+• **Portrait Toggle Option**: Users can enable/disable portrait generation during character creation
+• **Random Generation Rewrite**: Improved random character generation logic and state management
+• **Updated Usage Limits**: Adjusted monthly limits for better balance across model tiers
+• **Single-Column Layout**: Better layout when portraits are not generated
 
-### v0.13.0: Wizard Interface (2025-05-15)
+### Earlier Versions (v0.1.0 - v0.13.2)
 
-• **Step-by-Step Character Creation**: Four-step guided wizard interface
-• **Progress Navigation**: Clickable progress bar with step navigation
-• **Welcome Guide**: Introduction popup for first-time users
-• **Generate Random Character**: Quick character creation with default settings
-
-### v0.12.0: Character Regeneration (2025-05-09)
-
-• **Individual Attribute Regeneration**: Name, appearance, personality, backstory
-• **Portrait Regeneration**: Update images with different models
-• **Component-Level Regeneration**: Quest, dialogue, and item elements
-• **New API Endpoint**: `/api/regenerate` for handling regeneration requests
-
-### Earlier Versions (v0.1.0 - v0.11.1)
-
-• **Core Character Generation**: AI-powered wizard with multiple models
-• **Character Library System**: IndexedDB storage with import/export functionality
-• **Model Selection System**: Standard, Enhanced, Premium tiers with usage limits
-• **Dark Mode Support**: Complete theme system with persistence
-• **Portrait Generation**: AI-generated character portraits with customization
-• **Quest, Dialogue, and Item Generation**: Complete character content creation
+• **Core Character Generation**: AI-powered wizard with multiple models and comprehensive character creation
+• **Character Library System**: IndexedDB storage with import/export functionality and advanced search
+• **Model Selection System**: Standard, Enhanced, Premium tiers with usage limits and tier indicators
+• **Dark Mode Support**: Complete theme system with persistence and smooth transitions
+• **Portrait Generation**: AI-generated character portraits with customization options
+• **Quest, Dialogue, and Item Generation**: Complete character content creation with customizable options
+• **Regeneration System**: Individual component regeneration for all character attributes
+• **Documentation System**: Comprehensive in-app documentation with navigation and cross-references
 
 ## Future Development
 
-### Next Priority: User Accounts & Cloud Features (v0.21.0)
+### Next Priority: Advanced Character Relationships (v0.22.0)
 
-Based on user feedback and platform maturity, the next major feature set may include:
+**Character Relationship Systems**:
+• Character connection graphs and relationship webs
+• Connected character generation (families, factions, guilds)
+• Relationship-aware chat responses between characters
+• Multi-character conversation scenarios
+• Dynamic relationship tracking and development
+
+**Enhanced Character Development**:
+• Character progression systems (aging, development, experience)
+• Alternate character versions (parallel timelines, "what if" variants)
+• Personality evolution over time based on interactions
+• Advanced memory systems for long-term character development
+
+### Planned: User Accounts & Cloud Features (v0.23.0)
 
 **Optional Account System**:
 • User registration and authentication
@@ -101,7 +112,7 @@ Based on user feedback and platform maturity, the next major feature set may inc
 • Character rating and commenting system
 • Follow favorite character creators
 
-### Future Considerations: Game Integration (v0.22.0+)
+### Future Considerations: Game Integration (v0.24.0+)
 
 **API and Integration Tools**:
 • RESTful API for accessing characters
@@ -115,25 +126,33 @@ Based on user feedback and platform maturity, the next major feature set may inc
 • TTRPG compatibility (D&D 5e stat blocks, etc.)
 • Custom integration examples and templates
 
-### Advanced Character Features (Future Versions)
-
-**Character Relationships**:
-• Character connection graphs and relationship webs
-• Connected character generation (families, factions, etc.)
-• Relationship-aware chat responses
-• Multi-character conversation scenarios
-
 **Advanced Chat Features**:
-• Voice generation for dialogue lines (text-to-speech)
+• Voice synthesis for character dialogue
 • Group conversations with multiple characters
 • Character memory persistence across long conversations
 • Emotional state tracking and development
+• Chat themes and customization options
+• Chat export and sharing capabilities
+
+### Advanced Character Features (Future Versions)
 
 **Worldbuilding Tools**:
 • Setting and world generation
 • Procedural map creation with character placement
 • Timeline/event generator for historical context
 • Character integration with world events
+
+**Enhanced Portrait Features**:
+• Multiple portrait styles per character
+• Portrait variation generation
+• Advanced editing tools and filters
+• Portrait gallery and comparison tools
+
+**Advanced Trait Systems**:
+• Trait relationships and dependencies
+• Dynamic trait evolution over time
+• Trait-based character matching and compatibility
+• Advanced trait categorization and organization
 
 ## Development Approach
 
@@ -146,55 +165,39 @@ Based on user feedback and platform maturity, the next major feature set may inc
 
 ### Quality Focus
 
-1. **Stability First**: Ensure core features work reliably before adding new ones
-2. **User Experience**: Prioritize interface improvements and usability enhancements
-3. **Performance**: Optimize loading times and responsiveness
-4. **Documentation**: Maintain comprehensive, up-to-date guides
+**Reliability First**: Each release prioritizes stability and user experience over rapid feature addition
+**Comprehensive Testing**: Thorough testing of all features before release
+**User-Centric Design**: Features designed based on actual user needs and workflows
+**Performance Optimization**: Continuous improvement of load times and responsiveness
 
-### Technical Priorities
-
-• **Error Handling**: Continue improving error recovery and user feedback
-• **Performance Optimization**: Enhance speed and responsiveness
-• **Browser Compatibility**: Ensure consistent experience across platforms
-• **Accessibility**: Improve accessibility features and compliance
-
-## Community Input
-
-### How to Influence Development
-
-• **GitHub Issues**: Report bugs and suggest improvements at [GitHub Repository](https://github.com/EthanPerello/npc-forge/issues)
-• **GitHub Discussions**: Share ideas and participate in feature discussions
-• **Email Feedback**: Contact [ethanperello@gmail.com](mailto:ethanperello@gmail.com) with suggestions
-
-### For Contributors
-
-• Check [Contributing Guidelines](/docs/contributing) for development workflow
-• See [Development Setup](/docs/dev-setup) for getting started with local development
-• Review [Architecture Documentation](/docs/architecture) for system understanding
-
-## Versioning Strategy
+### Version Strategy
 
 • **Patch (0.x.y)**: Bug fixes and minor improvements
-• **Minor (0.x.0)**: New features and significant enhancements
-• **Major (1.0.0)**: Stable release milestone with API guarantees
+• **Minor (0.x.0)**: New features and significant UI updates
+• **Major (1.0.0)**: Stable public release with API guarantees
+• **Post-1.0**: Semantic versioning for mature platform
 
-### Release Timeline
+## Long-Term Vision
 
-Recent releases have followed a steady development pace:
+### Comprehensive NPC Platform
 
-• **Major features** every 2-4 months
-• **Quality improvements** every 1-2 months
-• **Bug fixes** as needed
+NPC Forge aims to become the definitive platform for creating, managing, and interacting with AI-powered characters for games, stories, and creative projects. The long-term vision includes:
+
+**Creator Tools**: Complete suite of character creation and management tools with advanced AI assistance
+**Integration Ecosystem**: APIs and tools for integrating characters into games, stories, and other creative projects
+**Community Features**: Sharing, collaboration, and discovery tools for character creators
+**Professional Features**: Advanced tools for game developers, writers, and content creators
+
+### Technology Evolution
+
+**AI Integration**: Continued integration with latest AI models and capabilities
+**Performance Optimization**: Enhanced performance for large character libraries and complex interactions
+**Cross-Platform Support**: Expansion to mobile apps and desktop applications
+**Cloud Infrastructure**: Optional cloud services for backup, sync, and collaboration
 
 ## Related Documentation
 
-• [Features Overview](/docs/features) - Current implemented features
-• [Chat with Characters](/docs/chat) - Interactive conversation system
+• [Features Overview](/docs/features) - Complete current feature list
+• [How to Use NPC Forge](/docs/how-to-use) - User guide for all current features
 • [Contributing Guidelines](/docs/contributing) - How to contribute to development
-• [Development Setup](/docs/dev-setup) - For getting started with development
-• [Architecture Overview](/docs/architecture) - For understanding system design
-• [How to Use NPC Forge](/docs/how-to-use) - For understanding current capabilities
-
----
-
-*Roadmap last updated: June 2025 | Plans subject to change based on development priorities and community feedback*
+• [FAQ](/docs/faq) - Frequently asked questions about current and future features

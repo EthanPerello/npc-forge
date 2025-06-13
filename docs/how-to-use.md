@@ -1,6 +1,6 @@
 # How to Use NPC Forge
 
-NPC Forge is an AI-powered character generator featuring a step-by-step wizard interface for creating detailed NPCs. This guide covers the wizard-based creation process, character library management, and interactive chat features.
+NPC Forge is an AI-powered character generator featuring a step-by-step wizard interface for creating detailed NPCs. This guide covers the wizard-based creation process, character library management, interactive chat features, and the new portrait editing and trait management capabilities.
 
 ## Quick Start Guide
 
@@ -121,7 +121,8 @@ Use trait-specific searches:
 • Modify all character attributes
 • Add or remove quests, dialogue lines, and items
 • Regenerate specific character elements
-• Upload or regenerate portraits
+• Upload, regenerate, or edit portraits with text prompts
+• Generate and manage additional character traits
 • Choose different AI models for regeneration
 
 ## Interactive Chat with Characters
@@ -182,6 +183,115 @@ Use trait-specific searches:
 • Maximum 100 messages per session (automatically trimmed)
 • Retry failed messages with error handling
 
+## Portrait Editing (NEW in v0.21.0)
+
+### Accessing Portrait Editing
+
+Portrait editing is available in the character edit interface:
+
+1. Open any character in edit mode
+2. Navigate to the Portrait section
+3. Click **Edit Portrait** (only available with existing portraits)
+4. Model must support editing (gpt-image-1 recommended)
+
+### Using Portrait Editing
+
+**Edit Interface:**
+
+• **Edit Prompt Field**: Text area for describing desired changes
+• **Character Counter**: Shows remaining characters (max varies by model)
+• **Model Compatibility**: Warning shown for unsupported models
+• **Edit Button**: Starts the editing process
+• **Cancel Option**: Returns to normal portrait view
+
+**Writing Effective Edit Prompts:**
+
+```
+// Color changes
+"change hair color to blonde"
+"make the eyes green"
+
+// Accessories
+"add a red hat"
+"remove glasses"
+"add a beard"
+
+// Clothing modifications
+"change shirt to blue"
+"add armor"
+"remove the cloak"
+
+// Expression changes
+"make them smile"
+"give them a serious expression"
+```
+
+**Best Practices:**
+
+• Be specific about what you want to change
+• Use simple, clear language
+• Focus on one major change per edit
+• Test with different models to see quality differences
+
+### Portrait Editing Workflow
+
+1. **Select Character**: Open character with existing portrait in edit mode
+2. **Access Edit Interface**: Click "Edit Portrait" button
+3. **Choose Model**: Ensure compatible model is selected (gpt-image-1 recommended)
+4. **Write Prompt**: Describe desired changes clearly
+5. **Submit Edit**: Click "Edit Portrait" to start processing
+6. **Review Results**: New portrait appears when editing completes
+7. **Save Changes**: Use "Save Changes" to persist the edited portrait
+
+## Advanced Trait Management (NEW in v0.21.0)
+
+### Additional Traits Section
+
+The Additional Traits section in character editing provides comprehensive trait management:
+
+**Viewing Traits:**
+
+• All additional character traits displayed with editable keys and values
+• Traits shown in Title Case format for consistency
+• Category-based organization when available
+• Empty state shown when no additional traits exist
+
+**Adding Traits:**
+
+• **Add Custom Trait**: Manually add trait with custom name and value
+• **Add Generated Trait**: AI generates a new trait automatically
+• Both options create editable trait entries
+
+**Managing Existing Traits:**
+
+• **Edit Trait Names**: Click trait name field to modify
+• **Edit Trait Values**: Click trait value field to modify
+• **Regenerate Individual Traits**: Use regenerate button for each trait
+• **Remove Traits**: Use delete button to remove unwanted traits
+
+### Trait Generation Features
+
+**AI-Generated Traits:**
+
+• Click "Add Generated Trait" for AI to create relevant traits
+• Generated traits match character personality and background
+• Traits automatically formatted and validated
+• Integration with existing trait display system
+
+**Individual Trait Regeneration:**
+
+• Each trait has its own regenerate button
+• Regeneration maintains trait context and character consistency
+• Loading states show progress during regeneration
+• Error handling for failed regeneration attempts
+
+**Trait Organization:**
+
+• Traits automatically filtered for appropriate length and format
+• Long or sentence-like traits excluded from filter dropdowns
+• Consistent Title Case formatting throughout interface
+• Smart categorization when trait categories are recognizable
+
 ## Advanced Features
 
 ### Character Regeneration
@@ -190,9 +300,11 @@ Use trait-specific searches:
 
 • Character attributes (name, appearance, personality, backstory)
 • Portrait with different models or styles
+• Portrait editing with text prompts
 • Individual quest components (title, description, reward)
 • Specific dialogue lines
 • Item descriptions
+• Individual character traits
 
 **How to regenerate:**
 
@@ -207,6 +319,7 @@ Use trait-specific searches:
 • **Enhanced Tier**: Use for important characters requiring higher quality
 • **Premium Tier**: Reserve for key NPCs needing maximum detail
 • **Chat Usage**: Chat responses count against text model limits
+• **Portrait Editing**: Editing counts against image model limits
 
 ## Common Workflows
 
@@ -227,13 +340,33 @@ Use trait-specific searches:
 5. Edit and regenerate elements as needed
 6. Begin conversations to develop the character further
 
-### Character Development Through Chat
+### Character Development Through Chat and Editing
 
 1. Create initial character with basic details
 2. Save to library and start chatting
 3. Explore character background through conversation
 4. Edit character based on insights from chat
-5. Continue conversations to develop relationships
+5. Use portrait editing to refine character appearance
+6. Generate additional traits as character develops
+7. Continue conversations to develop relationships
+
+### Portrait Enhancement Workflow
+
+1. Generate character with basic portrait
+2. Save to library and review portrait quality
+3. Open character in edit mode
+4. Use "Edit Portrait" to refine appearance with text prompts
+5. Try different edit prompts for various improvements
+6. Save changes when satisfied with results
+
+### Trait Development Process
+
+1. Start with basic character generation
+2. Review generated traits in edit mode
+3. Add custom traits relevant to your story
+4. Use "Add Generated Trait" for AI suggestions
+5. Regenerate individual traits that need improvement
+6. Organize traits for better character presentation
 
 ### Organizing Your Collection
 
@@ -241,6 +374,7 @@ Use trait-specific searches:
 2. **Leverage Filtering**: Use the trait filtering system to organize
 3. **Export Collections**: Download related character groups as JSON backups
 4. **Chat Documentation**: Use conversations to develop character relationships
+5. **Regular Maintenance**: Remove unused characters and update existing ones
 
 ## Troubleshooting
 
@@ -249,6 +383,12 @@ Use trait-specific searches:
 • **Character generation failed**: Check your internet connection and try again
 • **Portrait generation failed**: Try with different portrait options
 • **Slow generation**: Higher-tier models take longer; wait patiently
+
+### Portrait Editing Issues
+
+• **Edit button disabled**: Ensure character has existing portrait and compatible model selected
+• **Editing failed**: Try simpler edit prompts or different model
+• **Poor results**: gpt-image-1 provides best editing quality
 
 ### Library Issues
 
@@ -262,6 +402,12 @@ Use trait-specific searches:
 • **Messages not sending**: Check your monthly usage limits for the selected model
 • **Character responses inconsistent**: Try using higher-tier models for better consistency
 
+### Trait Management Issues
+
+• **Traits not appearing**: Check that traits meet length and format requirements
+• **Regeneration failed**: Try different prompts or check usage limits
+• **Filter issues**: Traits only appear in filters after characters with those traits are saved
+
 ### Filtering Issues
 
 • **Traits not appearing in filters**: Traits only appear after characters with those traits are saved
@@ -272,7 +418,7 @@ Use trait-specific searches:
 
 • **Reached monthly limit**: Wait for the monthly reset or use Standard tier
 • **Unexpected limit reached**: Check which models you're using and their individual limits
-• **Chat usage**: Remember that chat responses count against text model limits
+• **Chat and editing usage**: Remember that chat responses and portrait editing count against model limits
 
 ## Tips for Best Results
 
@@ -288,11 +434,13 @@ Use trait-specific searches:
 • Choose occupation that fits the genre and character concept
 • Use physical traits to reinforce the character's background
 
-### Portrait Generation
+### Portrait Generation and Editing
 
 • Describe visual elements in your character description
 • Choose art style that matches your game's aesthetic
 • Use themed backgrounds for context
+• For editing, be specific about desired changes
+• Test different edit prompts for best results
 
 ### Chat Conversations
 
@@ -302,6 +450,13 @@ Use trait-specific searches:
 • Use conversations to develop character relationships
 • Switch between model tiers based on conversation importance
 
+### Trait Management
+
+• Use consistent trait naming conventions
+• Generate traits that complement existing character elements
+• Regularly review and update traits as characters develop
+• Use trait regeneration to improve existing traits
+
 ### Library Organization
 
 • Use descriptive names for easy searching
@@ -310,12 +465,13 @@ Use trait-specific searches:
 • Use trait-specific searches to find character archetypes
 • Download important character groups as JSON for backup
 • Start conversations to test character personalities
+• Use portrait editing to maintain visual consistency across your collection
 
 ## Related Documentation
 
 • [Character Examples](/docs/character-examples) - See what's possible
 • [Chat with Characters](/docs/chat) - Detailed conversation guide
-• [Generation Options](/docs/generation-options) - Detailed customization
-• [Character Library Guide](/docs/library) - Advanced management features
+• [Generation Options](/docs/generation-options) - Detailed customization including portrait editing
+• [Character Library Guide](/docs/library) - Advanced management and trait features
 • [Model Selection Guide](/docs/models) - Understanding AI model differences
-• [Features Overview](/docs/features) - Complete feature list
+• [Features Overview](/docs/features) - Complete feature list including latest additions
