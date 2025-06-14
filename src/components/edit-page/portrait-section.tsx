@@ -1,4 +1,3 @@
-// src/components/edit-page/portrait-section.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -25,7 +24,6 @@ interface PortraitSectionProps {
 }
 
 // Models that support image editing (according to OpenAI API docs)
-// Note: DALL-E 2 editing is unreliable despite meeting all documented requirements
 const EDIT_SUPPORTED_MODELS: ImageModel[] = ['gpt-image-1'];
 
 export function PortraitSection({
@@ -82,7 +80,10 @@ export function PortraitSection({
 
     // Check if selected model supports editing
     if (!EDIT_SUPPORTED_MODELS.includes(selectedImageModel)) {
-      setEditError(`${selectedImageModel} doesn't support image editing. Please switch to dall-e-2 or gpt-image-1.`);
+      const modelName = selectedImageModel === 'dall-e-2' ? 'DALL-E 2' : 
+                       selectedImageModel === 'dall-e-3' ? 'DALL-E 3' : 
+                       selectedImageModel;
+      setEditError(`${modelName} doesn't support image editing. Please switch to gpt-image-1.`);
       return;
     }
     
@@ -121,7 +122,10 @@ export function PortraitSection({
           } else if (errorData.errorType === 'timeout') {
             errorMessage = 'Portrait editing timed out. Please try again.';
           } else if (errorData.errorType === 'unsupported_model') {
-            errorMessage = `${selectedImageModel} doesn't support editing. Switch to dall-e-2 or gpt-image-1.`;
+            const modelName = selectedImageModel === 'dall-e-2' ? 'DALL-E 2' : 
+                             selectedImageModel === 'dall-e-3' ? 'DALL-E 3' : 
+                             selectedImageModel;
+            errorMessage = `${modelName} doesn't support editing. Switch to gpt-image-1.`;
           }
         } catch (parseError) {
           console.error("Failed to parse error response:", parseError);
@@ -202,6 +206,18 @@ export function PortraitSection({
   return (
     <FormSection title="Character Portrait">
       <div className="space-y-4">
+        {/* Loading overlay when portrait is regenerating or being edited */}
+        {(isRegeneratingPortrait || isEditingPortrait) && (
+          <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-200 border-t-blue-600 dark:border-blue-700 dark:border-t-blue-300"></div>
+              <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                {isRegeneratingPortrait ? 'Generating new portrait...' : 'Editing portrait with OpenAI...'}
+              </p>
+            </div>
+          </div>
+        )}
+        
         {/* Unsaved changes warning - more compact */}
         {hasUnsavedChanges && (
           <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
@@ -224,7 +240,7 @@ export function PortraitSection({
                   Portrait Editing Not Available
                 </p>
                 <p className="text-sm text-blue-700 dark:text-blue-300">
-                  <strong>{selectedImageModel}</strong> doesn't support reliable image editing. Switch to <strong>gpt-image-1</strong> above to enable portrait editing.
+                  <strong>{selectedImageModel === 'dall-e-2' ? 'DALL-E 2' : selectedImageModel === 'dall-e-3' ? 'DALL-E 3' : selectedImageModel}</strong> doesn't support reliable image editing. Switch to <strong>gpt-image-1</strong> above to enable portrait editing.
                 </p>
               </div>
             </div>
@@ -256,7 +272,7 @@ export function PortraitSection({
                   Edit Portrait with OpenAI
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                  Uses OpenAI's image editing API to modify your existing portrait. Only works with dall-e-2 and gpt-image-1.
+                  Uses OpenAI's image editing API to modify your existing portrait. Only works with gpt-image-1.
                 </p>
                 <textarea
                   id="edit-prompt"
@@ -301,7 +317,7 @@ export function PortraitSection({
 
               {!editSupported && (
                 <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
-                  Switch to dall-e-2 or gpt-image-1 to enable editing
+                  Switch to gpt-image-1 to enable editing
                 </p>
               )}
             </div>
@@ -338,7 +354,7 @@ export function PortraitSection({
                     onClick={handleToggleEditPrompt}
                     disabled={isRegeneratingPortrait || isEditingPortrait || !editSupported}
                     type="button"
-                    title={!editSupported ? `${selectedImageModel} doesn't support editing. Use dall-e-2 or gpt-image-1.` : 'Edit existing portrait'}
+                    title={!editSupported ? `${selectedImageModel === 'dall-e-2' ? 'DALL-E 2' : selectedImageModel === 'dall-e-3' ? 'DALL-E 3' : selectedImageModel} doesn't support editing. Use gpt-image-1.` : 'Edit existing portrait'}
                   >
                     <Edit3 className="h-4 w-4 mr-2" />
                     Edit Portrait
@@ -360,18 +376,6 @@ export function PortraitSection({
         </div>
         
         {/* Status Messages */}
-        {/* Generation Status */}
-        {(isRegeneratingPortrait || isEditingPortrait) && (
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 dark:border-blue-400"></div>
-              <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                {isRegeneratingPortrait ? 'Generating new portrait...' : 'Editing portrait with OpenAI...'}
-              </p>
-            </div>
-          </div>
-        )}
-
         {/* Edit Error Display */}
         {editError && (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">

@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Developer Documentation homepage at `/docs/developer` with dedicated navigation and sidebar highlighting
+- Clickable "Developer Docs" section in sidebar with breadcrumb-aware expansion and sub-page structure
+- Visual loading indicators for regeneration across all edit page sections (not just traits)
+- "Save to Library" → "View Library" dynamic button transition in character generation results step
+
+### Changed
+- Sidebar component refactored to integrate "Chat with Characters" link and fully support developer documentation section navigation
+- Docs homepage updated to feature main docs and a link to the developer docs landing page
+- Additional Traits section updated to:
+  - Capitalize category names
+  - Display all traits not included in the Basic Info or Character Traits sections
+  - Include unsupported traits (e.g. custom personality entries)
+- Regenerate button icon reverted to rotating circle (`RotateCcw`) for visual consistency across all edit sections
+- Portrait section messaging updated to clarify that only `gpt-image-1` supports editing; DALL·E 2 and 3 do not
+- Enhanced breadcrumb navigation under `/docs` to reflect correct hierarchy for developer documentation pages
+
+### Fixed
+- Quest regeneration fallback logic improved to handle malformed or non-JSON responses gracefully
+- Visual regeneration states now correctly trigger for dialogue, items, quests, and basic info sections
+- Developer docs sidebar section now properly expands and highlights based on active route
+- Duplicate portrait regeneration status messages removed
+
 ## [0.21.0] - 2025-06-12
 
 ### Added

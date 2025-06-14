@@ -124,6 +124,7 @@ export default function ResultsStep({ onNext, isGenerating }: ResultsStepProps) 
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [hasBeenSavedToLibrary, setHasBeenSavedToLibrary] = useState(false);
 
   const handleSaveToLibrary = async (e?: React.MouseEvent) => {
     // Explicitly prevent any default behavior or event propagation
@@ -148,6 +149,9 @@ export default function ResultsStep({ onNext, isGenerating }: ResultsStepProps) 
       
       if (success) {
         console.log('Save successful - showing toast, NO REDIRECT');
+        
+        // Mark as saved to library
+        setHasBeenSavedToLibrary(true);
         
         // Explicitly check that we're still on the same page
         console.log('Current location after save:', window.location.pathname);
@@ -286,16 +290,29 @@ export default function ResultsStep({ onNext, isGenerating }: ResultsStepProps) 
           
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-2">
-            <Button
-              variant="primary"
-              onClick={handleSaveToLibrary}
-              leftIcon={<Save className="h-4 w-4" />}
-              isLoading={isSaving}
-              size="sm"
-              type="button"
-            >
-              {isSaving ? 'Saving...' : 'Save to Library'}
-            </Button>
+            {/* Conditional Save to Library / View Library Button */}
+            {!hasBeenSavedToLibrary ? (
+              <Button
+                variant="primary"
+                onClick={handleSaveToLibrary}
+                leftIcon={<Save className="h-4 w-4" />}
+                isLoading={isSaving}
+                size="sm"
+                type="button"
+              >
+                {isSaving ? 'Saving...' : 'Save to Library'}
+              </Button>
+            ) : (
+              <Button
+                variant="primary"
+                onClick={handleViewLibrary}
+                leftIcon={<Library className="h-4 w-4" />}
+                size="sm"
+                type="button"
+              >
+                View Library
+              </Button>
+            )}
             
             <Button
               variant="secondary"
@@ -327,16 +344,6 @@ export default function ResultsStep({ onNext, isGenerating }: ResultsStepProps) 
                 Portrait
               </Button>
             )}
-            
-            {/* Button to view library - but doesn't auto-redirect */}
-            <Button
-              variant="secondary"
-              onClick={handleViewLibrary}
-              leftIcon={<Library className="h-4 w-4" />}
-              size="sm"
-            >
-              View Library
-            </Button>
           </div>
 
           {/* Portrait - Only show if there's image data or URL */}

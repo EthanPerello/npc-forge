@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { Book, Code, User, FileText, Settings, HelpCircle, Calendar, Map, ShieldCheck, CodeSquare, Bell, Layers, Server, FileJson, Award, Database, MessageCircle } from 'lucide-react';
+import { Book, User, FileText, Settings, HelpCircle, Database, MessageCircle, Layers, Server, Code, ArrowRight } from 'lucide-react';
 
 export const metadata = {
   title: 'NPC Forge Documentation',
-  description: 'Official NPC Forge documentation hub: guides, examples, and developer references for AI-powered character creation and interactive conversations.',
+  description: 'Official NPC Forge documentation hub: guides, examples, and references for AI-powered character creation and interactive conversations.',
 };
 
 export default function DocsIndexPage() {
@@ -12,7 +12,7 @@ export default function DocsIndexPage() {
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">NPC Forge Documentation</h1>
       
       <p className="lead mb-8 text-gray-700 dark:text-gray-300 text-lg">
-        Welcome to the NPC Forge documentation. Here you'll find comprehensive guides, examples, and developer references to help you get the most out of this AI-powered character generator with interactive chat capabilities.
+        Welcome to the NPC Forge documentation. Here you'll find comprehensive guides and references to help you get the most out of this AI-powered character generator with interactive chat capabilities.
       </p>
       
       <div className="mb-10">
@@ -126,122 +126,24 @@ export default function DocsIndexPage() {
           Developer Documentation
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-              <CodeSquare className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-              <Link href="/docs/dev-setup" className="hover:text-indigo-800 dark:hover:text-indigo-300">
-                Development Setup
+        <div className="p-6 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-xl font-medium mb-2 text-indigo-700 dark:text-indigo-400 flex items-center">
+                <Code className="h-6 w-6 mr-2 text-indigo-600 dark:text-indigo-400" />
+                Technical Documentation
+              </h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                Complete developer resources including setup guides, architecture documentation, API references, and contribution guidelines.
+              </p>
+              <Link 
+                href="/docs/developer" 
+                className="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+              >
+                View Developer Docs
+                <ArrowRight className="h-4 w-4 ml-2" />
               </Link>
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Local environment setup, prerequisites, and project configuration for development.
-            </p>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-              <Layers className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-              <Link href="/docs/architecture" className="hover:text-indigo-800 dark:hover:text-indigo-300">
-                Architecture Overview
-              </Link>
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              System structure, chat system architecture, component organization, and data flow.
-            </p>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-              <Server className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-              <Link href="/docs/api" className="hover:text-indigo-800 dark:hover:text-indigo-300">
-                API Reference
-              </Link>
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Complete API documentation including chat endpoints, generation, and OpenAI integration.
-            </p>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-              <ShieldCheck className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-              <Link href="/docs/security" className="hover:text-indigo-800 dark:hover:text-indigo-300">
-                Security Documentation
-              </Link>
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Input validation, data privacy practices, and security considerations for chat and storage.
-            </p>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-              <FileText className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-              <Link href="/docs/contributing" className="hover:text-indigo-800 dark:hover:text-indigo-300">
-                Contributing Guidelines
-              </Link>
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              How to contribute code, documentation, and report issues for the project.
-            </p>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-              <Bell className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-              <Link href="/docs/testing" className="hover:text-indigo-800 dark:hover:text-indigo-300">
-                Testing Guide
-              </Link>
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Manual testing procedures, chat testing workflows, and quality assurance practices.
-            </p>
-          </div>
-        </div>
-      </div>
-      
-      <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-6 text-indigo-700 dark:text-indigo-400 flex items-center">
-          <Map className="h-5 w-5 mr-2" />
-          Project Information
-        </h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-              <Map className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-              <Link href="/docs/roadmap" className="hover:text-indigo-800 dark:hover:text-indigo-300">
-                Development Roadmap
-              </Link>
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Completed features, upcoming releases, and long-term vision for the project.
-            </p>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-              <Award className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-              <Link href="/docs/credits" className="hover:text-indigo-800 dark:hover:text-indigo-300">
-                Credits
-              </Link>
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Acknowledgments, contributors, and technology credits for the project.
-            </p>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg shadow-sm dark:border-gray-700">
-            <h3 className="text-lg font-medium mb-3 text-indigo-700 dark:text-indigo-400 flex items-center">
-              <FileJson className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-              <Link href="/docs/license" className="hover:text-indigo-800 dark:hover:text-indigo-300">
-                License Information
-              </Link>
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              MIT License details, usage rights, and third-party library attributions.
-            </p>
+            </div>
           </div>
         </div>
       </div>

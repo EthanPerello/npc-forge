@@ -1,4 +1,3 @@
-// src/app/api/regenerate/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { generatePortrait } from '@/lib/openai';
 import { Character, OpenAIModel, ImageModel } from '@/lib/types';
@@ -158,6 +157,64 @@ function validateRequest(body: any): { isValid: boolean; error?: string } {
   return { isValid: true };
 }
 
+// Enhanced JSON parsing function with multiple strategies
+function parseJSONWithFallbacks(content: string): any {
+  // Clean the content first
+  let cleanContent = content.trim()
+    .replace(/["""'']/g, '"') // Normalize quotes
+    .replace(/—/g, '-') // Replace em dashes
+    .replace(/…/g, '...') // Replace ellipsis
+    .replace(/^["'`]|["'`]$/g, '') // Remove surrounding quotes
+    .replace(/^\*\*|\*\*$/g, '') // Remove bold markers
+    .replace(/^#+\s*/, ''); // Remove markdown headers
+
+  // Strategy 1: Direct JSON parse
+  try {
+    return JSON.parse(cleanContent);
+  } catch (e) {
+    console.log('Direct JSON parse failed, trying fallbacks...');
+  }
+
+  // Strategy 2: Extract JSON from code blocks
+  const codeBlockMatch = cleanContent.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+  if (codeBlockMatch) {
+    try {
+      return JSON.parse(codeBlockMatch[1]);
+    } catch (e) {
+      console.log('Code block JSON parse failed...');
+    }
+  }
+
+  // Strategy 3: Find JSON-like object in text
+  const jsonMatch = cleanContent.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    try {
+      let jsonStr = jsonMatch[0];
+      // Remove trailing commas
+      jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1');
+      return JSON.parse(jsonStr);
+    } catch (e) {
+      console.log('JSON extraction parse failed...');
+    }
+  }
+
+  // Strategy 4: Manual object construction for quest
+  const titleMatch = cleanContent.match(/"?title"?\s*:\s*"([^"]+)"/i);
+  const descriptionMatch = cleanContent.match(/"?description"?\s*:\s*"([^"]+)"/i);
+  const rewardMatch = cleanContent.match(/"?reward"?\s*:\s*"([^"]+)"/i);
+
+  if (titleMatch && descriptionMatch && rewardMatch) {
+    return {
+      title: titleMatch[1],
+      description: descriptionMatch[1],
+      reward: rewardMatch[1],
+      type: "any"
+    };
+  }
+
+  throw new Error(`Could not parse JSON from content: ${cleanContent.substring(0, 200)}...`);
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Check request size
@@ -301,7 +358,7 @@ export async function POST(request: NextRequest) {
       let prompt: string;
       let systemPrompt: string;
 
-      // Generate appropriate prompts based on the field with improved trait instructions
+      // Generate appropriate prompts based on the field with improved quest instructions
       if (field === 'name') {
         systemPrompt = `Generate a single character name that fits this character's appearance and background. Return only the name, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
         prompt = `Character: ${cleanedCharacter.appearance || 'A character'}\nBackground: ${cleanedCharacter.backstory_hook || 'Unknown background'}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
@@ -315,7 +372,7 @@ export async function POST(request: NextRequest) {
         systemPrompt = `Generate an engaging backstory hook for this character. Include their origin, key life events, and what drives them. Return only the backstory, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
         prompt = `Character Name: ${cleanedCharacter.name}\nAppearance: ${cleanedCharacter.appearance}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
       } else if (field.startsWith('quest_')) {
-        // Handle quest regeneration
+        // Handle quest regeneration with IMPROVED logic
         const parts = field.split('_');
         const questIndex = parseInt(parts[1], 10);
         const questPart = parts[2] || 'whole';
@@ -343,9 +400,22 @@ export async function POST(request: NextRequest) {
           systemPrompt = `Generate an appropriate quest reward. Include both tangible and intangible benefits. Return only the reward description, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
           prompt = `Quest: ${quest.title} - ${quest.description}\nCharacter: ${cleanedCharacter.name}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
         } else {
-          // Regenerate entire quest
-          systemPrompt = `Generate a complete quest object with title, description, and reward. Return as JSON object with fields: title, description, reward. Do not use special characters like em dashes or smart quotes.`;
-          prompt = `Character: ${cleanedCharacter.name}\nAppearance: ${cleanedCharacter.appearance}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
+          // FIXED: Regenerate entire quest with better prompt
+          systemPrompt = `Generate a complete quest as a valid JSON object. The quest should be appropriate for this character and genre. Return ONLY a JSON object with these exact fields: "title", "description", "reward", "type". Do not include any other text, markdown, or code blocks. Example format:
+{
+  "title": "The Lost Artifact",
+  "description": "Find the ancient relic hidden in the forgotten temple",
+  "reward": "500 gold coins and a magical pendant",
+  "type": "any"
+}`;
+          prompt = `Character: ${cleanedCharacter.name}
+Appearance: ${cleanedCharacter.appearance}
+Personality: ${cleanedCharacter.personality}
+Background: ${cleanedCharacter.backstory_hook}
+Genre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}
+Occupation: ${cleanedCharacter.selected_traits?.occupation || 'Unknown'}
+
+Generate a quest that would be meaningful and appropriate for this character.`;
         }
       } else if (field === 'additional_traits') {
         systemPrompt = `Generate 3-5 additional character traits as short keywords or phrases (1-3 words each). Return as JSON object with trait names as keys and short descriptions as values. Do not use special characters like em dashes or smart quotes. Examples: {"eye_color": "Green", "demeanor": "Stern", "skill": "Archery", "quirk": "Whistles"}`;
@@ -435,21 +505,40 @@ export async function POST(request: NextRequest) {
         console.warn('Error incrementing text model usage (continuing anyway):', usageError);
       }
 
-      // For quest whole regeneration, try to parse as JSON
+      // IMPROVED: For quest whole regeneration, use enhanced JSON parsing
       if (field.includes('quest_') && field.endsWith('_whole')) {
         try {
-          const questData = JSON.parse(regeneratedContent as string);
+          const questData = parseJSONWithFallbacks(regeneratedContent as string);
+          
+          // Validate the quest object has required fields
+          if (!questData.title || !questData.description || !questData.reward) {
+            console.warn('Quest data missing required fields, creating default values');
+            questData.title = questData.title || 'Generated Quest';
+            questData.description = questData.description || 'A quest for this character';
+            questData.reward = questData.reward || 'Experience and satisfaction';
+            questData.type = questData.type || 'any';
+          }
+          
           regeneratedContent = questData;
+          console.log('Successfully parsed quest JSON:', questData);
         } catch (e) {
-          // If parsing fails, return as-is
-          console.warn('Failed to parse quest JSON, using as text');
+          console.error('Failed to parse quest JSON:', e);
+          console.log('Raw content was:', regeneratedContent);
+          
+          // Fallback: create a basic quest from the text
+          regeneratedContent = {
+            title: "Generated Quest",
+            description: (regeneratedContent as string).substring(0, 200) || "A quest for this character",
+            reward: "Experience and rewards",
+            type: "any"
+          };
         }
       }
 
       // For additional traits regeneration, parse as JSON
       if (field === 'additional_traits' || field === 'add_single_trait') {
         try {
-          const traitsData = JSON.parse(regeneratedContent as string);
+          const traitsData = parseJSONWithFallbacks(regeneratedContent as string);
           if (typeof traitsData === 'object' && traitsData !== null) {
             // Clean the trait values
             const cleanedTraits: Record<string, string> = {};
@@ -508,9 +597,9 @@ export async function POST(request: NextRequest) {
       // Log to help debug image preservation
       console.log(`Original character has image_data: ${!!(character.image_data || character.image_url)}`);
       
-      // Update the appropriate field in the character object
+      // IMPROVED: Update the appropriate field in the character object
       if (field.startsWith('quest_')) {
-        // Handle quest regeneration
+        // Handle quest regeneration with better error checking
         const parts = field.split('_');
         const questIndex = parseInt(parts[1], 10);
         const questPart = parts[2] || 'whole';
@@ -521,11 +610,19 @@ export async function POST(request: NextRequest) {
         }
         
         if (questPart === 'whole') {
-          // Replace entire quest
-          if (typeof regeneratedContent === 'object') {
-            updatedCharacter.quests[questIndex] = regeneratedContent;
+          // Replace entire quest with validation
+          if (typeof regeneratedContent === 'object' && regeneratedContent !== null) {
+            // Ensure required fields exist
+            const questObject = {
+              title: regeneratedContent.title || 'Generated Quest',
+              description: regeneratedContent.description || 'A quest for this character',
+              reward: regeneratedContent.reward || 'Experience and rewards',
+              type: regeneratedContent.type || 'any'
+            };
+            updatedCharacter.quests[questIndex] = questObject;
+            console.log(`Updated quest ${questIndex} with:`, questObject);
           } else {
-            throw new Error('Invalid quest data format');
+            throw new Error('Quest regeneration did not return a valid object');
           }
         } else {
           // Update specific quest field
