@@ -1,4 +1,3 @@
-// src/app/library/edit/[id]/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -42,10 +41,10 @@ export default function CharacterEditorPage() {
   const [currentGenre, setCurrentGenre] = useState<string>('');
   const [subGenres, setSubGenres] = useState<{value: string, label: string}[]>([]);
   
-  // Regeneration state - updated to track individual fields
+  // UPDATED: Enhanced regeneration state tracking
   const [isRegeneratingPortrait, setIsRegeneratingPortrait] = useState(false);
   const [isRegeneratingField, setIsRegeneratingField] = useState<string | null>(null);
-  const [fieldLoadingStates, setFieldLoadingStates] = useState<Record<string, boolean>>({});
+  const [regeneratingFields, setRegeneratingFields] = useState<Set<string>>(new Set());
   const [feedbackMessage, setFeedbackMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
   
   // Portrait error tracking
@@ -128,6 +127,16 @@ export default function CharacterEditorPage() {
       setHasUnsavedChanges(hasChanges);
     }
   }, [character, originalCharacter]);
+  
+  // Auto-clear feedback messages
+  useEffect(() => {
+    if (feedbackMessage) {
+      const timer = setTimeout(() => {
+        setFeedbackMessage(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [feedbackMessage]);
   
   // Wrapper function for setCharacter to handle the portrait section's requirements
   const handleSetCharacter = (newCharacter: Character | ((prev: Character) => Character)) => {
@@ -396,11 +405,20 @@ export default function CharacterEditorPage() {
     }
   };
 
-  // UPDATED: Enhanced field regeneration handler that supports individual trait regeneration
+  // UPDATED: Enhanced field regeneration handler with proper state management
   const handleRegenerate = async (field: string, subField?: string, index?: number) => {
     if (!character) return;
     
-    setIsRegeneratingField(field);
+    let fieldIdentifier = field;
+    if (subField && typeof index === 'number') {
+      fieldIdentifier = `${field}_${index}_${subField}`;
+    } else if (typeof index === 'number') {
+      fieldIdentifier = `${field}_${index}`;
+    }
+    
+    // Update regenerating fields set
+    setRegeneratingFields(prev => new Set([...prev, fieldIdentifier]));
+    setIsRegeneratingField(fieldIdentifier);
     
     try {
       let fieldToRegenerate = field;
@@ -460,11 +478,6 @@ export default function CharacterEditorPage() {
           type: 'success',
           text: successMessage
         });
-        
-        // Clear success message after 3 seconds
-        setTimeout(() => {
-          setFeedbackMessage(null);
-        }, 3000);
       } else {
         console.error('Regeneration failed:', data.error);
         setFeedbackMessage({
@@ -479,6 +492,12 @@ export default function CharacterEditorPage() {
         text: error instanceof Error ? error.message : `Failed to regenerate ${field}. Please try again.`
       });
     } finally {
+      // Remove from regenerating fields set
+      setRegeneratingFields(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(fieldIdentifier);
+        return newSet;
+      });
       setIsRegeneratingField(null);
     }
   };
@@ -492,6 +511,18 @@ export default function CharacterEditorPage() {
     
     // Use the new handler
     await handleRegenerate(field);
+  };
+
+  // Helper function to check if a field is regenerating
+  const isFieldRegenerating = (field: string, index?: number, subField?: string): boolean => {
+    let fieldIdentifier = field;
+    if (subField && typeof index === 'number') {
+      fieldIdentifier = `${field}_${index}_${subField}`;
+    } else if (typeof index === 'number') {
+      fieldIdentifier = `${field}_${index}`;
+    }
+    
+    return regeneratingFields.has(fieldIdentifier);
   };
 
   // Handle array input changes
@@ -614,7 +645,8 @@ export default function CharacterEditorPage() {
           onGenreChange={handleGenreChange}
           currentGenre={currentGenre}
           subGenres={subGenres}
-          fieldLoadingStates={fieldLoadingStates}
+          isFieldRegenerating={isFieldRegenerating}
+          regeneratingFields={regeneratingFields}
         />
         
         {/* Portrait Section */}
@@ -652,7 +684,8 @@ export default function CharacterEditorPage() {
           character={character}
           onArrayInputChange={handleArrayInputChange}
           onRegenerateField={handleRegenerateField}
-          fieldLoadingStates={fieldLoadingStates}
+          isFieldRegenerating={isFieldRegenerating}
+          regeneratingFields={regeneratingFields}
         />
         
         {/* Dialogue Section */}
@@ -660,7 +693,8 @@ export default function CharacterEditorPage() {
           character={character}
           onArrayInputChange={handleArrayInputChange}
           onRegenerateField={handleRegenerateField}
-          fieldLoadingStates={fieldLoadingStates}
+          isFieldRegenerating={isFieldRegenerating}
+          regeneratingFields={regeneratingFields}
         />
         
         {/* Items Section */}
@@ -668,7 +702,8 @@ export default function CharacterEditorPage() {
           character={character}
           onArrayInputChange={handleArrayInputChange}
           onRegenerateField={handleRegenerateField}
-          fieldLoadingStates={fieldLoadingStates}
+          isFieldRegenerating={isFieldRegenerating}
+          regeneratingFields={regeneratingFields}
         />
         
       </form>

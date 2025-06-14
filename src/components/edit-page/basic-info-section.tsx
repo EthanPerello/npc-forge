@@ -13,7 +13,8 @@ interface BasicInfoSectionProps {
   onGenreChange: (section: 'selected_traits' | 'added_traits', field: string, value: string) => void;
   currentGenre: string;
   subGenres: {value: string, label: string}[];
-  fieldLoadingStates: Record<string, boolean>;
+  isFieldRegenerating: (field: string, index?: number, subField?: string) => boolean;
+  regeneratingFields: Set<string>;
 }
 
 export const BasicInfoSection = ({
@@ -23,11 +24,31 @@ export const BasicInfoSection = ({
   onGenreChange,
   currentGenre,
   subGenres,
-  fieldLoadingStates
+  isFieldRegenerating,
+  regeneratingFields
 }: BasicInfoSectionProps) => {
+  
+  // Check if any basic info field is regenerating
+  const hasBasicInfoLoading = regeneratingFields.has('name') || 
+                              regeneratingFields.has('appearance') || 
+                              regeneratingFields.has('personality') || 
+                              regeneratingFields.has('backstory_hook');
+
   return (
     <FormSection title="Basic Information">
-      <div className="mb-4">
+      {/* Loading overlay when any field is regenerating */}
+      {hasBasicInfoLoading && (
+        <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="flex items-center gap-3">
+            <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-200 border-t-blue-600 dark:border-blue-700 dark:border-t-blue-300"></div>
+            <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+              Regenerating character information...
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className={`mb-4 ${isFieldRegenerating('name') ? 'bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800' : ''}`}>
         <label className="block text-sm font-medium mb-1">
           Name
         </label>
@@ -37,11 +58,12 @@ export const BasicInfoSection = ({
             value={character.name}
             onChange={(e) => onInputChange('name', e.target.value)}
             className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
+            disabled={isFieldRegenerating('name')}
           />
           <RegenerateButton
             field="name"
             onClick={(e) => onRegenerateField('name', e)}
-            isLoading={fieldLoadingStates['name'] || false}
+            isLoading={isFieldRegenerating('name')}
           />
         </div>
       </div>
@@ -68,7 +90,7 @@ export const BasicInfoSection = ({
         />
       </div>
       
-      <div className="mb-4">
+      <div className={`mb-4 ${isFieldRegenerating('appearance') ? 'bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800' : ''}`}>
         <label className="block text-sm font-medium mb-1">
           Appearance
         </label>
@@ -78,16 +100,17 @@ export const BasicInfoSection = ({
             onChange={(e) => onInputChange('appearance', e.target.value)}
             rows={4}
             className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
+            disabled={isFieldRegenerating('appearance')}
           />
           <RegenerateButton
             field="appearance"
             onClick={(e) => onRegenerateField('appearance', e)}
-            isLoading={fieldLoadingStates['appearance'] || false}
+            isLoading={isFieldRegenerating('appearance')}
           />
         </div>
       </div>
       
-      <div className="mb-4">
+      <div className={`mb-4 ${isFieldRegenerating('personality') ? 'bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800' : ''}`}>
         <label className="block text-sm font-medium mb-1">
           Personality
         </label>
@@ -97,16 +120,17 @@ export const BasicInfoSection = ({
             onChange={(e) => onInputChange('personality', e.target.value)}
             rows={4}
             className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
+            disabled={isFieldRegenerating('personality')}
           />
           <RegenerateButton
             field="personality"
             onClick={(e) => onRegenerateField('personality', e)}
-            isLoading={fieldLoadingStates['personality'] || false}
+            isLoading={isFieldRegenerating('personality')}
           />
         </div>
       </div>
       
-      <div className="mb-4">
+      <div className={`mb-4 ${isFieldRegenerating('backstory_hook') ? 'bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800' : ''}`}>
         <label className="block text-sm font-medium mb-1">
           Backstory Hook
         </label>
@@ -116,11 +140,12 @@ export const BasicInfoSection = ({
             onChange={(e) => onInputChange('backstory_hook', e.target.value)}
             rows={2}
             className="flex-grow p-2 border border-theme rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-secondary"
+            disabled={isFieldRegenerating('backstory_hook')}
           />
           <RegenerateButton
             field="backstory_hook"
             onClick={(e) => onRegenerateField('backstory_hook', e)}
-            isLoading={fieldLoadingStates['backstory_hook'] || false}
+            isLoading={isFieldRegenerating('backstory_hook')}
           />
         </div>
       </div>

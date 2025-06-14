@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Character } from '@/lib/types';
 import { FormSection } from './shared';
-import { PlusCircle, Trash2, RotateCcw, Sparkles } from 'lucide-react';
+import { PlusCircle, Trash2, RotateCcw } from 'lucide-react';
 import Button from '@/components/ui/button';
 
 interface AdditionalTraitsSectionProps {
@@ -21,53 +21,144 @@ export const AdditionalTraitsSection = ({
 }: AdditionalTraitsSectionProps) => {
   const [regeneratingTrait, setRegeneratingTrait] = useState<string | null>(null);
 
-  // Get all displayable additional traits (matching what shows in character modal)
+  // Traits that are handled by the character traits section selectors
+  const characterTraitFields = [
+    'gender',
+    'age_group',
+    'moral_alignment', 
+    'relationship_to_player',
+    'species',
+    'occupation',
+    'social_class'
+  ];
+
+  // Traits that are handled by the basic info section
+  const basicInfoFields = [
+    'genre',
+    'sub_genre'
+  ];
+
+  // Predefined personality traits that are selectable in the character traits section
+  const predefinedPersonalityTraits = [
+    'brave', 'cautious', 'cheerful', 'rude', 'loyal', 'dishonest', 'kind', 'cruel',
+    'proud', 'humble', 'optimistic', 'pessimistic', 'shy', 'outgoing', 'intelligent', 'foolish'
+  ];
+
+  // Get all displayable additional traits
   const getDisplayableTraits = () => {
-    if (!character.added_traits) {
-      return {};
-    }
-    
     const filtered: Record<string, string> = {};
     
-    Object.entries(character.added_traits).forEach(([key, value]) => {
-      // Skip system/error traits and main profile fields
-      const isSystemTrait = key.includes('error') || 
-                           key.includes('fallback') || 
-                           key.includes('api') ||
-                           key.includes('portrait_') ||
-                           key === 'original_request' ||
-                           key === 'appearance' || 
-                           key === 'personality' || 
-                           key === 'backstory_hook';
-      
-      // Only include string values that aren't system traits and aren't empty after formatting
-      if (!isSystemTrait && typeof value === 'string' && value.trim().length > 0) {
-        // Apply the same formatting/filtering logic as the character modal
-        const formattedValue = value
-          .replace(/["""'']/g, '"')
-          .replace(/—/g, '-')
-          .replace(/…/g, '...')
-          .replace(/[^\w\s-.,!?]/g, '')
-          .trim();
-        
-        // Only include if it's not too long (same logic as character modal)
-        if (formattedValue.length <= 25 && 
-            !formattedValue.includes('.') && 
-            !formattedValue.includes(',') && 
-            formattedValue.split(' ').length <= 4) {
-          
-          // Capitalize properly
-          const capitalizedValue = formattedValue
-            .split(' ')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-            .join(' ');
-          
-          filtered[key] = capitalizedValue;
+    // Process selected_traits - include traits not handled by selectors
+    if (character.selected_traits) {
+      Object.entries(character.selected_traits).forEach(([key, value]) => {
+        // Skip traits handled by basic info or character traits sections
+        if (basicInfoFields.includes(key) || characterTraitFields.includes(key)) {
+          return;
         }
-      }
-    });
+        
+        // Handle personality_traits specially - include ones not in predefined list
+        if (key === 'personality_traits' && Array.isArray(value)) {
+          value.forEach((trait, index) => {
+            if (typeof trait === 'string' && trait.trim().length > 0) {
+              // Only include if it's NOT in the predefined list
+              if (!predefinedPersonalityTraits.includes(trait.toLowerCase())) {
+                const formattedValue = formatTraitValue(trait);
+                if (formattedValue) {
+                  filtered[`custom_personality_${index}`] = formattedValue;
+                }
+              }
+            }
+          });
+          return;
+        }
+        
+        // Include other non-handled traits from selected_traits
+        if (value && typeof value === 'string') {
+          const formattedValue = formatTraitValue(value);
+          if (formattedValue) {
+            filtered[key] = formattedValue;
+          }
+        } else if (Array.isArray(value)) {
+          value.forEach((item, index) => {
+            if (item && typeof item === 'string') {
+              const formattedValue = formatTraitValue(item);
+              if (formattedValue) {
+                filtered[`${key}_${index}`] = formattedValue;
+              }
+            }
+          });
+        }
+      });
+    }
+    
+    // Process AI-added traits
+    if (character.added_traits) {
+      Object.entries(character.added_traits).forEach(([key, value]) => {
+        // Skip system/error traits and main profile fields
+        const isSystemTrait = key.includes('error') || 
+                             key.includes('fallback') || 
+                             key.includes('api') ||
+                             key.includes('portrait_') ||
+                             key === 'original_request' ||
+                             key === 'appearance' || 
+                             key === 'personality' || 
+                             key === 'backstory_hook';
+        
+        // Skip traits already handled by selectors
+        if (basicInfoFields.includes(key) || characterTraitFields.includes(key)) {
+          return;
+        }
+        
+        // Skip if this trait was already added from selected_traits
+        if (character.selected_traits && (character.selected_traits as any)[key]) {
+          return;
+        }
+        
+        if (!isSystemTrait && value && typeof value === 'string') {
+          const formattedValue = formatTraitValue(value);
+          if (formattedValue && formattedValue.length > 0) {
+            filtered[key] = formattedValue;
+          }
+        } else if (!isSystemTrait && Array.isArray(value)) {
+          value.forEach((item, index) => {
+            if (item && typeof item === 'string') {
+              const formattedValue = formatTraitValue(item);
+              if (formattedValue) {
+                filtered[`${key}_${index}`] = formattedValue;
+              }
+            }
+          });
+        }
+      });
+    }
     
     return filtered;
+  };
+
+  // Format trait value with proper cleaning and validation
+  const formatTraitValue = (value: string): string => {
+    if (!value || typeof value !== 'string') {
+      return '';
+    }
+    
+    // Clean special characters first
+    const cleaned = value
+      .replace(/["""'']/g, '"') // Normalize quotes
+      .replace(/—/g, '-') // Replace em dashes
+      .replace(/…/g, '...') // Replace ellipsis
+      .replace(/[^\w\s-.,!?]/g, '') // Remove other special characters
+      .trim();
+    
+    // EXCLUDE long traits entirely - don't truncate, just return empty string
+    if (cleaned.length > 25 || cleaned.includes('.') || cleaned.includes(',') || cleaned.split(' ').length > 4) {
+      return '';
+    }
+    
+    // For proper short traits, capitalize properly
+    return cleaned
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
   };
 
   const displayableTraits = getDisplayableTraits();
@@ -172,18 +263,30 @@ export const AdditionalTraitsSection = ({
   return (
     <FormSection title="Additional Traits">
       <p className="text-sm text-muted mb-4">
-        These are additional traits that were generated by AI or that you can add yourself. You can edit, add, or remove traits as needed.
+        These are additional traits that were generated by AI, custom traits you've added, or traits that don't fit into the standard categories above. You can edit, add, or remove traits as needed.
       </p>
       
       <div className="space-y-3">
+        {/* Loading overlay when regenerating traits */}
+        {isRegenerating && regeneratingTrait === null && (
+          <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-200 border-t-blue-600 dark:border-blue-700 dark:border-t-blue-300"></div>
+              <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                Generating new trait...
+              </p>
+            </div>
+          </div>
+        )}
+        
         {/* List of existing additional traits */}
         {Object.entries(displayableTraits).length > 0 ? (
           Object.entries(displayableTraits).map(([key, value], index) => (
-            <div key={`${key}-${index}`} className="flex items-center gap-3 pb-3 border-b border-gray-200 dark:border-gray-700 last:border-0 last:mb-0 last:pb-0">
+            <div key={`${key}-${index}`} className={`flex items-center gap-3 pb-3 border-b border-gray-200 dark:border-gray-700 last:border-0 last:mb-0 last:pb-0 ${regeneratingTrait === key ? 'bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3' : ''}`}>
               <div className="w-1/4">
                 <input
                   type="text"
-                  value={key.replace(/_/g, ' ')} // Display with spaces for readability
+                  value={key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} // Display with spaces and proper capitalization
                   onChange={(e) => {
                     const newKey = e.target.value.replace(/\s+/g, '_').toLowerCase(); // Convert back to underscore format
                     handleTraitKeyChange(key, newKey);
@@ -205,10 +308,18 @@ export const AdditionalTraitsSection = ({
                 type="button"
                 onClick={() => handleRegenerateTrait(key)}
                 disabled={regeneratingTrait === key}
-                className="p-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors disabled:opacity-50"
-                title="Regenerate this trait"
+                className={`p-2 transition-colors disabled:opacity-50 ${
+                  regeneratingTrait === key 
+                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 rounded' 
+                    : 'text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300'
+                }`}
+                title={regeneratingTrait === key ? "Regenerating..." : "Regenerate this trait"}
               >
-                <RotateCcw className={`h-4 w-4 ${regeneratingTrait === key ? 'animate-spin' : ''}`} />
+                {regeneratingTrait === key ? (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-200 border-t-blue-600 dark:border-blue-700 dark:border-t-blue-300"></div>
+                ) : (
+                  <RotateCcw className="h-4 w-4" />
+                )}
               </button>
               <button
                 type="button"
@@ -246,7 +357,13 @@ export const AdditionalTraitsSection = ({
               variant="secondary"
               onClick={handleAddGeneratedTrait}
               disabled={isRegenerating}
-              leftIcon={<Sparkles className={`h-4 w-4 ${isRegenerating && regeneratingTrait === null ? 'animate-pulse' : ''}`} />}
+              leftIcon={
+                isRegenerating && regeneratingTrait === null ? (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-200 border-t-blue-600 dark:border-blue-700 dark:border-t-blue-300"></div>
+                ) : (
+                  <RotateCcw className="h-4 w-4" />
+                )
+              }
               type="button"
             >
               {isRegenerating && regeneratingTrait === null ? 'Generating...' : 'Add Generated Trait'}

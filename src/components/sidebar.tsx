@@ -24,7 +24,8 @@ import {
   Sparkles,
   Library,
   Server,
-  Database
+  Database,
+  MessageCircle
 } from 'lucide-react';
 import { ReactNode } from 'react';
 import { isValidElement } from 'react';
@@ -55,6 +56,7 @@ const navigationItems: NavItemType[] = [
     icon: <BookOpen className="h-5 w-5" />,
     items: [
       { title: 'How to Use', path: '/docs/how-to-use', icon: <File className="h-4 w-4" /> },
+      { title: 'Chat with Characters', path: '/docs/chat', icon: <MessageCircle className="h-4 w-4" /> },
       { title: 'Character Examples', path: '/docs/character-examples', icon: <File className="h-4 w-4" /> },
       { title: 'Generation Options', path: '/docs/generation-options', icon: <Settings className="h-4 w-4" /> },
       { title: 'Features', path: '/docs/features', icon: <List className="h-4 w-4" /> },
@@ -63,6 +65,7 @@ const navigationItems: NavItemType[] = [
       { title: 'FAQ', path: '/docs/faq', icon: <HelpCircle className="h-4 w-4" /> },
       { 
         title: 'Developer Docs', 
+        path: '/docs/developer',
         icon: <Terminal className="h-4 w-4" />,
         items: [
           { title: 'Dev Setup', path: '/docs/dev-setup', icon: <Code className="h-3 w-3" /> },
@@ -272,15 +275,35 @@ const NavItemWithState = ({ item, depth = 0, isFullSidebar, toggleSidebar }: Nav
   
   // For the Documentation section, only auto-expand if we're on a specific docs page
   // (not the main /docs page), otherwise start closed
+  // For Developer Docs, auto-expand if we're on any developer docs page
   const shouldStartOpen = () => {
     if (item.title === 'Documentation') {
       // Only auto-expand if we're on a specific docs page, not the main docs page
       return pathname !== '/docs' && pathname?.startsWith('/docs');
     }
+    if (item.title === 'Developer Docs') {
+      // Auto-expand if we're on any developer docs page (including the main developer page)
+      return pathname === '/docs/developer' || 
+             pathname?.startsWith('/docs/dev-setup') ||
+             pathname?.startsWith('/docs/architecture') ||
+             pathname?.startsWith('/docs/api') ||
+             pathname?.startsWith('/docs/security') ||
+             pathname?.startsWith('/docs/contributing') ||
+             pathname?.startsWith('/docs/testing') ||
+             pathname?.startsWith('/docs/deployment') ||
+             pathname?.startsWith('/docs/roadmap') ||
+             pathname?.startsWith('/docs/credits') ||
+             pathname?.startsWith('/docs/license');
+    }
     return isInPath(item);
   };
   
   const [isOpen, setIsOpen] = useState(shouldStartOpen());
+  
+  // Update the open state when pathname changes
+  useEffect(() => {
+    setIsOpen(shouldStartOpen());
+  }, [pathname]);
   
   return (
     <NavItem 

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Sparkles, CheckCircle, AlertCircle } from 'lucide-react';
+import { RotateCcw, CheckCircle, AlertCircle } from 'lucide-react';
 
 // Feedback Message Component for showing success/error messages
 export const FeedbackMessage = ({ message }: { message: {type: 'success' | 'error', text: string} | null }) => {
@@ -41,17 +41,19 @@ export const RegenerateButton = ({
       onClick={onClick}
       disabled={isLoading}
       className={`
-        ml-2 p-2 rounded-md transition-colors
+        ml-2 p-2 rounded-md transition-all duration-200 relative
         ${isLoading 
-          ? 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500' 
-          : 'text-indigo-600 hover:text-indigo-800 bg-indigo-50 dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300'}
+          ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 cursor-not-allowed border border-blue-200 dark:border-blue-700' 
+          : 'text-indigo-600 hover:text-indigo-800 bg-indigo-50 dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/30'}
       `}
       title={isLoading ? "Regenerating..." : "Regenerate with AI"}
     >
       {isLoading ? (
-        <div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600 dark:border-indigo-700 dark:border-t-indigo-300"></div>
+        <div className="flex items-center justify-center">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-200 border-t-blue-600 dark:border-blue-700 dark:border-t-blue-300"></div>
+        </div>
       ) : (
-        <Sparkles className="h-5 w-5" />
+        <RotateCcw className="h-5 w-5" />
       )}
     </button>
   );
