@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.22.0] - 2025-06-13
+
 ### Added
 - Developer Documentation homepage at `/docs/developer` with dedicated navigation and sidebar highlighting
 - Clickable "Developer Docs" section in sidebar with breadcrumb-aware expansion and sub-page structure
@@ -600,7 +602,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Export to JSON feature
 - Fully responsive UI for desktop and mobile
 
-[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.21.0...HEAD
+[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.22.0...HEAD
+[0.22.0]: https://github.com/EthanPerello/npc-forge/compare/v0.21.0...v0.22.0
 [0.21.0]: https://github.com/EthanPerello/npc-forge/compare/v0.20.1...v0.21.0
 [0.20.1]: https://github.com/EthanPerello/npc-forge/compare/v0.20.0...v0.20.1
 [0.20.0]: https://github.com/EthanPerello/npc-forge/compare/v0.19.0...v0.20.0
