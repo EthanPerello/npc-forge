@@ -48,7 +48,7 @@ npc-forge/
 │   ├── app/                     # Next.js App Router
 │   │   ├── api/                 # API routes
 │   │   │   ├── chat/            # Character conversation endpoint
-│   │   │   ├── edit-portrait/   # Portrait editing endpoint (NEW v0.21.0)
+│   │   │   ├── edit-portrait/   # Portrait editing endpoint
 │   │   │   ├── generate/        # Character generation endpoint
 │   │   │   ├── regenerate/      # Character regeneration endpoint
 │   │   │   └── proxy-image/     # Image proxy endpoint
@@ -107,7 +107,7 @@ The character creation wizard consists of four main steps:
 5. **Response Storage**: Save conversation to IndexedDB
 6. **UI Update**: Display response with proper formatting
 
-### Portrait Editing System (NEW in v0.21.0)
+### Portrait Editing System
 
 #### Portrait Editing Components
 
@@ -126,7 +126,7 @@ The character creation wizard consists of four main steps:
 6. **Result Display**: Updated portrait appears in character interface
 7. **Save Integration**: Edited portrait saved with character data
 
-### Advanced Trait Management (NEW in v0.21.0)
+### Advanced Trait Management
 
 #### Trait Management Components
 
@@ -188,11 +188,11 @@ Handles character creation requests with:
 Supports selective character updates including:
 • Individual attribute regeneration
 • Component-level regeneration (quests, dialogue, items)
-• Trait generation and regeneration (NEW in v0.21.0)
+• Trait generation and regeneration
 • Model switching for regeneration
 • Maintaining character data consistency
 
-#### Portrait Editing (`/api/edit-portrait`) (NEW in v0.21.0)
+#### Portrait Editing (`/api/edit-portrait`)
 
 Handles AI-powered portrait modifications with:
 • Image editing via OpenAI's `/v1/images/edits` endpoint
@@ -210,7 +210,7 @@ Handles character conversations with:
 • Usage limit integration
 • Error handling with automatic retry logic
 
-### Portrait Editing System Architecture (NEW in v0.21.0)
+### Portrait Editing System Architecture
 
 #### API Implementation
 
@@ -237,7 +237,7 @@ Handles character conversations with:
 • **Network Issues**: Retry logic for temporary connectivity problems
 • **Validation Errors**: Specific feedback for prompt and image issues
 
-### Trait Management System Architecture (NEW in v0.21.0)
+### Trait Management System Architecture
 
 #### API Integration
 
@@ -312,7 +312,7 @@ Client-side tracking with monthly limits:
 4. **Response Processing**: Character data returned and displayed
 5. **Library Storage**: Optional save to local IndexedDB
 
-### Portrait Editing Flow (NEW in v0.21.0)
+### Portrait Editing Flow
 
 1. **Edit Initiation**: User selects "Edit Portrait" from character edit interface
 2. **Validation**: Verify character has portrait and compatible model selected
@@ -323,7 +323,7 @@ Client-side tracking with monthly limits:
 7. **Character Update**: Client updates character with new portrait
 8. **Storage**: Edited character saved to IndexedDB
 
-### Trait Management Flow (NEW in v0.21.0)
+### Trait Management Flow
 
 1. **Trait Request**: User requests new trait generation or regeneration
 2. **API Call**: Send trait generation request to `/api/regenerate`
@@ -425,7 +425,7 @@ Client-side tracking with monthly limits:
 • Real-time filtering with optimized queries
 • Collapsible interface for organization
 
-## Enhanced Error Handling (v0.20.1)
+## Enhanced Error Handling
 
 ### JSON Parsing Improvements
 

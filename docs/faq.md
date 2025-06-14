@@ -66,7 +66,7 @@ Portrait editing uses AI to modify existing character portraits based on text pr
 
 ### Which models support portrait editing?
 
-Portrait editing is currently available with the **gpt-image-1** model (Premium tier only). This model provides the highest quality results for both generation and editing.
+Portrait editing is currently available with the **gpt-image-1** model (Premium tier only). This model provides the highest quality results for both generation and editing. DALL·E 2 has limited editing capabilities, while DALL·E 3 does not support editing.
 
 ### What makes a good edit prompt?
 
@@ -220,14 +220,27 @@ This usually means:
 5. **Maintain consistency**: Use portrait editing and trait management for cohesive collections
 6. **Regular maintenance**: Delete characters you no longer need and update existing ones
 
+## New Features (v0.22.0)
+
+### What's new in the latest version?
+
+• **Enhanced Visual Feedback**: All regeneration operations now show clear loading indicators
+• **Improved Navigation**: Better transitions between library and character creation
+• **Developer Documentation**: New comprehensive documentation for developers
+• **UI Improvements**: More consistent icons and better visual feedback throughout the app
+
+### How do I access developer documentation?
+
+Developer documentation is available in the sidebar under "Developer Docs" with comprehensive guides for technical implementation and API usage.
+
 ## Future Features
 
 ### Will there be more features added?
 
 Yes! Based on the roadmap, planned features may include:
+• Advanced character relationship systems
 • User accounts with cloud sync (future consideration)
 • Game integration tools and APIs
-• Advanced relationship systems between characters
 • Enhanced collaboration features
 
 ### Can I request features?

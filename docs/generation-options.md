@@ -1,6 +1,6 @@
 # Character Generation Options
 
-NPC Forge offers extensive customization options through its wizard-based interface. This guide provides a breakdown of all available settings across the four-step creation process, plus the new portrait editing and trait management features.
+NPC Forge offers extensive customization options through its wizard-based interface. This guide provides a breakdown of all available settings across the four-step creation process, plus the portrait editing and trait management features.
 
 ## Overview
 
@@ -113,11 +113,11 @@ Plain/Solid Color, Gradient, Themed (Based on Character), Environmental, Abstrac
 
 ### Character Generation Process
 
-1. Click "Generate Character" to begin
+1. Click "Generate Character" to begin with enhanced visual feedback (NEW in v0.22.0)
 2. AI processes inputs using selected models
 3. Character text is generated first, followed by portrait
 4. Results are displayed with tabs for different sections
-5. **Save to Library** to enable chat functionality and editing features
+5. **Save to Library** to enable chat functionality and editing features (now transitions to "View Library" in v0.22.0)
 
 ### Alternative Options
 
@@ -128,12 +128,12 @@ Plain/Solid Color, Gradient, Themed (Based on Character), Environmental, Abstrac
 
 After generating a character, you can:
 
-• **Save to Library**: Store character for editing, chat, and portrait editing
+• **Save to Library**: Store character for editing, chat, and portrait editing (enhanced transition in v0.22.0)
 • **Start Chatting**: Begin conversations immediately after saving
 • **Download JSON**: Export character data
 • **Download Portrait**: Save character image
 
-## Portrait Editing Features (NEW in v0.21.0)
+## Portrait Editing Features
 
 ### Accessing Portrait Editing
 
@@ -152,6 +152,7 @@ Portrait editing is available after saving characters to your library:
 • Maximum length: 32,000 characters for gpt-image-1, 1,000 for others
 
 **Model Compatibility:**
+• Clear messaging that only gpt-image-1 supports full editing capabilities (NEW in v0.22.0)
 • Warning displays for unsupported models
 • gpt-image-1 provides best editing results
 • dall-e-2 has limited editing capabilities
@@ -227,7 +228,7 @@ Portrait editing is available after saving characters to your library:
 • Plan edits carefully to maximize monthly usage
 • Consider which characters need editing most
 
-## Advanced Trait Management (NEW in v0.21.0)
+## Advanced Trait Management
 
 ### Additional Traits System
 
@@ -235,7 +236,7 @@ The Additional Traits section in character editing provides comprehensive trait 
 
 **Viewing Traits:**
 • All additional character traits displayed in organized layout
-• Traits shown with consistent Title Case formatting
+• Traits shown with consistent Title Case formatting with proper capitalization (NEW in v0.22.0)
 • Long or sentence-like traits automatically excluded from display
 • Category prefixes help organize trait types
 
@@ -246,7 +247,7 @@ The Additional Traits section in character editing provides comprehensive trait 
 • Uses selected text model for trait generation
 
 **Individual Trait Regeneration:**
-• **Regenerate buttons** next to each trait for individual updates
+• **Regenerate buttons** next to each trait for individual updates with enhanced visual feedback (NEW in v0.22.0)
 • Regenerate specific traits without affecting others
 • Maintains character consistency while refreshing specific aspects
 • Each regeneration counts against text model usage limits
@@ -297,6 +298,28 @@ When chatting with characters, the **text models** are used to generate response
 • Superior character personality depth and consistency
 • Complex conversation handling and emotional nuance
 • Best for important story moments and character development
+
+## Enhanced User Experience (v0.22.0)
+
+### Visual Feedback Improvements
+
+• **Enhanced Loading States**: All regeneration operations show clear visual indicators
+• **Consistent Iconography**: Rotating circle (RotateCcw) icons for all regeneration buttons
+• **Real-Time Updates**: Immediate feedback for all character operations
+• **Better Error Handling**: Enhanced fallback logic for quest regeneration and other operations
+
+### Navigation Enhancements
+
+• **Dynamic Button Transitions**: "Save to Library" → "View Library" transitions for better user flow
+• **Integrated Sidebar**: Enhanced navigation with direct chat links
+• **Improved Organization**: Cleaner layout and better visual hierarchy
+
+### Trait Management Enhancements
+
+• **Proper Capitalization**: All trait categories display with consistent Title Case formatting
+• **Enhanced Display Logic**: Additional traits section shows all traits not included in Basic Info or Character Traits sections
+• **Better Filtering**: Excludes unsupported traits from filter dropdowns
+• **Consistent Formatting**: Standardized trait display between modal and edit page
 
 ## Usage Optimization Strategies
 

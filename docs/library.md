@@ -1,6 +1,6 @@
 # Character Library Guide
 
-The Character Library is NPC Forge's system for saving, managing, and editing your generated characters, including the enhanced filtering system, interactive chat features, and the new portrait editing and trait management capabilities.
+The Character Library is NPC Forge's system for saving, managing, and editing your generated characters, including the enhanced filtering system, interactive chat features, and the portrait editing and trait management capabilities.
 
 ## Overview
 
@@ -8,7 +8,7 @@ The Character Library allows you to:
 • Save characters locally using IndexedDB
 • Edit and modify existing characters
 • Start conversations with your characters
-• Regenerate specific character elements
+• Regenerate specific character elements with enhanced visual feedback (NEW in v0.22.0)
 • Edit portraits using AI-powered text prompts
 • Generate and manage character traits
 • Search and filter your collection with advanced trait filtering
@@ -19,7 +19,7 @@ The Character Library allows you to:
 
 Access the Character Library through:
 • The "Library" link in the main navigation
-• The "Save to Library" button after generating a character
+• The "Save to Library" button after generating a character (now transitions to "View Library" in v0.22.0)
 
 ## Saving Characters
 
@@ -28,7 +28,8 @@ Access the Character Library through:
 After generating a character:
 1. Review your character in the results step
 2. Click "Save to Library"
-3. The character is saved with all data and portrait
+3. The button now dynamically transitions to "View Library" for better navigation (NEW in v0.22.0)
+4. The character is saved with all data and portrait
 
 ### From Editing
 
@@ -36,7 +37,7 @@ When editing a character:
 1. Make your desired changes
 2. Click "Save Changes"
 3. Updates are saved to your local storage
-4. Navigation back to Library is now immediate
+4. Navigation back to Library is immediate
 
 ## Library Interface
 
@@ -72,7 +73,7 @@ Click any character card to open a detailed modal with:
 **Multiple ways to begin chatting:**
 1. **From Character Cards**: Click the "Chat" button on any character card
 2. **From Library Modal**: Click "Start Chat" in the character details modal
-3. **Direct Navigation**: Go to `/chat/[characterId]` for saved characters
+3. **Direct Navigation**: Use the enhanced sidebar navigation (NEW in v0.22.0)
 
 ### Chat Integration
 
@@ -122,12 +123,12 @@ Use the simplified search with trait-specific syntax:
 The edit interface provides comprehensive character modification:
 • Edit character name and basic information
 • Modify all character attributes
-• Regenerate individual elements
+• Regenerate individual elements with enhanced visual feedback (NEW in v0.22.0)
 • Manage portraits with editing capabilities
 • Generate and manage additional traits
 • Add/remove quests, dialogue, and items
 
-### Portrait Management and Editing (NEW in v0.21.0)
+### Portrait Management and Editing
 
 **Portrait Options:**
 • **Upload**: Add custom portrait images
@@ -139,6 +140,7 @@ The edit interface provides comprehensive character modification:
 • Text-based prompts for describing desired changes
 • Support for color changes, accessories, clothing, and expressions
 • Model compatibility (gpt-image-1 recommended for best results)
+• Clear messaging that only gpt-image-1 supports full editing; DALL·E 2 has limited capabilities, DALL·E 3 doesn't support editing (NEW in v0.22.0)
 • Real-time preview of edited portraits
 
 **Portrait Editing Workflow:**
@@ -159,18 +161,18 @@ The edit interface provides comprehensive character modification:
 "add armor"
 ```
 
-### Advanced Trait Management (NEW in v0.21.0)
+### Advanced Trait Management
 
 **Additional Traits Section:**
 • View all additional character traits in organized layout
 • Traits displayed with editable names and values
-• Standardized Title Case formatting throughout
+• Standardized Title Case formatting with proper capitalization (NEW in v0.22.0)
 • Consistent display matching character modal
 
 **Trait Management Features:**
 • **Add Custom Trait**: Manually create traits with custom names and values
 • **Add Generated Trait**: AI generates new traits automatically
-• **Individual Regeneration**: Regenerate specific traits with dedicated buttons
+• **Individual Regeneration**: Regenerate specific traits with dedicated buttons and enhanced visual feedback (NEW in v0.22.0)
 • **Edit Trait Names**: Modify trait categories and names
 • **Edit Trait Values**: Update trait descriptions and values
 • **Remove Traits**: Delete unwanted traits from character
@@ -183,7 +185,7 @@ The edit interface provides comprehensive character modification:
 
 ### Regeneration Features
 
-Regenerate specific character elements:
+Regenerate specific character elements with enhanced visual feedback (NEW in v0.22.0):
 • Individual attributes (name, appearance, personality, backstory)
 • Portraits with different models
 • Portrait editing with text prompts
@@ -196,6 +198,12 @@ Choose different AI models for regeneration based on your monthly limits:
 • Standard: 50 text/10 images per month
 • Enhanced: 30 text/5 images per month
 • Premium: 10 text/3 images per month
+
+**Enhanced User Experience (NEW in v0.22.0):**
+• All regeneration buttons now use consistent rotating circle (RotateCcw) icons
+• Visual loading indicators show progress for all regeneration operations
+• Improved error handling with enhanced fallback logic
+• Real-time status updates for all operations
 
 ## Import and Export
 
@@ -247,6 +255,28 @@ The library uses IndexedDB for storage:
 • **Chat Integration**: Start Chat button in character details
 • **Consistent Layout**: Improved spacing and organization
 
+## Enhanced User Experience (v0.22.0)
+
+### Visual Feedback Improvements
+
+• **Enhanced Loading States**: All regeneration operations show clear visual indicators
+• **Consistent Iconography**: Rotating circle (RotateCcw) icons for all regeneration buttons
+• **Real-Time Updates**: Immediate feedback for all character operations
+• **Better Error Handling**: Enhanced fallback logic for failed operations
+
+### Navigation Enhancements
+
+• **Dynamic Button Transitions**: "Save to Library" → "View Library" transitions for better user flow
+• **Integrated Chat Access**: Enhanced sidebar navigation includes direct chat links
+• **Improved Organization**: Cleaner layout and better visual hierarchy
+
+### Trait Management Enhancements
+
+• **Proper Capitalization**: All trait categories now display with proper Title Case formatting
+• **Enhanced Display Logic**: Additional traits section shows all traits not included in Basic Info or Character Traits sections
+• **Better Filtering**: Excludes unsupported traits (e.g., custom personality entries) from filter dropdowns
+• **Consistent Formatting**: Standardized trait display between modal and edit page
+
 ## Library Management
 
 ### Organization Tips
@@ -270,7 +300,7 @@ The library uses IndexedDB for storage:
 1. **Create Characters**: Generate characters with initial portraits
 2. **Save to Library**: Add characters to your collection
 3. **Review Portraits**: Identify portraits that need refinement
-4. **Edit Portraits**: Use text prompts to modify specific aspects
+4. **Edit Portraits**: Use text prompts to modify specific aspects (gpt-image-1 recommended)
 5. **Maintain Consistency**: Ensure portraits match your campaign aesthetic
 
 ### Trait Management Workflow
@@ -343,6 +373,10 @@ The library uses IndexedDB for storage:
 • Check that trait names and values are properly formatted
 • Regenerate traits if they don't match character personality
 
+**Visual feedback issues (NEW)**:
+• Loading indicators not appearing: refresh the page
+• Button transitions not working: ensure JavaScript is enabled
+
 **Filtering issues**:
 • Traits only appear after characters with those traits are saved
 • Check syntax for trait-specific searches (`category: value`)
@@ -368,6 +402,7 @@ The library uses IndexedDB for storage:
 • Use portrait editing for minor adjustments rather than complete redesigns
 • Maintain consistent art style across character collections
 • Test different edit prompts to understand model capabilities
+• Use gpt-image-1 for reliable editing results
 
 ### Trait Development
 
@@ -375,6 +410,7 @@ The library uses IndexedDB for storage:
 • Use trait regeneration to improve inconsistent traits
 • Organize traits by importance and relevance to your story
 • Regular review and cleanup of unnecessary traits
+• Take advantage of enhanced visual feedback for trait operations
 
 ### Chat Integration
 
@@ -382,6 +418,13 @@ The library uses IndexedDB for storage:
 • Use chat to explore character background and motivations
 • Reference character traits in conversations for consistency
 • Document character development through ongoing conversations
+
+### Enhanced User Experience (v0.22.0)
+
+• Take advantage of improved visual feedback for all operations
+• Use dynamic button transitions for better navigation flow
+• Leverage enhanced trait capitalization for better organization
+• Utilize improved error handling for more reliable operations
 
 ## Related Documentation
 

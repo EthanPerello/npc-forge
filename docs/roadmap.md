@@ -1,12 +1,23 @@
 # Development Roadmap
 
-## Current Version: v0.21.0
+## Current Version: v0.22.0
 
-The current version includes comprehensive character creation wizard, interactive chat system, advanced character library with trait filtering, portrait editing capabilities, and enhanced trait management tools.
+The current version includes comprehensive character creation wizard, interactive chat system, advanced character library with trait filtering, portrait editing capabilities, enhanced trait management tools, and improved developer experience with enhanced navigation and visual feedback.
 
 ## Completed Features
 
-### v0.21.0: Portrait Editing & Trait Management (COMPLETED) ✓
+### v0.22.0: Enhanced User Experience & Developer Tools (COMPLETED) ✓
+
+• **Enhanced Visual Feedback**: Visual loading indicators for all regeneration operations across edit page sections
+• **Improved Navigation**: "Save to Library" → "View Library" dynamic button transitions in character generation
+• **Developer Documentation**: Dedicated developer documentation homepage with comprehensive navigation
+• **Enhanced Sidebar**: Integrated "Chat with Characters" link and full developer documentation support
+• **UI Consistency**: Rotating circle (RotateCcw) icons for all regeneration buttons
+• **Enhanced Trait Management**: Additional traits section shows all traits with proper capitalization and filtering
+• **Portrait Editing Clarity**: Clear messaging that only gpt-image-1 supports editing; DALL·E 2 and 3 do not
+• **Improved Error Handling**: Enhanced fallback logic for quest regeneration and other operations
+
+### v0.21.0: Portrait Editing & Advanced Trait Management (COMPLETED) ✓
 
 • **AI-Powered Portrait Editing**: Edit character portraits using text prompts with OpenAI's image editing API
 • **Enhanced Trait Management**: Generate new traits and regenerate individual traits using AI assistance
@@ -49,28 +60,7 @@ The current version includes comprehensive character creation wizard, interactiv
 • **Comprehensive JSON Parsing**: Multiple fallback strategies for malformed AI responses
 • **Improved Timeout Handling**: Better connectivity recovery and user feedback
 
-### v0.16.0: Portrait Management (COMPLETED) ✓
-
-• **Unsaved Changes Warning**: Clear indication when portrait modifications haven't been saved
-• **Enhanced Portrait Generation**: Improved reliability with automatic retry mechanisms
-• **Model-Specific Tips**: Generation status indicators and guidance in portrait section
-• **Explicit Save Actions**: Portrait changes require user confirmation to persist
-
-### v0.15.0: Navigation & Layout (COMPLETED) ✓
-
-• **Consistent Navigation**: Header across all pages for unified experience
-• **Mobile Optimizations**: Improved responsive design and touch interactions
-• **Sticky Footer Support**: Enhanced navigation on character edit screens
-• **Improved User Flow**: Better post-generation navigation and user guidance
-
-### v0.14.0: Portrait Toggle & Generation Logic (COMPLETED) ✓
-
-• **Portrait Toggle Option**: Users can enable/disable portrait generation during character creation
-• **Random Generation Rewrite**: Improved random character generation logic and state management
-• **Updated Usage Limits**: Adjusted monthly limits for better balance across model tiers
-• **Single-Column Layout**: Better layout when portraits are not generated
-
-### Earlier Versions (v0.1.0 - v0.13.2)
+### Earlier Versions (v0.1.0 - v0.16.0)
 
 • **Core Character Generation**: AI-powered wizard with multiple models and comprehensive character creation
 • **Character Library System**: IndexedDB storage with import/export functionality and advanced search
@@ -83,7 +73,7 @@ The current version includes comprehensive character creation wizard, interactiv
 
 ## Future Development
 
-### Next Priority: Advanced Character Relationships (v0.22.0)
+### Next Priority: Advanced Character Relationships (v0.23.0)
 
 **Character Relationship Systems**:
 • Character connection graphs and relationship webs
@@ -98,7 +88,7 @@ The current version includes comprehensive character creation wizard, interactiv
 • Personality evolution over time based on interactions
 • Advanced memory systems for long-term character development
 
-### Planned: User Accounts & Cloud Features (v0.23.0)
+### Planned: User Accounts & Cloud Features (v0.24.0)
 
 **Optional Account System**:
 • User registration and authentication
@@ -112,7 +102,7 @@ The current version includes comprehensive character creation wizard, interactiv
 • Character rating and commenting system
 • Follow favorite character creators
 
-### Future Considerations: Game Integration (v0.24.0+)
+### Future Considerations: Game Integration (v0.25.0+)
 
 **API and Integration Tools**:
 • RESTful API for accessing characters

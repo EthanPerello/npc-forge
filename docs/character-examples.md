@@ -1,6 +1,6 @@
 # Character Examples
 
-This page showcases examples of NPCs created with NPC Forge, demonstrating different genre capabilities, customization options, and the new portrait editing and trait management features.
+This page showcases examples of NPCs created with NPC Forge, demonstrating different genre capabilities, customization options, and the portrait editing and trait management features.
 
 ## Fantasy Characters
 
@@ -92,7 +92,7 @@ These characters were created using NPC Forge's wizard interface:
 1. **Concept Step**: Genre and description were selected/written
 2. **Options Step**: Basic traits and advanced options were set
 3. **Model Step**: Different model tiers were chosen based on character importance
-4. **Generate Step**: Characters were generated and saved to the library
+4. **Generate Step**: Characters were generated and saved to the library with enhanced visual feedback (v0.22.0)
 5. **Post-Creation Enhancement**: Characters were edited using portrait editing and trait management features
 
 ### Model Selection Strategy
@@ -103,7 +103,7 @@ These characters were created using NPC Forge's wizard interface:
 
 ### Character Editing and Enhancement
 
-All examples showcase the new editing capabilities:
+All examples showcase the editing capabilities:
 
 • **Elarion** had personality regenerated for scholarly depth, portrait edited for magical elements, AI-generated traits added for mystical knowledge
 • **Kira-7** had appearance enhanced through regeneration, portrait edited for cybernetic enhancements, traits generated for technological aspects
@@ -150,13 +150,37 @@ Each character offers unique conversation experiences:
 • **Kira-7** engages with suspicious, sarcastic responses reflecting their AI nature and technological traits
 • **Detective Miles** offers investigative insights with dry humor and street wisdom, drawing from his professional experience traits
 
+## Enhanced User Experience (v0.22.0)
+
+### Visual Feedback Improvements
+
+These examples demonstrate enhanced user experience features:
+
+• **Enhanced Loading States**: Character regeneration operations show clear visual indicators
+• **Consistent Iconography**: Rotating circle (RotateCcw) icons for all regeneration buttons
+• **Real-Time Updates**: Immediate feedback for all character operations
+• **Better Error Handling**: Enhanced fallback logic for quest regeneration and other operations
+
+### Navigation Enhancements
+
+• **Dynamic Button Transitions**: "Save to Library" → "View Library" transitions for better user flow
+• **Integrated Chat Access**: Enhanced sidebar navigation includes direct chat links
+• **Improved Organization**: Cleaner layout and better visual hierarchy
+
+### Trait Management Enhancements
+
+• **Proper Capitalization**: All trait categories display with consistent Title Case formatting
+• **Enhanced Display Logic**: Additional traits section shows all traits with proper formatting
+• **Better Filtering**: Excludes unsupported traits from filter dropdowns
+• **Consistent Formatting**: Standardized trait display between modal and edit page
+
 ## Using These Examples
 
 ### Study the Structure
 
 These examples demonstrate:
 
-• How character data is organized including new trait systems
+• How character data is organized including trait systems
 • The relationship between input traits and generated content
 • Different approaches to character descriptions
 • How portraits enhance character identity
@@ -286,7 +310,7 @@ These examples demonstrate:
 
 1. **Generate Base Character**: Create initial version with Standard models
 2. **Identify Key Elements**: Determine which aspects are most important
-3. **Selective Enhancement**: Regenerate critical elements with higher-tier models
+3. **Selective Enhancement**: Regenerate critical elements with higher-tier models with enhanced visual feedback (v0.22.0)
 4. **Portrait Refinement**: Use portrait editing to add visual details that enhance character identity
 5. **Trait Expansion**: Use AI trait generation to add depth and roleplay hooks
 6. **Chat Testing**: Verify personality consistency through conversations
@@ -331,6 +355,6 @@ Use the library and chat system to track character development:
 • [How to Use NPC Forge](/docs/how-to-use) - Complete wizard guide including portrait editing and trait management
 • [Chat with Characters](/docs/chat) - Interactive conversation guide
 • [Generation Options](/docs/generation-options) - Detailed customization options including portrait editing
-• [Character Library](/docs/library) - Managing and editing characters including trait management
+• [Character Library Guide](/docs/library) - Managing and editing characters including trait management
 • [Model Selection Guide](/docs/models) - Understanding model tiers including editing capabilities
 • [Features Overview](/docs/features) - Complete feature list including latest additions

@@ -59,7 +59,7 @@ Each type offers three tiers with different quality levels and monthly usage lim
 • **Best For**: Showcase-quality character art, characters requiring portrait editing
 • **Portrait Editing**: Full editing support with best results
 
-## Portrait Editing Capabilities (NEW in v0.21.0)
+## Portrait Editing Capabilities
 
 ### Model Support for Portrait Editing
 
@@ -133,7 +133,7 @@ When chatting with characters, the **text models** are used to generate response
 • Highest quality character voice and personality consistency
 • Most sophisticated understanding of character relationships and background
 
-## Trait Generation Integration (NEW in v0.21.0)
+## Trait Generation Integration
 
 ### Text Models for Trait Generation
 

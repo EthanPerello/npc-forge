@@ -18,7 +18,7 @@ NPC Forge offers comprehensive tools for creating detailed non-player characters
 ### AI-Powered Portrait Editing
 
 • **Text-Based Editing**: Edit character portraits using natural language prompts
-• **Multiple Model Support**: Portrait editing available with gpt-image-1 (Premium tier)
+• **Model Support**: Portrait editing available with gpt-image-1 (Premium tier recommended)
 • **Smart Edit Validation**: Automatic validation of edit prompts and model compatibility
 • **Seamless Integration**: Edit portraits directly from character edit pages
 • **Enhanced Image Processing**: Optimized handling for various image formats and sizes
@@ -86,6 +86,27 @@ NPC Forge offers comprehensive tools for creating detailed non-player characters
 • **Item Generation**: Unique items with descriptions, properties, and lore
 • **Relationship Mapping**: Character connections and social dynamics
 • **Backstory Creation**: Detailed character histories and motivations
+
+## Enhanced User Experience (v0.22.0)
+
+### Improved Visual Feedback
+
+• **Visual Loading Indicators**: Loading states for all regeneration operations across edit page sections
+• **Enhanced Button Transitions**: "Save to Library" → "View Library" dynamic button transitions
+• **Consistent Icon Design**: Rotating circle (RotateCcw) icons for all regeneration buttons
+• **Real-Time Status Updates**: Immediate feedback for all character operations
+
+### Enhanced Navigation
+
+• **Streamlined Sidebar**: Integrated "Chat with Characters" link in main navigation
+• **Improved Documentation**: Enhanced breadcrumb navigation for developer documentation
+• **Better Organization**: Cleaner layout and improved user flow throughout the application
+
+### Developer Experience Improvements
+
+• **Developer Documentation**: Dedicated developer documentation section with comprehensive guides
+• **Enhanced Documentation System**: Improved organization and navigation for technical documentation
+• **Better Error Handling**: Enhanced fallback logic for quest regeneration and other operations
 
 ## Technical Features
 

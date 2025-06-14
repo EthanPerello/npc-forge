@@ -67,7 +67,7 @@ Generates a new character based on provided parameters.
 
 ### `POST /api/regenerate`
 
-Regenerates specific character attributes or elements, including new trait generation capabilities.
+Regenerates specific character attributes or elements, including trait generation capabilities.
 
 #### Request Body
 
@@ -96,7 +96,7 @@ Regenerates specific character attributes or elements, including new trait gener
 - `dialogue_[index]`: Individual dialogue lines
 - `item_[index]`: Individual items
 
-**Trait Generation (NEW in v0.21.0):**
+**Trait Generation:**
 - `additional_traits`: Generate multiple new traits
 - `add_single_trait`: Generate one new trait
 - `regenerate_trait_[traitKey]`: Regenerate a specific trait
@@ -124,7 +124,7 @@ Regenerates specific character attributes or elements, including new trait gener
 }
 ```
 
-### `POST /api/edit-portrait` (NEW in v0.21.0)
+### `POST /api/edit-portrait`
 
 Edits existing character portraits using AI-powered image editing with text prompts.
 
@@ -296,7 +296,7 @@ Proxies external image URLs for CORS compatibility.
 }
 ```
 
-## Enhanced API Reliability (v0.20.1)
+## Enhanced API Reliability
 
 ### JSON Parsing Improvements
 
@@ -363,7 +363,7 @@ Enhanced error handling with specific user-friendly messages:
 4. **Portrait Generation**: Create character portrait if requested
 5. **Response Formatting**: Return structured character data
 
-## Portrait Editing Flow (NEW in v0.21.0)
+## Portrait Editing Flow
 
 1. **Validation**: Verify character has existing portrait and edit prompt is valid
 2. **Model Check**: Ensure selected model supports editing (gpt-image-1 recommended)
@@ -383,7 +383,7 @@ Enhanced error handling with specific user-friendly messages:
 6. **Storage**: Save messages to IndexedDB
 7. **Usage Tracking**: Increment usage count after successful response
 
-## Trait Generation Features (NEW in v0.21.0)
+## Trait Generation Features
 
 ### Additional Traits Generation
 

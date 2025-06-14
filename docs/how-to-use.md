@@ -1,6 +1,6 @@
 # How to Use NPC Forge
 
-NPC Forge is an AI-powered character generator featuring a step-by-step wizard interface for creating detailed NPCs. This guide covers the wizard-based creation process, character library management, interactive chat features, and the new portrait editing and trait management capabilities.
+NPC Forge is an AI-powered character generator featuring a step-by-step wizard interface for creating detailed NPCs. This guide covers the wizard-based creation process, character library management, interactive chat features, and the portrait editing and trait management capabilities.
 
 ## Quick Start Guide
 
@@ -68,8 +68,9 @@ A scarred elven ranger who protects a sacred forest, harboring a secret connecti
 **Create your character:**
 
 • Click **Generate Character** to start the AI generation process
-• Watch the progress as your character is created
+• Watch the progress with enhanced visual loading indicators (NEW in v0.22.0)
 • Review the complete character profile with tabs for different sections
+• Use the **Save to Library** button which now transitions to **View Library** for better navigation (NEW in v0.22.0)
 
 > **Quick Generation**: Click **Generate Random Character** from any step to create a character with default settings instantly.
 
@@ -77,7 +78,7 @@ A scarred elven ranger who protects a sacred forest, harboring a secret connecti
 
 ### Saving Characters
 
-After generating a character, use the **Save to Library** button to add it to your collection.
+After generating a character, use the **Save to Library** button to add it to your collection. The button now dynamically transitions to **View Library** for easier navigation (NEW in v0.22.0).
 
 ### Managing Your Library
 
@@ -120,7 +121,7 @@ Use trait-specific searches:
 
 • Modify all character attributes
 • Add or remove quests, dialogue lines, and items
-• Regenerate specific character elements
+• Regenerate specific character elements with enhanced visual feedback (NEW in v0.22.0)
 • Upload, regenerate, or edit portraits with text prompts
 • Generate and manage additional character traits
 • Choose different AI models for regeneration
@@ -133,7 +134,7 @@ Use trait-specific searches:
 
 1. **From Character Cards**: Click the **Chat** button on any character card
 2. **From Library Modal**: Open character details and click **Start Chat**
-3. **Direct Navigation**: Go to `/chat/[characterId]` for any saved character
+3. **Direct Navigation**: Use the enhanced navigation in the sidebar (NEW in v0.22.0)
 
 ### Chat Interface Features
 
@@ -183,7 +184,7 @@ Use trait-specific searches:
 • Maximum 100 messages per session (automatically trimmed)
 • Retry failed messages with error handling
 
-## Portrait Editing (NEW in v0.21.0)
+## Portrait Editing
 
 ### Accessing Portrait Editing
 
@@ -200,7 +201,7 @@ Portrait editing is available in the character edit interface:
 
 • **Edit Prompt Field**: Text area for describing desired changes
 • **Character Counter**: Shows remaining characters (max varies by model)
-• **Model Compatibility**: Warning shown for unsupported models
+• **Model Compatibility**: Warning shown for unsupported models - only gpt-image-1 fully supports editing (NEW in v0.22.0)
 • **Edit Button**: Starts the editing process
 • **Cancel Option**: Returns to normal portrait view
 
@@ -243,7 +244,7 @@ Portrait editing is available in the character edit interface:
 6. **Review Results**: New portrait appears when editing completes
 7. **Save Changes**: Use "Save Changes" to persist the edited portrait
 
-## Advanced Trait Management (NEW in v0.21.0)
+## Advanced Trait Management
 
 ### Additional Traits Section
 
@@ -252,7 +253,7 @@ The Additional Traits section in character editing provides comprehensive trait 
 **Viewing Traits:**
 
 • All additional character traits displayed with editable keys and values
-• Traits shown in Title Case format for consistency
+• Traits shown in Title Case format for consistency with proper capitalization (NEW in v0.22.0)
 • Category-based organization when available
 • Empty state shown when no additional traits exist
 
@@ -266,7 +267,7 @@ The Additional Traits section in character editing provides comprehensive trait 
 
 • **Edit Trait Names**: Click trait name field to modify
 • **Edit Trait Values**: Click trait value field to modify
-• **Regenerate Individual Traits**: Use regenerate button for each trait
+• **Regenerate Individual Traits**: Use regenerate button for each trait with enhanced visual feedback (NEW in v0.22.0)
 • **Remove Traits**: Use delete button to remove unwanted traits
 
 ### Trait Generation Features
@@ -280,7 +281,7 @@ The Additional Traits section in character editing provides comprehensive trait 
 
 **Individual Trait Regeneration:**
 
-• Each trait has its own regenerate button
+• Each trait has its own regenerate button with consistent rotating circle icons (NEW in v0.22.0)
 • Regeneration maintains trait context and character consistency
 • Loading states show progress during regeneration
 • Error handling for failed regeneration attempts
@@ -291,6 +292,27 @@ The Additional Traits section in character editing provides comprehensive trait 
 • Long or sentence-like traits excluded from filter dropdowns
 • Consistent Title Case formatting throughout interface
 • Smart categorization when trait categories are recognizable
+
+## Enhanced User Experience (v0.22.0)
+
+### Improved Visual Feedback
+
+• **Visual Loading Indicators**: All regeneration operations now show clear loading states across all edit page sections
+• **Enhanced Button Transitions**: "Save to Library" → "View Library" dynamic transitions in character generation
+• **Consistent Icon Design**: Rotating circle (RotateCcw) icons for all regeneration buttons
+• **Real-Time Status Updates**: Immediate feedback for all character operations
+
+### Enhanced Navigation
+
+• **Streamlined Sidebar**: Integrated "Chat with Characters" link in main navigation
+• **Developer Documentation**: New dedicated developer documentation section with comprehensive guides
+• **Better Organization**: Cleaner layout and improved user flow throughout the application
+
+### Portrait Editing Improvements
+
+• **Clear Model Messaging**: Enhanced messaging clarifying that only gpt-image-1 supports full editing capabilities
+• **Model Compatibility Warnings**: Better warnings for DALL·E 2 (limited) and DALL·E 3 (not supported)
+• **Improved Error Handling**: Better feedback for portrait editing failures
 
 ## Advanced Features
 
@@ -306,12 +328,13 @@ The Additional Traits section in character editing provides comprehensive trait 
 • Item descriptions
 • Individual character traits
 
-**How to regenerate:**
+**Enhanced Visual Feedback (NEW in v0.22.0):**
 
 1. Open character in edit mode
-2. Click the regenerate icon next to any element
-3. Choose your preferred model (if applicable)
-4. Wait for the new content to generate
+2. Click the regenerate icon next to any element (now with consistent rotating circle icons)
+3. Watch enhanced loading indicators showing regeneration progress
+4. Choose your preferred model (if applicable)
+5. Wait for the new content to generate with real-time feedback
 
 ### Model Selection Tips
 
@@ -328,7 +351,7 @@ The Additional Traits section in character editing provides comprehensive trait 
 1. Click **Generate Random Character** from any step
 2. Review the generated character
 3. Make minor edits if needed
-4. Save to library
+4. Save to library (now with enhanced "View Library" transition)
 5. Start chatting with your new character
 
 ### Detailed Character Creation
@@ -336,7 +359,7 @@ The Additional Traits section in character editing provides comprehensive trait 
 1. Start with Concept step and write a detailed description
 2. Set specific traits in Options step
 3. Choose appropriate model tier in Model step
-4. Generate and review in Generate step
+4. Generate and review in Generate step with enhanced visual feedback
 5. Edit and regenerate elements as needed
 6. Begin conversations to develop the character further
 
@@ -355,7 +378,7 @@ The Additional Traits section in character editing provides comprehensive trait 
 1. Generate character with basic portrait
 2. Save to library and review portrait quality
 3. Open character in edit mode
-4. Use "Edit Portrait" to refine appearance with text prompts
+4. Use "Edit Portrait" to refine appearance with text prompts (gpt-image-1 recommended)
 5. Try different edit prompts for various improvements
 6. Save changes when satisfied with results
 
@@ -365,7 +388,7 @@ The Additional Traits section in character editing provides comprehensive trait 
 2. Review generated traits in edit mode
 3. Add custom traits relevant to your story
 4. Use "Add Generated Trait" for AI suggestions
-5. Regenerate individual traits that need improvement
+5. Regenerate individual traits that need improvement with enhanced visual feedback
 6. Organize traits for better character presentation
 
 ### Organizing Your Collection
@@ -387,8 +410,8 @@ The Additional Traits section in character editing provides comprehensive trait 
 ### Portrait Editing Issues
 
 • **Edit button disabled**: Ensure character has existing portrait and compatible model selected
-• **Editing failed**: Try simpler edit prompts or different model
-• **Poor results**: gpt-image-1 provides best editing quality
+• **Editing failed**: Try simpler edit prompts or use gpt-image-1 model
+• **Poor results**: gpt-image-1 provides best editing quality; DALL·E 2 has limited capabilities, DALL·E 3 doesn't support editing
 
 ### Library Issues
 
@@ -408,17 +431,10 @@ The Additional Traits section in character editing provides comprehensive trait 
 • **Regeneration failed**: Try different prompts or check usage limits
 • **Filter issues**: Traits only appear in filters after characters with those traits are saved
 
-### Filtering Issues
+### Visual Feedback Issues (NEW)
 
-• **Traits not appearing in filters**: Traits only appear after characters with those traits are saved
-• **Search not working**: Check syntax for trait-specific searches (`category: value`)
-• **Inconsistent results**: Check for variations in trait spelling
-
-### Usage Limits
-
-• **Reached monthly limit**: Wait for the monthly reset or use Standard tier
-• **Unexpected limit reached**: Check which models you're using and their individual limits
-• **Chat and editing usage**: Remember that chat responses and portrait editing count against model limits
+• **Loading indicators not appearing**: Refresh the page if visual feedback isn't working
+• **Button transitions not working**: Ensure JavaScript is enabled in your browser
 
 ## Tips for Best Results
 
@@ -441,6 +457,7 @@ The Additional Traits section in character editing provides comprehensive trait 
 • Use themed backgrounds for context
 • For editing, be specific about desired changes
 • Test different edit prompts for best results
+• Use gpt-image-1 for reliable editing results
 
 ### Chat Conversations
 
@@ -456,6 +473,7 @@ The Additional Traits section in character editing provides comprehensive trait 
 • Generate traits that complement existing character elements
 • Regularly review and update traits as characters develop
 • Use trait regeneration to improve existing traits
+• Take advantage of enhanced visual feedback to track regeneration progress
 
 ### Library Organization
 
