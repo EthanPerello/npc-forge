@@ -4,7 +4,7 @@ This document outlines the security measures implemented in NPC Forge to protect
 
 ## Overview
 
-NPC Forge is designed with security in mind as a client-side application that interacts with the OpenAI API. It focuses on secure API communication, input validation, content moderation, and includes new security measures for portrait editing and trait management features.
+NPC Forge is designed with security in mind as a client-side application built with Next.js 15 that interacts with the OpenAI API. It focuses on secure API communication, input validation, content moderation, and includes security measures for portrait editing and trait management features.
 
 ## Key Security Measures
 
@@ -13,11 +13,12 @@ NPC Forge is designed with security in mind as a client-side application that in
 **Server-Side API Calls**
 • All OpenAI API calls are made server-side via Next.js API routes
 • API keys are never exposed to the client
-• Environment variables store sensitive credentials
+• Environment variables store sensitive credentials securely
 • Portrait editing API calls handled securely server-side
 
-**Rate Limiting**
-• Usage limits help prevent abuse through client-side tracking
+**Free Service Security**
+• Application provides free access to AI capabilities without requiring user credentials
+• Usage limits prevent abuse while maintaining fair access
 • Monthly limits per model tier: 50/30/10 text, 10/5/3 images
 • Chat conversations count against text model limits
 • Portrait editing counts against image model limits
@@ -70,7 +71,7 @@ NPC Forge is designed with security in mind as a client-side application that in
 • If trait generation fails, existing traits are maintained
 • Error messages provide context without revealing sensitive details
 
-### Portrait Editing Security (NEW in v0.21.0)
+### Portrait Editing Security (v0.21.0)
 
 **Image Processing Security**
 • Portrait editing requests are validated for image format and size
@@ -80,7 +81,7 @@ NPC Forge is designed with security in mind as a client-side application that in
 
 **Edit Prompt Security**
 • Edit prompts are sanitized and validated before processing
-• Prompt length limits enforced per model (32,000 for gpt-image-1, 1,000 for others)
+• Prompt length limits enforced per model (32,000 for gpt-image-1)
 • Content filtering applied to edit prompts
 • Malicious prompt detection and blocking
 
@@ -94,7 +95,7 @@ NPC Forge is designed with security in mind as a client-side application that in
 • Limits are verified before processing expensive operations
 • Rate limiting prevents abuse of editing features
 
-### Trait Management Security (NEW in v0.21.0)
+### Trait Management Security (v0.21.0)
 
 **Trait Generation Security**
 • AI-generated traits are subject to content filtering
@@ -202,7 +203,7 @@ NPC Forge is designed with security in mind as a client-side application that in
 
 ### Denial of Service
 
-**Vulnerability**: Excessive API calls could lead to rate limiting or increased costs.
+**Vulnerability**: Excessive API calls could lead to service degradation.
 
 **Mitigation**:
 • Client-side usage limits per model tier
@@ -256,7 +257,6 @@ NPC Forge is designed with security in mind as a client-side application that in
 
 • Premium models require explicit selection
 • Usage warnings before high-tier model use
-• No unauthorized access to model APIs
 • Model compatibility validation for editing features
 
 ## Security Contact
@@ -283,13 +283,6 @@ If you discover a security vulnerability in NPC Forge, please report it by email
 • Avoid sharing edit prompts that might contain sensitive information
 • Be aware that portrait editing counts against usage limits
 • Report any concerning AI-generated content
-
-### API Key Security (Developers)
-
-• Never commit `.env.local` files to version control
-• Use environment-specific API keys
-• Monitor API usage for unexpected patterns
-• Rotate API keys periodically
 
 ### Browser Security
 

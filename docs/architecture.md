@@ -1,451 +1,417 @@
 # Architecture Overview
 
-This document provides an overview of NPC Forge's architecture and key components.
+This document provides a comprehensive overview of NPC Forge's system architecture, technical components, and design decisions for developers and contributors.
 
-## System Architecture
+## System Architecture Overview
 
-NPC Forge is a Next.js 14 application with a React frontend and serverless API endpoints. It communicates with the OpenAI API for character and portrait generation, chat conversations, and portrait editing, with local character storage using IndexedDB. The interactive chat system enables real-time character conversations, and the portrait editing system allows AI-powered image modifications.
+NPC Forge is built as a modern web application using Next.js 15 with a client-side focus and serverless backend integration:
 
-### Key Components
+• **Frontend Architecture**: React-based client application with local data storage
+• **Backend Architecture**: Next.js API routes providing serverless functions
+• **AI Integration**: Server-side OpenAI API communication for security and performance
+• **Data Storage**: Client-side IndexedDB for privacy and offline capability
+• **Deployment Model**: Static generation with serverless function deployment
 
-**Frontend (Client-Side)**
-• React wizard interface for character creation
-• Character library management with IndexedDB
-• Interactive chat system with character conversations
-• AI-powered portrait editing interface
-• Advanced trait management system
-• State management with React Context
-• Character editing and regeneration
-• Local storage for usage tracking
-
-**Backend (Serverless Functions)**
-• Next.js API routes for OpenAI integration
-• Character generation and regeneration endpoints
-• Chat API with character-aware responses
-• Portrait editing API with image modification capabilities
-• Trait generation and management endpoints
-• Model selection and usage tracking
-• Input validation and error handling
-
-**Local Storage**
-• IndexedDB for character library storage
-• IndexedDB for chat conversation storage
-• Portrait storage with compression
-• Usage limit tracking per model
-• User preferences
-
-**External Services**
-• OpenAI API for text and image generation
-• OpenAI API for chat conversations
-• OpenAI Images API for portrait editing
-• Vercel for hosting and deployment
-
-## Project Structure
+### High-Level Architecture Diagram
 
 ```
-npc-forge/
-├── src/
-│   ├── app/                     # Next.js App Router
-│   │   ├── api/                 # API routes
-│   │   │   ├── chat/            # Character conversation endpoint
-│   │   │   ├── edit-portrait/   # Portrait editing endpoint
-│   │   │   ├── generate/        # Character generation endpoint
-│   │   │   ├── regenerate/      # Character regeneration endpoint
-│   │   │   └── proxy-image/     # Image proxy endpoint
-│   │   ├── chat/                # Chat interface pages
-│   │   │   └── [characterId]/   # Dynamic chat page
-│   │   ├── docs/                # Documentation pages
-│   │   ├── library/             # Character library pages
-│   │   └── page.tsx             # Homepage with wizard
-│   ├── components/              # UI components
-│   │   ├── character-wizard.tsx # Main wizard component
-│   │   ├── edit-page/           # Character editing components
-│   │   │   ├── portrait-section.tsx # Portrait editing interface
-│   │   │   └── additional-traits-section.tsx # Trait management
-│   │   ├── tabs/                # Tab-based components
-│   │   ├── ui/                  # Reusable UI components
-│   │   └── wizard-steps/        # Individual wizard steps
-│   ├── contexts/                # React contexts
-│   │   ├── character-context.tsx # Character state management
-│   │   ├── chat-context.tsx    # Chat state management
-│   │   └── theme-context.tsx    # Theme/dark mode state
-│   └── lib/                     # Utilities and core logic
-│       ├── character-storage.ts # IndexedDB character operations
-│       ├── chat-storage.ts     # IndexedDB chat operations
-│       ├── chat-types.ts       # Chat type definitions
-│       ├── models.ts           # Model configuration
-│       ├── openai.ts           # OpenAI API integration
-│       └── types.ts            # TypeScript definitions
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│                 │    │                  │    │                 │
+│   React Client  │◄──►│  Next.js API     │◄──►│   OpenAI API    │
+│                 │    │  Routes          │    │                 │
+│                 │    │                  │    │                 │
+└─────────┬───────┘    └──────────────────┘    └─────────────────┘
+          │
+          ▼
+┌─────────────────┐
+│                 │
+│   IndexedDB     │
+│   Local Storage │
+│                 │
+└─────────────────┘
 ```
 
 ## Frontend Architecture
 
-### Wizard-Based Interface
+### React Application Structure
 
-The character creation wizard consists of four main steps:
+**Component Hierarchy**:
+```
+App (layout.tsx)
+├── Character Wizard (character-wizard.tsx)
+│   ├── Concept Step (concept-step.tsx)
+│   ├── Options Step (options-step.tsx)
+│   ├── Model Step (model-step.tsx)
+│   └── Results Step (results-step.tsx)
+├── Character Library (library/page.tsx)
+│   ├── Character Cards (character-card.tsx)
+│   ├── Filter Panel (filter-panel.tsx)
+│   └── Character Modal (character-viewer-modal.tsx)
+├── Character Edit (library/edit/[id]/page.tsx)
+│   ├── Portrait Section (portrait-section.tsx)
+│   ├── Traits Section (additional-traits-section.tsx)
+│   ├── Quests Section (quests-section.tsx)
+│   └── Other Edit Sections
+├── Chat Interface (chat/[characterId]/page.tsx)
+└── Documentation (docs/*)
+```
 
-1. **Concept Step**: Genre selection and description input
-2. **Options Step**: Character traits and customization
-3. **Model Step**: AI model selection for text and images
-4. **Generate Step**: Character generation and results
+**State Management Architecture**:
+• **React Context**: Global state for character data, chat sessions, and theme
+• **Local Component State**: Form inputs, UI state, temporary data
+• **Persistent Storage**: IndexedDB for character library and conversation history
+• **URL State**: Navigation state and deep linking support
 
-### Chat System Architecture
+### Key React Contexts
 
-#### Chat Interface Components
+**CharacterContext**:
+```typescript
+interface CharacterContextType {
+  currentCharacter: Character | null;
+  setCurrentCharacter: (character: Character) => void;
+  savedCharacters: Character[];
+  saveCharacter: (character: Character) => Promise<void>;
+  deleteCharacter: (id: string) => Promise<void>;
+  updateCharacter: (id: string, updates: Partial<Character>) => Promise<void>;
+}
+```
 
-• **Chat Page**: `/chat/[characterId]` - Main conversation interface
-• **Chat Context**: React context for chat state management
-• **Chat Storage**: IndexedDB integration for conversation persistence
-• **Chat API**: Server-side conversation handling
+**ChatContext**:
+```typescript
+interface ChatContextType {
+  conversations: Record<string, ChatMessage[]>;
+  sendMessage: (characterId: string, message: string, model: string) => Promise<void>;
+  clearConversation: (characterId: string) => void;
+  getConversation: (characterId: string) => ChatMessage[];
+}
+```
 
-#### Chat Data Flow
+**ThemeContext**:
+```typescript
+interface ThemeContextType {
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
+  systemPreference: 'light' | 'dark';
+}
+```
 
-1. **Session Initialization**: Load character and get/create chat session
-2. **Message Composition**: User types message with validation
-3. **API Request**: Send message to `/api/chat` with character context
-4. **AI Processing**: OpenAI generates character-aware response
-5. **Response Storage**: Save conversation to IndexedDB
-6. **UI Update**: Display response with proper formatting
+### Component Design Patterns
 
-### Portrait Editing System
+**Wizard Pattern**:
+• Step-based navigation with progress tracking
+• State preservation across navigation
+• Validation at each step boundary
+• Flexible navigation allowing step jumping
 
-#### Portrait Editing Components
+**Modal Pattern**:
+• Character detail viewing with overlay interface
+• Action buttons for character operations
+• Responsive design for mobile and desktop
+• Keyboard navigation and accessibility support
 
-• **Portrait Section**: Enhanced portrait management interface in character edit page
-• **Edit Interface**: Text prompt input with model compatibility checking
-• **Edit API Integration**: Client-side calls to `/api/edit-portrait` endpoint
-• **Model Validation**: Ensures compatible models are selected for editing
-
-#### Portrait Editing Data Flow
-
-1. **Edit Initiation**: User clicks "Edit Portrait" button in character edit interface
-2. **Validation**: Check character has existing portrait and compatible model selected
-3. **Prompt Input**: User enters text description of desired changes
-4. **API Request**: Send character data and edit prompt to `/api/edit-portrait`
-5. **Image Processing**: OpenAI processes image editing request
-6. **Result Display**: Updated portrait appears in character interface
-7. **Save Integration**: Edited portrait saved with character data
-
-### Advanced Trait Management
-
-#### Trait Management Components
-
-• **Additional Traits Section**: Comprehensive trait editing interface
-• **Trait Generation**: AI-powered trait creation with individual controls
-• **Trait Display**: Standardized formatting and organization
-• **Trait Regeneration**: Individual trait regeneration with dedicated buttons
-
-#### Trait Management Data Flow
-
-1. **Trait Display**: Load and display existing character traits
-2. **Trait Addition**: User adds custom traits or requests AI generation
-3. **API Integration**: Generate new traits via `/api/regenerate` endpoint
-4. **Trait Editing**: User modifies trait names and values
-5. **Trait Regeneration**: Individual traits regenerated with AI assistance
-6. **Trait Organization**: Smart filtering and formatting for display
-
-### Character Library System
-
-#### Storage Architecture
-
-The library uses IndexedDB for local storage:
-• Character data with trait indexing
-• Compressed portrait images
-• Chat conversation sessions per character
-• Search indices and trait categories
-• Automatic trait discovery for filtering
-
-#### Enhanced Filtering
-
-• Comprehensive trait filtering with dropdown filters
-• Automatic filter generation from character data
-• Smart search with "category: value" syntax
-• Organized filter panel with collapsible sections
-
-### Character Editing System
-
-The edit system provides character modification:
-• Individual attribute regeneration
-• Portrait management, regeneration, and editing
-• Advanced trait management with AI assistance
-• Quest, dialogue, and item editing
-• Model selection for regeneration
+**Edit Pattern**:
+• In-place editing with validation
+• Regeneration controls with loading states
+• Unsaved changes detection and warnings
+• Model selection for quality control
 
 ## Backend Architecture
 
-### API Endpoints
+### Next.js API Routes
 
-#### Character Generation (`/api/generate`)
+**API Route Structure**:
+```
+/api
+├── /generate (POST)          # Character generation
+├── /regenerate (POST)        # Character element regeneration
+├── /chat (POST)              # Chat message processing
+├── /edit-portrait (POST)     # Portrait editing
+└── /proxy-image (GET)        # Image proxy for CORS
+```
 
-Handles character creation requests with:
-• Input validation and sanitization
-• Model selection and API calls to OpenAI
-• Character data processing and formatting
-• Portrait generation with selected image models
+**Serverless Function Design**:
+• **Stateless Functions**: No server-side session management
+• **Environment Isolation**: Secure API key handling
+• **Error Handling**: Comprehensive error categorization and logging
+• **Performance Optimization**: Efficient OpenAI API integration
 
-#### Character Regeneration (`/api/regenerate`)
+### OpenAI API Integration
 
-Supports selective character updates including:
-• Individual attribute regeneration
-• Component-level regeneration (quests, dialogue, items)
-• Trait generation and regeneration
-• Model switching for regeneration
-• Maintaining character data consistency
+**Model Integration Architecture**:
+```typescript
+interface ModelConfiguration {
+  textModels: {
+    standard: 'gpt-4o-mini';
+    enhanced: 'gpt-4.1-mini';
+    premium: 'gpt-4o';
+  };
+  imageModels: {
+    standard: 'dall-e-2';
+    enhanced: 'dall-e-3';
+    premium: 'gpt-image-1';
+  };
+}
+```
 
-#### Portrait Editing (`/api/edit-portrait`)
+**Request Processing Flow**:
+1. **Input Validation**: Sanitize and validate all user inputs
+2. **Usage Verification**: Check monthly limits and model availability
+3. **Prompt Construction**: Build model-specific prompts with character context
+4. **AI Processing**: Send requests to OpenAI with error handling and retries
+5. **Response Processing**: Parse and validate AI responses
+6. **Data Formatting**: Structure response data for client consumption
 
-Handles AI-powered portrait modifications with:
-• Image editing via OpenAI's `/v1/images/edits` endpoint
-• Text prompt processing and validation
-• Model compatibility checking (gpt-image-1 recommended)
-• Image size and format validation
-• Usage limit integration with image models
+**Security Measures**:
+• **API Key Protection**: Server-side storage with environment variable isolation
+• **Input Sanitization**: Comprehensive cleaning of user inputs
+• **Content Filtering**: OpenAI moderation integration
+• **Rate Limiting**: Usage tracking and enforcement
 
-#### Chat API (`/api/chat`)
-
-Handles character conversations with:
-• Character context system prompts
-• Dynamic response length adjustment
-• Recent conversation history management
-• Usage limit integration
-• Error handling with automatic retry logic
-
-### Portrait Editing System Architecture
-
-#### API Implementation
-
-• **Endpoint**: `/api/edit-portrait` handles all portrait editing requests
-• **Model Support**: Validates compatible models (gpt-image-1 recommended)
-• **Image Processing**: Converts character portrait data for OpenAI API
-• **Prompt Validation**: Ensures edit prompts meet model requirements
-• **Error Handling**: Comprehensive error categorization and user feedback
-
-#### Image Processing Pipeline
-
-1. **Input Validation**: Verify character has existing portrait and valid edit prompt
-2. **Model Compatibility**: Check selected model supports editing operations
-3. **Usage Verification**: Ensure monthly limits haven't been exceeded
-4. **Image Conversion**: Convert portrait data to format required by OpenAI API
-5. **API Request**: Send editing request to OpenAI with character portrait and prompt
-6. **Response Processing**: Handle edited image data and update character
-7. **Usage Tracking**: Increment usage count for successful edits
-
-#### Error Handling
-
-• **Model Compatibility**: Clear warnings for unsupported models
-• **Usage Limits**: Integration with existing usage tracking system
-• **Network Issues**: Retry logic for temporary connectivity problems
-• **Validation Errors**: Specific feedback for prompt and image issues
-
-### Trait Management System Architecture
-
-#### API Integration
-
-• **Regeneration Endpoint**: Enhanced `/api/regenerate` supports trait operations
-• **Trait Generation**: New `add_single_trait` and `additional_traits` operations
-• **Individual Regeneration**: Supports `regenerate_trait_[key]` operations
-• **Validation**: Ensures generated traits meet formatting requirements
-
-#### Trait Processing Pipeline
-
-1. **Trait Request**: User requests new trait generation or regeneration
-2. **Context Preparation**: Include character data for appropriate trait generation
-3. **AI Generation**: Call OpenAI with trait-specific prompts
-4. **Validation**: Ensure generated traits meet length and format requirements
-5. **Integration**: Add traits to character data with proper formatting
-6. **Display**: Update UI with new traits in standardized format
-
-### Chat System Architecture
-
-#### System Prompt Generation
-
-• Combines character name, appearance, personality, backstory
-• Includes selected and generated character traits
-• Maintains character consistency instructions
-• Filters out technical metadata
-
-#### Response Length Management
-
-• **Simple greetings** (< 20 chars): 150 tokens
-• **Medium questions** (20-100 chars): 200-350 tokens
-• **Detailed requests** (> 100 chars): 600 tokens
-• **Maximum cap**: 800 tokens with automatic retry for cutoff
-
-#### Context Management
-
-• Recent conversation context (last 15 messages)
-• System message with character details
-• Message role tracking (user/assistant/system)
-• Conversation trimming (100 message limit per session)
-
-### Model Selection System
-
-#### Tiered Model Architecture
-
-**Text Models (including chat and trait generation):**
-• gpt-4o-mini (Standard): 50 generations/month
-• gpt-4.1-mini (Enhanced): 30 generations/month
-• gpt-4o (Premium): 10 generations/month
-
-**Image Models (including portrait editing):**
-• dall-e-2 (Standard): 10 generations/month
-• dall-e-3 (Enhanced): 5 generations/month
-• gpt-image-1 (Premium): 3 generations/month
-
-#### Usage Tracking
-
-Client-side tracking with monthly limits:
-• Per-model usage counts
-• Monthly reset on the 1st
-• Local storage persistence
-• Development mode bypass
-• Chat integration with text model limits
-• Portrait editing integration with image model limits
-
-## Data Flow
-
-### Character Creation Flow
-
-1. **User Input Collection**: Wizard collects data across four steps
-2. **Generation Request**: Client sends POST to `/api/generate`
-3. **AI Model Interaction**: Server calls OpenAI API with selected models
-4. **Response Processing**: Character data returned and displayed
-5. **Library Storage**: Optional save to local IndexedDB
-
-### Portrait Editing Flow
-
-1. **Edit Initiation**: User selects "Edit Portrait" from character edit interface
-2. **Validation**: Verify character has portrait and compatible model selected
-3. **Prompt Input**: User enters text description of desired changes
-4. **API Request**: Send character and edit prompt to `/api/edit-portrait`
-5. **Image Processing**: OpenAI processes image editing request
-6. **Response Handling**: Updated portrait data returned to client
-7. **Character Update**: Client updates character with new portrait
-8. **Storage**: Edited character saved to IndexedDB
-
-### Trait Management Flow
-
-1. **Trait Request**: User requests new trait generation or regeneration
-2. **API Call**: Send trait generation request to `/api/regenerate`
-3. **AI Processing**: OpenAI generates trait based on character context
-4. **Validation**: Ensure generated trait meets formatting requirements
-5. **Integration**: Add trait to character data structure
-6. **Display Update**: Update UI with new trait in standardized format
-7. **Storage**: Save updated character with new traits
-
-### Chat Conversation Flow
-
-1. **Chat Initialization**: Load character and create/get chat session
-2. **Message Input**: User types message with length validation
-3. **Usage Check**: Verify monthly limits before API call
-4. **Context Preparation**: Create system prompt and conversation history
-5. **API Request**: Send to `/api/chat` with character data
-6. **Response Generation**: OpenAI generates character-aware response
-7. **Response Processing**: Handle cutoff detection and retry logic
-8. **Storage Update**: Save messages to IndexedDB
-9. **UI Update**: Display response with proper formatting
-
-### Character Regeneration Flow
-
-1. **Regeneration Request**: User selects element to regenerate
-2. **Selective Regeneration**: Only specified element is updated
-3. **Update and Storage**: Updated character returned and saved
-
-## Security Architecture
-
-### Input Security
-
-• Input sanitization and validation
-• Protection against malicious inputs
-• Content filtering through OpenAI moderation
-• Message length limits (1000 characters for chat)
-• Edit prompt validation and sanitization
-
-### API Security
-
-• Server-side API key storage
-• Rate limiting through usage tracking
-• Error handling without information leakage
-• 60-second timeout for chat requests
-• 120-second timeout for portrait editing
-
-### Data Privacy
-
-• Local-only character and chat storage
-• No server-side data collection
-• Complete user control over data
-• IndexedDB encryption by browser
-
-## Performance Optimizations
-
-### Client-Side Optimizations
-
-• IndexedDB for efficient character and chat storage
-• Portrait compression for storage efficiency
-• Trait indexing for fast filtering
-• Lazy loading of character data
-• Message pagination for large conversations
-
-### API Optimizations
-
-• Optimized prompts for token efficiency
-• Model-specific configurations
-• Retry logic for transient failures
-• Dynamic response length adjustment
-• Graceful error handling
-
-### Portrait Editing Optimizations
-
-• Image size validation before processing
-• Efficient image format conversion
-• Caching of original portraits
-• Incremental editing workflow
-• Model-specific optimization
-
-## Storage Architecture
+## Data Storage Architecture
 
 ### IndexedDB Implementation
 
-**Character Storage:**
-• Reliable local storage for characters and portraits
-• Trait indexing for filtering performance
-• Automatic compression for images
-• Database recovery and error handling
+**Database Structure**:
+```typescript
+interface NPCForgeDatabase {
+  characters: {
+    key: string;              // Character ID
+    value: Character;         // Complete character data
+    indexes: {
+      'by-name': string;      // Character name index
+      'by-genre': string;     // Genre filtering
+      'by-traits': string[];  // Trait-based filtering
+    };
+  };
+  
+  conversations: {
+    key: string;              // Conversation ID
+    value: ChatMessage[];     // Message history
+    indexes: {
+      'by-character': string; // Character ID index
+      'by-timestamp': number; // Temporal ordering
+    };
+  };
+  
+  portraits: {
+    key: string;              // Portrait ID
+    value: Blob;              // Compressed image data
+    indexes: {
+      'by-character': string; // Character association
+    };
+  };
+}
+```
 
-**Chat Storage:**
-• Per-character conversation sessions
-• Message history with automatic trimming
-• System prompt persistence
-• Conversation context management
+**Storage Optimization**:
+• **Image Compression**: Automatic portrait compression for storage efficiency
+• **Incremental Updates**: Partial character updates without full data rewrite
+• **Garbage Collection**: Automatic cleanup of orphaned data
+• **Index Maintenance**: Real-time search index updates
 
-### Filtering System
+### Data Consistency and Recovery
 
-• Dynamic filter generation from character data
-• Trait categorization and search
-• Real-time filtering with optimized queries
-• Collapsible interface for organization
+**Consistency Measures**:
+• **Atomic Operations**: Database transactions for data integrity
+• **Validation**: Schema validation for all stored data
+• **Backup Systems**: Automatic data backup during critical operations
+• **Conflict Resolution**: Handling of concurrent data modifications
 
-## Enhanced Error Handling
+**Recovery Systems**:
+• **Database Recovery**: Automatic database recreation after corruption
+• **Data Migration**: Version-compatible data format evolution
+• **Error Handling**: Graceful degradation during storage failures
+• **Manual Recovery**: User-initiated data recovery options
 
-### JSON Parsing Improvements
+## Frontend Data Flow
 
-• Multiple fallback strategies for malformed AI responses
-• Enhanced parsing for responses with trailing commas
-• Content cleaning for incomplete formatting
-• Graceful degradation when parsing fails
+### Character Creation Flow
 
-### API Reliability
+```
+User Input → Wizard Steps → Validation → API Request → AI Processing → Response Handling → Storage → UI Update
+```
 
-• Request size validation and payload cleaning
-• Automatic retry logic with exponential backoff
-• Enhanced error categorization for better user feedback
-• Usage limit checking with graceful fallbacks
+**Detailed Flow**:
+1. **User Input Collection**: Wizard interface captures user preferences
+2. **Client-Side Validation**: Input validation and sanitization
+3. **API Request Construction**: Format data for backend processing
+4. **Server Processing**: AI generation through OpenAI integration
+5. **Response Handling**: Parse and validate AI-generated content
+6. **Local Storage**: Save character data to IndexedDB
+7. **UI Updates**: Display results and update application state
+
+### Chat System Data Flow
+
+```
+User Message → Context Loading → API Request → AI Response → Storage → UI Update → Context Update
+```
+
+**Chat Processing**:
+1. **Message Input**: User types message with character limit validation
+2. **Context Loading**: Retrieve character data and conversation history
+3. **Request Preparation**: Format chat request with character context
+4. **AI Processing**: Generate character response maintaining personality
+5. **Response Storage**: Save conversation to local storage
+6. **UI Update**: Display new messages and update conversation state
+
+### Character Editing Flow
+
+```
+Edit Action → Data Loading → Modification → Validation → API Request (optional) → Storage → UI Update
+```
+
+**Edit Processing**:
+1. **Data Loading**: Load complete character data for editing
+2. **Modification Interface**: Present editable character elements
+3. **Change Detection**: Track modifications and validate inputs
+4. **Regeneration (Optional)**: AI-powered content regeneration
+5. **Data Storage**: Save changes to IndexedDB
+6. **UI Synchronization**: Update all UI elements reflecting changes
+
+## Security Architecture
+
+### Client-Side Security
+
+**Input Security**:
+• **XSS Prevention**: React's built-in XSS protection and content sanitization
+• **Content Validation**: Client-side validation with server-side verification
+• **Safe Rendering**: Controlled rendering of user-generated content
+• **Input Sanitization**: Cleaning of all text inputs before processing
+
+**Data Security**:
+• **Local Storage Only**: No transmission of sensitive data to external servers
+• **Encryption**: Browser-provided encryption for IndexedDB storage
+• **Access Control**: Origin-based access control for storage
+• **Privacy Protection**: No tracking or analytics collection
+
+### Server-Side Security
+
+**API Security**:
+• **Environment Variables**: Secure API key storage and access
+• **Request Validation**: Comprehensive input validation and sanitization
+• **Error Handling**: Secure error responses without information leakage
+• **Rate Limiting**: Usage-based request limiting and throttling
+
+**Content Security**:
+• **Content Moderation**: OpenAI content policy enforcement
+• **Prompt Engineering**: Safe prompt construction preventing injection
+• **Response Filtering**: Validation of AI-generated content
+• **Policy Compliance**: Adherence to content generation guidelines
+
+## Performance Architecture
+
+### Frontend Performance
+
+**Optimization Strategies**:
+• **Code Splitting**: Automatic route-based code splitting with Next.js
+• **Lazy Loading**: Dynamic imports for large components
+• **Image Optimization**: Automatic image compression and format optimization
+• **Caching**: Browser caching for static assets and API responses
+
+**Runtime Performance**:
+• **Virtual Scrolling**: Efficient rendering of large character lists
+• **Debounced Search**: Optimized search input handling
+• **Memoization**: React optimization for expensive computations
+• **IndexedDB Optimization**: Efficient database queries and indexing
+
+### Backend Performance
+
+**API Optimization**:
+• **Connection Pooling**: Efficient OpenAI API connection management
+• **Request Batching**: Combine multiple operations where possible
+• **Caching**: Response caching for repeated requests
+• **Timeout Management**: Appropriate timeout settings for different operations
+
+**Resource Management**:
+• **Memory Optimization**: Efficient memory usage in serverless functions
+• **CPU Optimization**: Optimized processing algorithms
+• **Network Optimization**: Minimized data transfer and compression
+• **Error Recovery**: Fast recovery from transient failures
+
+## Scalability Architecture
+
+### Horizontal Scalability
+
+**Client Scalability**:
+• **Static Generation**: Pre-built pages for optimal performance
+• **CDN Distribution**: Global content delivery for reduced latency
+• **Client-Side Storage**: Reduced server load through local data management
+• **Progressive Enhancement**: Graceful degradation for various client capabilities
+
+**Server Scalability**:
+• **Serverless Functions**: Automatic scaling with demand
+• **Stateless Design**: No session management or server-side state
+• **Database Independence**: Client-side storage eliminates database bottlenecks
+• **API Efficiency**: Optimized API calls and response handling
+
+### Vertical Scalability
+
+**Resource Optimization**:
+• **Memory Efficiency**: Optimized data structures and processing
+• **CPU Efficiency**: Algorithmic optimization for complex operations
+• **Storage Efficiency**: Compressed data storage and efficient indexing
+• **Network Efficiency**: Minimized data transfer and optimal protocols
+
+## Technology Stack Integration
+
+### Core Technologies
+
+**Frontend Stack**:
+• **Next.js 15**: React framework with App Router and server components
+• **React 18**: UI library with concurrent features and hooks
+• **TypeScript**: Type-safe development with comprehensive type definitions
+• **Tailwind CSS**: Utility-first styling with responsive design
+
+**Backend Stack**:
+• **Next.js API Routes**: Serverless function implementation
+• **OpenAI SDK**: Official OpenAI API integration library
+• **Node.js Runtime**: Server-side JavaScript execution environment
+
+**Storage Stack**:
+• **IndexedDB**: Client-side database for structured data storage
+• **Local Storage**: Simple key-value storage for preferences
+• **File API**: Browser file handling for import/export functionality
+
+### Development Tools
+
+**Development Environment**:
+• **TypeScript Compiler**: Static type checking and compilation
+• **ESLint**: Code quality and style enforcement
+• **Prettier**: Automatic code formatting
+• **Hot Reload**: Development server with live updates
+
+**Build and Deployment**:
+• **Vercel**: Optimized deployment platform for Next.js
+• **Webpack**: Module bundling and optimization
+• **PostCSS**: CSS processing and optimization
+• **Tree Shaking**: Unused code elimination
+
+## Future Architecture Considerations
+
+### Planned Enhancements
+
+**Feature Scalability**:
+• **Plugin Architecture**: Extensible system for additional features
+• **API Expansion**: Additional AI service integration capabilities
+• **Data Export**: Enhanced export formats for game engine integration
+• **Collaboration Features**: Multi-user character sharing and collaboration
+
+**Performance Improvements**:
+• **Service Workers**: Offline functionality and background processing
+• **WebAssembly**: Performance-critical operations optimization
+• **Advanced Caching**: Sophisticated caching strategies for improved performance
+• **Progressive Web App**: Enhanced mobile experience and installation
+
+### Technology Evolution
+
+**Framework Updates**:
+• **React Concurrent Features**: Advanced React capabilities integration
+• **Next.js Evolution**: Latest Next.js features and optimizations
+• **Web Standards**: Modern web API adoption and feature enhancement
+• **AI Integration**: Advanced AI model integration and capabilities
 
 ## Related Documentation
 
-• [API Documentation](/docs/api) - Detailed API specifications including portrait editing
-• [Model Selection Guide](/docs/models) - Understanding the tier system and editing capabilities
-• [Chat with Characters](/docs/chat) - Chat system usage guide
-• [Character Library Guide](/docs/library) - Library usage, filtering, and trait management
-• [Generation Options](/docs/generation-options) - Including portrait editing options
-• [Development Setup](/docs/dev-setup) - Local development configuration
+• [API Documentation](/docs/api) - Detailed API specifications and integration
+• [Security Documentation](/docs/security) - Comprehensive security measures and practices
+• [Development Setup](/docs/dev-setup) - Local development environment configuration

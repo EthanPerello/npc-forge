@@ -207,7 +207,7 @@ function updateChangelog(version: string, dateStr: string): void {
   
   // Find the previous version to create proper comparison links
   const versionRegex = /## \[(\d+\.\d+\.\d+)\]/g;
-  let versions: string[] = [];
+  const versions: string[] = [];
   let match;
   
   while ((match = versionRegex.exec(changelog)) !== null) {

@@ -2,89 +2,87 @@
 
 ![Site Header](public/images/site-header.png)
 
-NPC Forge is an AI-powered character generator for games, tabletop RPGs, and storytelling. Create detailed NPCs with personalities, quests, dialogue, items, and AI-generated portraits. Features interactive conversations with your characters and advanced portrait editing capabilities!
+**AI-powered character generator for games, tabletop RPGs, and storytelling.** Create detailed NPCs with personalities, quests, dialogue, items, and portraits. Chat with your characters and edit their portraits using AI.
 
 [![Version](https://img.shields.io/badge/version-0.22.0-blue.svg)](https://github.com/EthanPerello/npc-forge/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Next.js](https://img.shields.io/badge/built%20with-Next.js%2014-black)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/built%20with-Next.js%2015-black)](https://nextjs.org/)
 
-## ✨ Features
+## 🎮 [Try It Now - Completely Free!](https://npc-forge.vercel.app)
 
-- **AI-Powered Character Generation**: Create detailed NPCs with unique personalities, backgrounds, and traits
-- **Interactive Chat System**: Have conversations with your generated characters
-- **Portrait Editing**: Edit character portraits with AI-powered text prompts
-- **Advanced Trait Management**: Generate and customize character traits with AI assistance
-- **Comprehensive Library**: Store, organize, and filter your character collection
-- **Multiple AI Models**: Choose from different AI model tiers for optimal quality and usage
-- **Export & Import**: Save characters as JSON for external use
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
+## ✨ Key Features
+
+- **🤖 AI Character Generation** - Detailed NPCs with unique personalities and backgrounds
+- **💬 Interactive Chat** - Have conversations with your generated characters  
+- **🎨 Portrait Editing** - Edit character portraits with AI-powered text prompts
+- **📚 Character Library** - Store, organize, and filter your character collection
+- **⚙️ Multiple AI Models** - Choose from Standard, Enhanced, and Premium quality tiers
+- **📱 Responsive Design** - Works seamlessly on desktop and mobile
+- **🔒 Privacy First** - All data stored locally in your browser
 
 ## 🚀 Quick Start
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/EthanPerello/npc-forge.git
-   cd npc-forge
-   ```
+### For Users
+**No setup required!** Visit [npc-forge.vercel.app](https://npc-forge.vercel.app) and start creating characters immediately.
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+### For Developers
+```bash
+# Clone and install
+git clone https://github.com/EthanPerello/npc-forge.git
+cd npc-forge
+npm install
 
-3. Create a `.env.local` file:
-   ```
-   OPENAI_API_KEY=your-api-key-here
-   ```
+# Add your OpenAI API key
+echo "OPENAI_API_KEY=your-api-key-here" > .env.local
 
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-## 🔧 Model Selection
-
-| Tier | Text Model | Image Model | Monthly Limit |
-|------|------------|-------------|---------------|
-| 🟢 Standard | gpt-4o-mini | dall-e-2 | 50 text / 10 images |
-| 🟡 Enhanced | gpt-4.1-mini | dall-e-3 | 30 text / 5 images |
-| 🔴 Premium | gpt-4o | gpt-image-1 | 10 text / 3 images |
-
-*Note: Chat conversations and portrait editing count against your selected model limits*
+# Start development server
+npm run dev
+```
 
 ## 📖 Documentation
 
-Comprehensive documentation is available at `/docs` including:
+| Guide | Description |
+|-------|-------------|
+| [How to Use](/docs/how-to-use) | Complete user guide with step-by-step instructions |
+| [Character Examples](/docs/character-examples) | Sample characters showcasing different genres and styles |
+| [Chat with Characters](/docs/chat) | Interactive conversation guide and best practices |
+| [Model Selection](/docs/models) | Understanding AI model tiers and usage limits |
+| [Character Library](/docs/library) | Managing and organizing your character collection |
+| [API Documentation](/docs/api) | Technical reference for developers |
+| [FAQ](/docs/faq) | Frequently asked questions and troubleshooting |
 
-- **[How to Use](/docs/how-to-use)** - Complete user guide with chat and editing features
-- **[Character Examples](/docs/character-examples)** - Sample characters and use cases  
-- **[Character Library](/docs/library)** - Library management and advanced filtering
-- **[Chat with Characters](/docs/chat)** - Interactive conversation guide
-- **[Model Selection](/docs/models)** - Understanding AI model tiers
-- **[Generation Options](/docs/generation-options)** - Detailed customization guide
-- **[Features Overview](/docs/features)** - Complete feature list including latest additions
-- **[API Documentation](/docs/api)** - Technical API reference
-- **[Development Setup](/docs/dev-setup)** - Local development guide
-- **[Contributing](/docs/contributing)** - How to contribute
-- **[FAQ](/docs/faq)** - Frequently asked questions
+## 🎯 Perfect For
 
-## 📜 License
+- **Game Masters** - Create compelling NPCs for tabletop RPGs
+- **Game Developers** - Generate characters for video games and interactive fiction  
+- **Writers** - Develop characters for stories and novels
+- **Content Creators** - Generate characters for streaming and media
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## 🆓 Free & Open Source
 
-## 👏 Credits
+NPC Forge is completely free to use with no accounts, subscriptions, or hidden costs. Built-in usage limits ensure fair access for all users while providing generous monthly allowances.
 
-- Created by [Ethan Perello](https://github.com/EthanPerello)
-- Character generation powered by [OpenAI API](https://openai.com/)
-- Built with [Next.js](https://nextjs.org/) and [Tailwind CSS](https://tailwindcss.com/)
-- Icons by [Lucide](https://lucide.dev/)
+## 🛠️ Built With
+
+- [Next.js 15](https://nextjs.org/) - React framework
+- [OpenAI API](https://openai.com/) - AI generation
+- [Tailwind CSS](https://tailwindcss.com/) - Styling
+- [TypeScript](https://www.typescriptlang.org/) - Type safety
 
 ## 🤝 Contributing
 
-For bug reports, feature requests, or questions, please [open an issue](https://github.com/EthanPerello/npc-forge/issues).
+Contributions are welcome! Please see our [Contributing Guide](/docs/contributing) for details.
 
-For development contributions, see our [Contributing Guide](/docs/contributing).
+**For Contributors:** Local development requires an OpenAI API key and charges against your personal account.
 
-## 📞 Contact
+## 📄 License
 
-For questions or feedback, contact Ethan Perello at [ethanperello@gmail.com](mailto:ethanperello@gmail.com).
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Creator
+
+Created by [Ethan Perello](https://github.com/EthanPerello) • [ethanperello@gmail.com](mailto:ethanperello@gmail.com)
+
+---
+
+**⭐ Star this project if you find it useful!**

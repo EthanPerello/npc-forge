@@ -1,362 +1,370 @@
 # Character Generation Options
 
-NPC Forge offers extensive customization options through its wizard-based interface. This guide provides a breakdown of all available settings across the four-step creation process, plus the portrait editing and trait management features.
+This comprehensive reference covers all customization options available in NPC Forge's four-step character creation wizard, providing detailed explanations of every setting and feature.
 
-## Overview
+## Wizard Overview
 
-The character creation wizard consists of four steps:
-
+The character creation process consists of four sequential steps:
 1. **Concept**: Genre selection and character description
-2. **Options**: Trait and attribute customization
-3. **Model**: AI model selection
-4. **Generate**: Character creation and results
+2. **Options**: Character traits, content types, and advanced customization
+3. **Model**: AI model selection for text and image generation
+4. **Generate**: Character creation and results management
 
-## Step 1: Concept
+Each step builds upon the previous ones, allowing you to create precisely the character you envision.
 
-### Genre Selection
+## Step 1: Concept Configuration
 
-Choose from four main genres with specialized sub-genres:
+### Genre and Sub-Genre Selection
 
-**Fantasy**: High Fantasy, Dark Fantasy, Urban Fantasy, Sword & Sorcery
+**Fantasy Genre Options**:
+• **High Fantasy**: Traditional fantasy with magic, elves, dwarves, and epic quests
+• **Dark Fantasy**: Gritty fantasy with horror elements and moral ambiguity
+• **Urban Fantasy**: Modern world with hidden magical elements
+• **Sword & Sorcery**: Adventure-focused fantasy with barbarians and sorcerers
 
-**Sci-Fi**: Space Opera, Cyberpunk, Post-Apocalyptic, Hard Sci-Fi
+**Sci-Fi Genre Options**:
+• **Space Opera**: Large-scale space adventures with galactic civilizations
+• **Cyberpunk**: High-tech dystopian futures with corporate control
+• **Post-Apocalyptic**: Survival in devastated worlds after catastrophic events
+• **Hard Sci-Fi**: Scientifically accurate speculative fiction
 
-**Historical**: Medieval, Ancient Civilizations, Renaissance, Age of Sail
+**Historical Genre Options**:
+• **Medieval**: Middle Ages with knights, castles, and feudal systems
+• **Ancient Civilizations**: Greek, Roman, Egyptian, or other ancient cultures
+• **Renaissance**: Cultural rebirth period with art, science, and exploration
+• **Age of Sail**: Maritime adventures during the golden age of sailing
 
-**Contemporary**: Urban Life, Mystery & Thriller, Supernatural, Slice of Life
+**Contemporary Genre Options**:
+• **Urban Life**: Modern city settings with realistic social dynamics
+• **Mystery & Thriller**: Crime, investigation, and suspense scenarios
+• **Supernatural**: Modern world with paranormal or occult elements
+• **Slice of Life**: Everyday realistic scenarios and character interactions
 
-### Character Description
+### Character Description Guidelines
 
-Free-text description field for character details. More detailed descriptions typically result in more tailored characters that will have richer personalities for chat conversations and better portraits for editing.
+**Effective Description Elements**:
+• **Visual Details**: Physical appearance, clothing, distinctive features
+• **Personality Hints**: Key traits, quirks, or behavioral patterns
+• **Background Context**: Occupation, origin, social status, or relationships
+• **Conflict Elements**: Internal struggles, external opposition, or goals
 
-> **Chat & Portrait Consideration**: Well-developed character descriptions create more engaging conversational AI personalities and provide better context for portrait generation and editing.
+**Description Length Recommendations**:
+• **Optimal Range**: 2-3 sentences providing focused details
+• **Minimum Effective**: One detailed sentence with specific elements
+• **Maximum Recommended**: One paragraph (4-5 sentences) to avoid confusion
+• **Key Focus**: Specific details work better than vague generalizations
 
-## Step 2: Options
+**Example Effective Descriptions**:
+```
+"A weathered dwarven blacksmith whose legendary hammer was stolen by raiders, leaving him unable to work and desperate for its return."
 
-### Character Trait Options
+"An ambitious young noble who secretly practices forbidden magic while navigating the treacherous politics of the royal court."
 
-#### Basic Traits
+"A retired space marine turned bartender on a frontier station, haunted by memories of a battle that went terribly wrong."
+```
 
-• **Gender**: Male, Female, Nonbinary, Unknown
-• **Age Group**: Child, Teen, Adult, Elder
-• **Moral Alignment**: Good, Neutral, Evil
-• **Relationship to Player**: Ally, Enemy, Neutral, Mentor, Rival, Betrayer
+## Step 2: Character Options
 
-#### Advanced Options
+### Basic Character Traits
 
-• **Physical Traits**: Height, build, distinctive features
-• **Background Elements**: Social class, homeland/origin
-• **Occupation**: Searchable dropdown with genre-specific options
-• **Personality Traits**: Multi-select system
-• **Additional Traits**: AI-generated or custom traits with individual management
+**Gender Options**:
+• **Male**: Traditional masculine character
+• **Female**: Traditional feminine character  
+• **Nonbinary**: Non-traditional gender identity or expression
+• **Unknown**: Ambiguous, mysterious, or unspecified gender
+
+**Age Group Classifications**:
+• **Child**: Pre-adolescent characters (typically under 13)
+• **Teen**: Adolescent characters (typically 13-17)
+• **Adult**: Mature characters (typically 18-60)
+• **Elder**: Elderly or ancient characters (typically over 60)
+
+**Moral Alignment System**:
+• **Good**: Altruistic, heroic, protects others, follows moral codes
+• **Neutral**: Pragmatic, self-interested, situational morality
+• **Evil**: Selfish, harmful, exploits others, disregards moral constraints
+
+**Relationship to Player Options**:
+• **Ally**: Friendly, helpful, supports player goals
+• **Enemy**: Opposed to players, creates conflict or obstacles
+• **Neutral**: Indifferent to players, focused on own agenda
+• **Mentor**: Guides players, provides wisdom or training
+• **Rival**: Competitive relationship, not necessarily hostile
+• **Betrayer**: Initially appears friendly but has hidden agenda
+
+### Advanced Character Options
+
+**Physical Trait Customization**:
+• **Height Options**: Short, Average, Tall, Variable (species-dependent)
+• **Build Categories**: Thin, Athletic, Average, Muscular, Heavy, Imposing
+• **Distinctive Features**: Scars, tattoos, unusual coloring, prosthetics, birthmarks
+
+**Background and Social Elements**:
+• **Social Class Options**: Lower Class, Working Class, Middle Class, Upper Class, Nobility, Royalty
+• **Homeland/Origin**: Rural village, major city, foreign land, wilderness, other plane/world
+• **Cultural Background**: Influenced by selected genre and sub-genre
+
+**Occupation System**:
+• **Searchable Database**: Over 100 occupations organized by genre relevance
+• **Fantasy Examples**: Knight, Wizard, Rogue, Cleric, Bard, Merchant, Blacksmith
+• **Sci-Fi Examples**: Pilot, Engineer, Medic, Soldier, Scientist, Hacker, Trader
+• **Historical Examples**: Monk, Artisan, Scholar, Noble, Peasant, Warrior, Healer
+• **Contemporary Examples**: Detective, Doctor, Teacher, Artist, Journalist, Mechanic
+
+**Personality Trait Selection**:
+• **Multi-Select System**: Choose multiple traits (no limit)
+• **Trait Categories**: Behavioral, emotional, intellectual, social characteristics
+• **Example Traits**: Brave, Cautious, Ambitious, Loyal, Curious, Stubborn, Compassionate
+• **Trait Interaction**: Selected traits influence dialogue and behavior generation
 
 ### Content Generation Options
 
-#### Quest Options (if enabled)
+**Quest Generation Settings**:
+• **Number of Quests**: Range from 3-7 quests per character
+• **Quest Type Options**:
+  - Main Quest: Central storyline adventures
+  - Side Quest: Optional character-specific missions
+  - Fetch Quest: Retrieval and delivery missions
+  - Combat Quest: Battle-focused challenges
+  - Social Quest: Diplomacy and relationship missions
+  - Exploration Quest: Discovery and investigation missions
+  - Puzzle/Riddle: Mental challenge quests
+  - Escort Quest: Protection and guidance missions
+  - Collection Quest: Gathering multiple items or information
+  - Mystery Quest: Investigation and problem-solving missions
 
-• **Number of Quests**: 3-7 quests
-• **Quest Types**: Main Quest, Side Quest, Fetch Quest, Combat Quest, Social Quest, Exploration Quest, Puzzle/Riddle, Escort Quest, Collection Quest, Mystery Quest
-• **Reward Types**: Balanced, Gold & Currency, Items & Equipment, Information & Clues, Relationships & Favors, Experience & Skills
+• **Reward Type Distribution**:
+  - Balanced: Mix of all reward types
+  - Gold & Currency: Monetary rewards
+  - Items & Equipment: Physical objects and gear
+  - Information & Clues: Knowledge and secrets
+  - Relationships & Favors: Social connections and obligations
+  - Experience & Skills: Character development opportunities
 
-#### Dialogue Options (if enabled)
+**Dialogue Generation Settings**:
+• **Number of Lines**: Range from 5-15 dialogue options
+• **Dialogue Context Options**:
+  - Introduction: First meeting dialogue
+  - Casual Conversation: General interaction options
+  - Giving Quests: Mission briefing dialogue
+  - Combat/Conflict: Hostile or tense interactions
+  - Emotional Scenes: Personal or dramatic conversations
+  - Information/Exposition: Lore and background sharing
+  - Bartering/Trading: Commercial interactions
+  - Farewell/Parting: Goodbye and departure dialogue
 
-• **Number of Lines**: 5-15 lines
-• **Dialogue Context**: Introduction, Casual Conversation, Giving Quests, Combat/Conflict, Emotional Scenes, Information/Exposition, Bartering/Trading, Farewell/Parting
+**Item Generation Settings**:
+• **Number of Items**: Range from 3-10 items per character
+• **Rarity Distribution Options**:
+  - Balanced: Natural distribution across all rarities
+  - Mostly Common: Primarily everyday items
+  - Mostly Uncommon: Focus on notable but accessible items
+  - Include Rare Items: Add valuable or special items
+  - Themed by Character: Items matching character background
 
-#### Item Options (if enabled)
+• **Item Category Options**:
+  - Weapons: Combat equipment and armaments
+  - Armor & Clothing: Protective gear and attire
+  - Potions & Consumables: Single-use beneficial items
+  - Scrolls & Books: Knowledge and magical items
+  - Tools & Utility Items: Practical equipment
+  - Jewelry & Accessories: Decorative and status items
+  - Artifacts & Relics: Unique items with history
+  - Food & Drink: Consumable provisions
+  - Currency & Valuables: Money and precious items
+  - Crafting Materials: Components for creating items
+  - Technology & Gadgets: Sci-fi specific equipment
+  - Magical Items: Fantasy-specific enchanted objects
 
-• **Number of Items**: 3-10 items
-• **Rarity Distribution**: Balanced, Mostly Common, Mostly Uncommon, Include Rare Items, Themed by Character
-• **Item Categories**: Weapons, Armor & Clothing, Potions & Consumables, Scrolls & Books, Tools & Utility Items, Jewelry & Accessories, Artifacts & Relics, Food & Drink, Currency & Valuables, Crafting Materials, Technology & Gadgets (Sci-Fi), Magical Items (Fantasy)
+**Portrait Generation Toggle**:
+• **Include Portrait**: Enables AI-generated character artwork
+• **Disable Portrait**: Character creation without image generation
+• **Impact on Generation**: Portrait creation adds 30-120 seconds to process time
 
-## Step 3: Model Selection
+## Step 3: Model Selection and Portrait Options
 
-### Text Generation Models
+### Text Model Selection
+For complete information on model capabilities, usage limits, and quality differences, see the [Model Selection Guide](/docs/models).
 
-| Tier | Model | Monthly Limit | Best For | Chat Quality |
-|------|-------|---------------|----------|--------------|
-| 🟢 Standard | gpt-4o-mini | 50/month | Regular use | Good for casual conversation |
-| 🟡 Enhanced | gpt-4.1-mini | 30/month | Higher quality | Better character consistency |
-| 🔴 Premium | gpt-4o | 10/month | Maximum detail | Superior personality depth |
+**Model Selection Impact**:
+• **Character Generation**: Affects personality depth, backstory richness, and content quality
+• **Quest Quality**: Higher models create more engaging and coherent quest narratives
+• **Dialogue Sophistication**: Better models produce more character-appropriate dialogue
+• **Item Descriptions**: Enhanced detail and creativity in item generation
 
-> **Chat Consideration**: Text model selection affects both character generation and chat conversation quality. Higher tiers provide more consistent character personalities in chat.
+### Image Model Selection
+Complete image model capabilities and portrait editing support detailed in [Model Selection Guide](/docs/models).
 
-### Image Generation Models
+**Model Selection Impact**:
+• **Portrait Quality**: Artistic detail, composition, and visual appeal
+• **Style Consistency**: Better adherence to specified art style
+• **Editing Capability**: Only gpt-image-1 supports full portrait editing
 
-| Tier | Model | Monthly Limit | Best For | Portrait Editing |
-|------|-------|---------------|----------|------------------|
-| 🟢 Standard | dall-e-2 | 10/month | Basic portraits | Limited editing support |
-| 🟡 Enhanced | dall-e-3 | 5/month | Better quality | Not supported for editing |
-| 🔴 Premium | gpt-image-1 | 3/month | Highest quality | Full editing support |
+### Portrait Customization Options
 
-> **Portrait Editing Note**: Only gpt-image-1 provides reliable portrait editing capabilities with consistent results.
+**Art Style Categories**:
+• **Realistic**: Photographic or lifelike artistic representation
+• **Fantasy Art**: Traditional fantasy illustration style
+• **Anime/Manga**: Japanese animation/comic art style
+• **Comic Book**: Western comic book illustration style
+• **Pixel Art**: Retro video game sprite style
+• **Oil Painting**: Classical painted portrait style
+• **Watercolor**: Soft, artistic watercolor painting style
+• **3D Render**: Computer-generated three-dimensional style
 
-### Portrait Customization
+**Expression and Mood Options**:
+• **Neutral**: Calm, composed, resting expression
+• **Happy/Smiling**: Cheerful, friendly, welcoming expression
+• **Serious**: Focused, determined, professional expression
+• **Angry**: Hostile, aggressive, intimidating expression
+• **Sad**: Melancholy, sorrowful, dejected expression
+• **Determined**: Resolute, confident, strong-willed expression
+• **Mysterious**: Enigmatic, secretive, intriguing expression
+• **Heroic**: Noble, inspiring, leadership-oriented expression
 
-#### Art Style
+**Framing and Composition Options**:
+• **Portrait (Head/Shoulders)**: Traditional headshot focusing on face and expression
+• **Bust (Upper Body)**: Torso view including clothing and accessories
+• **Full Body**: Complete character view showing full outfit and stance
+• **Action Pose**: Dynamic positioning suggesting movement or combat readiness
 
-Realistic, Fantasy Art, Anime/Manga, Comic Book, Pixel Art, Oil Painting, Watercolor, 3D Render
+**Background Style Options**:
+• **Plain/Solid Color**: Simple, non-distracting solid background
+• **Gradient**: Smooth color transitions creating subtle depth
+• **Themed (Based on Character)**: Background elements matching character concept
+• **Environmental**: Detailed scene setting appropriate to character
+• **Abstract**: Artistic, non-representational background designs
 
-#### Expression/Mood
+## Step 4: Generation and Results Management
 
-Neutral, Happy/Smiling, Serious, Angry, Sad, Determined, Mysterious, Heroic
+### Generation Process
 
-#### Framing
+**Generation Sequence**:
+1. **Text Content Creation**: Character profile, traits, quests, dialogue, items (10-30 seconds)
+2. **Portrait Generation**: AI artwork creation if enabled (30-120 seconds)
+3. **Content Assembly**: Organizing and formatting all generated content
+4. **Results Display**: Tabbed interface presentation of complete character
 
-Portrait (Head/Shoulders), Bust (Upper Body), Full Body, Action Pose
+**Generation Time Factors**:
+• **Model Selection**: Higher tier models may take longer but produce better results
+• **Content Complexity**: More content types increase generation time
+• **Portrait Options**: Complex art styles or detailed descriptions extend image generation
+• **Server Load**: Peak usage times may affect processing speed
 
-#### Background
+### Results Interface
 
-Plain/Solid Color, Gradient, Themed (Based on Character), Environmental, Abstract
+**Tabbed Content Organization**:
+• **Profile Tab**: Character basics, appearance, personality, backstory
+• **Quests Tab**: Generated missions with objectives, descriptions, and rewards
+• **Dialogue Tab**: Character-appropriate speech options and conversation starters
+• **Items Tab**: Associated objects, equipment, and possessions
 
-## Step 4: Generate
+**Post-Generation Options**:
+• **Save to Library**: Store character locally for editing, chat, and future reference
+• **Download JSON**: Export complete character data for backup or sharing
+• **Download Portrait**: Save character artwork as image file (if generated)
+• **New Character**: Reset wizard and start fresh character creation
 
-### Character Generation Process
+### Character Data Structure
 
-1. Click "Generate Character" to begin with enhanced visual feedback (NEW in v0.22.0)
-2. AI processes inputs using selected models
-3. Character text is generated first, followed by portrait
-4. Results are displayed with tabs for different sections
-5. **Save to Library** to enable chat functionality and editing features (now transitions to "View Library" in v0.22.0)
+**Generated Character Elements**:
+• **Core Identity**: Name, age group, gender, moral alignment, relationship status
+• **Physical Description**: Detailed appearance including distinctive features
+• **Personality Profile**: Character traits, behavioral patterns, and motivations
+• **Background Information**: Origin, occupation, social status, and history
+• **Backstory Hook**: Engaging narrative element for story integration
+• **Additional Traits**: AI-generated characteristics enhancing roleplay depth
 
-### Alternative Options
+**Content Generation Results**:
+• **Quest Structure**: Title, description, objectives, rewards, and difficulty level
+• **Dialogue Options**: Contextual speech patterns and conversation starters
+• **Item Descriptions**: Detailed objects with properties, value, and significance
+• **Portrait Data**: High-resolution character artwork (if image generation enabled)
 
-• **Generate Random Character**: Creates character with random traits
-• **New Character**: Starts wizard over with fresh options
+## Advanced Generation Techniques
 
-### Post-Generation Options
+### Optimizing Character Descriptions
 
-After generating a character, you can:
+**Layered Description Approach**:
+1. **Core Concept**: Basic character archetype and role
+2. **Visual Elements**: Distinctive physical characteristics
+3. **Personality Hook**: Key behavioral trait or quirk
+4. **Conflict Element**: Internal struggle or external challenge
 
-• **Save to Library**: Store character for editing, chat, and portrait editing (enhanced transition in v0.22.0)
-• **Start Chatting**: Begin conversations immediately after saving
-• **Download JSON**: Export character data
-• **Download Portrait**: Save character image
-
-## Portrait Editing Features
-
-### Accessing Portrait Editing
-
-Portrait editing is available after saving characters to your library:
-
-1. Open any character with an existing portrait in edit mode
-2. Navigate to the Portrait section
-3. Click **Edit Portrait** button
-4. Ensure compatible model is selected (gpt-image-1 recommended)
-
-### Portrait Editing Interface
-
-**Edit Prompt Field:**
-• Text area for describing desired changes
-• Character counter shows remaining characters (varies by model)
-• Maximum length: 32,000 characters for gpt-image-1, 1,000 for others
-
-**Model Compatibility:**
-• Clear messaging that only gpt-image-1 supports full editing capabilities (NEW in v0.22.0)
-• Warning displays for unsupported models
-• gpt-image-1 provides best editing results
-• dall-e-2 has limited editing capabilities
-• dall-e-3 does not support editing
-
-### Writing Effective Edit Prompts
-
-**Color Changes:**
+**Example Layered Description**:
 ```
-"change hair color to blonde"
-"make the eyes green"
-"change shirt to red"
+Core: "A ship's navigator"
+Visual: "with intricate tattoos marking sea routes"
+Personality: "who never admits when lost"
+Conflict: "haunted by a navigation error that sank her previous ship"
 ```
 
-**Adding Accessories:**
-```
-"add a red hat"
-"add glasses"
-"add a beard"
-"add armor"
-```
+### Genre-Specific Optimization
 
-**Removing Elements:**
-```
-"remove glasses"
-"remove the hat"
-"remove facial hair"
-```
+**Fantasy Character Enhancement**:
+• Include magical elements, species variations, or supernatural abilities
+• Reference fantasy locations, organizations, or historical events
+• Consider long lifespans and their impact on personality and knowledge
 
-**Expression Changes:**
-```
-"make them smile"
-"give them a serious expression"
-"make them look angry"
-```
+**Sci-Fi Character Enhancement**:
+• Integrate technology, cybernetics, or genetic modifications
+• Reference future societies, space travel, or advanced science
+• Consider human-AI relationships or post-human evolution
 
-**Clothing Modifications:**
-```
-"change shirt to blue"
-"add a cloak"
-"remove the jacket"
-"add medieval armor"
-```
+**Historical Character Enhancement**:
+• Research period-appropriate occupations, social structures, and technology
+• Include historically accurate cultural details and social constraints
+• Consider religious, political, or social movements of the era
 
-### Portrait Editing Best Practices
+**Contemporary Character Enhancement**:
+• Ground characters in realistic modern professions and social contexts
+• Include current technology and communication methods
+• Reference contemporary cultural and social issues
 
-**Effective Prompts:**
-• Be specific about what you want to change
-• Use simple, clear language
-• Focus on one major change per edit
-• Reference colors, objects, and expressions directly
+### Strategic Model Usage
 
-**Model Selection:**
-• Use gpt-image-1 for best results
-• Test with different models to understand capabilities
-• Consider usage limits when choosing models
+**Incremental Enhancement Approach**:
+1. **Generate Base Character**: Use Standard models for initial creation
+2. **Identify Key Elements**: Determine which aspects are most important
+3. **Selective Regeneration**: Use Enhanced/Premium models for critical elements
+4. **Final Polish**: Apply highest-tier models for finishing touches
 
-**Workflow Tips:**
-• Start with small changes to test results
-• Make incremental edits rather than major overhauls
-• Save edited portraits before making additional changes
-• Keep original portraits as backup
+**Content Priority Strategy**:
+• **High Priority**: Character personality and backstory (use Enhanced/Premium)
+• **Medium Priority**: Quests and dialogue (use Enhanced for important characters)
+• **Lower Priority**: Items and additional traits (Standard often sufficient)
 
-### Portrait Editing Usage
+## Quality Optimization Tips
 
-**Usage Limits:**
-• Standard (dall-e-2): 10 edits per month
-• Enhanced (dall-e-3): 5 edits per month (not recommended for editing)
-• Premium (gpt-image-1): 3 edits per month
+### Description Writing Best Practices
 
-**Cost Considerations:**
-• Portrait editing counts against image model limits
-• Plan edits carefully to maximize monthly usage
-• Consider which characters need editing most
+**Effective Techniques**:
+• **Show, Don't Tell**: "Has nervous tics" vs. "Constantly taps fingers and avoids eye contact"
+• **Specific Details**: "Wears armor" vs. "Wears dented chainmail with a family crest"
+• **Implied Depth**: "Former soldier" vs. "Veteran who still checks exits in every room"
 
-## Advanced Trait Management
+**Common Pitfalls to Avoid**:
+• **Overly Generic**: "A nice person who helps others"
+• **Too Complex**: Multi-paragraph descriptions with excessive detail
+• **Contradictory Elements**: Conflicting personality traits or background elements
+• **Anachronistic Details**: Modern elements in historical settings
 
-### Additional Traits System
+### Model Selection Strategy
 
-The Additional Traits section in character editing provides comprehensive trait management:
+**Efficiency Maximization**:
+• **Test with Standard**: Experiment with concepts using lower-cost models
+• **Upgrade Strategically**: Use higher tiers for characters you plan to keep
+• **Mixed Approach**: Combine different model tiers (Standard text + Enhanced image)
+• **Regeneration Planning**: Use lower models initially, upgrade specific elements later
 
-**Viewing Traits:**
-• All additional character traits displayed in organized layout
-• Traits shown with consistent Title Case formatting with proper capitalization (NEW in v0.22.0)
-• Long or sentence-like traits automatically excluded from display
-• Category prefixes help organize trait types
-
-**Adding Generated Traits:**
-• **"Add Generated Trait"** button generates new AI-powered traits
-• Traits generated based on existing character personality and background
-• Generated traits automatically formatted and integrated
-• Uses selected text model for trait generation
-
-**Individual Trait Regeneration:**
-• **Regenerate buttons** next to each trait for individual updates with enhanced visual feedback (NEW in v0.22.0)
-• Regenerate specific traits without affecting others
-• Maintains character consistency while refreshing specific aspects
-• Each regeneration counts against text model usage limits
-
-### Trait Management Best Practices
-
-**Generating New Traits:**
-• Use higher-tier models for more creative and fitting traits
-• Generate traits that complement existing character personality
-• Review generated traits and remove any that don't fit
-• Balance trait quantity with character focus
-
-**Regenerating Traits:**
-• Regenerate traits that seem out of character or repetitive
-• Use regeneration to refresh stale or overused traits
-• Consider character development when updating traits
-• Maintain consistency with core character concept
-
-**Trait Organization:**
-• Use trait categories to understand character aspects
-• Remove traits that are too long or sentence-like
-• Keep trait lists focused and relevant
-• Balance different trait types (personality, skills, background)
-
-## Chat Integration
-
-### How Chat Uses Models
-
-When chatting with characters, the **text models** are used to generate responses:
-• Each chat response counts as **one generation** against your monthly text model limit
-• You can switch between models during conversations
-• Higher-tier models provide more consistent character personalities
-• Response quality and character voice depth improve with higher tiers
-
-### Chat-Specific Model Considerations
-
-**Standard (gpt-4o-mini):**
-• Good for casual conversation and exploration
-• Basic character personality consistency
-• Suitable for frequent, low-stakes interactions
-
-**Enhanced (gpt-4.1-mini):**
-• Better character voice consistency
-• More nuanced responses and personality depth
-• Good balance of quality and usage limits
-
-**Premium (gpt-4o):**
-• Superior character personality depth and consistency
-• Complex conversation handling and emotional nuance
-• Best for important story moments and character development
-
-## Enhanced User Experience (v0.22.0)
-
-### Visual Feedback Improvements
-
-• **Enhanced Loading States**: All regeneration operations show clear visual indicators
-• **Consistent Iconography**: Rotating circle (RotateCcw) icons for all regeneration buttons
-• **Real-Time Updates**: Immediate feedback for all character operations
-• **Better Error Handling**: Enhanced fallback logic for quest regeneration and other operations
-
-### Navigation Enhancements
-
-• **Dynamic Button Transitions**: "Save to Library" → "View Library" transitions for better user flow
-• **Integrated Sidebar**: Enhanced navigation with direct chat links
-• **Improved Organization**: Cleaner layout and better visual hierarchy
-
-### Trait Management Enhancements
-
-• **Proper Capitalization**: All trait categories display with consistent Title Case formatting
-• **Enhanced Display Logic**: Additional traits section shows all traits not included in Basic Info or Character Traits sections
-• **Better Filtering**: Excludes unsupported traits from filter dropdowns
-• **Consistent Formatting**: Standardized trait display between modal and edit page
-
-## Usage Optimization Strategies
-
-### Efficient Model Usage
-
-**Start Low, Upgrade High:**
-• Generate characters with Standard tier
-• Use Enhanced/Premium for important regenerations
-• Chat with Standard, upgrade for key conversations
-
-**Strategic Feature Usage:**
-• Reserve portrait editing for most important characters
-• Use trait generation/regeneration judiciously
-• Plan character conversations around monthly limits
-
-**Batch Operations:**
-• Generate multiple characters when actively creating
-• Edit multiple character aspects in single sessions
-• Plan character development sessions around usage limits
-
-### Monthly Limit Management
-
-**Track Usage:**
-• Monitor usage indicators regularly
-• Plan character creation around monthly cycles
-• Balance different feature types (text vs. image)
-
-**Prioritize Features:**
-• Character generation: High priority
-• Chat conversations: Medium priority
-• Portrait editing: Use for key characters
-• Trait management: Use for character refinement
+**Quality Optimization**:
+• **Character Importance**: Match model tier to character significance in your story
+• **Content Type Focus**: Prioritize model upgrades for most important content types
+• **Iterative Improvement**: Generate, evaluate, and selectively enhance
 
 ## Related Documentation
 
-• [How to Use NPC Forge](/docs/how-to-use) - Complete creation and editing guide
-• [Chat with Characters](/docs/chat) - Interactive conversation guide
-• [Character Library](/docs/library) - Library management and trait systems
-• [Model Selection](/docs/models) - Understanding AI model tiers and capabilities
-• [Features Overview](/docs/features) - Complete feature list including latest additions
+• [How to Use NPC Forge](/docs/how-to-use) - Step-by-step wizard guide
+• [Model Selection Guide](/docs/models) - Complete model information and usage limits
+• [Character Examples](/docs/character-examples) - See results from different generation options
+• [Character Library Guide](/docs/library) - Managing and editing generated characters

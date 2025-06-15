@@ -160,7 +160,7 @@ function validateRequest(body: any): { isValid: boolean; error?: string } {
 // Enhanced JSON parsing function with multiple strategies
 function parseJSONWithFallbacks(content: string): any {
   // Clean the content first
-  let cleanContent = content.trim()
+  const cleanContent = content.trim()
     .replace(/["""'']/g, '"') // Normalize quotes
     .replace(/—/g, '-') // Replace em dashes
     .replace(/…/g, '...') // Replace ellipsis

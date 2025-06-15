@@ -161,7 +161,7 @@ class JSONParser {
     }
     
     // Remove quotes and special characters
-    let cleaned = value
+    const cleaned = value
       .replace(/["""'']/g, '"')
       .replace(/—/g, '-')
       .replace(/…/g, '...')

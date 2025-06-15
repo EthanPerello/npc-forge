@@ -9,7 +9,7 @@ Thank you for your interest in contributing to NPC Forge! This document provides
 • Node.js v18 or newer
 • npm v7 or newer
 • Git
-• An OpenAI API key for testing
+• An OpenAI API key for local development testing
 • A GitHub account
 
 ### Setting Up the Development Environment
@@ -236,7 +236,7 @@ Before submitting a PR, test the following areas:
 • Conversation persistence
 • Model selection during chat
 
-**Portrait Editing System (NEW - if applicable):**
+**Portrait Editing System (if applicable):**
 • Portrait editing interface access and functionality
 • Edit prompt input and validation
 • Model compatibility checking
@@ -244,7 +244,7 @@ Before submitting a PR, test the following areas:
 • Usage limit integration
 • Error handling for various failure scenarios
 
-**Trait Management System (NEW - if applicable):**
+**Trait Management System (if applicable):**
 • Additional traits display and editing
 • Custom trait addition and removal
 • AI trait generation functionality
@@ -264,63 +264,6 @@ Before submitting a PR, test the following areas:
 • Portrait generation and management
 • Usage limit tracking and enforcement
 
-### Chat System Testing
-
-When working on chat-related functionality:
-
-**Character Consistency Testing:**
-• Verify AI maintains character personality
-• Test with different character types and traits
-• Ensure backstory integration in responses
-
-**Conversation Flow Testing:**
-• Test message persistence across browser sessions
-• Verify loading states and error handling
-• Test conversation clearing functionality
-
-**Usage Integration Testing:**
-• Verify chat counts against model limits
-• Test model switching during conversations
-• Ensure usage warnings appear appropriately
-
-### Portrait Editing Testing
-
-When working on portrait editing functionality:
-
-**Interface Testing:**
-• Verify edit interface appears for characters with portraits
-• Test model compatibility warnings
-• Verify edit prompt input and validation
-
-**Processing Testing:**
-• Test successful edits with various prompt types
-• Test error handling for failed edits
-• Verify usage limit integration
-
-**Result Testing:**
-• Test edited portrait display and saving
-• Verify original portrait preservation
-• Test unsaved changes warnings
-
-### Trait Management Testing
-
-When working on trait management functionality:
-
-**Display Testing:**
-• Verify trait display consistency across interfaces
-• Test trait formatting and organization
-• Verify empty state handling
-
-**Generation Testing:**
-• Test AI trait generation functionality
-• Verify generated traits match character context
-• Test individual trait regeneration
-
-**Editing Testing:**
-• Test custom trait addition and editing
-• Verify trait validation and formatting
-• Test trait removal functionality
-
 ## Key Development Areas
 
 ### Core Features
@@ -330,7 +273,7 @@ When working on trait management functionality:
 • Regeneration system refinements and new capabilities
 • Model selection optimization and new model support
 
-### Portrait Editing System (NEW)
+### Portrait Editing System
 
 • Portrait editing interface improvements and optimization
 • Edit prompt validation and processing enhancements
@@ -338,7 +281,7 @@ When working on trait management functionality:
 • Integration with existing portrait management system
 • Performance optimizations for image processing
 
-### Trait Management System (NEW)
+### Trait Management System
 
 • Trait generation and regeneration improvements
 • Trait display and formatting enhancements
@@ -390,19 +333,23 @@ When working on trait management functionality:
 3. **Maintain Consistency**: Follow established UI patterns and terminology
 4. **Document Changes**: Update relevant documentation files
 
-### Portrait Editing Implementation Guidelines
+## Cost Considerations for Developers
 
-1. **Model Compatibility**: Ensure proper validation of model support for editing
-2. **Error Handling**: Implement comprehensive error handling for various failure modes
-3. **User Feedback**: Provide clear feedback during edit processing
-4. **Integration**: Ensure seamless integration with existing portrait management
+### API Usage During Development
 
-### Trait Management Implementation Guidelines
+When developing locally with your own OpenAI API key:
+• Development mode bypasses usage limits but not OpenAI billing
+• Use Standard tier models for most testing to minimize costs
+• Test key features with Enhanced/Premium models sparingly
+• Monitor your OpenAI usage dashboard regularly
+• Set billing alerts in your OpenAI account
 
-1. **Data Consistency**: Maintain consistent trait formatting and display
-2. **AI Integration**: Ensure proper integration with AI generation endpoints
-3. **Validation**: Implement appropriate validation for trait data
-4. **User Experience**: Provide intuitive interfaces for trait management
+### Testing Best Practices
+
+• Use the minimum model tiers needed for testing
+• Focus testing on logic and UI rather than extensive AI generation
+• Create test characters once and reuse them
+• Consider using mock data for extensive UI testing
 
 ## Bug Reports
 

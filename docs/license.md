@@ -1,6 +1,6 @@
 # License Information
 
-NPC Forge is made available under the terms of the MIT License.
+NPC Forge is open source software released under the MIT License.
 
 ## MIT License
 
@@ -30,67 +30,43 @@ SOFTWARE.
 
 ## What This Means
 
-The MIT License is a permissive license that allows you to:
+The MIT License allows you to:
+• **Use** the software for any purpose, including commercial projects
+• **Modify** the source code to suit your needs
+• **Distribute** copies of the original or modified software
+• **Include** the software in larger projects or applications
 
-• Use NPC Forge commercially
-• Modify the code
-• Distribute your own versions
-• Use it privately
-• Use it as part of larger works
+**The only requirement** is including the original copyright notice and license text in any copy of the software.
 
-The only requirement is that you include the original copyright notice and license text in any copy of the software/source.
+## Generated Content Ownership
+
+**Your Characters and Content**:
+• Characters, conversations, and portraits you generate belong to you
+• You own all content created using NPC Forge
+• No restrictions on commercial use of generated characters
+• Generated content is not subject to the MIT License
+
+**Third-Party Services**:
+• Generated content uses OpenAI's AI services
+• Subject to [OpenAI's Terms of Use](https://openai.com/policies/terms-of-use)
+• Content ownership follows OpenAI's standard policy (user owns generated content)
 
 ## Third-Party Licenses
 
-NPC Forge uses several third-party libraries and resources, each with their own licenses:
+NPC Forge uses open source libraries under their respective licenses:
+• **Next.js**: MIT License
+• **React**: MIT License  
+• **Tailwind CSS**: MIT License
+• **Lucide Icons**: ISC License
+• **TypeScript**: Apache License 2.0
 
-### Major Dependencies
-
-• **Next.js** - MIT License
-• **React** - MIT License
-• **TypeScript** - Apache License 2.0
-• **Tailwind CSS** - MIT License
-• **Lucide Icons** - ISC License
-
-### API Usage
-
-• **OpenAI API** - When using NPC Forge, you are indirectly using OpenAI's API services, which are subject to [OpenAI's Terms of Use](https://openai.com/policies/terms-of-use).
-
-## Content Ownership
-
-### Generated Characters, Conversations, and Edited Content
-
-The characters, content, conversations, and portrait modifications generated using NPC Forge belong to you, the user. You are free to use them in any way you see fit, including in commercial projects. This includes:
-
-• Character profiles and attributes
-• AI-generated portraits and edited portraits
-• Character conversations and chat history
-• Generated traits and character enhancements
-• Quest, dialogue, and item content
-
-### OpenAI Usage Rights
-
-According to OpenAI's policy, content created using their API services belongs to the entity that created it. However, please refer to the most current [OpenAI Terms of Service](https://openai.com/policies/terms-of-service) for any updates to this policy.
-
-### Project Assets
-
-• The NPC Forge name and branding elements are proprietary to Ethan Perello
-• Documentation and other project-specific content are provided under the same MIT License as the code
-
-## Contributing
-
-By contributing to NPC Forge, you agree that your contributions will be licensed under the same MIT License as the rest of the project.
+All third-party licenses are compatible with the MIT License and commercial use.
 
 ## Questions
 
-If you have questions about licensing or usage rights, please contact [ethanperello@gmail.com](mailto:ethanperello@gmail.com).
+For licensing questions, contact [ethanperello@gmail.com](mailto:ethanperello@gmail.com).
 
 ## Related Documentation
 
-• [Credits and Acknowledgments](/docs/credits) - For attribution information
-• [Contributing Guidelines](/docs/contributing) - For contribution terms
-• [Security Documentation](/docs/security) - For security policies
-
----
-
-*This license information is provided for general understanding and does not constitute legal advice. If you require specific legal guidance, please consult with a qualified legal professional.*
+• [Credits and Acknowledgments](/docs/credits) - Attribution and acknowledgments
+• [Contributing Guidelines](/docs/contributing) - Contribution terms and process
