@@ -135,19 +135,18 @@ export const AdditionalTraitsSection = ({
     return filtered;
   };
 
-  // Format trait value with proper cleaning and validation
+  // Format trait value with proper cleaning and validation but preserve accented characters
   const formatTraitValue = (value: string): string => {
     if (!value || typeof value !== 'string') {
       return '';
     }
     
-    // Clean special characters first
+    // Clean special characters but preserve accented characters
     const cleaned = value
       .replace(/["""'']/g, '"') // Normalize quotes
       .replace(/—/g, '-') // Replace em dashes
       .replace(/…/g, '...') // Replace ellipsis
-      .replace(/[^\w\s-.,!?]/g, '') // Remove other special characters
-      .trim();
+      .trim(); // Don't remove any other characters to preserve accents
     
     // EXCLUDE long traits entirely - don't truncate, just return empty string
     if (cleaned.length > 25 || cleaned.includes('.') || cleaned.includes(',') || cleaned.split(' ').length > 4) {

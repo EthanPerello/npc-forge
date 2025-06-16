@@ -102,13 +102,12 @@ function cleanCharacterForAPI(character: any): any {
   delete cleaned.image_data;
   delete cleaned.image_url;
   
-  // Clean the character name of special characters
+  // Clean the character name of special characters but preserve accented characters
   if (cleaned.name) {
     cleaned.name = cleaned.name
       .replace(/["""'']/g, '"')
       .replace(/—/g, '-')
-      .replace(/[^\w\s-]/g, '')
-      .trim();
+      .trim(); // Don't remove accented characters
   }
   
   // Limit the size of trait objects
@@ -123,11 +122,11 @@ function cleanCharacterForAPI(character: any): any {
   if (cleaned.added_traits) {
     Object.keys(cleaned.added_traits).forEach(key => {
       if (typeof cleaned.added_traits[key] === 'string') {
-        // Clean special characters and limit length
+        // Clean special characters but preserve accented characters and limit length
         cleaned.added_traits[key] = cleaned.added_traits[key]
           .replace(/["""'']/g, '"')
           .replace(/—/g, '-')
-          .substring(0, 500);
+          .substring(0, 500); // Don't remove accented characters
       }
     });
   }
@@ -159,7 +158,7 @@ function validateRequest(body: any): { isValid: boolean; error?: string } {
 
 // Enhanced JSON parsing function with multiple strategies
 function parseJSONWithFallbacks(content: string): any {
-  // Clean the content first
+  // Clean the content first but preserve accented characters
   const cleanContent = content.trim()
     .replace(/["""'']/g, '"') // Normalize quotes
     .replace(/—/g, '-') // Replace em dashes
@@ -358,18 +357,18 @@ export async function POST(request: NextRequest) {
       let prompt: string;
       let systemPrompt: string;
 
-      // Generate appropriate prompts based on the field with improved quest instructions
+      // Generate appropriate prompts based on the field with short length specifications
       if (field === 'name') {
-        systemPrompt = `Generate a single character name that fits this character's appearance and background. Return only the name, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
+        systemPrompt = `Generate a single character name that fits this character's appearance and background. Return only the name, no additional text or formatting. Preserve any accented characters if appropriate for the character's background.`;
         prompt = `Character: ${cleanedCharacter.appearance || 'A character'}\nBackground: ${cleanedCharacter.backstory_hook || 'Unknown background'}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
       } else if (field === 'appearance') {
-        systemPrompt = `Generate a detailed physical appearance description for this character. Include facial features, build, clothing, and distinguishing characteristics. Return only the description, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
+        systemPrompt = `Generate a concise physical appearance description for this character in one short paragraph (2-4 sentences). Include facial features, build, clothing, and distinguishing characteristics. Return only the description, no additional text or formatting. Preserve any accented characters if appropriate.`;
         prompt = `Character Name: ${cleanedCharacter.name}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
       } else if (field === 'personality') {
-        systemPrompt = `Generate a detailed personality description for this character. Include traits, mannerisms, motivations, and behavioral patterns. Return only the description, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
+        systemPrompt = `Generate a concise personality description for this character in one short paragraph (2-4 sentences). Include traits, mannerisms, motivations, and behavioral patterns. Return only the description, no additional text or formatting. Preserve any accented characters if appropriate.`;
         prompt = `Character Name: ${cleanedCharacter.name}\nAppearance: ${cleanedCharacter.appearance}\nBackground: ${cleanedCharacter.backstory_hook}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
       } else if (field === 'backstory_hook') {
-        systemPrompt = `Generate an engaging backstory hook for this character. Include their origin, key life events, and what drives them. Return only the backstory, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
+        systemPrompt = `Generate a brief backstory hook for this character in 1-2 sentences. Include their origin, key life events, and what drives them. Return only the backstory, no additional text or formatting. Preserve any accented characters if appropriate.`;
         prompt = `Character Name: ${cleanedCharacter.name}\nAppearance: ${cleanedCharacter.appearance}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
       } else if (field.startsWith('quest_')) {
         // Handle quest regeneration with IMPROVED logic
@@ -391,17 +390,17 @@ export async function POST(request: NextRequest) {
         const quest = cleanedCharacter.quests[questIndex];
 
         if (questPart === 'title') {
-          systemPrompt = `Generate a compelling quest title. Return only the title, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
+          systemPrompt = `Generate a compelling quest title. Return only the title, no additional text or formatting. Preserve any accented characters if appropriate.`;
           prompt = `Quest Description: ${quest.description}\nCharacter: ${cleanedCharacter.name}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
         } else if (questPart === 'description') {
-          systemPrompt = `Generate a detailed quest description. Include the objective, stakes, and any relevant context. Return only the description, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
+          systemPrompt = `Generate a detailed quest description. Include the objective, stakes, and any relevant context. Return only the description, no additional text or formatting. Preserve any accented characters if appropriate.`;
           prompt = `Quest Title: ${quest.title}\nCharacter: ${cleanedCharacter.name}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
         } else if (questPart === 'reward') {
-          systemPrompt = `Generate an appropriate quest reward. Include both tangible and intangible benefits. Return only the reward description, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
+          systemPrompt = `Generate an appropriate quest reward. Include both tangible and intangible benefits. Return only the reward description, no additional text or formatting. Preserve any accented characters if appropriate.`;
           prompt = `Quest: ${quest.title} - ${quest.description}\nCharacter: ${cleanedCharacter.name}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
         } else {
           // FIXED: Regenerate entire quest with better prompt
-          systemPrompt = `Generate a complete quest as a valid JSON object. The quest should be appropriate for this character and genre. Return ONLY a JSON object with these exact fields: "title", "description", "reward", "type". Do not include any other text, markdown, or code blocks. Example format:
+          systemPrompt = `Generate a complete quest as a valid JSON object. The quest should be appropriate for this character and genre. Return ONLY a JSON object with these exact fields: "title", "description", "reward", "type". Do not include any other text, markdown, or code blocks. Preserve any accented characters if appropriate. Example format:
 {
   "title": "The Lost Artifact",
   "description": "Find the ancient relic hidden in the forgotten temple",
@@ -418,14 +417,14 @@ Occupation: ${cleanedCharacter.selected_traits?.occupation || 'Unknown'}
 Generate a quest that would be meaningful and appropriate for this character.`;
         }
       } else if (field === 'additional_traits') {
-        systemPrompt = `Generate 3-5 additional character traits as short keywords or phrases (1-3 words each). Return as JSON object with trait names as keys and short descriptions as values. Do not use special characters like em dashes or smart quotes. Examples: {"eye_color": "Green", "demeanor": "Stern", "skill": "Archery", "quirk": "Whistles"}`;
+        systemPrompt = `Generate 3-5 additional character traits as short keywords or phrases (1-3 words each). Return as JSON object with trait names as keys and short descriptions as values. Preserve any accented characters if appropriate (e.g., "Café Owner"). Examples: {"eye_color": "Green", "demeanor": "Stern", "skill": "Archery", "quirk": "Whistles"}`;
         prompt = `Character: ${cleanedCharacter.name}\nAppearance: ${cleanedCharacter.appearance}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
       } else if (field === 'add_single_trait') {
-        systemPrompt = `Generate 1 additional character trait as a short keyword or phrase (1-3 words). Return as JSON object with one trait name as key and short description as value. Do not use special characters like em dashes or smart quotes. Example: {"hobby": "Reading"}`;
+        systemPrompt = `Generate 1 additional character trait as a short keyword or phrase (1-3 words). Return as JSON object with one trait name as key and short description as value. Preserve any accented characters if appropriate (e.g., "Café Owner"). Example: {"hobby": "Reading"}`;
         prompt = `Character: ${cleanedCharacter.name}\nAppearance: ${cleanedCharacter.appearance}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
       } else if (field.startsWith('regenerate_trait_')) {
         const traitKey = field.replace('regenerate_trait_', '');
-        systemPrompt = `Generate a new value for the trait "${traitKey.replace(/_/g, ' ')}" as a short keyword or phrase (1-3 words). Return only the trait value, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
+        systemPrompt = `Generate a new value for the trait "${traitKey.replace(/_/g, ' ')}" as a short keyword or phrase (1-3 words). Return only the trait value, no additional text or formatting. Preserve any accented characters if appropriate (e.g., "Café Owner").`;
         prompt = `Character: ${cleanedCharacter.name}\nAppearance: ${cleanedCharacter.appearance}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}\nTrait to regenerate: ${traitKey.replace(/_/g, ' ')}`;
       } else if (field.startsWith('dialogue_')) {
         const parts = field.split('_');
@@ -442,7 +441,7 @@ Generate a quest that would be meaningful and appropriate for this character.`;
           );
         }
 
-        systemPrompt = `Generate a dialogue line that this character would say. Make it consistent with their personality and background. Return only the dialogue, no quotes or additional formatting. Do not use special characters like em dashes or smart quotes.`;
+        systemPrompt = `Generate a dialogue line that this character would say. Make it consistent with their personality and background. Return only the dialogue, no quotes or additional formatting. Preserve any accented characters if appropriate.`;
         prompt = `Character: ${cleanedCharacter.name}\nPersonality: ${cleanedCharacter.personality}\nBackground: ${cleanedCharacter.backstory_hook}\nExisting dialogue style: ${cleanedCharacter.dialogue_lines[0] || 'Unknown'}`;
       } else if (field.startsWith('item_')) {
         const parts = field.split('_');
@@ -459,7 +458,7 @@ Generate a quest that would be meaningful and appropriate for this character.`;
           );
         }
 
-        systemPrompt = `Generate an item that this character would own or carry. Include its name, description, and significance. Return only the item description, no additional text or formatting. Do not use special characters like em dashes or smart quotes.`;
+        systemPrompt = `Generate an item that this character would own or carry. Include its name, description, and significance. Return only the item description, no additional text or formatting. Preserve any accented characters if appropriate.`;
         prompt = `Character: ${cleanedCharacter.name}\nOccupation: ${cleanedCharacter.selected_traits?.occupation || 'Unknown'}\nPersonality: ${cleanedCharacter.personality}\nGenre: ${cleanedCharacter.selected_traits?.genre || 'fantasy'}`;
       } else {
         return NextResponse.json(
@@ -488,7 +487,7 @@ Generate a quest that would be meaningful and appropriate for this character.`;
         throw new Error("No content returned from OpenAI");
       }
 
-      // Clean up the response and remove special characters
+      // Clean up the response but preserve accented characters
       let regeneratedContent: string | Record<string, string> = content.trim()
         .replace(/["""'']/g, '"') // Normalize quotes
         .replace(/—/g, '-') // Replace em dashes
@@ -540,7 +539,7 @@ Generate a quest that would be meaningful and appropriate for this character.`;
         try {
           const traitsData = parseJSONWithFallbacks(regeneratedContent as string);
           if (typeof traitsData === 'object' && traitsData !== null) {
-            // Clean the trait values
+            // Clean the trait values but preserve accented characters
             const cleanedTraits: Record<string, string> = {};
             Object.entries(traitsData).forEach(([key, value]) => {
               if (typeof value === 'string') {
@@ -569,7 +568,7 @@ Generate a quest that would be meaningful and appropriate for this character.`;
         }
       }
 
-      // For individual trait regeneration, just clean the value
+      // For individual trait regeneration, just clean the value but preserve accented characters
       if (field.startsWith('regenerate_trait_')) {
         const cleanedValue = (regeneratedContent as string)
           .replace(/["""'']/g, '"')

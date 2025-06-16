@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Linted codebase with `npx eslint . --fix` to enforce consistent formatting and resolve automatic fixes
+- Regeneration outputs for appearance, personality, and backstory hooks now return short, single-paragraph results instead of verbose text
+- Trait regeneration updated to preserve special characters (e.g. accented letters) in display and storage
+- Model selector on edit page updated to show actual model names instead of only tier labels (e.g., “gpt-4o” instead of “Premium”)
+- Model selection buttons restyled for consistent coloring and improved clarity when selected
+  (helps users more easily identify the active model)
+  
+### Fixed
+- Documentation updated across all files to:
+  - Correct outdated framework references (e.g., “Next.js 14” → “Next.js 15”)
+  - Remove redundant usage tables and move technical details to developer docs
+  - Ensure version badge, changelog links, and content match latest release (v0.22.0)
+  - Improve formatting, accuracy, and clarity across all remaining `.md` files
+
 ## [0.22.0] - 2025-06-13
 
 ### Added
