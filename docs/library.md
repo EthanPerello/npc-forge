@@ -1,436 +1,372 @@
 # Character Library Guide
 
-The Character Library is NPC Forge's system for saving, managing, and editing your generated characters, including the enhanced filtering system, interactive chat features, and the portrait editing and trait management capabilities.
+The Character Library is NPC Forge's comprehensive system for saving, organizing, filtering, editing, and managing your generated characters. This guide covers all library features from basic organization to advanced character editing.
 
-## Overview
+## Library Overview
 
-The Character Library allows you to:
-• Save characters locally using IndexedDB
-• Edit and modify existing characters
-• Start conversations with your characters
-• Regenerate specific character elements with enhanced visual feedback (NEW in v0.22.0)
-• Edit portraits using AI-powered text prompts
-• Generate and manage character traits
-• Search and filter your collection with advanced trait filtering
-• Import and export characters as JSON
-• Manage character portraits and data
+### Core Functions
+• **Character Storage**: Save generated characters locally with all data and portraits
+• **Organization Tools**: Enhanced filtering and smart search capabilities  
+• **Character Editing**: Comprehensive editing interface for all character elements
+• **Chat Integration**: Direct conversation access from character cards
+• **Data Management**: Import/export capabilities for backup and sharing
 
-## Accessing the Library
+### Library Interface Elements
 
-Access the Character Library through:
-• The "Library" link in the main navigation
-• The "Save to Library" button after generating a character (now transitions to "View Library" in v0.22.0)
+![Character Library Interface](public/images/character-library.png)
 
-## Saving Characters
+• **Character Cards**: Visual grid displaying portraits, names, and trait tags
+• **Filter Panel**: Collapsible interface with dropdown filters organized by category
+• **Search Bar**: Smart search with general text and trait-specific syntax support
+• **Action Buttons**: Direct access to chat, edit, download, and delete functions
+• **Character Modal**: Detailed view with complete character information and actions
 
-### From Generation
+## Character Storage and Organization
 
-After generating a character:
-1. Review your character in the results step
-2. Click "Save to Library"
-3. The button now dynamically transitions to "View Library" for better navigation (NEW in v0.22.0)
-4. The character is saved with all data and portrait
+### Saving Characters to Library
 
-### From Editing
+**From Character Generation**:
+1. Complete the four-step wizard and generate your character
+2. Click "Save to Library" button in the results step
+3. Character is immediately saved with all generated content and portrait
+4. Automatic trait indexing for enhanced filtering capabilities
 
-When editing a character:
-1. Make your desired changes
-2. Click "Save Changes"
-3. Updates are saved to your local storage
-4. Navigation back to Library is immediate
+**Character Data Stored**:
+• Complete character profile (name, traits, appearance, personality, backstory)
+• Generated content (quests, dialogue, items)
+• Portrait image (compressed for storage efficiency)
+• Metadata for filtering and search functionality
+• Creation timestamp and generation model information
 
-## Library Interface
+### Library Storage System
 
-### Character Cards
+**Local Browser Storage**:
+• All data stored in IndexedDB for reliability and performance
+• Typical storage capacity: Several gigabytes per browser
+• Data persists across browser sessions and restarts
+• No external server dependencies or data transmission
+• Complete user control and privacy
 
-Each character is displayed as a card containing:
-• Character portrait (fills container responsively)
-• Character name (always visible)
-• Trait tags with category prefixes
-• Action buttons for common operations
-
-### Character Actions
-
-Each character card includes buttons for:
-• **Chat**: Start a conversation with the character
-• **View/Edit**: Open character in edit mode
-• **Download JSON**: Export character data
-• **Download Portrait**: Save character image (if available)
-• **Delete**: Remove character from library
-
-### Library Modal
-
-Click any character card to open a detailed modal with:
-• Full character profile with tabs
-• All character traits and information
-• **Start Chat** button for conversations
-• Edit, download, and delete options
-
-## Interactive Chat Features
-
-### Starting Conversations
-
-**Multiple ways to begin chatting:**
-1. **From Character Cards**: Click the "Chat" button on any character card
-2. **From Library Modal**: Click "Start Chat" in the character details modal
-3. **Direct Navigation**: Use the enhanced sidebar navigation (NEW in v0.22.0)
-
-### Chat Integration
-
-The library seamlessly integrates with the chat system:
-• Chat buttons available on all character cards
-• Conversation history maintained per character
-• Easy switching between library browsing and chatting
-• Character traits and backstory inform chat responses
+**Storage Optimization**:
+• Portrait images compressed automatically for efficient storage
+• Character data structured for fast retrieval and filtering
+• Automatic cleanup of orphaned data and temporary files
+• Database recovery mechanisms for corruption handling
 
 ## Enhanced Filtering System
 
 ### Automatic Trait Discovery
 
-• Filter dropdowns are automatically created from your character data
-• New traits appear in filters as you save more characters
-• Traits are organized into logical categories
-• Long or sentence-like traits are automatically excluded for cleaner organization
+**Filter Generation Process**:
+• Filters automatically created from existing character data in your library
+• New traits appear in filter options as you save more characters
+• Smart categorization based on trait type and content
+• Dynamic filter updates when character data changes
 
-### Filter Categories
+**Filter Categories**:
+• **Basic Information**: Genre, sub-genre, gender, age group, moral alignment, relationship
+• **Physical Traits**: Species, height, build, distinctive features
+• **Background & Social**: Occupation, social class, homeland, cultural background
+• **Personality**: Character traits, behavioral patterns, motivations
 
-The filter panel is organized into sections:
-• **Basic Information**: Genre, gender, age, alignment, relationship
-• **Physical Traits**: Species, height, build, physical characteristics
-• **Background & Social**: Occupation, social class, homeland
-• **Personality**: Personality traits and motivations
+**Filter Quality Control**:
+• Automatically excludes overly long traits (sentences or paragraphs)
+• Removes duplicate or near-duplicate trait values
+• Filters out non-trait metadata like appearance descriptions
+• Maintains clean, usable filter categories
 
-### Smart Search
+### Filter Interface and Usage
 
-Use the simplified search with trait-specific syntax:
-• Search placeholder: "Search characters…"
-• `personality: brave` - Find characters with brave personality
-• `occupation: knight` - Find all knights
-• `genre: fantasy` - Filter by fantasy genre
-• `build: muscular` - Find characters with muscular build
+**Filter Panel Organization**:
+• Collapsible sections for different trait categories
+• Dropdown menus with all available values for each trait type
+• Multi-select capability for combining multiple filters
+• Clear indicators showing active filters and result counts
 
-### Using Filters
+**Using Dropdown Filters**:
+1. Expand relevant filter category section
+2. Select desired values from dropdown menus
+3. Multiple selections within a category act as "OR" conditions
+4. Multiple categories act as "AND" conditions
+5. Results update immediately as filters are applied
 
-1. Use dropdown filters to narrow by categories
-2. Add specific searches using `category: value` syntax
-3. Combine multiple filters and search terms
-4. Results update in real-time
+**Filter Management**:
+• Clear individual filters with "×" buttons
+• Reset all filters with "Clear All" option
+• Filter state preserved during browsing session
+• Filter combinations saved for complex searches
 
-## Character Editing
+### Smart Search Functionality
 
-### Edit Interface
+**General Text Search**:
+• Searches across character names, descriptions, and trait values
+• Case-insensitive matching with partial word support
+• Searches within generated content (quests, dialogue, items)
+• Real-time results as you type
 
-The edit interface provides comprehensive character modification:
-• Edit character name and basic information
-• Modify all character attributes
-• Regenerate individual elements with enhanced visual feedback (NEW in v0.22.0)
-• Manage portraits with editing capabilities
-• Generate and manage additional traits
-• Add/remove quests, dialogue, and items
+**Trait-Specific Search Syntax**:
+• Format: `category: value` for precise trait matching
+• Examples:
+  - `personality: brave` - Find characters with brave personality trait
+  - `occupation: knight` - Find all knight characters
+  - `genre: fantasy` - Filter by fantasy genre
+  - `build: muscular` - Find characters with muscular build
+  - `alignment: good` - Find good-aligned characters
+
+**Advanced Search Techniques**:
+• Combine multiple trait searches: `personality: wise occupation: wizard`
+• Mix general search with trait syntax: `magic personality: mysterious`
+• Use partial matches: `occup: knig` will find knight occupations
+• Quotation marks for exact phrases: `"ancient wizard"`
+
+**Search Best Practices**:
+• Start with broad searches, then narrow with additional terms
+• Use trait syntax for precise filtering by specific characteristics
+• Combine search with dropdown filters for maximum precision
+• Check spelling and try variations if results are unexpected
+
+## Character Editing and Management
+
+### Accessing Character Edit Mode
+
+**Edit Interface Entry Points**:
+• Click "Edit" button on character cards in library grid
+• Use "Edit Character" option in character detail modal
+• Direct navigation to edit page from character URLs
+
+![Character Edit Interface](public/images/edit-page.png)
+
+**Edit Page Layout**:
+• Model selectors at top for choosing regeneration models
+• Organized sections for different character elements
+• Save/cancel controls with unsaved changes warnings
+• Navigation breadcrumbs for easy library return
+
+### Comprehensive Character Editing
+
+**Basic Information Editing**:
+• **Character Name**: Direct text editing with validation
+• **Character Description**: Full description modification
+• **Core Traits**: Gender, age, alignment, relationship status modification
+• **Advanced Traits**: Physical characteristics, background elements, personality traits
+
+**Content Element Management**:
+• **Quest Management**: Add new quests, edit existing ones, remove unwanted quests
+• **Dialogue Editing**: Modify dialogue lines, add character-appropriate options
+• **Item Management**: Edit item descriptions, add new items, organize inventory
+• **Individual Regeneration**: Regenerate specific elements without affecting others
+
+**Regeneration Controls**:
+• **Attribute Regeneration**: Name, appearance, personality, backstory with model selection
+• **Content Regeneration**: Individual quest components, dialogue lines, item descriptions
+• **Bulk Regeneration**: Multiple elements simultaneously with progress tracking
+• **Regeneration History**: Track changes and compare versions
 
 ### Portrait Management and Editing
 
-**Portrait Options:**
-• **Upload**: Add custom portrait images
-• **Regenerate**: Create new portraits with different models
-• **Edit**: Modify existing portraits using text prompts
+**Portrait Operations**:
+• **Upload Custom Portraits**: Replace AI-generated images with custom artwork
+• **Regenerate Portraits**: Create new AI portraits with different models or styles
+• **Portrait Editing**: Modify existing portraits using text-based prompts
+• **Portrait Download**: Save portrait images to device storage
 
-**Portrait Editing Features:**
-• AI-powered editing using OpenAI's image editing API
-• Text-based prompts for describing desired changes
-• Support for color changes, accessories, clothing, and expressions
-• Model compatibility (gpt-image-1 recommended for best results)
-• Clear messaging that only gpt-image-1 supports full editing; DALL·E 2 has limited capabilities, DALL·E 3 doesn't support editing (NEW in v0.22.0)
-• Real-time preview of edited portraits
+**Portrait Editing Features** (gpt-image-1 only):
+• **Text-Based Editing**: Describe changes in natural language
+• **Edit Categories**: Color changes, accessories, clothing, expressions, backgrounds
+• **Edit Prompt Examples**:
+  - `"change hair color to blonde"`
+  - `"add round glasses"`
+  - `"remove the hat"`
+  - `"make them smile"`
+  - `"change shirt to blue"`
+  - `"add a beard"`
 
-**Portrait Editing Workflow:**
-1. Open character in edit mode
+**Portrait Editing Workflow**:
+1. Select character with existing portrait in edit mode
 2. Navigate to Portrait section
-3. Click "Edit Portrait" button (requires existing portrait)
-4. Enter text description of desired changes
-5. Click "Edit Portrait" to process changes
-6. Review results and save if satisfied
-
-**Edit Prompt Examples:**
-```
-"change hair color to blonde"
-"add a red hat"
-"remove glasses"
-"make them smile"
-"change shirt to blue"
-"add armor"
-```
+3. Ensure gpt-image-1 model is selected for full editing support
+4. Enter specific edit prompt describing desired changes
+5. Click "Edit Portrait" and wait for processing (30-90 seconds)
+6. Review results and save changes if satisfied
 
 ### Advanced Trait Management
 
-**Additional Traits Section:**
-• View all additional character traits in organized layout
-• Traits displayed with editable names and values
-• Standardized Title Case formatting with proper capitalization (NEW in v0.22.0)
-• Consistent display matching character modal
-
-**Trait Management Features:**
-• **Add Custom Trait**: Manually create traits with custom names and values
-• **Add Generated Trait**: AI generates new traits automatically
-• **Individual Regeneration**: Regenerate specific traits with dedicated buttons and enhanced visual feedback (NEW in v0.22.0)
-• **Edit Trait Names**: Modify trait categories and names
-• **Edit Trait Values**: Update trait descriptions and values
-• **Remove Traits**: Delete unwanted traits from character
-
-**Trait Generation:**
-• AI-generated traits match character personality and background
-• Automatic formatting and validation
-• Smart filtering excludes overly long traits
-• Integration with existing trait display system
-
-### Regeneration Features
-
-Regenerate specific character elements with enhanced visual feedback (NEW in v0.22.0):
-• Individual attributes (name, appearance, personality, backstory)
-• Portraits with different models
-• Portrait editing with text prompts
-• Quest components (title, description, reward)
-• Dialogue lines
-• Item descriptions
-• Individual character traits
-
-Choose different AI models for regeneration based on your monthly limits:
-• Standard: 50 text/10 images per month
-• Enhanced: 30 text/5 images per month
-• Premium: 10 text/3 images per month
-
-**Enhanced User Experience (NEW in v0.22.0):**
-• All regeneration buttons now use consistent rotating circle (RotateCcw) icons
-• Visual loading indicators show progress for all regeneration operations
-• Improved error handling with enhanced fallback logic
-• Real-time status updates for all operations
-
-## Import and Export
-
-### JSON Export
-
-Export individual characters:
-1. Click "Download JSON" on any character card
-2. File contains complete character data including traits and portrait information
-
-### JSON Import
-
-Import characters from files:
-1. Use "Import Character" option in library
-2. Select JSON file from your device
-3. Character is added to your library with traits automatically categorized
-
-## Storage and Performance
-
-### Local Storage
-
-The library uses IndexedDB for storage:
-• Character data with trait indexing
-• Chat conversation sessions per character
-• Compressed portrait images
-• Search indices and trait categories
-• Automatic cleanup of orphaned data
-
-### Performance Features
-
-• Characters loaded as needed
-• Portrait compression for storage efficiency
-• Indexed search for fast filtering
-• Optimized filter operations
-• Responsive card layouts with uniform sizing
-
-## User Interface Improvements
-
-### Enhanced Character Cards
-
-• **Responsive Portraits**: Images fill containers responsively
-• **Uniform Card Sizing**: Consistent dimensions across all cards
-• **Always-Visible Names**: Character names always displayed prominently
-• **Streamlined Design**: Removed genre badges for cleaner appearance
-• **Direct Chat Access**: Chat buttons prominently featured on each card
-
-### Improved Library Modal
-
-• **Modal Interactions**: Click cards to open detailed view instead of portrait zoom
-• **Chat Integration**: Start Chat button in character details
-• **Consistent Layout**: Improved spacing and organization
-
-## Enhanced User Experience (v0.22.0)
-
-### Visual Feedback Improvements
-
-• **Enhanced Loading States**: All regeneration operations show clear visual indicators
-• **Consistent Iconography**: Rotating circle (RotateCcw) icons for all regeneration buttons
-• **Real-Time Updates**: Immediate feedback for all character operations
-• **Better Error Handling**: Enhanced fallback logic for failed operations
-
-### Navigation Enhancements
-
-• **Dynamic Button Transitions**: "Save to Library" → "View Library" transitions for better user flow
-• **Integrated Chat Access**: Enhanced sidebar navigation includes direct chat links
-• **Improved Organization**: Cleaner layout and better visual hierarchy
-
-### Trait Management Enhancements
-
-• **Proper Capitalization**: All trait categories now display with proper Title Case formatting
-• **Enhanced Display Logic**: Additional traits section shows all traits not included in Basic Info or Character Traits sections
-• **Better Filtering**: Excludes unsupported traits (e.g., custom personality entries) from filter dropdowns
-• **Consistent Formatting**: Standardized trait display between modal and edit page
-
-## Library Management
-
-### Organization Tips
-
-1. **Consistent Traits**: Use standardized trait values across characters
-2. **Complete Profiles**: Fill out relevant trait categories for better filtering
-3. **Regular Backups**: Export important characters as JSON files
-4. **Descriptive Names**: Use clear, searchable character names
-5. **Chat Documentation**: Use conversations to develop character relationships
-6. **Portrait Consistency**: Use portrait editing to maintain visual consistency
-
-### Using Filtering Effectively
-
-1. **Start Broad**: Begin with genre or basic trait filters
-2. **Use Smart Search**: Leverage `category: value` syntax for precision
-3. **Combine Methods**: Mix dropdown filters with text search
-4. **Organize Collections**: Use consistent traits for related characters
-
-### Portrait Editing Workflow
-
-1. **Create Characters**: Generate characters with initial portraits
-2. **Save to Library**: Add characters to your collection
-3. **Review Portraits**: Identify portraits that need refinement
-4. **Edit Portraits**: Use text prompts to modify specific aspects (gpt-image-1 recommended)
-5. **Maintain Consistency**: Ensure portraits match your campaign aesthetic
-
-### Trait Management Workflow
-
-1. **Generate Characters**: Create characters with basic traits
-2. **Review Traits**: Examine additional traits in edit mode
-3. **Add Custom Traits**: Include story-specific traits manually
-4. **Generate AI Traits**: Use AI to suggest relevant traits
-5. **Organize Traits**: Edit and format traits for consistency
-6. **Filter and Search**: Use traits to organize your collection
-
-### Chat Integration Workflow
-
-1. **Create Characters**: Generate characters using the wizard
-2. **Save to Library**: Add characters to your collection
-3. **Start Conversations**: Use chat buttons to begin interactions
-4. **Develop Characters**: Use conversations to explore character depth
-5. **Edit and Refine**: Update character details based on chat insights
-6. **Maintain Relationships**: Use chat history to track character development
-
-## Advanced Features
-
-### Bulk Operations
-
-• Export multiple characters by selecting and downloading JSON files
-• Use consistent trait values across character collections
-• Organize related characters using similar trait structures
-
-### Character Development
-
-• Use chat conversations to discover new character traits
-• Edit portraits to reflect character development over time
-• Generate additional traits based on character growth
-• Maintain character consistency across long campaigns
-
-### Collection Management
-
-• Use trait filtering to organize character types (allies, enemies, NPCs)
-• Create character groups using consistent homeland or faction traits
-• Manage campaign-specific characters with custom traits
-
-## Troubleshooting
-
-### Common Issues
-
-**Characters not saving**:
-• Check browser storage permissions
-• Verify sufficient storage space
-• Try refreshing the page
-
-**Missing portraits**:
-• Portraits may fail to generate due to network issues
-• Try regenerating the portrait with different models
-• Use portrait editing to fix minor issues
-• Upload a custom image as backup
-
-**Portrait editing not working**:
-• Ensure character has existing portrait
-• Check that gpt-image-1 model is selected for best results
-• Verify monthly image model limits haven't been exceeded
-• Try simpler edit prompts
-
-**Chat not working**:
-• Verify the character exists in your library
-• Check that you haven't reached monthly usage limits
-• Try refreshing the browser
-
-**Trait management issues**:
-• Traits may not appear in filters if they're too long
-• Check that trait names and values are properly formatted
-• Regenerate traits if they don't match character personality
-
-**Visual feedback issues (NEW)**:
-• Loading indicators not appearing: refresh the page
-• Button transitions not working: ensure JavaScript is enabled
-
-**Filtering issues**:
-• Traits only appear after characters with those traits are saved
-• Check syntax for trait-specific searches (`category: value`)
-• Try refreshing the library page
-
-**Search not working**:
-• Clear and retry search terms
-• Try using trait-specific syntax
-• Use dropdown filters first, then add search
-
-## Best Practices
-
-### Character Organization
-
-• Use consistent naming conventions for related characters
-• Apply similar trait structures to character groups
-• Regular maintenance of trait values for better filtering
-• Export character collections for backup and sharing
-
-### Portrait Management
-
-• Generate initial portraits with appropriate art styles
-• Use portrait editing for minor adjustments rather than complete redesigns
-• Maintain consistent art style across character collections
-• Test different edit prompts to understand model capabilities
-• Use gpt-image-1 for reliable editing results
-
-### Trait Development
-
-• Balance AI-generated traits with custom traits for character depth
-• Use trait regeneration to improve inconsistent traits
-• Organize traits by importance and relevance to your story
-• Regular review and cleanup of unnecessary traits
-• Take advantage of enhanced visual feedback for trait operations
-
-### Chat Integration
-
-• Start conversations immediately after character creation
-• Use chat to explore character background and motivations
-• Reference character traits in conversations for consistency
-• Document character development through ongoing conversations
-
-### Enhanced User Experience (v0.22.0)
-
-• Take advantage of improved visual feedback for all operations
-• Use dynamic button transitions for better navigation flow
-• Leverage enhanced trait capitalization for better organization
-• Utilize improved error handling for more reliable operations
+**Additional Traits Section**:
+• **Trait Display**: All additional character traits in organized layout
+• **Trait Formatting**: Consistent Title Case formatting throughout interface
+• **Trait Editing**: Edit trait names and values directly in interface
+• **Trait Organization**: Automatic grouping and categorization when possible
+
+**Trait Management Operations**:
+• **Add Generated Trait**: AI creates contextually appropriate new traits
+• **Add Custom Trait**: Manually create trait with custom name and value
+• **Individual Trait Regeneration**: Regenerate specific traits independently
+• **Trait Editing**: Modify existing trait names and values
+• **Trait Removal**: Delete unwanted or incorrect traits
+
+**AI Trait Generation**:
+• **Context-Aware Generation**: AI analyzes existing character elements
+• **Character Consistency**: Generated traits match personality and background
+• **Genre Appropriateness**: Traits fit selected genre and setting
+• **Roleplay Enhancement**: Traits designed to add depth and story hooks
+
+**Trait Generation Process**:
+1. Click "Add Generated Trait" in Additional Traits section
+2. AI analyzes character context and generates appropriate trait
+3. Trait appears as editable entry in trait list
+4. Can be further edited, regenerated, or removed as needed
+5. Trait automatically integrates with filtering system
+
+## Chat System Integration
+
+### Chat Access Points
+
+**Starting Conversations**:
+• **Character Card Buttons**: Direct "Chat" button on each character card
+• **Library Modal**: "Start Chat" button in character detail view
+• **Edit Page Integration**: Chat access from character editing interface
+• **Enhanced Navigation**: Chat links in improved sidebar navigation
+
+**Chat Features from Library**:
+• **Character Context**: Full character data automatically loaded into chat
+• **Conversation Persistence**: Chat history maintained per character
+• **Model Selection**: Choose AI model tier for conversation quality
+• **Seamless Integration**: Switch between library browsing and chatting
+
+### Chat and Character Development
+
+**Using Chat for Character Enhancement**:
+• **Personality Exploration**: Discover character traits through conversation
+• **Backstory Development**: Explore character history and motivations
+• **Relationship Building**: Develop character connections and dynamics
+• **Character Testing**: Verify personality consistency and voice
+
+**Chat-Informed Editing**:
+• **Trait Refinement**: Edit character traits based on conversation insights
+• **Personality Adjustment**: Modify character elements to match developed voice
+• **Content Enhancement**: Add quests or dialogue based on chat interactions
+• **Character Evolution**: Track character development over time
+
+## Data Management and Portability
+
+### Export Capabilities
+
+**Character Export Options**:
+• **Individual Export**: Download single characters as JSON files
+• **Bulk Export**: Multiple character selection for batch download
+• **Complete Data**: Exports include all character data and portrait information
+• **Cross-Platform Compatibility**: JSON format works across different devices
+
+**Export Data Contents**:
+• Complete character profile and generated content
+• Portrait image data (base64 encoded)
+• Character traits and filtering metadata
+• Creation and modification timestamps
+• Model information and generation settings
+
+**Export Workflow**:
+1. Click "Download JSON" on character cards or in character modal
+2. Choose download location on your device
+3. File contains complete character data for backup or sharing
+4. Can be imported into any NPC Forge installation
+
+### Import Functionality
+
+**Character Import Process**:
+• **File Selection**: Choose JSON files from device storage
+• **Data Validation**: Automatic validation of file format and content
+• **Library Integration**: Characters added to library with full functionality
+• **Conflict Resolution**: Handling of duplicate character names or IDs
+
+**Import Sources**:
+• **Backup Files**: Restore characters from previous exports
+• **Shared Characters**: Import characters shared by other users
+• **Cross-Device Transfer**: Move characters between different devices
+• **Collaboration**: Share character collections between team members
+
+**Import Considerations**:
+• **Portrait Storage**: Large portrait files may affect import speed
+• **Trait Integration**: Imported character traits automatically added to filters
+• **Data Integrity**: Validation ensures imported characters work properly
+• **Storage Impact**: Consider available browser storage when importing large collections
+
+### Data Backup and Recovery
+
+**Backup Strategies**:
+• **Regular Exports**: Schedule periodic character exports for safety
+• **Incremental Backups**: Export new or modified characters regularly
+• **Collection Snapshots**: Export entire character collections at major milestones
+• **Cloud Storage**: Store exported JSON files in cloud services for accessibility
+
+**Recovery Procedures**:
+• **Data Loss Recovery**: Import backed-up characters after data loss
+• **Corruption Handling**: Database recovery tools and procedures
+• **Migration Support**: Moving characters between browsers or devices
+• **Version Management**: Managing multiple versions of character collections
+
+## Performance Optimization
+
+### Library Performance
+
+**Large Collection Management**:
+• **Efficient Loading**: Characters loaded as needed for performance
+• **Search Optimization**: Indexed searching for fast results even with large collections
+• **Filter Performance**: Optimized filter operations for responsive interface
+• **Memory Management**: Automatic cleanup of unused data and resources
+
+**Storage Optimization**:
+• **Portrait Compression**: Automatic image compression for storage efficiency
+• **Data Deduplication**: Elimination of duplicate trait values and metadata
+• **Index Maintenance**: Automatic search index updates and optimization
+• **Cleanup Procedures**: Regular maintenance of storage and temporary files
+
+### User Experience Optimization
+
+**Interface Responsiveness**:
+• **Progressive Loading**: Character cards load incrementally for faster display
+• **Search Debouncing**: Optimized search input handling for smooth typing
+• **Filter Updates**: Real-time filter results without performance impact
+• **Smooth Transitions**: Optimized animations and state changes
+
+**Mobile Optimization**:
+• **Touch Interface**: Optimized touch controls for mobile devices
+• **Responsive Layout**: Adaptive interface for different screen sizes
+• **Performance Scaling**: Adjusted performance for mobile hardware limitations
+• **Network Consideration**: Efficient data usage for mobile connections
+
+## Advanced Library Features
+
+### Collection Organization Strategies
+
+**Character Categorization**:
+• **Campaign Organization**: Group characters by game campaign or story
+• **Role-Based Grouping**: Organize by character function (ally, enemy, neutral)
+• **Setting Classification**: Group by fantasy realm, sci-fi universe, historical period
+• **Importance Levels**: Distinguish main characters from background NPCs
+
+**Tagging Strategies**:
+• **Consistent Naming**: Use standardized character names for easy searching
+• **Strategic Traits**: Apply relevant traits for effective filtering
+• **Genre Consistency**: Maintain consistent genre and setting tags
+• **Update Maintenance**: Regular review and updating of character traits
+
+### Advanced Search Techniques
+
+**Complex Filtering**:
+• **Multi-Category Combinations**: Use multiple filter categories simultaneously
+• **Search + Filter Combinations**: Combine text search with dropdown filters
+• **Exclusion Searching**: Find characters without specific traits
+• **Range Filtering**: Filter by numeric or ordered values
+
+**Collection Analytics**:
+• **Character Distribution**: Understanding character type distribution in collection
+• **Trait Analysis**: Identifying common traits and patterns
+• **Usage Tracking**: Monitoring which characters are used most frequently
+• **Collection Health**: Identifying incomplete or outdated character data
 
 ## Related Documentation
 
-• [How to Use NPC Forge](/docs/how-to-use) - Complete creation, chat, and editing guide
-• [Chat with Characters](/docs/chat) - Detailed conversation guide
-• [Character Examples](/docs/character-examples) - Sample library characters
-• [Generation Options](/docs/generation-options) - Customization settings including portrait editing
-• [Model Selection Guide](/docs/models) - Understanding AI models for editing and generation
-• [Features Overview](/docs/features) - Complete feature list including trait management
+• [How to Use NPC Forge](/docs/how-to-use) - Basic character creation and library usage
+• [Chat with Characters](/docs/chat) - Detailed chat system features and integration
+• [Character Examples](/docs/character-examples) - Examples showcasing library features
+• [Model Selection Guide](/docs/models) - Model capabilities for editing and regeneration

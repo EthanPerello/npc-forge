@@ -1,357 +1,313 @@
 # Model Selection Guide
 
-NPC Forge offers multiple AI models with different capabilities and usage limits. This guide explains the tiered model system and helps you choose the right models for your needs.
+This is the authoritative reference for AI models, usage limits, and capabilities in NPC Forge. All usage information in other documentation files references this guide.
 
-## Overview
+## Model Overview
 
-NPC Forge uses two types of AI models:
-• **Text Models**: For generating character attributes, quests, dialogue, items, **chat conversations**, and **trait generation**
-• **Image Models**: For creating character portraits and **portrait editing**
+NPC Forge uses two types of AI models with three quality tiers each:
+• **Text Models**: Generate character attributes, quests, dialogue, items, chat responses, and traits
+• **Image Models**: Create and edit character portraits
 
-Each type offers three tiers with different quality levels and monthly usage limits.
+Each tier offers different quality levels and monthly usage limits, allowing you to balance output quality with available generations.
 
 ## Text Generation Models
 
 ### 🟢 Standard Tier: gpt-4o-mini
-
 • **Monthly Limit**: 50 generations
-• **Best For**: Regular character creation, casual conversations, experimentation, frequent trait generation
-• **Quality**: Good baseline quality for most use cases
-• **Chat Usage**: Suitable for everyday character interactions
-• **Trait Generation**: Good for basic trait creation and regeneration
+• **Reset Date**: 1st of each month
+• **Quality**: Good baseline quality suitable for most characters
+• **Best For**: 
+  - Regular character creation and experimentation
+  - Background NPCs and supporting characters
+  - Casual chat conversations
+  - Frequent trait generation and editing
+  - Testing different character concepts
 
-### 🟡 Enhanced Tier: gpt-4.1-mini
-
+### 🟡 Enhanced Tier: gpt-4.1-mini  
 • **Monthly Limit**: 30 generations
-• **Best For**: Important characters, meaningful conversations, higher quality content, targeted trait development
-• **Quality**: Improved detail and narrative consistency
-• **Chat Usage**: Better character voice consistency and depth
-• **Trait Generation**: More sophisticated and character-appropriate traits
+• **Reset Date**: 1st of each month
+• **Quality**: Improved detail, narrative consistency, and character depth
+• **Best For**:
+  - Important story characters requiring depth
+  - Meaningful chat conversations about plot or relationships
+  - Higher quality quest and dialogue generation
+  - Characters central to your campaign or story
+  - Targeted trait development for key NPCs
 
 ### 🔴 Premium Tier: gpt-4o
-
-• **Monthly Limit**: 10 generations
-• **Best For**: Critical characters, key story moments, maximum detail, premium trait development
-• **Quality**: Highest quality output with rich detail
-• **Chat Usage**: Most consistent character personality and sophisticated responses
-• **Trait Generation**: Most nuanced and contextually appropriate traits
+• **Monthly Limit**: 10 generations  
+• **Reset Date**: 1st of each month
+• **Quality**: Highest quality output with rich detail and sophisticated personality development
+• **Best For**:
+  - Critical main characters and primary antagonists
+  - Key story moments and dramatic chat conversations
+  - Maximum detail character creation
+  - Premium trait development for complex personalities
+  - Characters requiring nuanced psychological depth
 
 ## Image Generation Models
 
 ### 🟢 Standard Tier: DALL-E 2
-
 • **Monthly Limit**: 10 generations
-• **Quality**: Good basic portrait generation
-• **Best For**: Quick character visualization
-• **Portrait Editing**: Limited editing capabilities, basic modifications only
+• **Reset Date**: 1st of each month
+• **Quality**: Good basic portrait generation with clear character representation
+• **Portrait Editing**: Not supported - no editing capabilities
+• **Best For**:
+  - Quick character visualization
+  - Background NPCs requiring portraits
+  - Testing portrait concepts
 
 ### 🟡 Enhanced Tier: DALL-E 3
-
 • **Monthly Limit**: 5 generations
-• **Quality**: Improved detail and artistic quality
-• **Best For**: Important character portraits
-• **Portrait Editing**: Not supported for editing operations
+• **Reset Date**: 1st of each month  
+• **Quality**: Improved detail, artistic quality, and visual consistency
+• **Portrait Editing**: Not supported - no editing capabilities
+• **Best For**:
+  - Important character portraits requiring quality
+  - Characters with complex visual descriptions
+  - Final portraits for key NPCs
 
 ### 🔴 Premium Tier: gpt-image-1
-
 • **Monthly Limit**: 3 generations
-• **Quality**: Maximum artistic control and quality
-• **Best For**: Showcase-quality character art, characters requiring portrait editing
+• **Reset Date**: 1st of each month
+• **Quality**: Maximum artistic control, detail, and visual fidelity
 • **Portrait Editing**: Full editing support with best results
+• **Best For**:
+  - Showcase-quality character portraits
+  - Characters requiring portrait editing capabilities
+  - Complex visual concepts needing highest quality
+  - Final portraits for main characters
 
 ## Portrait Editing Capabilities
 
 ### Model Support for Portrait Editing
 
-**gpt-image-1 (Premium) - RECOMMENDED**
-• Full editing support with reliable results
-• Handles complex edits (color changes, accessories, clothing, expressions)
-• Best quality and most consistent editing results
-• Support for detailed edit prompts up to 32,000 characters
+**gpt-image-1 (Premium) - ONLY MODEL SUPPORTING EDITING**
+• **Full editing support** with reliable, high-quality results
+• Handles complex edits: color changes, accessories, clothing modifications, expression changes
+• **Edit prompt limit**: Up to 32,000 characters for detailed instructions
+• **Best quality** editing with consistent results
+• **Supports all edit types**: additions, removals, color changes, style modifications
 
-**dall-e-2 (Standard) - LIMITED**
-• Basic editing capabilities
-• Simple modifications may work
-• Inconsistent results and quality
-• Limited prompt support (1,000 characters)
+**dall-e-2 (Standard) - NO EDITING SUPPORT**
+• **Cannot be used for portrait editing** operations
+• Generate-only model for initial portrait creation
+• **No modification capabilities** available
+• Must regenerate entirely for changes
 
-**dall-e-3 (Enhanced) - NOT SUPPORTED**
-• No editing capabilities available
-• Cannot be used for portrait modifications
-• Generate-only model for initial portraits
+**dall-e-3 (Enhanced) - NO EDITING SUPPORT**
+• **Cannot be used for portrait editing** operations
+• Generate-only model for initial portrait creation
+• **No modification capabilities** available
+• Must regenerate entirely for changes
 
 ### Portrait Editing Use Cases
 
-**Color Modifications:**
-• Hair color changes
-• Eye color adjustments  
-• Clothing color updates
-• Skin tone adjustments
+**Successful Edit Types**:
+• **Color Modifications**: Hair color, eye color, clothing colors, skin tone adjustments
+• **Accessory Management**: Adding/removing hats, glasses, jewelry, weapons, armor
+• **Expression Changes**: Smile adjustments, serious expressions, emotional modifications
+• **Clothing Updates**: Outfit changes, adding/removing layers, style modifications
+• **Detail Enhancement**: Scars, tattoos, facial hair, age modifications
 
-**Accessory Management:**
-• Adding hats, glasses, jewelry
-• Removing unwanted accessories
-• Facial hair modifications
-• Armor and equipment additions
-
-**Expression Changes:**
-• Smile adjustments
-• Serious or angry expressions
-• Emotional state modifications
-• Subtle facial feature changes
-
-**Clothing Updates:**
-• Shirt and outfit changes
-• Adding or removing layers
-• Style modifications
-• Period-appropriate clothing
+**Edit Prompt Examples**:
+```
+"change hair color to blonde"
+"add round glasses"
+"remove the hat"
+"make them smile"
+"change shirt to red"
+"add a beard"
+"give them a serious expression"
+"add leather armor"
+```
 
 ## Chat Integration
 
-### How Chat Uses Models
+### How Chat Uses Text Models
 
-When chatting with characters, the **text models** are used to generate responses:
-• Each chat response counts as **one generation** against your monthly text model limit
-• You can switch between models during conversations
-• Higher-tier models provide more consistent character personalities
-• Response quality and character voice depth improve with higher tiers
+Chat conversations utilize the selected text model for generating character responses:
+• **Each chat response counts as one generation** against your monthly text model limit
+• **Model selection can be changed** during conversations
+• **Response quality directly correlates** with selected model tier
+• **Character personality consistency** improves with higher tiers
 
-### Chat-Specific Model Considerations
+### Chat-Specific Model Performance
 
-**Standard Model for Chat:**
-• Good for casual conversations and everyday interactions
-• Suitable for background characters and quick exchanges
-• Most efficient use of monthly limits
+**Standard Model (gpt-4o-mini) for Chat**:
+• **Response Quality**: Clear, coherent character responses with basic personality consistency
+• **Character Voice**: Adequate for general character interactions and world-building
+• **Context Understanding**: Good grasp of immediate conversation context
+• **Best For**: Daily character interactions, casual conversations, background character dialogue
 
-**Enhanced Model for Chat:**
-• Better for important character development conversations
-• More consistent character voice and personality
-• Improved understanding of character context and traits
+**Enhanced Model (gpt-4.1-mini) for Chat**:
+• **Response Quality**: More nuanced character voice with improved personality depth
+• **Character Voice**: Better consistency and understanding of character relationships
+• **Context Understanding**: Superior comprehension of character motivations and background
+• **Best For**: Important character development conversations, plot discussions, relationship building
 
-**Premium Model for Chat:**
-• Best for critical story moments and main character interactions
-• Highest quality character voice and personality consistency
-• Most sophisticated understanding of character relationships and background
+**Premium Model (gpt-4o) for Chat**:
+• **Response Quality**: Sophisticated character development with excellent personality consistency
+• **Character Voice**: Most natural and engaging character interactions
+• **Context Understanding**: Deep understanding of character relationships, history, and motivations
+• **Best For**: Critical story moments, emotional scenes, main character interactions, complex plot discussions
 
-## Trait Generation Integration
+### Chat Usage Patterns
+
+**Conversation Planning**:
+• **Daily Interactions** (Standard): Greetings, small talk, general world-building
+• **Character Development** (Enhanced): Exploring backstory, developing relationships, important discussions
+• **Key Story Moments** (Premium): Major revelations, emotional scenes, critical decision points
+
+## Trait Management Integration
 
 ### Text Models for Trait Generation
 
-**Standard Model (gpt-4o-mini):**
-• Good for basic trait generation and regeneration
-• Suitable for frequent trait additions
-• Adequate quality for most trait needs
+**Trait Generation Capabilities**:
+• **"Add Generated Trait"** counts as one text generation against monthly limits
+• **Individual trait regeneration** counts as one generation per trait
+• **Multiple traits generated simultaneously** count as one generation
+• **Trait quality** improves with higher model tiers
 
-**Enhanced Model (gpt-4.1-mini):**
-• Better trait quality and character consistency
-• More sophisticated trait selection
-• Improved integration with existing character elements
+**Model Performance for Traits**:
 
-**Premium Model (gpt-4o):**
-• Highest quality trait generation
-• Most contextually appropriate traits
-• Best understanding of character nuance and depth
+**Standard Model**:
+• **Quality**: Good basic trait generation appropriate to character context
+• **Consistency**: Adequate integration with existing character elements
+• **Best For**: Frequent trait additions, experimental character development
 
-### Trait Generation Usage
+**Enhanced Model**: 
+• **Quality**: Better trait quality with improved character consistency
+• **Consistency**: Superior integration with character personality and background
+• **Best For**: Important character trait development, refined character elements
 
-• **Add Generated Trait**: Counts as one text generation
-• **Regenerate Individual Traits**: Each regeneration counts as one text generation  
-• **Multiple Trait Generation**: Generating several traits at once counts as one generation
-• **Model Selection**: Choose appropriate tier based on character importance
+**Premium Model**:
+• **Quality**: Highest quality trait generation with nuanced character understanding
+• **Consistency**: Excellent contextual appropriateness and character integration
+• **Best For**: Critical character traits, complex personality development, main character enhancement
 
-## Usage Strategy
+## Usage Tracking and Management
 
-### Monthly Planning
+### Monthly Limit System
 
-**Recommended Strategy**:
-• Use Standard models for most characters and casual chat
-• Reserve Enhanced tier for important characters and meaningful conversations
-• Save Premium tier for critical main characters and key story interactions
-• Plan portrait editing carefully with gpt-image-1's limited monthly quota
+**Limit Tracking**:
+• **Individual tracking** for each model tier (text and image separately)
+• **Monthly reset** on the 1st of each month at 00:00 UTC
+• **Real-time usage display** in model selection interfaces
+• **Warning notifications** when approaching limits
 
-### Model Combination Tips
+**Usage Calculation**:
+• **Character Generation**: Counts against selected text and image models
+• **Chat Responses**: Count against selected text model only
+• **Portrait Editing**: Counts against selected image model only
+• **Trait Operations**: Count against selected text model only
+• **Regeneration**: Each operation counts as one generation
 
-**Efficient Combinations**:
-• Standard Text + Enhanced Image: Good balance for most characters
-• Enhanced Text + Standard Image: Better character depth with quick visualization
-• Premium Text + Premium Image: Maximum character development with editing capabilities
+**Development Mode**:
+• **Usage limits bypassed** in development environment for testing
+• **Production deployment** enforces all limits normally
+• **Local development** can test all features without limit restrictions
 
-**Chat-Focused Strategy**:
-• Start conversations with Standard model to establish character voice
-• Switch to Enhanced/Premium for important character development moments
-• Use Premium sparingly for crucial story revelations or emotional scenes
+### Strategic Usage Planning
 
-**Portrait Editing Strategy**:
-• Generate initial portraits with dall-e-3 for quality
-• Reserve gpt-image-1 for characters needing editing
-• Plan edits carefully due to low monthly limits
-• Use editing for refinements rather than complete redesigns
+**Efficient Usage Strategies**:
 
-## Usage Tracking
+**Model Combination Approaches**:
+• **Standard Text + Enhanced Image**: Good balance for most characters
+• **Enhanced Text + Standard Image**: Better character depth with basic visualization
+• **Premium Text + Premium Image**: Maximum character development with editing capabilities
+• **Mixed Regeneration**: Start with Standard, upgrade specific elements with higher tiers
 
-### Monthly Limits
+**Monthly Planning**:
+• **Early Month**: Experiment with Standard models, create base characters
+• **Mid-Month**: Use Enhanced models for important character development
+• **End-Month**: Reserve Premium models for critical characters and key moments
 
-Each model tier has individual monthly limits:
-• Limits reset on the 1st of each month
-• Tracking is per device/browser
-• Development mode bypasses limits for testing
-• **Chat conversations count against text model limits**
-• **Portrait editing counts against image model limits**
-• **Trait generation counts against text model limits**
+**Feature-Specific Strategies**:
+• **Character Creation**: Use Standard for testing, Enhanced/Premium for final versions
+• **Chat Conversations**: Start with Standard, upgrade for important story moments
+• **Portrait Editing**: Plan edits carefully due to limited Premium image generations
+• **Trait Management**: Use Standard for frequent additions, Enhanced/Premium for key character traits
 
-### Limit Display
+## Usage Limit Comparison Table
 
-The interface shows:
-• Remaining generations for each model
-• Current month's usage
-• Warning when approaching limits
-• Chat usage integration with text model tracking
-• Portrait editing integration with image model tracking
+| Feature | Standard Monthly | Enhanced Monthly | Premium Monthly |
+|---------|------------------|------------------|-----------------|
+| **Text Model Limit** | 50 generations | 30 generations | 10 generations |
+| **Image Model Limit** | 10 generations | 5 generations | 3 generations |
+| **Character Creation** | ✅ Unlimited variety | ✅ Better quality | ✅ Highest quality |
+| **Chat Conversations** | ✅ Casual interactions | ✅ Character development | ✅ Key story moments |
+| **Portrait Editing** | ❌ Not supported | ❌ Not supported | ✅ Full support |
+| **Trait Generation** | ✅ Frequent additions | ✅ Quality improvements | ✅ Premium development |
+| **Best Use Case** | Regular characters | Important characters | Critical characters |
 
-## Regeneration with Models
+## Model Selection Recommendations
 
-When editing characters, you can:
-• Regenerate individual attributes with different text models
-• Update portraits with different image models
-• Edit portraits using text prompts with compatible image models
-• Generate new traits with selected text models
-• Mix and match models for optimal results
+### For New Users
+1. **Start with Standard models** to learn the system and experiment
+2. **Create several test characters** to understand quality differences
+3. **Try different combinations** of text and image model tiers
+4. **Gradually use Enhanced/Premium** for characters you want to keep
 
-### Regeneration Strategy
+### For Regular Users
+1. **Use Standard models** for background NPCs and experimentation
+2. **Reserve Enhanced models** for important story characters
+3. **Save Premium models** for main characters and critical moments
+4. **Plan usage around monthly cycles** for optimal distribution
 
-1. **Start with Standard**: Generate initial character
-2. **Identify Key Areas**: Determine which aspects need improvement
-3. **Selective Upgrade**: Regenerate specific elements with higher-tier models
-4. **Portrait Enhancement**: Use gpt-image-1 for portrait editing when needed
-5. **Final Polish**: Use Premium models for critical final touches
+### For Campaign Managers
+1. **Standard Tier**: Shopkeepers, guards, random encounters
+2. **Enhanced Tier**: Recurring NPCs, faction leaders, important allies
+3. **Premium Tier**: Main antagonists, key story characters, party mentors
 
-## Chat Usage Patterns
+### For Writers and Content Creators
+1. **Standard Tier**: Background characters, world-building NPCs
+2. **Enhanced Tier**: Secondary characters, supporting cast
+3. **Premium Tier**: Protagonists, primary antagonists, central figures
 
-### Conversation Planning
+## Quality Comparison Examples
 
-**Daily Interactions** (Standard Model):
-• Casual greetings and small talk
-• Basic character interactions
-• General world-building conversations
+### Text Generation Quality Differences
 
-**Character Development** (Enhanced Model):
-• Exploring character backstory and motivations
-• Developing character relationships
-• Important plot-related discussions
+**Character Description Generation**:
+• **Standard**: "Marcus is a thoughtful monk who values knowledge and questions authority."
+• **Enhanced**: "Marcus embodies scholarly curiosity beneath a humble exterior, his gentle demeanor concealing profound theological questions that challenge orthodox doctrine."
+• **Premium**: "Brother Marcus moves through the monastery with deliberate quietude, his ink-stained fingers betraying countless hours spent not merely copying sacred texts, but wrestling with their deeper implications—a scholar whose faith is deepened rather than diminished by intellectual honesty."
 
-**Key Story Moments** (Premium Model):
-• Major character revelations
-• Emotional or dramatic scenes
-• Critical decision points in your story
+### Image Generation Quality Differences
 
-### Response Quality Differences
+**Portrait Generation Results**:
+• **Standard (DALL-E 2)**: Clear, recognizable portraits with basic detail and good color accuracy
+• **Enhanced (DALL-E 3)**: Improved artistic quality, better lighting, more sophisticated composition and detail
+• **Premium (gpt-image-1)**: Maximum visual fidelity, superior artistic control, exceptional detail and style consistency
 
-**Standard Model Chat Responses:**
-• Clear, coherent character responses
-• Basic personality consistency
-• Good for general interactions
+## Technical Considerations
 
-**Enhanced Model Chat Responses:**
-• More nuanced character voice
-• Better personality depth and consistency
-• Improved understanding of character context
+### Model Performance Characteristics
 
-**Premium Model Chat Responses:**
-• Sophisticated character development
-• Excellent personality consistency
-• Deep understanding of character relationships and background
-• Most natural and engaging conversations
+**Response Time Expectations**:
+• **Text Generation**: 10-30 seconds for character content
+• **Image Generation**: 30-120 seconds depending on model and complexity
+• **Chat Responses**: 5-15 seconds for conversational responses
+• **Portrait Editing**: 30-90 seconds for image modifications
 
-## Portrait Editing Workflow
+**Model Availability**:
+• **All models available 24/7** through OpenAI infrastructure
+• **Temporary slowdowns possible** during high-demand periods
+• **Automatic retry logic** for transient failures
+• **Error handling** with user-friendly feedback
 
-### Planning Portrait Edits
+### Integration Details
 
-**Before Editing:**
-1. **Assess Current Portrait**: Identify specific improvements needed
-2. **Choose Model**: Ensure gpt-image-1 is selected for best results
-3. **Plan Edits**: Write clear, specific edit prompts
-4. **Check Limits**: Verify monthly image model usage
-
-**During Editing:**
-1. **Start Simple**: Begin with basic modifications
-2. **Be Specific**: Use clear, descriptive edit prompts
-3. **Test Incrementally**: Make one change at a time
-4. **Review Results**: Evaluate each edit before proceeding
-
-**After Editing:**
-1. **Save Changes**: Preserve edited portraits immediately
-2. **Document Edits**: Note successful edit prompts for future reference
-3. **Plan Future Edits**: Consider additional improvements needed
-
-## Quality Differences
-
-### Text Model Comparison
-
-• **Standard**: Basic but functional character profiles, conversations, and traits
-• **Enhanced**: More nuanced personalities, backstories, chat responses, and sophisticated traits
-• **Premium**: Rich, complex character development, sophisticated conversations, and highly contextual traits
-
-### Image Model Comparison
-
-• **DALL-E 2**: Clear, recognizable portraits with basic editing capabilities
-• **DALL-E 3**: Enhanced detail and artistic quality (no editing support)
-• **gpt-image-1**: Maximum visual fidelity, style control, and full editing capabilities
-
-### Portrait Editing Quality
-
-• **dall-e-2**: Basic edits may work but results are inconsistent
-• **dall-e-3**: No editing capabilities available
-• **gpt-image-1**: Professional-quality editing with reliable results
-
-## Best Practices
-
-### Efficient Usage
-
-1. **Plan Your Month**: Identify which characters need higher-tier models
-2. **Start Low, Upgrade High**: Generate with Standard, regenerate important parts with Premium
-3. **Monitor Usage**: Track your monthly consumption across all features
-4. **Strategic Chat**: Use appropriate model tiers based on conversation importance
-5. **Smart Portrait Editing**: Reserve gpt-image-1 for characters that truly need editing
-
-### Chat-Specific Tips
-
-1. **Model Switching**: Change models during conversations based on the importance of the interaction
-2. **Character Voice**: Higher-tier models maintain more consistent character personalities
-3. **Context Awareness**: Premium models better understand character relationships and background
-4. **Conversation Flow**: Start with Standard to establish baseline, upgrade for key moments
-
-### Portrait Editing Best Practices
-
-1. **Model Selection**: Use gpt-image-1 for all portrait editing needs
-2. **Clear Prompts**: Write specific, detailed edit descriptions
-3. **Incremental Changes**: Make small adjustments rather than major overhauls
-4. **Plan Carefully**: Consider edit needs during initial portrait generation
-5. **Save Originals**: Keep copies of original portraits before editing
-
-### Trait Management Tips
-
-1. **Appropriate Models**: Match trait generation model to character importance
-2. **Batch Generation**: Generate multiple traits at once when possible
-3. **Strategic Regeneration**: Use higher-tier models for key character traits
-4. **Consistent Quality**: Use same model tier for related characters
-
-## Model Comparison Table
-
-| Aspect | Standard | Enhanced | Premium |
-|--------|----------|----------|---------|
-| **Text Monthly Limit** | 50 | 30 | 10 |
-| **Image Monthly Limit** | 10 | 5 | 3 |
-| **Text Quality** | Good | Better | Best |
-| **Image Quality** | Good | Better | Best |
-| **Chat Personality** | Basic | Consistent | Sophisticated |
-| **Portrait Editing** | Limited | Not Supported | Full Support |
-| **Trait Generation** | Basic | Enhanced | Premium |
-| **Best Use** | Regular characters | Important characters | Critical characters |
+**API Integration**:
+• **Server-side processing** for all model interactions
+• **Secure API key handling** without client exposure
+• **Usage validation** before expensive operations
+• **Error categorization** for specific user guidance
 
 ## Related Documentation
 
-• [How to Use NPC Forge](/docs/how-to-use) - Complete creation, chat, and editing guide
-• [Chat with Characters](/docs/chat) - Detailed conversation guide
-• [Generation Options](/docs/generation-options) - Detailed customization including portrait editing
-• [Character Library](/docs/library) - Managing characters, traits, and conversations
-• [Features Overview](/docs/features) - Complete feature list including portrait editing
+• [How to Use NPC Forge](/docs/how-to-use) - Complete user guide including model selection
+• [Character Examples](/docs/character-examples) - See quality differences across model tiers
+• [Generation Options](/docs/generation-options) - Detailed customization options
+• [Chat with Characters](/docs/chat) - Chat-specific model usage strategies

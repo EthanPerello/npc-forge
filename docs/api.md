@@ -1,474 +1,527 @@
 # API Documentation
 
-This document describes the internal API structure of NPC Forge for developers who want to understand how the application works or contribute to its development.
+This comprehensive technical reference documents NPC Forge's internal API structure for developers who want to understand system functionality or contribute to development.
 
-## API Endpoints
+## API Architecture Overview
 
-NPC Forge uses Next.js API routes for its backend functionality.
+NPC Forge uses Next.js 15 API routes for all backend functionality with server-side OpenAI integration:
 
-### `POST /api/generate`
+• **Server-Side Processing**: All AI interactions handled server-side for security
+• **RESTful Design**: Standard HTTP methods and response patterns
+• **JSON Communication**: Structured request/response format throughout
+• **Error Handling**: Comprehensive error categorization and user-friendly messaging
+• **Free for End Users**: No API keys or costs required for end users
 
-Generates a new character based on provided parameters.
+## Core API Endpoints
 
-#### Request Body
+### Character Generation API
 
+#### `POST /api/generate`
+
+**Purpose**: Creates new characters based on user specifications with AI generation
+
+**Request Format**:
 ```typescript
 {
-  description: string;                    // Character description
-  include_quests: boolean;                // Whether to include quests
-  include_dialogue: boolean;              // Whether to include dialogue
-  include_items: boolean;                 // Whether to include items
-  genre?: string;                         // Optional genre
-  sub_genre?: string;                     // Optional sub-genre
-  gender?: string;                        // Optional gender
-  age_group?: string;                     // Optional age group
-  moral_alignment?: string;               // Optional alignment
-  relationship_to_player?: string;        // Optional relationship
-  advanced_options?: object;              // Advanced character options
-  quest_options?: object;                 // Quest configuration
-  dialogue_options?: object;              // Dialogue configuration
-  item_options?: object;                  // Item configuration
-  portrait_options?: object;              // Portrait configuration
-  text_model?: string;                    // Selected text model
-  image_model?: string;                   // Selected image model
+  // Required Core Fields
+  description: string;                    // Character description (2-500 characters)
+  include_quests: boolean;                // Generate quest content
+  include_dialogue: boolean;              // Generate dialogue options
+  include_items: boolean;                 // Generate item inventory
+  include_portrait: boolean;              // Generate character portrait
+  
+  // Optional Character Configuration
+  genre?: string;                         // Selected genre category
+  sub_genre?: string;                     // Specific sub-genre template
+  gender?: string;                        // Character gender option
+  age_group?: string;                     // Age category selection
+  moral_alignment?: string;               // Good/Neutral/Evil alignment
+  relationship_to_player?: string;        // Ally/Enemy/Neutral/etc.
+  
+  // Advanced Configuration Objects
+  advanced_options?: {
+    height?: string;                      // Physical height category
+    build?: string;                       // Physical build type
+    distinctive_features?: string;        // Special physical characteristics
+    social_class?: string;                // Social/economic status
+    homeland?: string;                    // Origin/background location
+    occupation?: string;                  // Character profession
+    personality_traits?: string[];        // Selected personality characteristics
+  };
+  
+  // Content Generation Configuration
+  quest_options?: {
+    num_quests?: number;                  // Number of quests (3-7)
+    quest_types?: string[];               // Types of quests to generate
+    reward_types?: string[];              // Types of rewards to include
+  };
+  
+  dialogue_options?: {
+    num_lines?: number;                   // Number of dialogue lines (5-15)
+    dialogue_contexts?: string[];         // Conversation contexts
+  };
+  
+  item_options?: {
+    num_items?: number;                   // Number of items (3-10)
+    rarity_distribution?: string;         // Item rarity preferences
+    item_categories?: string[];           // Types of items to generate
+  };
+  
+  // Portrait Configuration
+  portrait_options?: {
+    art_style?: string;                   // Visual art style preference
+    expression?: string;                  // Character expression/mood
+    framing?: string;                     // Portrait composition type
+    background?: string;                  // Background style option
+  };
+  
+  // Model Selection
+  text_model?: string;                    // Selected text generation model
+  image_model?: string;                   // Selected image generation model
 }
 ```
 
-#### Response
+**Response Formats**:
 
-**Success response (200 OK):**
-
+**Success Response (200 OK)**:
 ```typescript
 {
   character: {
-    name: string;                     // Character name
-    selected_traits: object;          // User-selected traits
-    added_traits: object;             // AI-added traits
-    appearance: string;               // Appearance description
-    personality: string;              // Personality description
-    backstory_hook: string;           // Brief backstory
-    quests?: Array<object>;           // Optional quests
-    dialogue_lines?: string[];        // Optional dialogue
-    items?: string[];                 // Optional items
-    image_url?: string;               // Optional portrait URL
-    image_data?: string;              // Optional portrait data
+    // Core Identity
+    id: string;                           // Unique character identifier
+    name: string;                         // Generated character name
+    age_group: string;                    // Age category
+    gender: string;                       // Character gender
+    moral_alignment: string;              // Character alignment
+    relationship_to_player: string;       // Player relationship
+    
+    // Generated Content
+    appearance: string;                   // Physical description
+    personality: string;                  // Personality overview
+    backstory_hook: string;               // Background narrative
+    
+    // Optional Generated Content
+    quests?: Array<{
+      title: string;                      // Quest name
+      description: string;                // Quest details
+      reward: string;                     // Quest completion reward
+    }>;
+    
+    dialogue?: string[];                  // Character dialogue options
+    
+    items?: Array<{
+      name: string;                       // Item name
+      description: string;                // Item details
+      rarity?: string;                    // Item rarity level
+    }>;
+    
+    // Portrait Data
+    portrait?: {
+      url: string;                        // Generated image URL
+      alt_text: string;                   // Accessibility description
+      style: string;                      // Art style used
+    };
+    
+    // Metadata
+    created_at: string;                   // Creation timestamp
+    generation_models: {
+      text_model: string;                 // Model used for text
+      image_model?: string;               // Model used for image
+    };
+    
+    // Additional Traits
+    additional_traits?: Record<string, string>; // AI-generated character traits
   }
 }
 ```
 
-**Error response (400/500):**
-
+**Error Response (400/500)**:
 ```typescript
 {
-  error: string;                      // Error message
-  character: null;                    // Null character data
-}
-```
-
-### `POST /api/regenerate`
-
-Regenerates specific character attributes or elements, including trait generation capabilities.
-
-#### Request Body
-
-```typescript
-{
-  character: object;                  // Complete character object
-  field: string;                      // Type of regeneration
-  model?: string;                     // Model for text regeneration
-  portraitOptions?: object;           // Portrait options for image regeneration
-}
-```
-
-#### Supported Regeneration Types
-
-**Character Attributes:**
-- `name`: Character name
-- `appearance`: Physical appearance description
-- `personality`: Personality description
-- `backstory_hook`: Character backstory
-
-**Portrait Regeneration:**
-- `portrait`: Complete portrait regeneration
-
-**Component Regeneration:**
-- `quest_[index]_[component]`: Quest components (title, description, reward)
-- `dialogue_[index]`: Individual dialogue lines
-- `item_[index]`: Individual items
-
-**Trait Generation:**
-- `additional_traits`: Generate multiple new traits
-- `add_single_trait`: Generate one new trait
-- `regenerate_trait_[traitKey]`: Regenerate a specific trait
-
-#### Response
-
-**Success response (200 OK):**
-
-```typescript
-{
-  success: true;
-  character: object;                  // Updated character object
-  field: string;                      // Field that was regenerated
-}
-```
-
-**Error response (400/403/500):**
-
-```typescript
-{
-  success: false;
-  error: string;                      // Error message
-  type: string;                       // Error category
-  field: string;                      // Field that failed
-}
-```
-
-### `POST /api/edit-portrait`
-
-Edits existing character portraits using AI-powered image editing with text prompts.
-
-#### Request Body
-
-```typescript
-{
-  character: Character;               // Complete character object with existing portrait
-  editPrompt: string;                 // Text description of desired changes
-  imageModel?: ImageModel;            // Image model to use (defaults to 'gpt-image-1')
-}
-```
-
-#### Edit Prompt Examples
-
-```typescript
-// Color changes
-"change hair color to blonde"
-"make the eyes green"
-
-// Accessories
-"add a red hat"
-"remove glasses"
-"add a beard"
-
-// Clothing
-"change shirt to blue"
-"add armor"
-"remove the cloak"
-
-// Facial expressions
-"make them smile"
-"give them a serious expression"
-```
-
-#### Response
-
-**Success response (200 OK):**
-
-```typescript
-{
-  success: true;
-  character: {
-    ...originalCharacter,
-    image_data: string;               // Updated portrait as base64 data
-    portrait_options: {
-      ...originalOptions,
-      image_model: string;            // Model used for editing
-    }
+  error: string;                          // Technical error message
+  character: null;                        // Null character data
+  errorType: string;                      // Error category classification
+  userMessage: string;                    // User-friendly error description
+  details?: {
+    field?: string;                       // Problematic field if validation error
+    suggestion?: string;                  // Suggested resolution
   }
 }
 ```
 
-**Error response (400/403/500):**
+**Error Categories**:
+• `validation_error`: Invalid input parameters
+• `usage_limit_exceeded`: Monthly generation limits reached
+• `api_error`: OpenAI API issues (rate limits, service issues)
+• `content_policy_violation`: Generated content blocked by content filters
+• `timeout_error`: Generation took too long and timed out
+• `network_error`: Connection issues with external services
 
+### Character Regeneration API
+
+#### `POST /api/regenerate`
+
+**Purpose**: Regenerates specific character elements or adds new content to existing characters
+
+**Request Format**:
 ```typescript
 {
-  success: false;
-  error: string;                      // Error message
-  errorType: string;                  // Error category
+  // Required Fields
+  character: Character;                   // Complete existing character object
+  field: string;                          // Regeneration target specification
+  
+  // Optional Configuration
+  model?: string;                         // Text model for regeneration
+  portraitOptions?: {                     // Portrait-specific options
+    art_style?: string;
+    expression?: string;
+    framing?: string;
+    background?: string;
+  };
+  
+  // Advanced Options
+  regeneration_context?: {
+    preserve_relationships?: boolean;     // Maintain character relationships
+    maintain_core_identity?: boolean;     // Keep essential character elements
+    enhancement_focus?: string;           // Specific improvement area
+  };
 }
 ```
 
-#### Error Types
+**Supported Regeneration Fields**:
 
-• `invalid_request`: Missing fields, invalid character data, or prompt issues
-• `unsupported_model`: Model doesn't support image editing (only gpt-image-1 recommended)
-• `rate_limit`: Temporary API rate limit reached
-• `quota_exceeded`: Monthly usage limit reached
-• `payload_too_large`: Image too large for editing
-• `timeout`: Request timeout
-• `network`: Network connectivity issues
+**Character Attributes**:
+• `name` - Generate new character name
+• `appearance` - Regenerate physical description
+• `personality` - Create new personality description
+• `backstory_hook` - Generate new background narrative
 
-#### Model Support
+**Portrait Operations**:
+• `portrait` - Regenerate character portrait with new settings
 
-Currently, only `gpt-image-1` is recommended for reliable image editing:
-- `dall-e-2`: Limited editing capabilities
-- `dall-e-3`: Not supported for editing
-- `gpt-image-1`: Full editing support with best results
+**Content Elements**:
+• `quest_[index]_title` - Regenerate specific quest title
+• `quest_[index]_description` - Regenerate quest description
+• `quest_[index]_reward` - Regenerate quest reward
+• `quest_[index]` - Regenerate complete quest
+• `dialogue_[index]` - Regenerate specific dialogue line
+• `item_[index]` - Regenerate specific item
 
-#### Usage Limits
+**Trait Management**:
+• `additional_traits` - Generate multiple new traits
+• `add_single_trait` - Generate one new trait
+• `regenerate_trait_[traitKey]` - Regenerate specific existing trait
 
-Portrait editing counts against your image model monthly limits:
-- Standard (dall-e-2): 10 edits per month
-- Enhanced (dall-e-3): 5 edits per month  
-- Premium (gpt-image-1): 3 edits per month
+**Response Format**: Same as generation API, returning updated character object
 
-### `POST /api/chat`
+### Portrait Editing API
 
-Handles character conversations with AI-powered responses.
+#### `POST /api/edit-portrait`
 
-#### Request Body
+**Purpose**: Edit existing character portraits using AI-powered image modification
 
+**Request Format**:
 ```typescript
 {
-  characterId: string;                // ID of the character
-  character: Character;               // Complete character object
-  messages: ChatMessage[];            // Previous conversation messages
-  newMessage: string;                 // User's new message (max 1000 chars)
-  model: OpenAIModel;                 // Selected AI model for response
+  // Required Fields
+  character: Character;                   // Character with existing portrait
+  editPrompt: string;                     // Natural language edit description
+  
+  // Optional Configuration
+  imageModel?: string;                    // Image model for editing (gpt-image-1 only)
+  
+  // Advanced Edit Options
+  editOptions?: {
+    preserve_style?: boolean;             // Maintain original art style
+    enhancement_mode?: boolean;           // Focus on improvements vs changes
+    iteration_count?: number;             // Number of edit attempts (1-3)
+  };
 }
 ```
 
-#### Response
+**Edit Prompt Guidelines**:
+• **Maximum Length**: 32,000 characters (gpt-image-1)
+• **Effective Prompts**: Clear, specific descriptions of desired changes
+• **Supported Edits**: Color changes, accessories, clothing, expressions, backgrounds
+• **Edit Examples**:
+  - `"change hair color to blonde"`
+  - `"add round glasses"`
+  - `"remove the hat"`
+  - `"make them smile"`
+  - `"change shirt to red"`
 
-**Success response (200 OK):**
+**Model Support**:
+• **gpt-image-1**: Full editing support with high-quality results
+• **dall-e-2**: No editing support
+• **dall-e-3**: No editing support
 
+**Response Format**:
 ```typescript
 {
-  success: true;
-  message: {
-    id: string;                       // Unique message ID
-    role: 'assistant';                // Message role
-    content: string;                  // Character's response
-    timestamp: string;                // ISO timestamp
-    characterId: string;              // Character ID
-  }
+  success: boolean;                       // Edit operation success status
+  character: Character;                   // Updated character with edited portrait
+  editMetadata?: {
+    originalPrompt: string;               // Original edit request
+    processingTime: number;               // Edit processing duration
+    modelUsed: string;                    // AI model used for editing
+  };
+  error?: string;                         // Error message if edit failed
 }
 ```
 
-**Error response (400/403/500):**
+### Interactive Chat API
 
+#### `POST /api/chat`
+
+**Purpose**: Generate AI responses for character conversations maintaining personality consistency
+
+**Request Format**:
 ```typescript
 {
-  success: false;
-  error: string;                      // Error message
-  errorType: string;                  // Error category
+  // Required Fields
+  characterId: string;                    // Unique character identifier
+  character: Character;                   // Complete character object
+  messages: ChatMessage[];                // Previous conversation history
+  newMessage: string;                     // User's current message (max 1000 chars)
+  model: string;                          // Selected AI model for response
+  
+  // Optional Configuration
+  conversationContext?: {
+    maxContextMessages?: number;          // Number of previous messages to include (default: 15)
+    responseStylePreference?: string;     // Preferred response style or length
+    emotionalContext?: string;            // Current conversation emotional state
+  };
 }
 ```
 
-#### Error Types
-
-• `invalid_request`: Missing fields or invalid data
-• `rate_limit`: Temporary API rate limit reached
-• `quota_exceeded`: Monthly usage limit reached
-• `authentication`: API authentication error
-• `server_error`: Temporary server issues
-• `timeout`: Request timeout
-• `network`: Network connectivity issues
-
-#### Chat Features
-
-**Dynamic Response Lengths:**
-• Simple greetings (< 20 chars): 150 tokens (1-2 sentences)
-• Medium questions (20-100 chars): 200-350 tokens (2-4 sentences)
-• Detailed requests (> 100 chars): 600 tokens (1-2 paragraphs)
-• Maximum cap: 800 tokens to prevent cutoff
-
-**Character Consistency:**
-• System prompts include character traits, personality, and backstory
-• Recent conversation context (last 15 messages) provided
-• Temperature set to 0.8 for natural responses
-• Automatic retry for responses that appear cut off
-
-**Usage Integration:**
-• Checks usage limits before API calls
-• Increments usage count only after successful responses
-• Model switching supported mid-conversation
-
-### `GET /api/proxy-image`
-
-Proxies external image URLs for CORS compatibility.
-
-#### Query Parameters
-
+**ChatMessage Interface**:
 ```typescript
 {
-  url: string;                        // External image URL to proxy
+  id: string;                             // Unique message identifier
+  role: 'user' | 'character';             // Message sender type
+  content: string;                        // Message text content
+  timestamp: string;                      // Message creation time
+  characterId: string;                    // Associated character ID
+  metadata?: {
+    modelUsed?: string;                   // AI model for character responses
+    processingTime?: number;              // Response generation time
+    tokenCount?: number;                  // Message token usage
+  };
 }
 ```
 
-## Enhanced API Reliability
+**Response Format**:
+```typescript
+{
+  success: boolean;                       // Response generation success
+  message: ChatMessage;                   // Generated character response
+  conversationMetadata?: {
+    totalMessages: number;                // Total conversation length
+    characterConsistencyScore?: number;   // Personality consistency rating
+    responseQuality?: string;             // Response quality assessment
+  };
+  error?: string;                         // Error message if generation failed
+}
+```
 
-### JSON Parsing Improvements
+**Character Response Features**:
+• **Personality Consistency**: Responses reflect character traits, occupation, and background
+• **Dynamic Length**: Response length adapts to conversation context and input complexity
+• **Contextual Awareness**: AI uses recent conversation history for coherent responses
+• **Character Voice**: Maintains consistent speech patterns and personality throughout
 
-All API endpoints now include enhanced JSON parsing with multiple fallback strategies:
+### Image Proxy API
 
-• Primary JSON parsing with error handling
-• Fallback parsing for responses with trailing commas
-• Content cleaning for malformed responses
-• Graceful degradation when parsing fails
+#### `GET /api/proxy-image?url={imageUrl}`
 
-### Request Size Validation
+**Purpose**: Proxy external image URLs for CORS compatibility and caching
 
-• Maximum request size limits enforced (10MB for regeneration, 50MB for portrait editing)
-• Automatic payload cleaning to prevent oversized requests
-• Character data sanitization before API calls
-• Special character handling in character names and IDs
+**Query Parameters**:
+• `url` (required): External image URL to proxy
 
-### Error Categorization
+**Response**: Image data with appropriate headers for browser compatibility
 
-Enhanced error handling with specific user-friendly messages:
+**Use Cases**:
+• Loading OpenAI-generated portraits from external URLs
+• Handling CORS restrictions for image display
+• Caching frequently accessed images
 
-• `rate_limit`: Temporary API rate limiting
-• `quota_exceeded`: Monthly usage limits reached
-• `authentication`: API key or authentication issues
-• `payload_too_large`: Request size exceeds limits
-• `timeout`: Request timeout errors
-• `network`: Network connectivity issues
-• `server_error`: Temporary server issues
-• `invalid_request`: Request validation failures
+## Security and Privacy
 
-## Model Integration
+### Server-Side Security
 
-### Supported Models
+**API Security**:
+• OpenAI API keys stored securely in environment variables
+• Keys never exposed to client-side code
+• Server-side validation of all API requests
+• Automatic key rotation support for production deployments
 
-**Text Models:**
-• gpt-4o-mini (Standard tier)
-• gpt-4.1-mini (Enhanced tier)
-• gpt-4o (Premium tier)
+**Request Authentication**:
+• No user authentication required (free public application)
+• Request validation through input sanitization
+• Rate limiting through usage tracking
+• Content filtering through OpenAI moderation
 
-**Image Models:**
-• dall-e-2 (Standard tier)
-• dall-e-3 (Enhanced tier)
-• gpt-image-1 (Premium tier, best for editing)
+### Input Validation and Sanitization
 
-### Usage Limits
+**Request Validation**:
+• **Character Description**: Length limits (2-500 characters), content filtering
+• **Chat Messages**: Maximum 1000 characters, inappropriate content detection
+• **Edit Prompts**: Model-specific length limits, content policy compliance
+• **File Uploads**: Image format validation, size limits, security scanning
 
-**Text Models (including chat):**
-• Standard: 50 generations per month
-• Enhanced: 30 generations per month
-• Premium: 10 generations per month
+**Data Sanitization**:
+• HTML/script tag removal from text inputs
+• Special character encoding for safe processing
+• JSON structure validation for complex requests
+• Binary data validation for image uploads
 
-**Image Models (including portrait editing):**
-• Standard: 10 generations per month
-• Enhanced: 5 generations per month
-• Premium: 3 generations per month
+### Content Moderation
 
-> **Note**: Chat conversations and portrait editing count against respective model limits
+**OpenAI Integration**:
+• All generated content subject to OpenAI's content policy
+• Automatic content filtering for inappropriate material
+• Real-time moderation of user inputs and AI outputs
+• Appeals process for false positive content blocks
 
-## Character Generation Flow
+**Safety Measures**:
+• Character generation limited to appropriate content
+• Chat conversations monitored for policy compliance
+• Portrait generation subject to image content guidelines
+• User input preprocessing to prevent policy violations
 
-1. **Input Validation**: Verify required fields and sanitize inputs
-2. **Model Selection**: Apply user-selected text and image models
-3. **Character Generation**: Request character data from OpenAI
-4. **Portrait Generation**: Create character portrait if requested
-5. **Response Formatting**: Return structured character data
+## Usage Tracking and Limits
 
-## Portrait Editing Flow
+### Monthly Limit System
 
-1. **Validation**: Verify character has existing portrait and edit prompt is valid
-2. **Model Check**: Ensure selected model supports editing (gpt-image-1 recommended)
-3. **Usage Verification**: Check monthly limits before processing
-4. **Image Processing**: Convert portrait data to appropriate format
-5. **AI Editing**: Call OpenAI image editing endpoint with prompt
-6. **Response Processing**: Return updated character with new portrait
-7. **Usage Tracking**: Increment usage count after successful edit
+**Limit Structure**:
+• **Text Models**: 50 (Standard), 30 (Enhanced), 10 (Premium) generations per month
+• **Image Models**: 10 (Standard), 5 (Enhanced), 3 (Premium) generations per month
+• **Reset Schedule**: Monthly limits reset on 1st of each month at 00:00 UTC
+• **Tracking Granularity**: Individual operation tracking per model type
 
-## Chat System Flow
+**Usage Calculation**:
+• **Character Generation**: Counts against both text and image models (if portrait included)
+• **Regeneration**: Each operation counts as one generation against relevant model
+• **Chat Responses**: Count against text model limits only
+• **Portrait Editing**: Counts against image model limits only
+• **Trait Operations**: Count against text model limits
 
-1. **Session Management**: Get or create chat session for character
-2. **Context Preparation**: Include character details and recent conversation history
-3. **Input Validation**: Check message length and usage limits
-4. **Response Generation**: Call OpenAI with dynamic token limits
-5. **Response Processing**: Handle cutoff detection and retry logic
-6. **Storage**: Save messages to IndexedDB
-7. **Usage Tracking**: Increment usage count after successful response
+**Limit Enforcement**:
+• Client-side usage tracking with real-time validation
+• Server-side verification before expensive operations
+• Grace period handling for near-limit situations
+• Clear error messaging when limits exceeded
 
-## Trait Generation Features
+### Development Environment
 
-### Additional Traits Generation
+**Testing Support**:
+• Usage limits bypassed in development mode
+• Full feature testing without limit restrictions
+• Production behavior simulation available
+• Comprehensive error testing capabilities
 
-• Generate multiple new traits for a character
-• Traits returned as JSON object with trait names as keys
-• Automatic formatting and validation
-• Integration with existing trait display system
+## Error Handling and Recovery
 
-### Individual Trait Generation
+### Error Classification System
 
-• Generate single traits on demand
-• Regenerate specific existing traits
-• Consistent formatting with Title Case
-• Smart filtering excludes overly long traits
+**Error Types and Handling**:
 
-### Trait Management
+**Validation Errors (400)**:
+• **Cause**: Invalid input parameters, missing required fields, format violations
+• **Response**: Detailed field-specific error messages with correction guidance
+• **Recovery**: Client-side validation improvement, user input correction
 
-• Add custom traits manually
-• Edit existing trait names and values
-• Remove unwanted traits
-• Regenerate traits with AI assistance
+**Usage Limit Errors (429)**:
+• **Cause**: Monthly generation limits exceeded for selected model tier
+• **Response**: Clear limit information with reset date and alternative model suggestions
+• **Recovery**: Wait for monthly reset, switch to available model tier
 
-## Regeneration Features
+**API Integration Errors (502/503)**:
+• **Cause**: OpenAI API issues, rate limiting, service unavailability
+• **Response**: Automatic retry with exponential backoff, user-friendly status updates
+• **Recovery**: Automatic retry logic, temporary feature degradation, status page monitoring
 
-Supports regenerating:
-• Individual character attributes (name, appearance, personality, backstory)
-• Portrait images with different models
-• Portrait editing with text prompts
-• Quest components (title, description, reward)
-• Dialogue lines
-• Item descriptions
-• Character traits (individual or multiple)
+**Content Policy Errors (400)**:
+• **Cause**: Generated content blocked by content moderation systems
+• **Response**: Policy violation explanation with content modification suggestions
+• **Recovery**: Content adjustment, alternative generation approaches
 
-## Error Handling
+**Timeout Errors (408)**:
+• **Cause**: Generation or processing operations exceeding time limits
+• **Response**: Timeout notification with retry option and alternative approaches
+• **Recovery**: Automatic retry with simplified parameters, alternative model selection
 
-### Character Generation
+### Automatic Recovery Systems
 
-• Input validation and sanitization
-• API error categorization and user-friendly messages
-• Timeout protection with retry logic
-• Graceful degradation for failed generations
+**Retry Logic**:
+• **Exponential Backoff**: Progressive delay increase for repeated failures
+• **Circuit Breaker**: Temporary service degradation during widespread issues
+• **Graceful Degradation**: Feature-specific fallbacks during partial service failures
+• **User Communication**: Clear status updates during recovery operations
 
-### Portrait Editing
+**Data Recovery**:
+• **Partial Success Handling**: Save successful elements even if some operations fail
+• **Transaction Rollback**: Revert incomplete operations to maintain data consistency
+• **Cache Recovery**: Restore from cached data during temporary service issues
+• **Manual Recovery**: User-initiated retry options for failed operations
 
-• Model compatibility validation
-• Image size and format validation
-• Edit prompt validation and sanitization
-• Automatic retry for network issues
-• Clear error messages for different failure types
+## Performance Optimization
 
-### Chat System
+### Response Time Optimization
 
-• Comprehensive error categorization (rate limits, quotas, network issues)
-• Automatic retry for cut-off responses
-• Usage limit enforcement before API calls
-• Message length validation (1000 character limit)
-• Network timeout handling with 60-second timeout
+**API Performance Targets**:
+• **Character Generation**: 10-30 seconds (text), 30-120 seconds (with portrait)
+• **Chat Responses**: 5-15 seconds per message
+• **Portrait Editing**: 30-90 seconds depending on complexity
+• **Regeneration**: 5-20 seconds per element
 
-## Security Measures
+**Optimization Strategies**:
+• **Parallel Processing**: Simultaneous generation of independent elements
+• **Caching**: Frequent data caching for improved response times
+• **Request Optimization**: Efficient API call structuring and batching
+• **Resource Management**: Optimal server resource allocation
 
-• Server-side API calls to OpenAI (API keys not exposed to client)
-• Input sanitization to prevent malicious content
-• Content filtering through OpenAI's moderation system
-• Rate limiting through client-side usage tracking
-• Message and prompt length limits to prevent abuse
+### Scalability Considerations
 
-## Data Storage
+**Architecture Scalability**:
+• **Serverless Functions**: Next.js API routes with automatic scaling
+• **Stateless Design**: No server-side session management
+• **Database Optimization**: Efficient client-side storage with IndexedDB
+• **CDN Integration**: Static asset optimization and global distribution
 
-### Character Data
+## Development Integration
 
-• IndexedDB for character library storage
-• Portrait compression for storage efficiency
-• JSON import/export capabilities
+### Testing API Endpoints
 
-### Chat Data
+**Local Development**:
+• Full API functionality available in development environment
+• Environment variable configuration for API keys (developers only)
+• Comprehensive error simulation for testing
+• Debug mode with detailed logging and response inspection
 
-• IndexedDB for conversation storage per character
-• System prompts with character context
-• Message history with automatic trimming (100 message limit)
-• Complete local storage - no server-side data retention
+**API Testing Tools**:
+• **Curl Examples**: Command-line testing scripts for all endpoints
+• **Postman Collection**: Pre-configured API testing collection
+• **Integration Tests**: Automated testing suite for API functionality
+• **Load Testing**: Performance testing tools and benchmarks
+
+### Contributing to API Development
+
+**Development Guidelines**:
+• Follow existing API patterns and response formats
+• Implement comprehensive error handling and validation
+• Add appropriate documentation for new endpoints
+• Include test coverage for new functionality
+
+**Code Standards**:
+• TypeScript interfaces for all request/response formats
+• Consistent error handling patterns across endpoints
+• Input validation and sanitization for security
+• Performance monitoring and optimization
 
 ## Related Documentation
 
-• [Architecture Overview](/docs/architecture) - For system design
-• [Model Selection Guide](/docs/models) - For understanding model tiers
-• [Chat with Characters](/docs/chat) - For chat system usage
-• [Character Library Guide](/docs/library) - For trait management features
-• [Contributing Guidelines](/docs/contributing) - For development workflow
+• [Architecture Overview](/docs/architecture) - High-level system design and API integration
+• [Security Documentation](/docs/security) - Detailed security measures and best practices
+• [Development Setup](/docs/dev-setup) - Local development environment configuration

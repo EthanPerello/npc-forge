@@ -77,7 +77,7 @@ Character generation, chat functionality, portrait editing, and trait management
 
 The example characters showcased in the documentation were created using NPC Forge:
 
-• **Elarion** - Fantasy High Wizard (Enhanced text, Standard image, edited for magical elements)
+• **Elarion** - Fantasy High Elf Wizard (Enhanced text, Enhanced image, edited for magical elements)
 • **Kira-7** - Sci-Fi Cybernetic Character (Enhanced text and image, edited for cybernetic enhancements)
 • **Detective Miles Navarro** - Contemporary Mystery Character (Standard text, Enhanced image, edited for professional details)
 

@@ -78,19 +78,11 @@ export default function ModelSelectorsSection({
   // Get tier color class
   const getTierColorClass = (tier: string, isSelected: boolean) => {
     if (isSelected) {
-      return 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30';
+      return 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 ring-2 ring-indigo-200 dark:ring-indigo-700';
     }
     
-    switch (tier) {
-      case 'cheap':
-        return 'border-green-200 hover:border-green-300 dark:border-green-700 dark:hover:border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20';
-      case 'mid':
-        return 'border-yellow-200 hover:border-yellow-300 dark:border-yellow-700 dark:hover:border-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20';
-      case 'premium':
-        return 'border-purple-200 hover:border-purple-300 dark:border-purple-700 dark:hover:border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20';
-      default:
-        return 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600';
-    }
+    // Use neutral colors for all unselected items to make selection clearer
+    return 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700';
   };
 
   // Get tier badge color
@@ -196,7 +188,7 @@ export default function ModelSelectorsSection({
                   <span className="text-base">{selectedTextConfig.emoji}</span>
                   <div className="flex-1">
                     <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">
-                      {selectedTextConfig.label}
+                      {selectedTextConfig.id}
                     </h4>
                     <p className="text-xs text-gray-600 dark:text-gray-400">
                       {selectedTextConfig.description}
@@ -240,7 +232,7 @@ export default function ModelSelectorsSection({
                           <span className="text-base">{config.emoji}</span>
                           <div className="flex-1">
                             <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">
-                              {config.label}
+                              {config.id}
                             </h4>
                             <p className="text-xs text-gray-600 dark:text-gray-400">
                               {config.description}
@@ -284,7 +276,7 @@ export default function ModelSelectorsSection({
                   <span className="text-base">{selectedImageConfig.emoji}</span>
                   <div className="flex-1">
                     <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">
-                      {selectedImageConfig.label}
+                      {selectedImageConfig.id}
                     </h4>
                     <p className="text-xs text-gray-600 dark:text-gray-400">
                       {selectedImageConfig.description}
@@ -328,7 +320,7 @@ export default function ModelSelectorsSection({
                           <span className="text-base">{config.emoji}</span>
                           <div className="flex-1">
                             <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">
-                              {config.label}
+                              {config.id}
                             </h4>
                             <p className="text-xs text-gray-600 dark:text-gray-400">
                               {config.description}
