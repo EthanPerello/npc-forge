@@ -148,7 +148,7 @@ For complete model information, see the [Model Selection Guide](/docs/models).
 • **Browser API Usage**: Leverages modern browser capabilities for optimal performance
 • **Progressive Enhancement**: Features degrade gracefully on older browsers
 
-## Recent Improvements (v0.22.0)
+## Recent Improvements (v0.30.0)
 
 ### Developer Experience Enhancements
 • **Developer Documentation**: Dedicated developer documentation homepage with comprehensive navigation

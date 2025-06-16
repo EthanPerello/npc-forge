@@ -1,12 +1,12 @@
 # Development Roadmap
 
-## Current Version: v0.23.0
+## Current Version: v0.30.0
 
 The current version includes comprehensive character creation wizard, interactive chat system, advanced character library with trait filtering, portrait editing capabilities, enhanced trait management tools, developer documentation system, and improved user experience with enhanced visual feedback and navigation.
 
 ## Completed Features
 
-### v0.23.0: Code Quality & Regeneration Improvements (COMPLETED) ✓
+### v0.30.0: Code Quality & Regeneration Improvements (COMPLETED) ✓
 
 **Code Quality Enhancements:**
 • Linted codebase with `npx eslint . --fix` for consistent formatting and automatic fixes
@@ -21,7 +21,7 @@ The current version includes comprehensive character creation wizard, interactiv
 • Documentation updated across all files to correct outdated framework references (e.g., "Next.js 14" → "Next.js 15")
 • Improved formatting, accuracy, and clarity across all documentation files
 
-### v0.22.0: Enhanced Developer Experience & Visual Feedback (COMPLETED) ✓
+### v0.29.0: Enhanced Developer Experience & Visual Feedback (COMPLETED) ✓
 
 **Enhanced Developer Tools:**
 • Developer Documentation homepage at `/docs/developer` with dedicated navigation and sidebar highlighting
@@ -46,7 +46,7 @@ The current version includes comprehensive character creation wizard, interactiv
 • Visual regeneration states now correctly trigger for dialogue, items, quests, and basic info sections
 • Developer docs sidebar section now properly expands and highlights based on active route
 
-### v0.21.0: Portrait Editing & Advanced Trait Management (COMPLETED) ✓
+### v0.28.0: Portrait Editing & Advanced Trait Management (COMPLETED) ✓
 
 **AI-Powered Portrait Editing:**
 • Edit character portraits using text prompts with OpenAI's image editing API
@@ -67,14 +67,14 @@ The current version includes comprehensive character creation wizard, interactiv
 • Immediate navigation back to the Library after saving changes
 • Enhanced trait display matching between character modal and edit page
 
-### v0.20.1: API Reliability & System Stability (COMPLETED) ✓
+### v0.27.0: API Reliability & System Stability (COMPLETED) ✓
 
 • **Enhanced JSON parsing** with multiple fallback strategies for improved reliability
 • **Automatic retry logic** for IndexedDB operations and API calls
 • **Request validation** and payload cleaning to prevent API errors
 • **Error categorization** improvements for better user feedback
 
-### v0.20.0: Interactive Chat System (COMPLETED) ✓
+### v0.26.0: Interactive Chat System (COMPLETED) ✓
 
 • Chat interface design and implementation
 • Character-aware AI conversation system
@@ -82,21 +82,21 @@ The current version includes comprehensive character creation wizard, interactiv
 • Dynamic response length optimization
 • Usage tracking integration for chat features
 
-### v0.19.0: Documentation System Overhaul (COMPLETED) ✓
+### v0.25.0: Documentation System Overhaul (COMPLETED) ✓
 
 • Automatic markdown content loading system
 • Enhanced visual hierarchy and professional styling
 • Cross-reference navigation system
 • Comprehensive user and developer guides
 
-### v0.18.0: Enhanced Filtering System (COMPLETED) ✓
+### v0.24.0: Enhanced Filtering System (COMPLETED) ✓
 
 • Comprehensive trait filtering with automatic discovery
 • Smart search with category syntax support
 • Organized filter panel with collapsible sections
 • Enhanced trait display with category prefixes
 
-### Earlier Versions (v0.1.0 - v0.17.0) (COMPLETED) ✓
+### Earlier Versions (v0.1.0 - v0.23.0) (COMPLETED) ✓
 
 • Core character generation wizard implementation
 • AI model integration and tiered system
@@ -108,7 +108,7 @@ The current version includes comprehensive character creation wizard, interactiv
 
 ## Future Development
 
-### Next Priority: Unity Integration (v0.24.0)
+### Next Priority: Unity Integration (v0.31.0)
 
 **Unity Package & SDK Development:**
 • Unity package for seamless NPC Forge integration
@@ -120,7 +120,7 @@ The current version includes comprehensive character creation wizard, interactiv
 • Basic SDK and API for Unity developers
 • Character behavior templates and integration examples
 
-### Second Priority: User Account System (v0.25.0)
+### Second Priority: User Account System (v0.32.0)
 
 **User Authentication & Cloud Storage:**
 • User account creation and authentication system
@@ -228,9 +228,9 @@ These are ideas under consideration for future releases, but not committed roadm
 • **Post-1.0:** Semantic versioning with clear upgrade paths and deprecation notices
 
 **Timeline:**
-• v0.23.0 (June 2025): Code Quality & Regeneration Improvements ✓
-• v0.24.0 (Next Release): Unity Integration & SDK
-• v0.25.0 (Following Release): User Account System
+• v0.30.0 (June 2025): Code Quality & Regeneration Improvements ✓
+• v0.31.0 (Next Release): Unity Integration & SDK
+• v0.32.0 (Following Release): User Account System
 • Future releases: Features from "Potential Future" section based on user demand and development priorities
 
 ## Long-Term Vision
