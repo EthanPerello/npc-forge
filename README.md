@@ -4,7 +4,7 @@
 
 **AI-powered character generator for games, tabletop RPGs, and storytelling.** Create detailed NPCs with personalities, quests, dialogue, items, and portraits. Chat with your characters and edit their portraits using AI.
 
-[![Version](https://img.shields.io/badge/version-0.22.0-blue.svg)](https://github.com/EthanPerello/npc-forge/releases)
+[![Version](https://img.shields.io/badge/version-0.30.0-blue.svg)](https://github.com/EthanPerello/npc-forge/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/built%20with-Next.js%2015-black)](https://nextjs.org/)
 
