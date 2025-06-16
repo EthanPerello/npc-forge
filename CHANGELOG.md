@@ -11,17 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Linted codebase with `npx eslint . --fix` to enforce consistent formatting and resolve automatic fixes
 - Regeneration outputs for appearance, personality, and backstory hooks now return short, single-paragraph results instead of verbose text
 - Trait regeneration updated to preserve special characters (e.g. accented letters) in display and storage
-- Model selector on edit page updated to show actual model names instead of only tier labels (e.g., “gpt-4o” instead of “Premium”)
+- Model selector on edit page updated to show actual model names instead of only tier labels (e.g., "gpt-4o" instead of "Premium")
 - Model selection buttons restyled for consistent coloring and improved clarity when selected (helps users more easily identify the active model)
   
 ### Fixed
 - Documentation updated across all files to:
-  - Correct outdated framework references (e.g., “Next.js 14” → “Next.js 15”)
+  - Correct outdated framework references (e.g., "Next.js 14" → "Next.js 15")
   - Remove redundant usage tables and move technical details to developer docs
-  - Ensure version badge, changelog links, and content match latest release (v0.22.0)
+  - Ensure version badge, changelog links, and content match latest release (v0.29.0)
   - Improve formatting, accuracy, and clarity across all remaining `.md` files
 
-## [0.22.0] - 2025-06-13
+## [0.29.0] - 2025-06-13
 
 ### Added
 - Developer Documentation homepage at `/docs/developer` with dedicated navigation and sidebar highlighting
@@ -46,10 +46,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Developer docs sidebar section now properly expands and highlights based on active route
 - Duplicate portrait regeneration status messages removed
 
-## [0.21.0] - 2025-06-12
+## [0.28.0] - 2025-06-12
 
 ### Added
-- AI-powered portrait editing via text prompts using OpenAI’s `/v1/images/edits` endpoint (supports `gpt-image-1`)
+- AI-powered portrait editing via text prompts using OpenAI's `/v1/images/edits` endpoint (supports `gpt-image-1`)
 - "Add Generated Trait" button in Additional Traits section to generate a new short trait via AI
 - Individual regenerate buttons for each trait in the Additional Traits section
 
@@ -62,7 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Traits missing from the edit page but visible in the modal due to inconsistent filtering logic
 
-## [0.20.1] - 2025-06-10
+## [0.27.0] - 2025-06-10
 
 ### Added
 - Enhanced JSON parsing with multiple fallback strategies to handle malformed AI responses
@@ -88,7 +88,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Usage limit system errors when localStorage access is restricted or corrupted
 - Portrait display cropping issues in library cards cutting off important parts of character images
 
-## [0.20.0] - 2025-06-09
+## [0.26.0] - 2025-06-09
 
 ### Added
 - Chat with Character page at `/chat/[characterId]` with real-time messaging
@@ -104,12 +104,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Portraits fill containers responsively
   - Uniform card sizing with always-visible names
   - Genre badges removed
-  - Search bar placeholder simplified to “Search characters…”
+  - Search bar placeholder simplified to "Search characters…"
   - Clicking cards opens the modal (portrait zoom removed)
 - Edit page:
   - Text and image model selectors moved to compact dropdowns at the top
   - Portrait section redesigned for cleaner layout and fewer tips
-  - “Unsaved changes” warning expanded to cover all edits
+  - "Unsaved changes" warning expanded to cover all edits
 - Model selector UI:
   - Redesigned as compact dropdowns with tier badges
   - Improved contrast in light mode
@@ -123,7 +123,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unified image-loading logic resolves mismatches between library, modal, and edit screens  
 - Chat API route enforces per-model usage limits and prevents mid-message truncation
 
-## [0.19.0] - 2025-06-02
+## [0.25.0] - 2025-06-02
 
 ### Added
 - Automatic documentation content loading system that reads directly from markdown files in docs/ directory
@@ -135,7 +135,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Roadmap documentation updated to remove emojis for cleaner, professional appearance
 - Enhanced markdown rendering with improved visual hierarchy, content grouping, and typography throughout documentation pages
 
-## [0.18.0] - 2025-05-30
+## [0.24.0] - 2025-05-30
 
 ### Added
 - Comprehensive trait filtering system with dropdown filters for all character trait categories (personality, occupation, species, social class, height, build, homeland, etc.)
@@ -148,7 +148,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Library filtering logic upgraded to support both dropdown filters and trait search simultaneously
 - Filter panel redesigned with expandable sections and improved organization
 
-## [0.17.0] - 2025-05-28
+## [0.23.0] - 2025-05-28
 
 ### Added
 - Enhanced error handling with automatic retry logic for portrait generation failures
@@ -166,7 +166,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Network timeout errors (ETIMEDOUT) now properly trigger retry logic instead of failing immediately
 - Portrait regeneration reliability significantly improved with enhanced error recovery and user feedback
 
-## [0.16.0] - 2025-05-27
+## [0.22.0] - 2025-05-27
 
 ### Added
 - Unsaved changes warning banner on character edit pages when portrait modifications haven't been saved yet
@@ -187,7 +187,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Random character generation now properly respects user's content type selections (portraits, quests, dialogue, items)
 - Random character generation now correctly counts against monthly usage limits like regular character generation
 
-## [0.15.1] - 2025-05-26
+## [0.21.0] - 2025-05-26
 
 ### Changed
 - Save to Library button now shows success notification and keeps users on current page instead of redirecting to Library
@@ -198,7 +198,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Field regeneration on character edit pages now works reliably without errors
 - AI-generated content no longer includes unwanted formatting or prefixes in regenerated fields
 
-## [0.15.0] - 2025-05-23
+## [0.20.0] - 2025-05-23
 
 ### Added
 - `EditPageFooter` component to support consistent navigation on the Edit screen.
@@ -216,7 +216,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Integrated a sticky footer for persistent navigation actions on the Edit page.
   - Simplified and polished existing edit-page components for clarity and reusability (e.g., `HeaderSection`, `PortraitSection`, `CharacterTraitsSection`, etc.).
 
-## [0.14.0] - 2025-05-22
+## [0.19.0] - 2025-05-22
 
 ### Changed
 - Rewrote random character generation logic to bypass delayed state updates and directly pass generated data to the API.
@@ -230,7 +230,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - `include_portrait` toggle in concept step, allowing users to enable or disable portrait generation.
 
-## [0.13.1] - 2025-05-16
+## [0.18.0] - 2025-05-16
 
 ### Changed
 - Rewrote and updated all public documentation to match the current v0.13.0 features:
@@ -252,7 +252,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Deprecated documentation pages: `changelog/` and `prompts/`
 
-## [0.13.0] - 2025-05-15
+## [0.17.0] - 2025-05-15
 
 ### Added
 - Redesigned character creation flow with a new step-by-step wizard interface:
@@ -276,14 +276,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Legacy tabbed character creation interface and related components (e.g. main-form-tabs.tsx, character-form.tsx)
 
-## [0.12.1] - 2025-05-14
+## [0.16.0] - 2025-05-14
 
 ### Fixed
 - Fixed bug where character generation would trigger automatically without clicking the Generate button.
 - Fixed issue where character portraits would disappear after saving to the library.
 - Fixed bug causing stale portraits to appear after regeneration due to improper state and cache management.
 
-## [0.12.0] - 2025-05-09
+## [0.15.0] - 2025-05-09
 
 ### Added
 - Character regeneration capabilities in the edit page:
@@ -306,7 +306,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Prevented infinite update loops in portrait display component
 - Fixed portrait disappearing after saving to library or viewing a character
 
-## [0.11.1] - 2025-05-08
+## [0.14.0] - 2025-05-08
 
 ### Changed
 - Improved image handling across display, storage, and context components
@@ -326,7 +326,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Sticky footer showing behind character modals
   - Model selection card layouts and alignment
 
-## [0.11.0] - 2025-05-07
+## [0.13.0] - 2025-05-07
 
 ### Added
 - Model selectors for text and image regeneration on the edit character page
@@ -356,7 +356,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Redundant "Import Character" button from the top of the library page
 - "Usage varies by model tier..." footer banner from the main screen
 
-## [0.10.0] - 2025-05-06
+## [0.12.0] - 2025-05-06
 
 ### Added
 - Ability to add and remove quests, dialogue lines, and items in the character editor
@@ -377,7 +377,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "Special Ability" field from character profiles
 - 3-trait limit for personality traits in both the editor and advanced options dropdown
 
-## [0.9.0] - 2025-05-05
+## [0.11.0] - 2025-05-05
 
 ### Added
 - Sticky footer with Generate Character, Clear Options, and Randomize buttons
@@ -405,7 +405,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Example description box from the character description field
 
-## [0.8.0] - 2025-05-04
+## [0.10.0] - 2025-05-04
 
 ### Added
 - Character Library system:
@@ -431,7 +431,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Various styling issues in light mode
 
-## [0.7.2] - 2025-05-02
+## [0.9.0] - 2025-05-02
 
 ### Changed
 - Replaced all native `<select>` elements across the app with a custom full-width dropdown using the existing `ui/select.tsx` component for consistent styling and improved accessibility
@@ -446,7 +446,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - User feedback messages like "Character generation may take a second..." now display properly
   - Selected model generation badges (e.g., "∞ left") have corrected contrast in all selectors
 
-## [0.7.1] - 2025-05-01
+## [0.8.0] - 2025-05-01
 
 ### Added
 - New CSS utility classes: `text-description`, `bg-secondary`, `border-theme`, and additional variants for consistent theme support
@@ -616,30 +616,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Export to JSON feature
 - Fully responsive UI for desktop and mobile
 
-[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.22.0...HEAD
+[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.29.0...HEAD
+[0.29.0]: https://github.com/EthanPerello/npc-forge/compare/v0.28.0...v0.29.0
+[0.28.0]: https://github.com/EthanPerello/npc-forge/compare/v0.27.0...v0.28.0
+[0.27.0]: https://github.com/EthanPerello/npc-forge/compare/v0.26.0...v0.27.0
+[0.26.0]: https://github.com/EthanPerello/npc-forge/compare/v0.25.0...v0.26.0
+[0.25.0]: https://github.com/EthanPerello/npc-forge/compare/v0.24.0...v0.25.0
+[0.24.0]: https://github.com/EthanPerello/npc-forge/compare/v0.23.0...v0.24.0
+[0.23.0]: https://github.com/EthanPerello/npc-forge/compare/v0.22.0...v0.23.0
 [0.22.0]: https://github.com/EthanPerello/npc-forge/compare/v0.21.0...v0.22.0
-[0.21.0]: https://github.com/EthanPerello/npc-forge/compare/v0.20.1...v0.21.0
-[0.20.1]: https://github.com/EthanPerello/npc-forge/compare/v0.20.0...v0.20.1
+[0.21.0]: https://github.com/EthanPerello/npc-forge/compare/v0.20.0...v0.21.0
 [0.20.0]: https://github.com/EthanPerello/npc-forge/compare/v0.19.0...v0.20.0
 [0.19.0]: https://github.com/EthanPerello/npc-forge/compare/v0.18.0...v0.19.0
 [0.18.0]: https://github.com/EthanPerello/npc-forge/compare/v0.17.0...v0.18.0
 [0.17.0]: https://github.com/EthanPerello/npc-forge/compare/v0.16.0...v0.17.0
-[0.16.0]: https://github.com/EthanPerello/npc-forge/compare/v0.15.1...v0.16.0
-[0.15.1]: https://github.com/EthanPerello/npc-forge/compare/v0.15.0...v0.15.1
+[0.16.0]: https://github.com/EthanPerello/npc-forge/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/EthanPerello/npc-forge/compare/v0.14.0...v0.15.0
-[0.14.0]: https://github.com/EthanPerello/npc-forge/compare/v0.13.2...v0.14.0
-[0.13.2]: https://github.com/EthanPerello/npc-forge/compare/v0.13.1...v0.13.2
-[0.13.1]: https://github.com/EthanPerello/npc-forge/compare/v0.13.0...v0.13.1
-[0.13.0]: https://github.com/EthanPerello/npc-forge/compare/v0.12.1...v0.13.0
-[0.12.1]: https://github.com/EthanPerello/npc-forge/compare/v0.12.0...v0.12.1
-[0.12.0]: https://github.com/EthanPerello/npc-forge/compare/v0.11.1...v0.12.0
-[0.11.1]: https://github.com/EthanPerello/npc-forge/compare/v0.11.0...v0.11.1
+[0.14.0]: https://github.com/EthanPerello/npc-forge/compare/v0.13.0...v0.14.0
+[0.13.0]: https://github.com/EthanPerello/npc-forge/compare/v0.12.0...v0.13.0
+[0.12.0]: https://github.com/EthanPerello/npc-forge/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/EthanPerello/npc-forge/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/EthanPerello/npc-forge/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/EthanPerello/npc-forge/compare/v0.8.0...v0.9.0
-[0.8.0]: https://github.com/EthanPerello/npc-forge/compare/v0.7.2...v0.8.0
-[0.7.2]: https://github.com/EthanPerello/npc-forge/compare/v0.7.1...v0.7.2
-[0.7.1]: https://github.com/EthanPerello/npc-forge/compare/v0.7.0...v0.7.1
+[0.8.0]: https://github.com/EthanPerello/npc-forge/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/EthanPerello/npc-forge/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/EthanPerello/npc-forge/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/EthanPerello/npc-forge/compare/v0.4.0...v0.5.0
