@@ -17,7 +17,7 @@ import {
 } from '@/lib/types';
 import { DEFAULT_MODEL } from '@/lib/models';
 import { DEFAULT_IMAGE_MODEL } from '@/lib/image-models';
-import { saveCharacter } from '@/lib/character-storage';
+import { hybridCharacterStorage } from '@/lib/hybrid-storage';
 import { downloadJson } from '@/lib/utils';
 import { GENRE_TEMPLATES, getTemplateExample } from '@/lib/templates';
 
@@ -314,7 +314,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     downloadJson(character, `${character.name.replace(/\s+/g, '_').toLowerCase()}.json`);
   }, [character]);
   
-  // Save to library
+  // Save to library - Updated to use hybrid storage
   const saveToLibrary = useCallback(async (customCharacter?: Character): Promise<boolean> => {
     // Use the provided character if available, otherwise use state
     const characterToSave = customCharacter || character;
@@ -351,11 +351,11 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
         }
       }
       
-      // Save character to IndexedDB
-      console.log('Saving character to IndexedDB...');
-      const result = await saveCharacter(characterCopy, formData);
+      // Use hybrid storage instead of direct IndexedDB
+      console.log('Saving character using hybrid storage...');
+      const result = await hybridCharacterStorage.saveCharacter(characterCopy, formData);
       
-      console.log('Character saved successfully to IndexedDB');
+      console.log('Character saved successfully with hybrid storage');
       
       return !!result;
     } catch (error) {
