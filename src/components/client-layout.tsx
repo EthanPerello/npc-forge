@@ -1,35 +1,32 @@
-// src/components/client-layout.tsx
-// Updated to integrate ChatProvider with existing structure
-
 'use client';
 
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { ThemeProvider } from '@/contexts/theme-context';
 import { CharacterProvider } from '@/contexts/character-context';
 import { ChatProvider } from '@/contexts/chat-context';
-import ThemeToggle from './ui/theme-toggle';
-import Link from 'next/link';
-import { Sparkles } from 'lucide-react';
+import Header from '@/components/header';
 
-export default function ClientLayout({ children }: { children: React.ReactNode }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+interface ClientLayoutProps {
+  children: ReactNode;
+}
 
+export default function ClientLayout({ children }: ClientLayoutProps) {
+  const [sidebarExpanded, setSidebarExpanded] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Listen for sidebar state changes
   useEffect(() => {
-    // Listen for sidebar state changes
-    const handleSidebarChange = (e: CustomEvent) => {
-      setIsExpanded(e.detail.expanded);
-      
-      // If mobile sidebar is opening, we'll track that separately
-      if (e.detail.mobileOpen !== undefined) {
-        setIsMobileSidebarOpen(e.detail.mobileOpen);
+    const handleSidebarStateChange = (event: CustomEvent) => {
+      setSidebarExpanded(event.detail.expanded);
+      if (event.detail.mobileOpen !== undefined) {
+        setMobileOpen(event.detail.mobileOpen);
       }
     };
-    
-    window.addEventListener('sidebarStateChange' as any, handleSidebarChange as EventListener);
-    
+
+    window.addEventListener('sidebarStateChange', handleSidebarStateChange as EventListener);
+
     return () => {
-      window.removeEventListener('sidebarStateChange' as any, handleSidebarChange as EventListener);
+      window.removeEventListener('sidebarStateChange', handleSidebarStateChange as EventListener);
     };
   }, []);
 
@@ -37,38 +34,21 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     <ThemeProvider>
       <CharacterProvider>
         <ChatProvider>
-          <div
-            className={`min-h-screen transition-all duration-300 ${
-              isExpanded ? 'lg:pl-64' : 'lg:pl-16'
-            }`}
+          {/* Header */}
+          <Header />
+          
+          {/* Main content with sidebar offset */}
+          <main 
+            className={`
+              min-h-screen pt-16 transition-all duration-300 ease-in-out
+              ${sidebarExpanded ? 'lg:pl-64' : 'lg:pl-16'}
+              ${mobileOpen ? 'pl-0' : 'pl-0 lg:pl-16'}
+            `}
           >
-            {/* Header - visible on all pages but collapses when mobile sidebar is open */}
-            <header 
-              className={`fixed z-40 top-0 right-0 left-0 bg-card border-b border-theme py-2 px-4 
-                ${isMobileSidebarOpen ? 'lg:left-16 hidden' : 'lg:left-16'}
-                ${isExpanded ? 'lg:left-64' : 'lg:left-16'}`}
-            >
-              <div className="flex justify-between items-center h-12">
-                {/* Only show app title on medium+ screens or when sidebar is collapsed */}
-                <div className={`${isExpanded ? 'hidden lg:flex' : 'flex'} items-center pl-12 sm:pl-0`}>
-                  <Link href="/" className="text-xl font-bold flex items-center">
-                    <Sparkles className="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" />
-                    NPC Forge
-                  </Link>
-                </div>
-                
-                {/* Right side with theme toggle */}
-                <div>
-                  <ThemeToggle />
-                </div>
-              </div>
-            </header>
-            
-            {/* Main content - add padding for header */}
-            <div className="pt-16">
+            <div className="p-4 lg:p-8">
               {children}
             </div>
-          </div>
+          </main>
         </ChatProvider>
       </CharacterProvider>
     </ThemeProvider>

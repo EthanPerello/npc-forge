@@ -1,9 +1,12 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from "next/font/google";
+import { getServerSession } from 'next-auth/next';
 import Sidebar from '@/components/sidebar';
 import ClientLayout from '@/components/client-layout';
 import { Analytics } from '@vercel/analytics/react';
+import { authOptions } from '@/lib/auth-config';
+import { AuthProvider } from '@/components/auth-provider';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -59,11 +62,13 @@ export const metadata: Metadata = {
 };
 
 // Root layout with server components
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession(authOptions);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -76,10 +81,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Sidebar />
-        <ClientLayout>
-          {children}
-        </ClientLayout>
+        <AuthProvider session={session}>
+          <Sidebar />
+          <ClientLayout>
+            {children}
+          </ClientLayout>
+        </AuthProvider>
         <Analytics />
       </body>
     </html>
