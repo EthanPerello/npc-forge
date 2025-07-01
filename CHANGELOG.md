@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.0] - 2025-06-30
+
 ### Added
 - User authentication system powered by NextAuth.js with support for Google and GitHub sign-in providers
 - Cloud-based character storage using Prisma and Supabase with fallback to local storage for unauthenticated users
@@ -631,7 +633,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Export to JSON feature
 - Fully responsive UI for desktop and mobile
 
-[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.30.0...HEAD
+[Unreleased]: https://github.com/EthanPerello/npc-forge/compare/v0.31.0...HEAD
+[0.31.0]: https://github.com/EthanPerello/npc-forge/compare/v0.30.0...v0.31.0
 [0.30.0]: https://github.com/EthanPerello/npc-forge/compare/v0.29.0...v0.30.0
 [0.29.0]: https://github.com/EthanPerello/npc-forge/compare/v0.28.0...v0.29.0
 [0.28.0]: https://github.com/EthanPerello/npc-forge/compare/v0.27.0...v0.28.0
