@@ -30,9 +30,10 @@ async function authenticateRequest(request: NextRequest) {
 // GET /api/v1/characters/[id] - Get specific character
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params;
     const user = await authenticateRequest(request);
     if (!user) {
       return NextResponse.json(
@@ -75,9 +76,10 @@ export async function GET(
 // PUT /api/v1/characters/[id] - Update character
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params;
     const user = await authenticateRequest(request);
     if (!user) {
       return NextResponse.json(
@@ -147,9 +149,10 @@ export async function PUT(
 // DELETE /api/v1/characters/[id] - Delete character
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params;
     const user = await authenticateRequest(request);
     if (!user) {
       return NextResponse.json(
