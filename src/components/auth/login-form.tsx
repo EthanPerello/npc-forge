@@ -1,28 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn, getProviders } from 'next-auth/react';
+import { signIn, getProviders, type ClientSafeProvider } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Github, Mail, Sparkles, Loader2 } from 'lucide-react';
-
-interface Provider {
-  id: string;
-  name: string;
-  type: string;
-  signinUrl: string;
-  callbackUrl: string;
-}
+import Button from '@/components/ui/button';
+import { Github, Sparkles, Loader2 } from 'lucide-react';
 
 interface LoginFormProps {
-  providers?: Record<string, Provider>;
+  providers?: Record<string, ClientSafeProvider> | null;
 }
 
 export default function LoginForm({ providers }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState<string | null>(null);
-  const [email, setEmail] = useState('');
-  const [emailSent, setEmailSent] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams?.get('callbackUrl') || '/';
@@ -33,30 +22,6 @@ export default function LoginForm({ providers }: LoginFormProps) {
       await signIn(providerId, { callbackUrl });
     } catch (error) {
       console.error('Sign in error:', error);
-    } finally {
-      setIsLoading(null);
-    }
-  };
-
-  const handleEmailSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-
-    setIsLoading('email');
-    try {
-      const result = await signIn('email', { 
-        email, 
-        redirect: false,
-        callbackUrl 
-      });
-      
-      if (result?.error) {
-        console.error('Email sign in error:', result.error);
-      } else {
-        setEmailSent(true);
-      }
-    } catch (error) {
-      console.error('Email sign in error:', error);
     } finally {
       setIsLoading(null);
     }
@@ -88,61 +53,20 @@ export default function LoginForm({ providers }: LoginFormProps) {
           </svg>
         );
       default:
-        return <Mail className="h-5 w-5" />;
+        return null;
     }
   };
 
-  const getProviderLabel = (provider: Provider) => {
+  const getProviderLabel = (provider: ClientSafeProvider) => {
     switch (provider.id) {
       case 'github':
         return 'Continue with GitHub';
       case 'google':
         return 'Continue with Google';
-      case 'email':
-        return 'Continue with Email';
       default:
         return `Continue with ${provider.name}`;
     }
   };
-
-  if (emailSent) {
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="w-16 h-16 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center">
-            <Mail className="h-8 w-8 text-green-600 dark:text-green-400" />
-          </div>
-          <div className="text-center">
-            <h2 className="text-xl font-semibold mb-2">Check your email</h2>
-            <p className="text-muted">
-              We sent a sign-in link to <strong>{email}</strong>
-            </p>
-            <p className="text-sm text-muted mt-2">
-              Click the link in the email to sign in to your account.
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex flex-col space-y-2">
-          <Button
-            variant="outline"
-            onClick={() => {
-              setEmailSent(false);
-              setEmail('');
-            }}
-          >
-            Try a different email
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => router.push('/')}
-          >
-            Continue without signing in
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -161,7 +85,7 @@ export default function LoginForm({ providers }: LoginFormProps) {
       {providers && (
         <div className="space-y-3">
           {Object.values(providers)
-            .filter(provider => provider.id !== 'email')
+            .filter(provider => provider.id !== 'email') // Filter out email provider
             .map((provider) => (
               <Button
                 key={provider.id}
@@ -181,48 +105,10 @@ export default function LoginForm({ providers }: LoginFormProps) {
         </div>
       )}
 
-      {/* Divider */}
-      {providers && Object.keys(providers).length > 1 && (
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-theme" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted">Or continue with email</span>
-          </div>
-        </div>
-      )}
-
-      {/* Email Form */}
-      <form onSubmit={handleEmailSignIn} className="space-y-4">
-        <div>
-          <Input
-            type="email"
-            placeholder="Enter your email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={isLoading !== null}
-            required
-          />
-        </div>
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={!email || isLoading !== null}
-        >
-          {isLoading === 'email' ? (
-            <Loader2 className="h-5 w-5 animate-spin mr-2" />
-          ) : (
-            <Mail className="h-5 w-5 mr-2" />
-          )}
-          Send sign-in link
-        </Button>
-      </form>
-
       {/* Continue without account */}
       <div className="text-center">
         <Button
-          variant="ghost"
+          variant="secondary"
           onClick={() => router.push('/')}
           className="text-sm"
         >
@@ -251,6 +137,13 @@ export default function LoginForm({ providers }: LoginFormProps) {
             Cloud backup of chat conversations
           </li>
         </ul>
+      </div>
+
+      {/* Note about OAuth only */}
+      <div className="text-center">
+        <p className="text-xs text-muted">
+          Secure OAuth authentication - no passwords needed!
+        </p>
       </div>
     </div>
   );

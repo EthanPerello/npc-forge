@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- User authentication system powered by NextAuth.js with support for Google and GitHub sign-in providers
+- Cloud-based character storage using Prisma and Supabase with fallback to local storage for unauthenticated users
+- Middleware to protect API routes and enforce authentication for cloud-backed features
+- Header bar with dynamic sign-in button, user menu, and theme toggle integrated into the client layout
+- Automatic syncing of user-generated characters to Supabase when logged in, with ID and timestamp preservation
+- API key model and GDPR-compliant user metadata fields added to Prisma schema (unused but scaffolded for future use)
+
+### Changed
+- Sidebar layout updated to remove outdated sign-in button and improve spacing consistency across screen sizes
+- Character storage logic refactored to route all storage actions through a hybrid provider supporting both IndexedDB and Supabase
+- Character context and library logic updated to use new hybrid character service with automatic provider fallback
+
 ## [0.30.0] - 2025-06-15
 
 ### Changed

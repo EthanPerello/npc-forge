@@ -1,4 +1,4 @@
-// app/api/v1/characters/route.ts
+// src/app/api/v1/characters/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser, validateApiKey } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -18,6 +18,17 @@ const POST_RATE_LIMIT = { maxRequests: 10, windowMs: 60000 }; // 10 creates per 
 
 // Maximum request size (5MB)
 const MAX_REQUEST_SIZE = 5 * 1024 * 1024;
+
+// Helper function to check if error has message property
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === 'string') {
+    return error;
+  }
+  return 'Unknown error occurred';
+}
 
 // Helper function to authenticate request with enhanced logging
 async function authenticateRequest(request: NextRequest) {
@@ -56,7 +67,7 @@ async function authenticateRequest(request: NextRequest) {
         userAgent,
         timestamp: new Date(),
         success: false,
-        details: { error: error.message }
+        details: { error: getErrorMessage(error) }
       });
     }
   }
@@ -88,7 +99,7 @@ async function authenticateRequest(request: NextRequest) {
       userAgent,
       timestamp: new Date(),
       success: false,
-      details: { error: error.message }
+      details: { error: getErrorMessage(error) }
     });
   }
   
@@ -163,9 +174,9 @@ export async function GET(request: NextRequest) {
     });
     
     // Transform to match existing format
-    const transformedCharacters = characters.map(char => ({
+    const transformedCharacters = characters.map((char: any) => ({
       id: char.id,
-      character: char.data as Character,
+      character: char.data as unknown as Character,
       createdAt: char.createdAt.toISOString(),
       isExample: false,
       hasStoredImage: !!char.portraitUrl,
@@ -341,7 +352,7 @@ export async function POST(request: NextRequest) {
     // Return in format compatible with existing code
     return NextResponse.json({
       id: character.id,
-      character: character.data as Character,
+      character: character.data as unknown as Character,
       createdAt: character.createdAt.toISOString(),
       isExample: false,
       formData,

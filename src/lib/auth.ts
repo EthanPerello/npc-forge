@@ -1,14 +1,24 @@
-// lib/auth.ts
+// src/lib/auth.ts
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
-import type { User } from '@prisma/client';
 
 export type AuthUser = {
   id: string;
   name?: string | null;
   email?: string | null;
   image?: string | null;
+};
+
+// Database user type (without importing from Prisma)
+export type DatabaseUser = {
+  id: string;
+  name: string | null;
+  email: string;
+  emailVerified: Date | null;
+  image: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 /**
@@ -32,7 +42,7 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
 /**
  * Get the current user from the database with full details
  */
-export async function getCurrentUserFromDB(): Promise<User | null> {
+export async function getCurrentUserFromDB(): Promise<DatabaseUser | null> {
   const session = await getServerSession(authOptions);
   
   if (!session?.user?.id) {
@@ -110,7 +120,7 @@ export async function updateUserPreferences(
 /**
  * Validate API key for external integrations
  */
-export async function validateApiKey(apiKey: string): Promise<User | null> {
+export async function validateApiKey(apiKey: string): Promise<DatabaseUser | null> {
   try {
     const key = await prisma.apiKey.findUnique({
       where: { 

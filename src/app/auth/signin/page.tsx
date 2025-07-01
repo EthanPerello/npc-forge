@@ -1,4 +1,4 @@
-// app/auth/signin/page.tsx
+// src/app/auth/signin/page.tsx
 import { getProviders } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth';

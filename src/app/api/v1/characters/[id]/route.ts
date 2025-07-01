@@ -1,4 +1,4 @@
-// app/api/v1/characters/[id]/route.ts
+// src/app/api/v1/characters/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser, validateApiKey } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -58,7 +58,7 @@ export async function GET(
     // Return in format compatible with existing code
     return NextResponse.json({
       id: character.id,
-      character: character.data as Character,
+      character: character.data as unknown as Character,
       createdAt: character.createdAt.toISOString(),
       isExample: false,
       hasStoredImage: !!character.portraitUrl,
@@ -129,7 +129,7 @@ export async function PUT(
     // Return in format compatible with existing code
     return NextResponse.json({
       id: updatedCharacter.id,
-      character: updatedCharacter.data as Character,
+      character: updatedCharacter.data as unknown as Character,
       createdAt: updatedCharacter.createdAt.toISOString(),
       isExample: false,
       formData,

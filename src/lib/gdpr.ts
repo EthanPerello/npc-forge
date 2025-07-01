@@ -1,4 +1,4 @@
-// lib/gdpr.ts
+// src/lib/gdpr.ts
 import { prisma } from './prisma';
 import { auditLog } from './security';
 
@@ -28,6 +28,17 @@ const DEFAULT_RETENTION_POLICY: DataRetentionPolicy = {
   anonymizeAfterDays: 365 * 7, // 7 years
   inactivityThresholdDays: 365, // 1 year
 };
+
+// Helper function to get error message from unknown type
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === 'string') {
+    return error;
+  }
+  return 'Unknown error occurred';
+}
 
 /**
  * GDPR Article 15: Right of access
@@ -141,7 +152,7 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
       userAgent: 'server',
       timestamp: new Date(),
       success: false,
-      details: { error: error.message }
+      details: { error: getErrorMessage(error) }
     });
     throw error;
   }
@@ -223,7 +234,7 @@ export async function deleteUserData(userId: string, reason: string = 'user_requ
       userAgent: 'server',
       timestamp: new Date(),
       success: false,
-      details: { error: error.message, reason }
+      details: { error: getErrorMessage(error), reason }
     });
     throw error;
   }
@@ -293,7 +304,7 @@ export async function updateUserData(
       userAgent: 'server',
       timestamp: new Date(),
       success: false,
-      details: { error: error.message }
+      details: { error: getErrorMessage(error) }
     });
     throw error;
   }
@@ -389,7 +400,7 @@ export async function enforceDataRetention(
       userAgent: 'server',
       timestamp: new Date(),
       success: false,
-      details: { error: error.message }
+      details: { error: getErrorMessage(error) }
     });
     throw error;
   }
@@ -438,7 +449,7 @@ export async function updateUserConsent(
       userAgent: 'server',
       timestamp: new Date(),
       success: false,
-      details: { error: error.message }
+      details: { error: getErrorMessage(error) }
     });
     throw error;
   }

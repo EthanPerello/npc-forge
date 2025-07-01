@@ -90,7 +90,7 @@ const emitSidebarEvent = (expanded: boolean, mobileOpen?: boolean) => {
     const event = new CustomEvent('sidebarStateChange', { 
       detail: { 
         expanded,
-        mobileOpen // Pass mobile state as well
+        mobileOpen
       }
     });
     window.dispatchEvent(event);
@@ -122,38 +122,21 @@ const NavItem = ({ item, depth = 0, isOpen = false, toggleOpen, isFullSidebar, t
     if (!isFullSidebar) {
       // When sidebar is collapsed, expand it when any icon is clicked
       toggleSidebar();
-      e.preventDefault(); // Prevent navigation
+      e.preventDefault();
       return;
     }
     
     if (hasChildren) {
-      // For parent items with both path and children
       if (item.path) {
-        // If dropdown is currently open and item has a path, navigate to that path
         if (isOpen) {
           router.push(item.path);
         } else {
-          // If dropdown is closed, open it first
           toggleOpen();
-          e.preventDefault(); // Prevent navigation
+          e.preventDefault();
         }
       } else {
-        // For items with only children, just toggle the dropdown
         toggleOpen();
-        e.preventDefault(); // Prevent navigation
-      }
-    }
-    // For items with only a path, default link behavior will work
-  };
-  
-  // Special handler for the book icon to always expand the sidebar
-  const handleBookIconClick = (e: React.MouseEvent) => {
-    // Fixed TypeScript error by properly checking if item.icon is a valid React element and has type property
-    if (item.title === 'Documentation' || (depth === 0 && isValidElement(item.icon) && item.icon.type === BookOpen)) {
-      if (!isFullSidebar) {
-        toggleSidebar();
         e.preventDefault();
-        return;
       }
     }
   };
@@ -161,16 +144,13 @@ const NavItem = ({ item, depth = 0, isOpen = false, toggleOpen, isFullSidebar, t
   // If the sidebar is collapsed and it's a top-level item, just show the icon
   if (!isFullSidebar && depth === 0) {
     return (
-      <div className="mb-2 flex justify-center">
+      <div className="mb-3 flex justify-center">
         <div 
           className={`
-            w-10 h-10 flex justify-center items-center rounded-md cursor-pointer
+            w-10 h-10 flex justify-center items-center rounded-lg cursor-pointer transition-colors
             ${isActive ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300' : 'hover:bg-secondary text-muted'}
           `}
-          onClick={(e) => {
-            handleItemClick(e);
-            handleBookIconClick(e);
-          }}
+          onClick={handleItemClick}
           title={item.title}
         >
           {item.icon}
@@ -183,21 +163,20 @@ const NavItem = ({ item, depth = 0, isOpen = false, toggleOpen, isFullSidebar, t
     <div className="w-full">
       <div 
         className={`
-          flex justify-between items-center w-full px-4 py-2 rounded-md mb-1
+          flex justify-between items-center w-full px-3 py-2.5 rounded-lg mb-1 transition-colors
           ${isActive ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300' : 'hover:bg-secondary'}
           ${depth === 0 ? 'font-medium' : ''}
           ${depth === 2 ? 'text-sm' : ''}
         `}
       >
-        <div className="flex items-center flex-1">
-          <span className="mr-2 text-indigo-600 dark:text-indigo-400">{item.icon}</span>
+        <div className="flex items-center flex-1 min-w-0">
+          <span className="mr-3 text-indigo-600 dark:text-indigo-400 flex-shrink-0">{item.icon}</span>
           
           {item.path ? (
             <Link 
               href={item.path} 
-              className="flex-1 cursor-pointer"
+              className="flex-1 cursor-pointer truncate"
               onClick={e => {
-                // If it has children and is not open, we want to open it first instead of navigating
                 if (hasChildren && !isOpen) {
                   e.preventDefault();
                   toggleOpen();
@@ -208,12 +187,11 @@ const NavItem = ({ item, depth = 0, isOpen = false, toggleOpen, isFullSidebar, t
             </Link>
           ) : (
             <span 
-              className="flex-1 cursor-pointer"
+              className="flex-1 cursor-pointer truncate"
               onClick={(e) => {
                 if (hasChildren) {
                   toggleOpen();
                 }
-                handleBookIconClick(e);
               }}
             >
               {item.title}
@@ -223,7 +201,7 @@ const NavItem = ({ item, depth = 0, isOpen = false, toggleOpen, isFullSidebar, t
         
         {hasChildren && (
           <span 
-            className="text-muted cursor-pointer p-1"
+            className="text-muted cursor-pointer p-1 ml-2 flex-shrink-0"
             onClick={(e) => {
               e.stopPropagation();
               toggleOpen();
@@ -235,7 +213,7 @@ const NavItem = ({ item, depth = 0, isOpen = false, toggleOpen, isFullSidebar, t
       </div>
       
       {isOpen && hasChildren && item.items && (
-        <div className={`pl-4 ml-2 border-l border-theme ${depth === 1 ? 'ml-4' : ''}`}>
+        <div className="pl-6 ml-2 border-l-2 border-indigo-100 dark:border-indigo-900/50 space-y-1">
           {item.items.map((child, index) => (
             <NavItemWithState 
               key={index} 
@@ -263,7 +241,6 @@ interface NavItemWithStateProps {
 const NavItemWithState = ({ item, depth = 0, isFullSidebar, toggleSidebar }: NavItemWithStateProps) => {
   const pathname = usePathname();
   
-  // Check if we're on a specific documentation page (not the main docs page)
   const isInPath = (item: NavItemType): boolean => {
     if (item.path === pathname) return true;
     if (item.path !== '/' && pathname?.startsWith(item.path!)) return true;
@@ -273,16 +250,11 @@ const NavItemWithState = ({ item, depth = 0, isFullSidebar, toggleSidebar }: Nav
     return false;
   };
   
-  // For the Documentation section, only auto-expand if we're on a specific docs page
-  // (not the main /docs page), otherwise start closed
-  // For Developer Docs, auto-expand if we're on any developer docs page
   const shouldStartOpen = () => {
     if (item.title === 'Documentation') {
-      // Only auto-expand if we're on a specific docs page, not the main docs page
       return pathname !== '/docs' && pathname?.startsWith('/docs');
     }
     if (item.title === 'Developer Docs') {
-      // Auto-expand if we're on any developer docs page (including the main developer page)
       return pathname === '/docs/developer' || 
              pathname?.startsWith('/docs/dev-setup') ||
              pathname?.startsWith('/docs/architecture') ||
@@ -300,7 +272,6 @@ const NavItemWithState = ({ item, depth = 0, isFullSidebar, toggleSidebar }: Nav
   
   const [isOpen, setIsOpen] = useState(shouldStartOpen());
   
-  // Update the open state when pathname changes
   useEffect(() => {
     setIsOpen(shouldStartOpen());
   }, [pathname]);
@@ -318,36 +289,27 @@ const NavItemWithState = ({ item, depth = 0, isFullSidebar, toggleSidebar }: Nav
 };
 
 export default function Sidebar() {
-  // Start collapsed by default
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  
-  // Pathname for active detection
   const pathname = usePathname();
   
-  // Toggle the sidebar expanded state
   const toggleSidebar = () => {
     const newExpandedState = !isExpanded;
     setIsExpanded(newExpandedState);
     emitSidebarEvent(newExpandedState);
   };
   
-  // Toggle the mobile sidebar state
   const toggleMobileSidebar = () => {
     const newMobileState = !isMobileOpen;
     setIsMobileOpen(newMobileState);
-    // Pass both states to the event
     emitSidebarEvent(isExpanded, newMobileState);
   };
   
-  // Close mobile sidebar when route changes
   useEffect(() => {
     setIsMobileOpen(false);
-    // Notify that mobile sidebar is closed
     emitSidebarEvent(isExpanded, false);
   }, [pathname, isExpanded]);
   
-  // Close mobile sidebar when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const sidebar = document.getElementById('main-sidebar');
@@ -364,7 +326,6 @@ export default function Sidebar() {
         isMobileOpen
       ) {
         setIsMobileOpen(false);
-        // Notify that mobile sidebar is closed
         emitSidebarEvent(isExpanded, false);
       }
     };
@@ -393,7 +354,7 @@ export default function Sidebar() {
         </button>
       </div>
       
-      {/* Desktop Toggle Button - Separate from sidebar */}
+      {/* Desktop Toggle Button */}
       <div className="hidden lg:block fixed top-4 left-4 z-50">
         <button
           id="sidebar-toggle-button"
@@ -413,58 +374,61 @@ export default function Sidebar() {
       <div 
         id="main-sidebar"
         className={`
-          fixed top-0 left-0 z-40 h-screen pt-16
+          fixed top-16 left-0 z-40 h-[calc(100vh-4rem)]
           transition-all duration-300 ease-in-out
-          bg-card border-r border-theme
+          bg-card border-r border-theme shadow-lg
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'} 
           lg:translate-x-0
           ${isExpanded ? 'lg:w-64' : 'lg:w-16'}
         `}
       >
-        <div className="h-full flex flex-col overflow-y-auto p-4">
+        <div className="h-full flex flex-col">
           {/* Title - only show when expanded */}
-          {isExpanded && (
-            <div className="mb-6">
-              <h2 className="text-xl font-bold mb-2">
-                NPC Forge
+          {(isExpanded || isMobileOpen) && (
+            <div className="p-6 border-b border-theme">
+              <h2 className="text-lg font-semibold mb-1">
+                Navigation
               </h2>
               <p className="text-sm text-muted">
-                AI Character Creator
+                Explore the app
               </p>
             </div>
           )}
           
-          <nav className="space-y-1 flex-1">
-            {navigationItems.map((item, index) => (
-              <NavItemWithState 
-                key={index} 
-                item={item} 
-                isFullSidebar={isExpanded || isMobileOpen} 
-                toggleSidebar={toggleSidebar}
-              />
-            ))}
+          {/* Navigation */}
+          <nav className="flex-1 overflow-y-auto py-4 px-3">
+            <div className="space-y-2">
+              {navigationItems.map((item, index) => (
+                <NavItemWithState 
+                  key={index} 
+                  item={item} 
+                  isFullSidebar={isExpanded || isMobileOpen} 
+                  toggleSidebar={toggleSidebar}
+                />
+              ))}
+            </div>
           </nav>
           
-          {/* Expand/Collapse button at bottom - only show in desktop expanded view */}
-          {isExpanded && (
-            <div className="pt-4 border-t border-theme mt-auto">
+          {/* Collapse button - only show when expanded */}
+          {(isExpanded || isMobileOpen) && (
+            <div className="p-3 border-t border-theme">
               <button
                 onClick={toggleSidebar}
-                className="w-full flex items-center justify-center p-2 text-muted hover:bg-secondary rounded-md"
+                className="w-full flex items-center justify-center p-2 text-muted hover:bg-secondary rounded-lg transition-colors"
                 aria-label="Collapse sidebar"
               >
-                <ChevronLeft className="h-5 w-5 mr-2" />
-                <span>Collapse</span>
+                <ChevronLeft className="h-4 w-4 mr-2" />
+                <span className="text-sm">Collapse</span>
               </button>
             </div>
           )}
         </div>
       </div>
       
-      {/* Backdrop for mobile */}
+      {/* Mobile backdrop */}
       {isMobileOpen && (
         <div 
-          className="fixed inset-0 bg-gray-800 bg-opacity-50 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
           onClick={toggleMobileSidebar}
         />
       )}
