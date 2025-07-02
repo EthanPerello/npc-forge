@@ -12,12 +12,14 @@ import {
   Download, 
   Trash2, 
   MessageCircle,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Star
 } from 'lucide-react';
 
 interface CharacterCardProps {
   character: Character;
   id?: string;
+  isExample?: boolean; // NEW: Add explicit example indicator
   onClick?: () => void;
   onEdit?: (e: React.MouseEvent) => void;
   onDownload?: (e: React.MouseEvent) => void;
@@ -28,6 +30,7 @@ interface CharacterCardProps {
 export default function CharacterCard({
   character,
   id,
+  isExample = false,
   onClick,
   onEdit,
   onDownload,
@@ -60,9 +63,19 @@ export default function CharacterCard({
 
   return (
     <div 
-      className="character-card bg-card border border-theme rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col"
+      className="character-card bg-card border border-theme rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col relative"
       onClick={onClick}
     >
+      {/* NEW: Example Character Badge */}
+      {isExample && (
+        <div className="absolute top-2 right-2 z-10">
+          <div className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 shadow-md">
+            <Star className="h-3 w-3 fill-current" />
+            Example
+          </div>
+        </div>
+      )}
+
       {/* Header with portrait and basic info - RESPONSIVE LAYOUT */}
       <div className="p-3 flex flex-col space-y-2 flex-1">
         {/* Portrait - ALWAYS use PortraitDisplay (FIXED) */}
@@ -81,7 +94,15 @@ export default function CharacterCard({
         
         {/* Character name - COMPACT */}
         <div className="text-center">
-          <h3 className="font-medium text-base mb-1 line-clamp-2">{character.name}</h3>
+          <h3 className="font-medium text-base mb-1 line-clamp-2">
+            {character.name}
+            {/* NEW: Small example indicator next to name */}
+            {isExample && (
+              <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">
+                (Example)
+              </span>
+            )}
+          </h3>
         </div>
 
         {/* Character Traits - COMPACT */}
@@ -91,7 +112,11 @@ export default function CharacterCard({
               {traits.slice(0, 3).map((trait, index) => (
                 <span 
                   key={index}
-                  className="character-trait-tag text-xs px-2 py-1"
+                  className={`character-trait-tag text-xs px-2 py-1 ${
+                    isExample 
+                      ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800' 
+                      : ''
+                  }`}
                 >
                   {trait}
                 </span>
@@ -128,7 +153,8 @@ export default function CharacterCard({
         
         {/* Secondary Actions Row 1 */}
         <div className="grid grid-cols-2 gap-2">
-          {onEdit && (
+          {/* NEW: Conditional Edit button - hide for example characters */}
+          {onEdit && !isExample && (
             <Button
               variant="secondary"
               onClick={onEdit}
@@ -140,7 +166,20 @@ export default function CharacterCard({
             </Button>
           )}
           
-          {onDownload && (
+          {/* Show different button layout if example character */}
+          {isExample && onDownload && (
+            <Button
+              variant="secondary"
+              onClick={onDownload}
+              leftIcon={<Download className="h-3 w-3" />}
+              size="sm"
+              className="col-span-2"
+            >
+              Download JSON
+            </Button>
+          )}
+          
+          {!isExample && onDownload && (
             <Button
               variant="secondary"
               onClick={onDownload}
@@ -153,33 +192,50 @@ export default function CharacterCard({
           )}
         </div>
         
-        {/* Secondary Actions Row 2 */}
-        <div className="grid grid-cols-2 gap-2">
-          {onDownloadImage && (
+        {/* Secondary Actions Row 2 - Hide for example characters */}
+        {!isExample && (
+          <div className="grid grid-cols-2 gap-2">
+            {onDownloadImage && (
+              <Button
+                variant="secondary"
+                onClick={onDownloadImage}
+                leftIcon={<ImageIcon className="h-3 w-3" />}
+                size="sm"
+                className="flex-1"
+                disabled={!shouldShowDownloadImage}
+              >
+                Portrait
+              </Button>
+            )}
+            
+            {onDelete && (
+              <Button
+                variant="danger"
+                onClick={onDelete}
+                leftIcon={<Trash2 className="h-3 w-3" />}
+                size="sm"
+                className="flex-1"
+              >
+                Delete
+              </Button>
+            )}
+          </div>
+        )}
+
+        {/* Example character actions */}
+        {isExample && onDownloadImage && shouldShowDownloadImage && (
+          <div className="grid grid-cols-1 gap-2">
             <Button
               variant="secondary"
               onClick={onDownloadImage}
               leftIcon={<ImageIcon className="h-3 w-3" />}
               size="sm"
-              className="flex-1"
-              disabled={!shouldShowDownloadImage}
+              className="w-full"
             >
-              Portrait
+              Download Portrait
             </Button>
-          )}
-          
-          {onDelete && (
-            <Button
-              variant="danger"
-              onClick={onDelete}
-              leftIcon={<Trash2 className="h-3 w-3" />}
-              size="sm"
-              className="flex-1"
-            >
-              Delete
-            </Button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

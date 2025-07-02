@@ -146,13 +146,22 @@ async function getChatSessionsFromCloud(characterId: string): Promise<any[]> {
 export class HybridCharacterStorage {
   private user: { id: string } | null = null;
   private initialized = false;
+  private syncPromise: Promise<void> | null = null;
   
   async initialize(): Promise<void> {
     if (this.initialized) return;
     
     try {
+      const previousUser = this.user;
       this.user = await getAuthenticatedUser();
+      
       console.log(`HybridStorage initialized. User authenticated: ${!!this.user}`);
+      
+      // If user just signed in (wasn't authenticated before but is now), trigger sync
+      if (!previousUser && this.user && isOnline()) {
+        console.log('User just signed in, triggering automatic sync...');
+        this.triggerAutoSync();
+      }
     } catch (error) {
       console.warn('Failed to initialize hybrid storage:', error);
     }
@@ -160,6 +169,80 @@ export class HybridCharacterStorage {
     // Always initialize local storage
     await initializeLocalLibrary();
     this.initialized = true;
+  }
+  
+  /**
+   * Trigger automatic sync in the background (non-blocking)
+   */
+  private triggerAutoSync(): void {
+    if (this.syncPromise) {
+      console.log('Sync already in progress, skipping...');
+      return;
+    }
+    
+    this.syncPromise = this.performAutoSync().finally(() => {
+      this.syncPromise = null;
+    });
+  }
+  
+  /**
+   * Perform automatic sync of local characters to cloud
+   */
+  private async performAutoSync(): Promise<void> {
+    try {
+      console.log('Starting automatic sync of local characters to cloud...');
+      
+      const localCharacters = await getLocalCharacters();
+      const userCharacters = localCharacters.filter(char => !char.isExample);
+      
+      if (userCharacters.length === 0) {
+        console.log('No user characters to sync');
+        return;
+      }
+      
+      let synced = 0;
+      let failed = 0;
+      
+      for (const storedChar of userCharacters) {
+        try {
+          await saveCharacterToCloud(storedChar.character, storedChar.formData);
+          synced++;
+          console.log(`Synced character: ${storedChar.character.name}`);
+        } catch (error) {
+          failed++;
+          console.warn(`Failed to sync character ${storedChar.character.name}:`, error);
+        }
+      }
+      
+      console.log(`Auto-sync completed: ${synced} synced, ${failed} failed`);
+      
+      // Emit event for UI updates
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('characters-synced', {
+          detail: { synced, failed, total: userCharacters.length }
+        }));
+      }
+    } catch (error) {
+      console.error('Auto-sync failed:', error);
+    }
+  }
+  
+  /**
+   * Get current sync status
+   */
+  getSyncStatus(): { isAuthenticated: boolean; isSyncing: boolean } {
+    return {
+      isAuthenticated: !!this.user,
+      isSyncing: !!this.syncPromise
+    };
+  }
+  
+  /**
+   * Force re-check authentication and trigger sync if needed
+   */
+  async refreshAuth(): Promise<void> {
+    this.initialized = false;
+    await this.initialize();
   }
   
   /**
@@ -207,7 +290,7 @@ export class HybridCharacterStorage {
       throw error; // Local save is critical
     }
     
-    // If authenticated and online, also save to cloud
+    // If authenticated and online, also save to cloud (but not example characters)
     if (this.user && isOnline() && !isExample) {
       try {
         cloudResult = await saveCharacterToCloud(character, formData);
@@ -340,28 +423,63 @@ export class HybridCharacterStorage {
   async deleteCharacter(id: string): Promise<boolean> {
     await this.initialize();
     
-    let success = false;
+    let localSuccess = false;
+    let cloudSuccess = false;
+    
+    console.log(`Starting deletion process for character: ${id}`);
+    
+    // First, check if character exists locally to get its details
+    const localCharacter = await getLocalCharacterById(id);
+    const isExample = localCharacter?.isExample || false;
+    
+    console.log(`Character found locally: ${!!localCharacter}, isExample: ${isExample}`);
     
     // Delete from local storage first
     try {
-      success = await deleteLocalCharacter(id);
-      console.log('Character deleted from local storage');
+      localSuccess = await deleteLocalCharacter(id);
+      console.log(`Local deletion ${localSuccess ? 'succeeded' : 'failed'} for character: ${id}`);
     } catch (error) {
       console.error('Failed to delete character locally:', error);
     }
     
-    // If authenticated and online, also delete from cloud
-    if (this.user && isOnline()) {
+    // If authenticated and online, also delete from cloud (but only for user characters)
+    if (this.user && isOnline() && !isExample) {
+      console.log('Attempting cloud deletion for user character...');
       try {
         await deleteCharacterFromCloud(id);
-        console.log('Character deleted from cloud');
+        cloudSuccess = true;
+        console.log('Character deleted from cloud successfully');
       } catch (error) {
-        console.warn('Failed to delete character from cloud:', error);
-        // Don't fail - local deletion may have succeeded
+        console.error('Failed to delete character from cloud:', error);
+        // For user characters, cloud deletion failure is concerning but not blocking
+        // since local deletion is the primary concern for user experience
+        cloudSuccess = false;
       }
+    } else if (isExample) {
+      // For example characters, we don't need cloud deletion
+      cloudSuccess = true;
+      console.log('Skipping cloud deletion for example character');
+    } else if (!this.user) {
+      // If not authenticated, only local deletion matters
+      cloudSuccess = true;
+      console.log('Skipping cloud deletion - user not authenticated');
+    } else if (!isOnline()) {
+      // If offline, only local deletion matters
+      cloudSuccess = true;
+      console.log('Skipping cloud deletion - user offline');
     }
     
-    return success;
+    const overallSuccess = localSuccess && cloudSuccess;
+    console.log(`Deletion process completed. Local: ${localSuccess}, Cloud: ${cloudSuccess}, Overall: ${overallSuccess}`);
+    
+    // Emit deletion event for UI updates
+    if (overallSuccess && typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('character-deleted', {
+        detail: { characterId: id, isExample }
+      }));
+    }
+    
+    return overallSuccess;
   }
   
   /**
@@ -390,7 +508,7 @@ export class HybridCharacterStorage {
       }
     }
     
-    console.log(`Sync completed: ${success} succeeded, ${failed} failed`);
+    console.log(`Manual sync completed: ${success} succeeded, ${failed} failed`);
     return { success, failed };
   }
 }

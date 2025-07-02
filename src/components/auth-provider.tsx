@@ -2,6 +2,7 @@
 
 import { SessionProvider } from 'next-auth/react';
 import { ReactNode } from 'react';
+import { AuthSyncProvider } from './auth-sync-provider';
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -11,7 +12,9 @@ interface AuthProviderProps {
 export function AuthProvider({ children, session }: AuthProviderProps) {
   return (
     <SessionProvider session={session}>
-      {children}
+      <AuthSyncProvider>
+        {children}
+      </AuthSyncProvider>
     </SessionProvider>
   );
 }
