@@ -18,23 +18,19 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   session: {
-    strategy: 'jwt',
+    strategy: 'database', // Changed from 'jwt' to 'database' when using Prisma adapter
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (token?.id && session.user) {
-        session.user.id = token.id as string;
+    async session({ session, user }) {
+      // When using database strategy, user comes from database
+      if (user && session.user) {
+        session.user.id = user.id;
       }
       return session;
     },
     async redirect({ url, baseUrl }) {
+      // Improved redirect logic
       if (url.startsWith('/')) return `${baseUrl}${url}`;
       else if (new URL(url).origin === baseUrl) return url;
       return baseUrl;
@@ -42,9 +38,10 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/auth/signin',
-    signOut: '/auth/signout',
-    error: '/auth/error',
-    verifyRequest: '/auth/verify-request',
+    // Remove other pages that don't exist yet
+    // signOut: '/auth/signout',
+    // error: '/auth/error', 
+    // verifyRequest: '/auth/verify-request',
   },
   events: {
     async createUser({ user }) {
@@ -69,8 +66,8 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account, profile, isNewUser }) {
       console.log(`User signed in: ${user.email} via ${account?.provider}`);
     },
-    async signOut({ token }) {
-      console.log(`User signed out: ${token?.email}`);
+    async signOut({ session }) {
+      console.log(`User signed out: ${session?.user?.email}`);
     },
   },
   debug: process.env.NODE_ENV === 'development',

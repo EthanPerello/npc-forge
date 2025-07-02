@@ -3,7 +3,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { getStoredCharacters, deleteCharacter, initializeLibrary, StoredCharacter, loadCharacterWithImage, resetDatabase } from '@/lib/character-storage';
+import { StoredCharacter, loadCharacterWithImage, resetDatabase } from '@/lib/character-storage';
+import { hybridCharacterStorage } from '@/lib/hybrid-storage';
 import { Character } from '@/lib/types';
 import CharacterCard from '@/components/character-card';
 import Button from '@/components/ui/button';
@@ -52,12 +53,12 @@ export default function CharacterLibraryPage() {
   // References
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Initialize library and load characters
+  // Initialize library and load characters using hybrid storage
   useEffect(() => {
     async function init() {
       setIsLoading(true);
       try {
-        await initializeLibrary();
+        await hybridCharacterStorage.initialize();
         await loadCharacters();
       } catch (error) {
         console.error("Error initializing library:", error);
@@ -100,7 +101,7 @@ export default function CharacterLibraryPage() {
                 await new Promise(r => setTimeout(r, 100 * attempts));
               }
               
-              character = await loadCharacterWithImage(selectedCharacter.id);
+              character = await hybridCharacterStorage.loadCharacterWithImage(selectedCharacter.id);
             } catch (attemptError) {
               console.warn(`Attempt ${attempts} failed:`, attemptError);
               // Continue to next attempt
@@ -130,10 +131,12 @@ export default function CharacterLibraryPage() {
     loadFullCharacter();
   }, [selectedCharacter]);
   
+  // Load characters using hybrid storage
   const loadCharacters = async () => {
     try {
-      const stored = await getStoredCharacters();
+      const stored = await hybridCharacterStorage.getCharacters();
       setCharacters(stored);
+      console.log(`Loaded ${stored.length} characters from hybrid storage`);
     } catch (error) {
       console.error('Error loading characters:', error);
       setDbError("Failed to load characters. Try refreshing the page.");
@@ -146,7 +149,7 @@ export default function CharacterLibraryPage() {
     try {
       await resetDatabase();
       setDbError(null);
-      await initializeLibrary();
+      await hybridCharacterStorage.initialize();
       await loadCharacters();
     } catch (error) {
       console.error("Error resetting database:", error);
@@ -303,12 +306,12 @@ export default function CharacterLibraryPage() {
       .join(' ');
   };
   
-  // Handle character deletion with confirmation
+  // Handle character deletion using hybrid storage
   const handleDeleteConfirm = async (id: string) => {
     setDeletingId(id);
     
     try {
-      const success = await deleteCharacter(id);
+      const success = await hybridCharacterStorage.deleteCharacter(id);
       if (success) {
         await loadCharacters();
         
@@ -357,7 +360,7 @@ export default function CharacterLibraryPage() {
       if (fullCharacter) {
         handleDownloadCharacter(fullCharacter);
       } else {
-        const character = await loadCharacterWithImage(selectedCharacter.id);
+        const character = await hybridCharacterStorage.loadCharacterWithImage(selectedCharacter.id);
         if (character) {
           handleDownloadCharacter(character);
         } else {
@@ -381,8 +384,8 @@ export default function CharacterLibraryPage() {
       if (fullCharacter && fullCharacter.image_data) {
         imageData = fullCharacter.image_data;
       } else {
-        // Try to load the image from IndexedDB
-        const character = await loadCharacterWithImage(selectedCharacter.id);
+        // Try to load the image using hybrid storage
+        const character = await hybridCharacterStorage.loadCharacterWithImage(selectedCharacter.id);
         if (character && character.image_data) {
           imageData = character.image_data;
         } else if (selectedCharacter.character.image_url) {
@@ -430,7 +433,7 @@ export default function CharacterLibraryPage() {
     }, 100);
   };
   
-  // Handle JSON file upload
+  // Handle JSON file upload using hybrid storage
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -446,9 +449,8 @@ export default function CharacterLibraryPage() {
           throw new Error('Invalid character file format');
         }
         
-        // Import the character
-        const { saveCharacter } = await import('@/lib/character-storage');
-        await saveCharacter(characterData);
+        // Import the character using hybrid storage
+        await hybridCharacterStorage.saveCharacter(characterData);
         await loadCharacters();
         alert(`Character ${characterData.name} has been added to your library!`);
       } catch (error) {
@@ -633,9 +635,10 @@ export default function CharacterLibraryPage() {
               <CharacterCard 
                 character={storedChar.character}
                 id={storedChar.id}
+                isExample={storedChar.isExample} // ✅ FIXED: Now passing the isExample prop
                 onDownload={(e) => {
                   e.stopPropagation();
-                  loadCharacterWithImage(storedChar.id).then(fullChar => {
+                  hybridCharacterStorage.loadCharacterWithImage(storedChar.id).then(fullChar => {
                     if (fullChar) {
                       handleDownloadCharacter(fullChar);
                     } else {
@@ -648,7 +651,7 @@ export default function CharacterLibraryPage() {
                 }}
                 onDownloadImage={(e) => {
                   e.stopPropagation();
-                  loadCharacterWithImage(storedChar.id).then(fullChar => {
+                  hybridCharacterStorage.loadCharacterWithImage(storedChar.id).then(fullChar => {
                     const imageData = fullChar?.image_data || storedChar.character.image_url;
                     if (imageData) {
                       const link = document.createElement('a');

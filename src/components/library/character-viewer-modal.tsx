@@ -7,7 +7,7 @@ import { Character } from '@/lib/types';
 import { StoredCharacter } from '@/lib/character-storage';
 import Button from '@/components/ui/button';
 import PortraitDisplay from '@/components/portrait-display';
-import { X, Trash2, Edit, Download, MessageCircle } from 'lucide-react';
+import { X, Trash2, Edit, Download, MessageCircle, Star } from 'lucide-react';
 import { getCharacterTraitsArray } from '@/lib/utils';
 
 // Profile Component for Modal
@@ -77,6 +77,9 @@ export default function CharacterViewerModal({
   // Use consistent character data - prefer fullCharacter but fallback to selectedCharacter
   const displayCharacter = fullCharacter || selectedCharacter.character;
   
+  // NEW: Check if this is an example character
+  const isExample = selectedCharacter.isExample || false;
+  
   // Check if portrait exists - use the same logic as character card
   const hasPortrait = !!(displayCharacter.image_url || displayCharacter.image_data);
 
@@ -135,7 +138,14 @@ export default function CharacterViewerModal({
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {traits.map((trait, index) => (
-                    <span key={index} className="character-trait-tag">
+                    <span 
+                      key={index} 
+                      className={`character-trait-tag ${
+                        isExample 
+                          ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800' 
+                          : ''
+                      }`}
+                    >
                       {trait}
                     </span>
                   ))}
@@ -196,7 +206,14 @@ export default function CharacterViewerModal({
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {traits.map((trait, index) => (
-                    <span key={index} className="character-trait-tag">
+                    <span 
+                      key={index} 
+                      className={`character-trait-tag ${
+                        isExample 
+                          ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800' 
+                          : ''
+                      }`}
+                    >
                       {trait}
                     </span>
                   ))}
@@ -235,7 +252,14 @@ export default function CharacterViewerModal({
             </h4>
             <div className="flex flex-wrap gap-2">
               {traits.map((trait, index) => (
-                <span key={index} className="character-trait-tag">
+                <span 
+                  key={index} 
+                  className={`character-trait-tag ${
+                    isExample 
+                      ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800' 
+                      : ''
+                  }`}
+                >
                   {trait}
                 </span>
               ))}
@@ -395,8 +419,15 @@ export default function CharacterViewerModal({
       >
         <div className="p-3 sm:p-4 border-b border-theme flex justify-between items-center">
           <div className="flex-1"></div>
-          <h3 className="text-lg font-medium text-center flex-1">
+          <h3 className="text-lg font-medium text-center flex-1 flex items-center justify-center gap-2">
             {displayCharacter.name}
+            {/* NEW: Example indicator in modal header */}
+            {isExample && (
+              <div className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                <Star className="h-3 w-3 fill-current" />
+                Example
+              </div>
+            )}
           </h3>
           <div className="flex-1 flex justify-end">
             <button 
@@ -458,10 +489,10 @@ export default function CharacterViewerModal({
             </ul>
           </div>
           
-          {/* Bottom action buttons - COMPACT SINGLE ROW LAYOUT */}
+          {/* Bottom action buttons - ADAPTIVE LAYOUT BASED ON EXAMPLE STATUS */}
           <div className="p-3 modal-footer-buttons">
             <div className="flex flex-wrap gap-2 justify-center items-center">
-              {/* Chat button (prominent) */}
+              {/* Chat button (prominent) - always available */}
               <Button
                 variant="primary"
                 onClick={handleChatWithCharacter}
@@ -472,18 +503,21 @@ export default function CharacterViewerModal({
                 {isChatNavigating ? 'Opening...' : 'Chat'}
               </Button>
               
-              {/* Secondary actions */}
-              <Button
-                variant="secondary"
-                onClick={handleEditFromModal}
-                disabled={isNavigating}
-                type="button"
-                leftIcon={<Edit className="h-4 w-4" />}
-                size="sm"
-              >
-                Edit
-              </Button>
+              {/* Edit button - only for user characters */}
+              {!isExample && (
+                <Button
+                  variant="secondary"
+                  onClick={handleEditFromModal}
+                  disabled={isNavigating}
+                  type="button"
+                  leftIcon={<Edit className="h-4 w-4" />}
+                  size="sm"
+                >
+                  Edit
+                </Button>
+              )}
                 
+              {/* Download JSON - always available */}
               <Button
                 variant="secondary"
                 onClick={handleDownloadFromModal}
@@ -494,6 +528,7 @@ export default function CharacterViewerModal({
                 JSON
               </Button>
                 
+              {/* Download Portrait - always available if portrait exists */}
               <Button
                 variant="secondary"
                 onClick={handleDownloadImage}
@@ -505,20 +540,22 @@ export default function CharacterViewerModal({
                 Portrait
               </Button>
               
-              {/* Delete */}
-              <Button
-                variant="danger"
-                onClick={() => {
-                  if (window.confirm(`Are you sure you want to delete ${displayCharacter.name}? This action cannot be undone.`)) {
-                    handleDeleteCharacter(selectedCharacter.id);
-                  }
-                }}
-                type="button"
-                leftIcon={<Trash2 className="h-4 w-4" />}
-                size="sm"
-              >
-                Delete
-              </Button>
+              {/* Delete - only for user characters */}
+              {!isExample && (
+                <Button
+                  variant="danger"
+                  onClick={() => {
+                    if (window.confirm(`Are you sure you want to delete ${displayCharacter.name}? This action cannot be undone.`)) {
+                      handleDeleteCharacter(selectedCharacter.id);
+                    }
+                  }}
+                  type="button"
+                  leftIcon={<Trash2 className="h-4 w-4" />}
+                  size="sm"
+                >
+                  Delete
+                </Button>
+              )}
             </div>
           </div>
         </div>

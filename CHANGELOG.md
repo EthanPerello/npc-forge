@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Automatic character sync when users sign in - local characters now sync to cloud account automatically
+- Visual badges to clearly identify example characters in the library with amber "Example" indicators
+
+### Fixed
+- Character deletion now properly syncs between local storage and cloud account for authenticated users
+- Example characters no longer show edit/delete buttons that shouldn't be available
+
 ## [0.31.0] - 2025-06-30
 
 ### Added
