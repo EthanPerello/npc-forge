@@ -1,4 +1,4 @@
-// lib/hybrid-storage.ts
+// lib/hybrid-storage.ts (COMPLETE FIXED VERSION)
 import { Character, CharacterFormData } from './types';
 import { 
   getStoredCharacters as getLocalCharacters,
@@ -10,7 +10,8 @@ import {
   initializeLibrary as initializeLocalLibrary,
   saveImage as saveLocalImage,
   getImage as getLocalImage,
-  deleteImage as deleteLocalImage
+  deleteImage as deleteLocalImage,
+  StoredCharacter
 } from './character-storage';
 import { 
   getChatSession as getLocalChatSession,
@@ -44,7 +45,7 @@ async function getAuthenticatedUser(): Promise<{ id: string } | null> {
   return null;
 }
 
-// Cloud API functions
+// FIXED: Cloud API functions with proper upsert behavior
 async function saveCharacterToCloud(character: Character, formData?: CharacterFormData): Promise<any> {
   const response = await fetch('/api/v1/characters', {
     method: 'POST',
@@ -63,6 +64,37 @@ async function saveCharacterToCloud(character: Character, formData?: CharacterFo
   }
   
   return response.json();
+}
+
+// NEW: Upsert character to cloud (create or update)
+async function upsertCharacterToCloud(id: string, character: Character, formData?: CharacterFormData): Promise<any> {
+  // First try to update existing character
+  try {
+    const response = await fetch(`/api/v1/characters/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: character.name,
+        data: character,
+        formData,
+      }),
+    });
+    
+    if (response.ok) {
+      return response.json();
+    } else if (response.status === 404) {
+      // Character doesn't exist, create it
+      return await saveCharacterToCloud(character, formData);
+    } else {
+      throw new Error(`Failed to update character in cloud: ${response.statusText}`);
+    }
+  } catch (error) {
+    // If update fails, try to create
+    console.warn('Update failed, trying to create:', error);
+    return await saveCharacterToCloud(character, formData);
+  }
 }
 
 async function getCharactersFromCloud(): Promise<any[]> {
@@ -142,11 +174,49 @@ async function getChatSessionsFromCloud(characterId: string): Promise<any[]> {
   return response.json();
 }
 
-// Hybrid Storage Class
+// NEW: Deduplication utility functions
+function deduplicateCharacters(characters: StoredCharacter[]): StoredCharacter[] {
+  const seen = new Map<string, StoredCharacter>();
+  
+  for (const character of characters) {
+    const existingChar = seen.get(character.id);
+    
+    if (!existingChar) {
+      seen.set(character.id, character);
+    } else {
+      // If duplicate found, prefer the newer one or cloud version
+      const existingDate = new Date(existingChar.createdAt).getTime();
+      const currentDate = new Date(character.createdAt).getTime();
+      
+      // Prefer cloud characters over local ones (assuming cloud has precedence)
+      // or prefer newer characters
+      if (currentDate > existingDate) {
+        seen.set(character.id, character);
+      }
+    }
+  }
+  
+  return Array.from(seen.values());
+}
+
+function convertCloudToStoredCharacter(cloudChar: any): StoredCharacter {
+  return {
+    id: cloudChar.id,
+    character: cloudChar.data || cloudChar.character,
+    createdAt: cloudChar.createdAt || new Date().toISOString(),
+    isExample: false, // Cloud characters are never examples
+    formData: cloudChar.formData,
+    hasStoredImage: false // Will be handled separately
+  };
+}
+
+// Hybrid Storage Class with FIXED deduplication
 export class HybridCharacterStorage {
   private user: { id: string } | null = null;
   private initialized = false;
   private syncPromise: Promise<void> | null = null;
+  private lastSyncTime = 0;
+  private readonly SYNC_COOLDOWN = 5000; // 5 seconds between syncs
   
   async initialize(): Promise<void> {
     if (this.initialized) return;
@@ -172,21 +242,23 @@ export class HybridCharacterStorage {
   }
   
   /**
-   * Trigger automatic sync in the background (non-blocking)
+   * FIXED: Trigger automatic sync with cooldown to prevent spam
    */
   private triggerAutoSync(): void {
-    if (this.syncPromise) {
-      console.log('Sync already in progress, skipping...');
+    const now = Date.now();
+    if (this.syncPromise || (now - this.lastSyncTime) < this.SYNC_COOLDOWN) {
+      console.log('Sync already in progress or in cooldown, skipping...');
       return;
     }
     
+    this.lastSyncTime = now;
     this.syncPromise = this.performAutoSync().finally(() => {
       this.syncPromise = null;
     });
   }
   
   /**
-   * Perform automatic sync of local characters to cloud
+   * FIXED: Perform automatic sync with proper duplicate checking
    */
   private async performAutoSync(): Promise<void> {
     try {
@@ -200,26 +272,51 @@ export class HybridCharacterStorage {
         return;
       }
       
+      // Get existing cloud characters to check for duplicates
+      let existingCloudCharacters: any[] = [];
+      try {
+        existingCloudCharacters = await getCharactersFromCloud();
+      } catch (error) {
+        console.warn('Failed to fetch existing cloud characters for sync check:', error);
+        // Continue with sync anyway, API should handle duplicates
+      }
+      
+      const existingCloudIds = new Set(existingCloudCharacters.map(char => char.id));
+      
       let synced = 0;
+      let skipped = 0;
       let failed = 0;
       
       for (const storedChar of userCharacters) {
         try {
-          await saveCharacterToCloud(storedChar.character, storedChar.formData);
-          synced++;
-          console.log(`Synced character: ${storedChar.character.name}`);
+          // Check if character already exists in cloud
+          if (existingCloudIds.has(storedChar.id)) {
+            console.log(`Character ${storedChar.character.name} already exists in cloud, updating...`);
+            await updateCharacterInCloud(storedChar.id, storedChar.character, storedChar.formData);
+            synced++;
+          } else {
+            console.log(`Syncing new character ${storedChar.character.name} to cloud...`);
+            await saveCharacterToCloud(storedChar.character, storedChar.formData);
+            synced++;
+          }
         } catch (error) {
-          failed++;
-          console.warn(`Failed to sync character ${storedChar.character.name}:`, error);
+          // Check if error is due to duplicate (409 conflict)
+          if (error instanceof Error && error.message.includes('409')) {
+            console.log(`Character ${storedChar.character.name} already exists (409), skipping...`);
+            skipped++;
+          } else {
+            failed++;
+            console.warn(`Failed to sync character ${storedChar.character.name}:`, error);
+          }
         }
       }
       
-      console.log(`Auto-sync completed: ${synced} synced, ${failed} failed`);
+      console.log(`Auto-sync completed: ${synced} synced, ${skipped} skipped, ${failed} failed`);
       
       // Emit event for UI updates
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('characters-synced', {
-          detail: { synced, failed, total: userCharacters.length }
+          detail: { synced, skipped, failed, total: userCharacters.length }
         }));
       }
     } catch (error) {
@@ -246,30 +343,48 @@ export class HybridCharacterStorage {
   }
   
   /**
-   * Get all characters - tries cloud first, falls back to local
+   * FIXED: Get all characters with proper deduplication and merging
    */
-  async getCharacters(): Promise<any[]> {
+  async getCharacters(): Promise<StoredCharacter[]> {
     await this.initialize();
     
-    // If user is authenticated and online, try cloud first
+    let cloudCharacters: StoredCharacter[] = [];
+    let localCharacters: StoredCharacter[] = [];
+    
+    // Always get local characters first
+    try {
+      localCharacters = await getLocalCharacters();
+      console.log(`Loaded ${localCharacters.length} characters from local storage`);
+    } catch (error) {
+      console.error('Failed to load local characters:', error);
+    }
+    
+    // If user is authenticated and online, also get cloud characters
     if (this.user && isOnline()) {
       try {
-        const cloudCharacters = await getCharactersFromCloud();
+        const cloudData = await getCharactersFromCloud();
+        cloudCharacters = cloudData.map(convertCloudToStoredCharacter);
         console.log(`Loaded ${cloudCharacters.length} characters from cloud`);
-        return cloudCharacters;
       } catch (error) {
-        console.warn('Failed to load from cloud, falling back to local:', error);
+        console.warn('Failed to load from cloud, using local only:', error);
       }
     }
     
-    // Fallback to local storage
-    const localCharacters = await getLocalCharacters();
-    console.log(`Loaded ${localCharacters.length} characters from local storage`);
-    return localCharacters;
+    // Merge and deduplicate characters
+    // Priority: Cloud characters take precedence over local ones for authenticated users
+    const allCharacters = [...cloudCharacters, ...localCharacters];
+    const deduplicatedCharacters = deduplicateCharacters(allCharacters);
+    
+    console.log(`Total unique characters after deduplication: ${deduplicatedCharacters.length}`);
+    
+    // Sort by creation date (newest first) for consistent ordering
+    return deduplicatedCharacters.sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
   }
   
   /**
-   * Save character - saves to both cloud and local if possible
+   * FIXED: Save character with duplicate checking
    */
   async saveCharacter(
     character: Character, 
@@ -293,8 +408,9 @@ export class HybridCharacterStorage {
     // If authenticated and online, also save to cloud (but not example characters)
     if (this.user && isOnline() && !isExample) {
       try {
-        cloudResult = await saveCharacterToCloud(character, formData);
-        console.log('Character saved to cloud');
+        // Use upsert to handle potential duplicates
+        cloudResult = await upsertCharacterToCloud(localResult.id, character, formData);
+        console.log('Character upserted to cloud');
       } catch (error) {
         console.warn('Failed to save character to cloud:', error);
         // Don't throw - local save succeeded
@@ -305,28 +421,45 @@ export class HybridCharacterStorage {
   }
   
   /**
-   * Get character by ID - tries cloud first, falls back to local
+   * FIXED: Get character by ID with proper cloud/local fallback
    */
-  async getCharacterById(id: string): Promise<any | null> {
+  async getCharacterById(id: string): Promise<StoredCharacter | null> {
     await this.initialize();
     
-    // If user is authenticated and online, try cloud first
+    // Try local first (faster)
+    const localCharacter = await getLocalCharacterById(id);
+    
+    // If user is authenticated and online, also check cloud
     if (this.user && isOnline()) {
       try {
         const cloudCharacter = await getCharacterFromCloud(id);
         if (cloudCharacter) {
-          console.log(`Loaded character ${id} from cloud`);
-          return cloudCharacter;
+          const cloudStored = convertCloudToStoredCharacter(cloudCharacter);
+          
+          // If we have both, prefer the newer one
+          if (localCharacter) {
+            const localDate = new Date(localCharacter.createdAt).getTime();
+            const cloudDate = new Date(cloudStored.createdAt).getTime();
+            
+            if (cloudDate >= localDate) {
+              console.log(`Using cloud version of character ${id} (newer or same age)`);
+              return cloudStored;
+            } else {
+              console.log(`Using local version of character ${id} (newer)`);
+              return localCharacter;
+            }
+          } else {
+            console.log(`Found character ${id} in cloud only`);
+            return cloudStored;
+          }
         }
       } catch (error) {
-        console.warn('Failed to load character from cloud, trying local:', error);
+        console.warn('Failed to load character from cloud, using local:', error);
       }
     }
     
-    // Fallback to local storage
-    const localCharacter = await getLocalCharacterById(id);
     if (localCharacter) {
-      console.log(`Loaded character ${id} from local storage`);
+      console.log(`Found character ${id} in local storage only`);
     }
     return localCharacter;
   }
@@ -337,11 +470,11 @@ export class HybridCharacterStorage {
   async loadCharacterWithImage(id: string): Promise<Character | null> {
     await this.initialize();
     
-    // Try to get character data (cloud first, then local)
+    // Try to get character data (with proper deduplication)
     const storedCharacter = await this.getCharacterById(id);
     if (!storedCharacter) return null;
     
-    const character = JSON.parse(JSON.stringify(storedCharacter.character || storedCharacter.data)) as Character;
+    const character = JSON.parse(JSON.stringify(storedCharacter.character)) as Character;
     
     // Try to load image from local storage first (for performance)
     if (storedCharacter.hasStoredImage || !character.image_data) {
@@ -383,7 +516,7 @@ export class HybridCharacterStorage {
   }
   
   /**
-   * Update character - updates both cloud and local
+   * FIXED: Update character with proper sync
    */
   async updateCharacter(
     id: string, 
@@ -418,7 +551,7 @@ export class HybridCharacterStorage {
   }
   
   /**
-   * Delete character - deletes from both cloud and local
+   * FIXED: Delete character with better sync handling
    */
   async deleteCharacter(id: string): Promise<boolean> {
     await this.initialize();
@@ -450,10 +583,14 @@ export class HybridCharacterStorage {
         cloudSuccess = true;
         console.log('Character deleted from cloud successfully');
       } catch (error) {
-        console.error('Failed to delete character from cloud:', error);
-        // For user characters, cloud deletion failure is concerning but not blocking
-        // since local deletion is the primary concern for user experience
-        cloudSuccess = false;
+        // If character doesn't exist in cloud (404), that's actually success
+        if (error instanceof Error && error.message.includes('404')) {
+          cloudSuccess = true;
+          console.log('Character was not in cloud (404), treating as successful deletion');
+        } else {
+          console.error('Failed to delete character from cloud:', error);
+          cloudSuccess = false;
+        }
       }
     } else if (isExample) {
       // For example characters, we don't need cloud deletion
@@ -483,9 +620,9 @@ export class HybridCharacterStorage {
   }
   
   /**
-   * Sync local changes to cloud (manual sync)
+   * FIXED: Sync local changes to cloud with proper duplicate handling
    */
-  async syncToCloud(): Promise<{ success: number; failed: number }> {
+  async syncToCloud(): Promise<{ success: number; failed: number; skipped: number }> {
     await this.initialize();
     
     if (!this.user || !isOnline()) {
@@ -493,23 +630,49 @@ export class HybridCharacterStorage {
     }
     
     const localCharacters = await getLocalCharacters();
+    const userCharacters = localCharacters.filter(char => !char.isExample);
+    
+    // Get existing cloud characters to check for duplicates
+    let existingCloudCharacters: any[] = [];
+    try {
+      existingCloudCharacters = await getCharactersFromCloud();
+    } catch (error) {
+      console.warn('Failed to fetch existing cloud characters:', error);
+    }
+    
+    const existingCloudIds = new Set(existingCloudCharacters.map(char => char.id));
+    
     let success = 0;
     let failed = 0;
+    let skipped = 0;
     
-    for (const storedChar of localCharacters) {
-      if (storedChar.isExample) continue; // Skip example characters
-      
+    for (const storedChar of userCharacters) {
       try {
-        await saveCharacterToCloud(storedChar.character, storedChar.formData);
-        success++;
+        if (existingCloudIds.has(storedChar.id)) {
+          // Character exists, update it
+          await updateCharacterInCloud(storedChar.id, storedChar.character, storedChar.formData);
+          success++;
+          console.log(`Updated existing character: ${storedChar.character.name}`);
+        } else {
+          // Character doesn't exist, create it
+          await saveCharacterToCloud(storedChar.character, storedChar.formData);
+          success++;
+          console.log(`Created new character: ${storedChar.character.name}`);
+        }
       } catch (error) {
-        console.error(`Failed to sync character ${storedChar.character.name}:`, error);
-        failed++;
+        if (error instanceof Error && error.message.includes('409')) {
+          // Conflict - character already exists
+          skipped++;
+          console.log(`Skipped duplicate character: ${storedChar.character.name}`);
+        } else {
+          console.error(`Failed to sync character ${storedChar.character.name}:`, error);
+          failed++;
+        }
       }
     }
     
-    console.log(`Manual sync completed: ${success} succeeded, ${failed} failed`);
-    return { success, failed };
+    console.log(`Manual sync completed: ${success} succeeded, ${skipped} skipped, ${failed} failed`);
+    return { success, failed, skipped };
   }
 }
 

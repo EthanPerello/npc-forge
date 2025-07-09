@@ -1,3 +1,4 @@
+// src/contexts/character-context.tsx (UPDATED VERSION)
 'use client';
 
 import { 
@@ -6,7 +7,8 @@ import {
   useState, 
   useCallback, 
   ReactNode, 
-  useMemo 
+  useMemo,
+  useEffect 
 } from 'react';
 import { 
   Character, 
@@ -20,12 +22,30 @@ import { DEFAULT_IMAGE_MODEL } from '@/lib/image-models';
 import { hybridCharacterStorage } from '@/lib/hybrid-storage';
 import { downloadJson } from '@/lib/utils';
 import { GENRE_TEMPLATES, getTemplateExample } from '@/lib/templates';
+import { 
+  deduplicateStoredCharacters, 
+  validateCharacterUniqueness,
+  getCharacterStats,
+  checkLibraryHealth,
+  type LibraryHealthCheck,
+  type SyncStatus
+} from '@/lib/character-utils';
+import { StoredCharacter } from '@/lib/character-storage';
 
 interface CharacterContextType {
   character: Character | null;
   formData: CharacterFormData;
   isLoading: boolean;
   error: string | null;
+  
+  // Library management
+  characters: StoredCharacter[];
+  isLoadingLibrary: boolean;
+  libraryError: string | null;
+  libraryHealth: LibraryHealthCheck | null;
+  syncStatus: SyncStatus;
+  
+  // Actions
   updateFormData: (data: Partial<CharacterFormData>) => void;
   resetFormData: () => void;
   generateCharacter: (customFormData?: CharacterFormData) => Promise<void>;
@@ -33,6 +53,13 @@ interface CharacterContextType {
   downloadCharacterJSON: () => void;
   saveToLibrary: (customCharacter?: Character) => Promise<boolean>;
   setCharacter: (character: Character | null | ((prev: Character | null) => Character | null)) => void;
+  
+  // Library actions
+  refreshLibrary: () => Promise<void>;
+  deleteCharacterFromLibrary: (id: string) => Promise<boolean>;
+  syncLibraryToCloud: () => Promise<{ success: number; failed: number; skipped: number }>;
+  checkLibraryHealthStatus: () => void;
+  emergencyFixDuplicates: () => Promise<void>;
 }
 
 // Default form values using undefined instead of empty strings for enum types
@@ -92,6 +119,59 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
   const [formData, setFormData] = useState<CharacterFormData>(defaultFormData);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Library state
+  const [characters, setCharacters] = useState<StoredCharacter[]>([]);
+  const [isLoadingLibrary, setIsLoadingLibrary] = useState<boolean>(false);
+  const [libraryError, setLibraryError] = useState<string | null>(null);
+  const [libraryHealth, setLibraryHealth] = useState<LibraryHealthCheck | null>(null);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>({
+    isAuthenticated: false,
+    isSyncing: false
+  });
+
+  // Initialize hybrid storage and load characters on mount
+  useEffect(() => {
+    const initializeStorage = async () => {
+      try {
+        await hybridCharacterStorage.initialize();
+        await refreshLibrary();
+        
+        // Update sync status
+        const status = hybridCharacterStorage.getSyncStatus();
+        setSyncStatus({
+          ...status,
+          lastSyncTime: Date.now()
+        });
+      } catch (error) {
+        console.error('Failed to initialize storage:', error);
+        setLibraryError('Failed to initialize character storage');
+      }
+    };
+
+    initializeStorage();
+
+    // Listen for sync events
+    const handleCharactersSynced = (event: CustomEvent) => {
+      console.log('Characters synced:', event.detail);
+      refreshLibrary(); // Refresh library after sync
+    };
+
+    const handleCharacterDeleted = (event: CustomEvent) => {
+      console.log('Character deleted:', event.detail);
+      refreshLibrary(); // Refresh library after deletion
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('characters-synced', handleCharactersSynced as EventListener);
+      window.addEventListener('character-deleted', handleCharacterDeleted as EventListener);
+      
+      return () => {
+        window.removeEventListener('characters-synced', handleCharactersSynced as EventListener);
+        window.removeEventListener('character-deleted', handleCharacterDeleted as EventListener);
+      };
+    }
+  }, []);
 
   // Update form data with improved merging logic
   const updateFormData = useCallback((data: Partial<CharacterFormData>) => {
@@ -157,8 +237,149 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     setError(null);
   }, []);
 
-  // FIXED: Generate random character data without updating state
-  // Returns pure random data that can be merged with user preferences
+  // Refresh library with deduplication
+  const refreshLibrary = useCallback(async () => {
+    setIsLoadingLibrary(true);
+    setLibraryError(null);
+    
+    try {
+      console.log('Refreshing character library...');
+      const rawCharacters = await hybridCharacterStorage.getCharacters();
+      
+      // Validate and deduplicate characters
+      const validation = validateCharacterUniqueness(rawCharacters);
+      
+      let processedCharacters = rawCharacters;
+      
+      if (!validation.isValid) {
+        console.warn('Found duplicate characters, deduplicating:', validation.duplicates);
+        processedCharacters = deduplicateStoredCharacters(rawCharacters, {
+          preferCloud: true,
+          preferNewer: true,
+          strictIdMatch: true,
+          fuzzyNameMatch: false
+        });
+        
+        console.log(`Deduplicated: ${rawCharacters.length} -> ${processedCharacters.length} characters`);
+      }
+      
+      setCharacters(processedCharacters);
+      
+      // Update health check
+      const health = checkLibraryHealth(processedCharacters);
+      setLibraryHealth(health);
+      
+      if (!health.isHealthy) {
+        console.warn('Library health issues detected:', health.issues);
+      }
+      
+      // Update sync status
+      const status = hybridCharacterStorage.getSyncStatus();
+      setSyncStatus(prev => ({
+        ...status,
+        lastSyncTime: Date.now(),
+        hasConflicts: !validation.isValid
+      }));
+      
+      console.log(`Library refreshed: ${processedCharacters.length} characters loaded`);
+    } catch (error) {
+      console.error('Failed to refresh library:', error);
+      setLibraryError(error instanceof Error ? error.message : 'Failed to load character library');
+    } finally {
+      setIsLoadingLibrary(false);
+    }
+  }, []);
+
+  // Delete character from library
+  const deleteCharacterFromLibrary = useCallback(async (id: string): Promise<boolean> => {
+    try {
+      console.log(`Deleting character from library: ${id}`);
+      const success = await hybridCharacterStorage.deleteCharacter(id);
+      
+      if (success) {
+        // Update local state immediately for better UX
+        setCharacters(prev => prev.filter(char => char.id !== id));
+        console.log('Character deleted successfully');
+      }
+      
+      return success;
+    } catch (error) {
+      console.error('Failed to delete character:', error);
+      return false;
+    }
+  }, []);
+
+  // Sync library to cloud
+  const syncLibraryToCloud = useCallback(async () => {
+    setSyncStatus(prev => ({ ...prev, isSyncing: true }));
+    
+    try {
+      const result = await hybridCharacterStorage.syncToCloud();
+      
+      // Refresh library after sync
+      await refreshLibrary();
+      
+      setSyncStatus(prev => ({
+        ...prev,
+        isSyncing: false,
+        lastSyncTime: Date.now()
+      }));
+      
+      return result;
+    } catch (error) {
+      console.error('Failed to sync to cloud:', error);
+      setSyncStatus(prev => ({ ...prev, isSyncing: false }));
+      throw error;
+    }
+  }, [refreshLibrary]);
+
+  // Check library health
+  const checkLibraryHealthStatus = useCallback(() => {
+    const health = checkLibraryHealth(characters);
+    setLibraryHealth(health);
+    
+    if (!health.isHealthy) {
+      console.warn('Library health check failed:', health);
+    }
+    
+    return health;
+  }, [characters]);
+
+  // Emergency fix for duplicates
+  const emergencyFixDuplicates = useCallback(async () => {
+    console.log('Starting emergency duplicate fix...');
+    
+    try {
+      setIsLoadingLibrary(true);
+      
+      // Get current characters and deduplicate aggressively
+      const rawCharacters = await hybridCharacterStorage.getCharacters();
+      const deduplicatedCharacters = deduplicateStoredCharacters(rawCharacters, {
+        preferCloud: true,
+        preferNewer: true,
+        strictIdMatch: true,
+        fuzzyNameMatch: false
+      });
+      
+      console.log(`Emergency fix: ${rawCharacters.length} -> ${deduplicatedCharacters.length} characters`);
+      
+      // Update state immediately
+      setCharacters(deduplicatedCharacters);
+      
+      // Update health status
+      const health = checkLibraryHealth(deduplicatedCharacters);
+      setLibraryHealth(health);
+      
+      console.log('Emergency duplicate fix completed');
+    } catch (error) {
+      console.error('Emergency fix failed:', error);
+      setLibraryError('Failed to fix duplicates');
+    } finally {
+      setIsLoadingLibrary(false);
+    }
+  }, []);
+
+  // Generate random character data without updating state
   const generateRandomCharacter = useCallback(async (): Promise<CharacterFormData> => {
     try {
       // Select a random genre template
@@ -191,11 +412,10 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
       const alignment = alignments[Math.floor(Math.random() * alignments.length)];
       const relationship = relationships[Math.floor(Math.random() * relationships.length)];
       
-      // Create random data object - NOTE: Don't include content type flags
-      // These will be preserved from the user's current selections
+      // Create random data object
       const randomData: CharacterFormData = {
         ...defaultFormData,
-        description,  // The key random element - description and genre
+        description,
         genre: randomGenre.id as Genre,
         sub_genre: randomGenre.subGenres && randomGenre.subGenres.length > 0 
           ? randomGenre.subGenres[Math.floor(Math.random() * randomGenre.subGenres.length)].id 
@@ -204,10 +424,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
         age_group: age,
         moral_alignment: alignment,
         relationship_to_player: relationship,
-        // Use standard model for random generation
         model: 'gpt-4o-mini',
-        // DON'T set content type flags - these will be merged from user preferences
-        // include_quests, include_dialogue, include_items, include_portrait will be preserved
         portrait_options: {
           art_style: '',
           mood: '',
@@ -217,13 +434,9 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
         }
       };
       
-      // DON'T update state here - let the caller handle merging and state updates
-      // This prevents race conditions and preserves user selections properly
-      
       console.log("Generated random character data with description:", description.substring(0, 30) + "...");
       console.log("Random character genre:", randomGenre.id);
       
-      // Return the random data object for merging
       return randomData;
     } catch (error) {
       console.error("Error generating random character:", error);
@@ -243,14 +456,12 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
         }
       };
       
-      // Return the fallback data (don't update state)
       return fallbackData;
     }
   }, []);
 
   // Generate character with improved error handling
   const generateCharacter = useCallback(async (customFormData?: CharacterFormData) => {
-    // Prevent generating if already in progress
     if (isLoading) {
       console.log("Generation already in progress, ignoring request");
       return;
@@ -260,30 +471,19 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     try {
-      // Use custom form data if provided, otherwise use current state
       const dataToUse = customFormData || formData;
       
-      // Update form data state if custom data was provided
-      // This ensures the UI reflects the data being used for generation
       if (customFormData) {
         console.log("Updating form data with custom data for generation");
         setFormData(customFormData);
       }
       
-      // Extra validation for description field
       if (!dataToUse.description || dataToUse.description.trim() === '') {
         throw new Error("Character description is required. Please describe your character or use random generation.");
       }
       
       console.log("Generating character with description:", dataToUse.description.substring(0, 50) + "...");
-      console.log("Content types enabled:", {
-        portrait: dataToUse.include_portrait,
-        quests: dataToUse.include_quests,
-        dialogue: dataToUse.include_dialogue,
-        items: dataToUse.include_items
-      });
       
-      // Call the API endpoint
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: {
@@ -314,9 +514,8 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     downloadJson(character, `${character.name.replace(/\s+/g, '_').toLowerCase()}.json`);
   }, [character]);
   
-  // Save to library - Updated to use hybrid storage
+  // Save to library - Updated to use hybrid storage with deduplication safeguards
   const saveToLibrary = useCallback(async (customCharacter?: Character): Promise<boolean> => {
-    // Use the provided character if available, otherwise use state
     const characterToSave = customCharacter || character;
     
     if (!characterToSave) {
@@ -325,18 +524,25 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     }
     
     console.log('Saving character to library:', characterToSave.name);
-    console.log('Character has image data:', !!characterToSave.image_data);
     
     try {
-      // Create a copy of the character to avoid mutating the original
+      // Check for potential duplicates by name before saving
+      const existingChars = characters.filter(c => 
+        c.character.name.toLowerCase().trim() === characterToSave.name.toLowerCase().trim()
+      );
+      
+      if (existingChars.length > 0) {
+        console.warn(`Found ${existingChars.length} existing characters with similar name: ${characterToSave.name}`);
+        // Continue anyway - let the user decide if they want duplicates by name
+      }
+      
       const characterCopy = JSON.parse(JSON.stringify(characterToSave)) as Character;
       
-      // If no image data but has image URL and include_portrait was true, try to fetch it
+      // Handle image fetching if needed
       if (!characterCopy.image_data && characterCopy.image_url && formData.include_portrait) {
         console.log('Character has image URL but no data, attempting to fetch');
         
         try {
-          // Try to fetch the image through the proxy endpoint
           const response = await fetch(`/api/proxy-image?url=${encodeURIComponent(characterCopy.image_url)}`);
           if (response.ok) {
             const data = await response.json();
@@ -347,22 +553,22 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
           }
         } catch (imgError) {
           console.error('Failed to fetch image from URL:', imgError);
-          // Continue without the image data if fetch fails
         }
       }
       
-      // Use hybrid storage instead of direct IndexedDB
       console.log('Saving character using hybrid storage...');
       const result = await hybridCharacterStorage.saveCharacter(characterCopy, formData);
       
-      console.log('Character saved successfully with hybrid storage');
+      // Refresh library to show the new character and handle any deduplication
+      await refreshLibrary();
       
+      console.log('Character saved successfully');
       return !!result;
     } catch (error) {
       console.error('Error saving character to library:', error);
       return false;
     }
-  }, [character, formData]);
+  }, [character, formData, characters, refreshLibrary]);
 
   // Create the context value
   const contextValue = useMemo(() => ({
@@ -370,6 +576,15 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     formData,
     isLoading,
     error,
+    
+    // Library state
+    characters,
+    isLoadingLibrary,
+    libraryError,
+    libraryHealth,
+    syncStatus,
+    
+    // Actions
     updateFormData,
     resetFormData,
     generateRandomCharacter,
@@ -377,17 +592,34 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     downloadCharacterJSON,
     saveToLibrary,
     setCharacter,
+    
+    // Library actions
+    refreshLibrary,
+    deleteCharacterFromLibrary,
+    syncLibraryToCloud,
+    checkLibraryHealthStatus,
+    emergencyFixDuplicates,
   }), [
     character, 
     formData, 
     isLoading, 
-    error, 
+    error,
+    characters,
+    isLoadingLibrary,
+    libraryError,
+    libraryHealth,
+    syncStatus,
     updateFormData, 
     resetFormData,
     generateRandomCharacter,
     generateCharacter,
     downloadCharacterJSON,
-    saveToLibrary
+    saveToLibrary,
+    refreshLibrary,
+    deleteCharacterFromLibrary,
+    syncLibraryToCloud,
+    checkLibraryHealthStatus,
+    emergencyFixDuplicates
   ]);
 
   return (
