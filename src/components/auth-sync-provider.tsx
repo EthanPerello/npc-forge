@@ -1,4 +1,4 @@
-// src/components/auth-sync-provider.tsx
+// src/components/auth-sync-provider.tsx (FIXED)
 'use client';
 
 import { useEffect, useRef } from 'react';
@@ -27,7 +27,7 @@ export function AuthSyncProvider({ children }: AuthSyncProviderProps) {
       // Trigger the hybrid storage to refresh authentication and sync
       hybridCharacterStorage.refreshAuth().then(() => {
         console.log('Authentication refreshed and sync triggered');
-      }).catch((error) => {
+      }).catch((error: Error) => {
         console.error('Failed to refresh authentication:', error);
       });
     }

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Character duplication in library caused by sync conflicts between local and cloud storage
+- Auto-sync creating duplicate characters when users sign in
+- TypeScript errors in hybrid storage and character context components
+
+### Added
+- Automatic character deduplication with intelligent conflict resolution
+- Sync protection to prevent race conditions and duplicate creation
+
+### Changed
+- Improved hybrid storage to properly merge and deduplicate characters from multiple sources
+
 ## [0.32.0] - 2025-07-01
 
 ### Added

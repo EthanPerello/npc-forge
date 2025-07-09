@@ -1,4 +1,4 @@
-// src/app/library/page.tsx
+// src/app/library/page.tsx (FIXED)
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -89,7 +89,7 @@ export default function CharacterLibraryPage() {
         setImageLoading(true);
         try {
           // Try up to 3 times to load the character with image
-          let character = null;
+          let character: Character | null = null;
           let attempts = 0;
           const maxAttempts = 3;
           
@@ -102,7 +102,7 @@ export default function CharacterLibraryPage() {
               }
               
               character = await hybridCharacterStorage.loadCharacterWithImage(selectedCharacter.id);
-            } catch (attemptError) {
+            } catch (attemptError: any) {
               console.warn(`Attempt ${attempts} failed:`, attemptError);
               // Continue to next attempt
             }
@@ -116,7 +116,7 @@ export default function CharacterLibraryPage() {
             console.warn("All attempts to load character with image failed, using stored character");
             setFullCharacter({...selectedCharacter.character});
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error('Error loading character with image:', error);
           // Fallback to stored character
           setFullCharacter({...selectedCharacter.character});
@@ -638,20 +638,20 @@ export default function CharacterLibraryPage() {
                 isExample={storedChar.isExample} // ✅ FIXED: Now passing the isExample prop
                 onDownload={(e) => {
                   e.stopPropagation();
-                  hybridCharacterStorage.loadCharacterWithImage(storedChar.id).then(fullChar => {
+                  hybridCharacterStorage.loadCharacterWithImage(storedChar.id).then((fullChar: Character | null) => {
                     if (fullChar) {
                       handleDownloadCharacter(fullChar);
                     } else {
                       handleDownloadCharacter(storedChar.character);
                     }
-                  }).catch(error => {
+                  }).catch((error: any) => {
                     console.error('Error loading character for download:', error);
                     handleDownloadCharacter(storedChar.character);
                   });
                 }}
                 onDownloadImage={(e) => {
                   e.stopPropagation();
-                  hybridCharacterStorage.loadCharacterWithImage(storedChar.id).then(fullChar => {
+                  hybridCharacterStorage.loadCharacterWithImage(storedChar.id).then((fullChar: Character | null) => {
                     const imageData = fullChar?.image_data || storedChar.character.image_url;
                     if (imageData) {
                       const link = document.createElement('a');
@@ -663,7 +663,7 @@ export default function CharacterLibraryPage() {
                     } else {
                       alert('No image available to download');
                     }
-                  }).catch(error => {
+                  }).catch((error: any) => {
                     console.error('Error loading image for download:', error);
                     alert('Failed to download image');
                   });
