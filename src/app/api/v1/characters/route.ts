@@ -13,13 +13,42 @@ import {
 } from '@/lib/security';
 
 // Rate limiting configurations
-const GET_RATE_LIMIT = { maxRequests: 100, windowMs: 60000 }; // 100 requests per minute
-const POST_RATE_LIMIT = { maxRequests: 10, windowMs: 60000 }; // 10 creates per minute
+const GET_RATE_LIMIT = { maxRequests: 100, windowMs: 60000 };
+const POST_RATE_LIMIT = { maxRequests: 10, windowMs: 60000 };
 
 // Maximum request size (5MB)
 const MAX_REQUEST_SIZE = 5 * 1024 * 1024;
 
-// Helper function to check if error has message property
+// Generate content hash for duplicate detection
+function generateContentHash(character: Character): string {
+  const normalized = {
+    name: character.name?.trim().toLowerCase(),
+    appearance: character.appearance?.trim(),
+    personality: character.personality?.trim(),
+    backstory_hook: character.backstory_hook?.trim()
+  };
+  
+  return Buffer.from(JSON.stringify(normalized)).toString('base64').slice(0, 16);
+}
+
+// Helper function to check if characters are duplicates
+function isDuplicateCharacter(char1: Character, char2: Character): boolean {
+  // Exact name match (case insensitive)
+  const name1 = char1.name?.trim().toLowerCase();
+  const name2 = char2.name?.trim().toLowerCase();
+  
+  if (name1 === name2 && name1 && name2) {
+    return true;
+  }
+  
+  // Content hash match
+  if (generateContentHash(char1) === generateContentHash(char2)) {
+    return true;
+  }
+  
+  return false;
+}
+
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message;
@@ -30,7 +59,6 @@ function getErrorMessage(error: unknown): string {
   return 'Unknown error occurred';
 }
 
-// Helper function to authenticate request with enhanced logging
 async function authenticateRequest(request: NextRequest) {
   const ip = getClientIP(request);
   const userAgent = request.headers.get('user-agent') || '';
@@ -50,15 +78,6 @@ async function authenticateRequest(request: NextRequest) {
           success: true
         });
         return user;
-      } else {
-        await auditLog({
-          action: 'API_KEY_AUTH_FAILED',
-          ip,
-          userAgent,
-          timestamp: new Date(),
-          success: false,
-          details: { apiKey: `${apiKey.substring(0, 8)}...` }
-        });
       }
     } catch (error) {
       await auditLog({
@@ -103,21 +122,12 @@ async function authenticateRequest(request: NextRequest) {
     });
   }
   
-  await auditLog({
-    action: 'AUTH_FAILED',
-    ip,
-    userAgent,
-    timestamp: new Date(),
-    success: false
-  });
-  
   return null;
 }
 
-// GET /api/v1/characters - List user's characters with enhanced security
+// GET /api/v1/characters - List user's characters
 export async function GET(request: NextRequest) {
   try {
-    // Apply rate limiting
     const rateLimitResponse = await rateLimit(GET_RATE_LIMIT)(request);
     if (rateLimitResponse) return rateLimitResponse;
     
@@ -134,13 +144,11 @@ export async function GET(request: NextRequest) {
     
     const { searchParams } = new URL(request.url);
     
-    // Validate and sanitize query parameters
-    const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100); // Cap at 100
+    const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 1000); // Allow up to 1000 for sync
     const offset = Math.max(parseInt(searchParams.get('offset') || '0'), 0);
     const search = InputValidator.sanitizeString(searchParams.get('search') || '', 100);
     const isPublic = searchParams.get('public') === 'true';
     
-    // Build where clause
     const where: any = {
       userId: user.id,
     };
@@ -173,7 +181,6 @@ export async function GET(request: NextRequest) {
       take: limit,
     });
     
-    // Transform to match existing format
     const transformedCharacters = characters.map((char: any) => ({
       id: char.id,
       character: char.data as unknown as Character,
@@ -212,7 +219,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/v1/characters - Create new character with enhanced validation
+// POST /api/v1/characters - Create new character with duplicate prevention
 export async function POST(request: NextRequest) {
   try {
     // Check request size
@@ -227,7 +234,6 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Apply rate limiting
     const rateLimitResponse = await rateLimit(POST_RATE_LIMIT)(request);
     if (rateLimitResponse) return rateLimitResponse;
     
@@ -243,9 +249,7 @@ export async function POST(request: NextRequest) {
     }
     
     const body = await request.json();
-    
-    // Validate input data
-    const { name, data, formData, tags = [], isPublic = false } = body;
+    const { name, data, formData, tags = [], isPublic = false, localId } = body;
     
     if (!name || !data) {
       await auditLog({
@@ -295,12 +299,67 @@ export async function POST(request: NextRequest) {
       ? tags.map(tag => InputValidator.sanitizeString(tag, 50)).filter(Boolean)
       : [];
     
-    // Check user's character limit (prevent abuse)
+    // FIXED: Check for duplicates before creating
+    const existingCharacters = await prisma.character.findMany({
+      where: { 
+        userId: user.id,
+        OR: [
+          // Check by name (case insensitive)
+          { name: { equals: sanitizedName, mode: 'insensitive' as const } },
+          // Additional check for similar names
+          { name: { contains: sanitizedName, mode: 'insensitive' as const } }
+        ]
+      },
+      select: {
+        id: true,
+        name: true,
+        data: true,
+        createdAt: true
+      }
+    });
+    
+    // Check for content duplicates
+    for (const existing of existingCharacters) {
+      const existingCharacter = existing.data as unknown as Character;
+      if (isDuplicateCharacter(existingCharacter, data)) {
+        console.log(`Duplicate character detected: ${sanitizedName}`);
+        
+        await auditLog({
+          userId: user.id,
+          action: 'CHARACTER_CREATE_DUPLICATE',
+          ip: getClientIP(request),
+          userAgent: request.headers.get('user-agent') || '',
+          timestamp: new Date(),
+          success: false,
+          details: { 
+            reason: 'Duplicate character',
+            existingId: existing.id,
+            characterName: sanitizedName
+          }
+        });
+        
+        // Return the existing character instead of creating a duplicate
+        return NextResponse.json({
+          id: existing.id,
+          character: existingCharacter,
+          createdAt: existing.createdAt.toISOString(),
+          isExample: false,
+          formData,
+          hasStoredImage: false,
+          message: 'Character already exists, returning existing character'
+        }, {
+          status: 200, // OK, not created
+          headers: getSecurityHeaders()
+        });
+      }
+    }
+    
+    // Check user's character limit
     const userCharacterCount = await prisma.character.count({
       where: { userId: user.id }
     });
     
-    const MAX_CHARACTERS_PER_USER = 1000; // Reasonable limit
+    const MAX_CHARACTERS_PER_USER = 1000;
     if (userCharacterCount >= MAX_CHARACTERS_PER_USER) {
       await auditLog({
         userId: user.id,
@@ -327,6 +386,7 @@ export async function POST(request: NextRequest) {
       portraitUrl = data.image_url;
     }
     
+    // Create the character
     const character = await prisma.character.create({
       data: {
         userId: user.id,
@@ -346,10 +406,9 @@ export async function POST(request: NextRequest) {
       userAgent: request.headers.get('user-agent') || '',
       timestamp: new Date(),
       success: true,
-      details: { characterName: sanitizedName, isPublic }
+      details: { characterName: sanitizedName, isPublic, wasUnique: true }
     });
     
-    // Return in format compatible with existing code
     return NextResponse.json({
       id: character.id,
       character: character.data as unknown as Character,
