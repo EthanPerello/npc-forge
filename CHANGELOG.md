@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Supabase Storage integration for character portraits with automatic cloud upload and hybrid local/cloud storage
+- Automatic background image migration system that seamlessly moves existing local images to cloud storage when users sign in
+
+### Changed
+- Image storage system upgraded from IndexedDB-only to hybrid Supabase Storage + IndexedDB architecture
+- Character portraits now automatically upload to cloud storage for authenticated users while maintaining offline fallback
+
 ## [0.33.0] - 2025-07-12
 
 ### Added
@@ -19,7 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Character sync repeatedly uploading identical characters on every sync operation
 - Database storage quota issues from excessive duplicate character records
 - API endpoints creating new characters instead of returning existing duplicates when content matches
-- TypeScript compilation errors in character cleanup and storage utilities
 
 ## [0.32.0] - 2025-07-01
 
